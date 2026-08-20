@@ -14,10 +14,14 @@ from pathlib import Path
 import re
 import tempfile
 from typing import Any
+from urllib.parse import unquote, urlsplit
 
 SCHEMA_NAME = "egohygiene.repository-report-summary/v1"
 SEVERITY_ORDER = ("unknown", "low", "medium", "high", "critical")
 SCORE_PATTERN = re.compile(r"^score is (?P<score>-?\d+):", re.IGNORECASE)
+REPOSITORY_PATTERN = re.compile(
+    r"^(?!\.{1,2}/)(?![^/]+/\.{1,2}$)[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+)
 
 
 class ReportInputError(ValueError):
@@ -153,7 +157,7 @@ def load_object(path: Path, label: str) -> dict[str, Any]:
     """Load one required JSON object with a useful contract error."""
 
     if not path.is_file() or path.stat().st_size == 0:
-        raise FileNotFoundError(f"{label} is unavailable: {path}")
+        raise FileNotFoundError(f"{label} is unavailable")
     try:
         value = json.loads(
             path.read_text(encoding="utf-8"),
@@ -161,8 +165,10 @@ def load_object(path: Path, label: str) -> dict[str, Any]:
         )
     except ReportInputError:
         raise
-    except (OSError, json.JSONDecodeError, RecursionError) as error:
-        raise ReportInputError(f"{label} is malformed: {error}") from error
+    except OSError as error:
+        raise ReportInputError(f"{label} is unreadable") from error
+    except (json.JSONDecodeError, RecursionError) as error:
+        raise ReportInputError(f"{label} is malformed JSON") from error
     if not isinstance(value, dict):
         raise ReportInputError(f"{label} must contain a JSON object")
     ensure_finite_json(value, label)
@@ -188,6 +194,40 @@ def format_timestamp(value: datetime) -> str:
     """Render one datetime as a stable UTC RFC 3339 value."""
 
     return value.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def validate_public_https_url(value: str, label: str, *, origin_only: bool = False) -> str:
+    """Validate a credential-free public HTTPS URL without queries or fragments."""
+
+    if "\\" in value or any(character.isspace() for character in value):
+        raise ReportInputError(
+            f"{label} must be a credential-free HTTPS URL without a query or fragment"
+        )
+    try:
+        parsed = urlsplit(value)
+        parsed.port
+    except ValueError as error:
+        raise ReportInputError(f"{label} must be a valid HTTPS URL") from error
+    if re.search(
+        r"(?i)(?:github_pat_|gh[pousr]_|(?:token|password|secret)\s*[:=])",
+        unquote(value),
+    ):
+        raise ReportInputError(f"{label} must not contain secret-like data")
+    if (
+        parsed.scheme != "https"
+        or not parsed.hostname
+        or parsed.port not in {None, 443}
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.query
+        or parsed.fragment
+    ):
+        raise ReportInputError(
+            f"{label} must be a credential-free HTTPS URL without a query or fragment"
+        )
+    if origin_only and parsed.path not in {"", "/"}:
+        raise ReportInputError(f"{label} must identify an HTTPS origin")
+    return value.rstrip("/")
 
 
 def unknown_findings() -> dict[str, Any]:
@@ -272,6 +312,8 @@ def common_summary(
 ) -> dict[str, Any]:
     """Create the common, versioned portion of a producer summary."""
 
+    if not REPOSITORY_PATTERN.fullmatch(repository):
+        raise ReportInputError("repository must use owner/name form")
     if not re.fullmatch(r"[0-9a-f]{40}", commit):
         raise ReportInputError("commit must be a full, lowercase 40-character SHA")
     if (
@@ -288,6 +330,14 @@ def common_summary(
         expires_at = generated_at + timedelta(days=stale_after_days)
     except OverflowError as error:
         raise ReportInputError("stale-after-days produces an out-of-range expiry") from error
+    validated_server_url = validate_public_https_url(
+        server_url,
+        "server-url",
+        origin_only=True,
+    )
+    validated_detail_url = (
+        validate_public_https_url(detail_url, "detail-url") if detail_url else None
+    )
     return {
         "schema": SCHEMA_NAME,
         "schema_version": 1,
@@ -311,9 +361,9 @@ def common_summary(
             producer=producer,
             repository=repository,
             commit=commit,
-            server_url=server_url,
+            server_url=validated_server_url,
             run_id=run_id,
-            detail_url=detail_url,
+            detail_url=validated_detail_url,
         ),
     }
 
@@ -702,11 +752,17 @@ def normalize(args: argparse.Namespace) -> dict[str, Any]:
                 except (FileNotFoundError, ReportInputError):
                     api_document = None
             normalize_scorecard(document, api_document, summary)
-    except FileNotFoundError as error:
-        summary["execution"] = {"state": "unknown", "message": str(error)}
+    except FileNotFoundError:
+        summary["execution"] = {
+            "state": "unknown",
+            "message": "Producer input is unavailable.",
+        }
         summary[args.producer] = {"status": "unavailable"}
-    except (ReportInputError, TypeError, AttributeError, KeyError, OverflowError) as error:
-        summary["execution"] = {"state": "failure", "message": str(error)}
+    except (ReportInputError, TypeError, AttributeError, KeyError, OverflowError):
+        summary["execution"] = {
+            "state": "failure",
+            "message": "Producer input is invalid.",
+        }
         summary["findings"] = unknown_findings()
         summary[args.producer] = {"status": "invalid"}
     return summary

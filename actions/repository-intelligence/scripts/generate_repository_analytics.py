@@ -29,6 +29,7 @@ DEFAULT_EXCLUDED_PATHS = [
     ".mypy_cache",
     ".ruff_cache",
     ".reports",
+    ".site",
     "docs/generated",
     "node_modules",
     "vendor",
@@ -36,7 +37,6 @@ DEFAULT_EXCLUDED_PATHS = [
     "build",
     "coverage",
     "__pycache__",
-    "site",
     "target",
 ]
 RELATIVE_SINCE = re.compile(
@@ -181,8 +181,7 @@ def collect_commits(
             "log",
             revision,
             f"--since={iso_timestamp(since)}",
-            "--use-mailmap",
-            "--format=%H%x1f%aI%x1f%P%x1f%aN%x1f%aE%x1e",
+            "--format=%H%x1f%aI%x1f%P%x1f%an%x1f%ae%x1e",
         ],
     ).decode("utf-8", errors="replace")
     commits: list[JsonObject] = []

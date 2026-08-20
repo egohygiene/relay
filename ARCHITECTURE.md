@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-08-19
+updated: 2026-08-20
 governed_by:
   - architecture-architecture
 depends_on:
@@ -102,7 +102,11 @@ The architecture favors independently usable local and self-hosted operation. Op
 
 ## Evidence and uncertainty
 
-- **Observed:** Relay now contains a machine-readable action catalog, three independently consumable composite actions, a reusable artifact workflow, validation gates, and a reviewed `release.json`-driven release workflow with manual recovery. Cross-repository consumer proof remains pending.
+- **Observed:** Relay contains a machine-readable action catalog, three
+  independently consumable composite actions, a reusable artifact workflow,
+  validation gates, and a `release.json`-driven release workflow with manual
+  recovery. Empathy, Akashic, and Optiflow have existing Repository Intelligence
+  integrations; their migrations remain planned pilots for the hardened package.
 - **Decided for this draft:** The repository owns the bounded concern described here and participates through versioned contracts.
 - **Proposed:** Target systems and later roadmap phases remain proposals until accepted and implemented.
 - **Open question:** Which additional reusable producers should join the repository-wide release unit after v1?

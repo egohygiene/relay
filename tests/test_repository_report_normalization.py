@@ -116,9 +116,12 @@ class RepositoryReportNormalizationTests(unittest.TestCase):
         self.assertEqual(summary["scorecard"]["check_source"], "sarif")
 
     def test_missing_input_is_unknown_instead_of_green(self) -> None:
-        summary = normalizer.normalize(arguments("osv", FIXTURE_ROOT / "missing.json"))
+        missing = FIXTURE_ROOT / "missing/private.json"
+        summary = normalizer.normalize(arguments("osv", missing))
 
         self.assertEqual(summary["execution"]["state"], "unknown")
+        self.assertEqual(summary["execution"]["message"], "Producer input is unavailable.")
+        self.assertNotIn(str(missing), json.dumps(summary))
         self.assertEqual(summary["findings"]["state"], "unknown")
         self.assertEqual(summary["osv"]["status"], "unavailable")
 
@@ -129,6 +132,8 @@ class RepositoryReportNormalizationTests(unittest.TestCase):
             summary = normalizer.normalize(arguments("scorecard", malformed))
 
         self.assertEqual(summary["execution"]["state"], "failure")
+        self.assertEqual(summary["execution"]["message"], "Producer input is invalid.")
+        self.assertNotIn(str(malformed), json.dumps(summary))
         self.assertEqual(summary["findings"]["state"], "unknown")
         self.assertEqual(summary["scorecard"]["status"], "invalid")
 
@@ -221,6 +226,38 @@ class RepositoryReportNormalizationTests(unittest.TestCase):
     def test_same_inputs_produce_the_same_summary(self) -> None:
         args = arguments("osv", FIXTURE_ROOT / "osv-success.json")
         self.assertEqual(normalizer.normalize(args), normalizer.normalize(args))
+
+    def test_public_url_validation_rejects_credentials_queries_and_fragments(self) -> None:
+        for value in (
+            "https://user:token@example.test/report",
+            "https://example.test/report?token=fake",
+            "https://example.test/report#session",
+            "https://example.test\\private/report",
+            "https://example.test/private report",
+            "https://[broken/report",
+            "https://example.test/%67%68%70%5fAAAAAAAAAAAAAAAAAAAA",
+            "https://example.test:444/report",
+            "http://example.test/report",
+        ):
+            with self.subTest(value=value), self.assertRaises(normalizer.ReportInputError):
+                normalizer.validate_public_https_url(value, "detail-url")
+
+        self.assertEqual(
+            normalizer.validate_public_https_url(
+                "https://example.test/report",
+                "detail-url",
+            ),
+            "https://example.test/report",
+        )
+
+    def test_repository_segments_must_not_be_dot_paths(self) -> None:
+        for repository in ("../repo", "owner/..", "./repo", "owner/."):
+            args = arguments("osv", FIXTURE_ROOT / "osv-success.json")
+            args.repository = repository
+            with self.subTest(repository=repository), self.assertRaises(
+                normalizer.ReportInputError
+            ):
+                normalizer.normalize(args)
 
     def test_checked_in_schema_declares_the_common_contract(self) -> None:
         schema = json.loads(

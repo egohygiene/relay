@@ -21,6 +21,8 @@ DEFAULT_EXCLUDED_PATHS = [
     ".staging",
     ".cache",
     ".venv",
+    ".reports",
+    ".site",
     "docs/generated",
     "node_modules",
     "vendor",
@@ -28,7 +30,6 @@ DEFAULT_EXCLUDED_PATHS = [
     "build",
     "coverage",
     "__pycache__",
-    "site",
 ]
 
 TREE_SCHEMA = "egohygiene.repository-tree/v1"

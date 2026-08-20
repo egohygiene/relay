@@ -54,6 +54,24 @@ class ActionCatalogTests(unittest.TestCase):
 
         self.assertIn("^[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$", action)
         self.assertIn("reports-directory and output-directory must not overlap", action)
+        self.assertIn("repository must not override the GitHub workflow repository", action)
+        self.assertEqual(
+            action.count(
+                "${INPUT_WORK_DIRECTORY},${INPUT_REPORTS_DIRECTORY},${INPUT_OUTPUT_DIRECTORY}"
+            ),
+            2,
+        )
+        workflow_identity = action.index(
+            'if [[ "${RELAY_WORKFLOW_REPOSITORY}" == "egohygiene/relay"'
+        )
+        direct_action_identity = action.index(
+            'elif [[ "${generator_repository}" == "egohygiene/relay"'
+        )
+        self.assertLess(workflow_identity, direct_action_identity)
+        self.assertIn(
+            "egohygiene/relay/.github/workflows/repository-intelligence.yml@*",
+            action,
+        )
         self.assertIn("INPUT_MAX_DEPTH > 20", action)
 
     def test_validation_and_release_gates_are_present(self) -> None:
@@ -63,11 +81,16 @@ class ActionCatalogTests(unittest.TestCase):
         release = (REPOSITORY_ROOT / ".github/workflows/release.yml").read_text(
             encoding="utf-8"
         )
+        reusable = (
+            REPOSITORY_ROOT / ".github/workflows/repository-intelligence.yml"
+        ).read_text(encoding="utf-8")
 
         self.assertIn("python3 -m unittest discover", validation)
         self.assertIn("python3 -m compileall", validation)
         self.assertIn("bash -n", validation)
         self.assertIn("uses: $/.github/workflows/repository-intelligence.yml", validation)
+        self.assertIn("Verify reusable-workflow generator provenance", reusable)
+        self.assertIn('EXPECTED_WORKFLOW_REF: "${{ job.workflow_ref }}"', reusable)
         self.assertIn("workflow_dispatch:", release)
         self.assertIn("release.json", release)
         self.assertIn("git tag --annotate", release)
@@ -90,6 +113,25 @@ class ActionCatalogTests(unittest.TestCase):
                 (REPOSITORY_ROOT / relative_path).read_text(encoding="utf-8")
             )
             self.assertEqual(document["$id"], expected_id)
+
+    def test_new_provenance_contract_uses_the_relay_namespace(self) -> None:
+        document = json.loads(
+            (
+                REPOSITORY_ROOT
+                / "actions/repository-intelligence/schemas/"
+                "repository-intelligence-provenance.schema.json"
+            ).read_text(encoding="utf-8")
+        )
+
+        self.assertEqual(
+            document["$id"],
+            "https://egohygiene.github.io/relay/contracts/"
+            "repository-intelligence-provenance/v1/schema.json",
+        )
+        self.assertEqual(
+            document["properties"]["schema"]["const"],
+            "egohygiene.relay.repository-intelligence-provenance/v1",
+        )
 
 
 if __name__ == "__main__":

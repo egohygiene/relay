@@ -9,7 +9,7 @@ on:
   workflow_call:
     inputs:
       output-directory:
-        description: Public dashboard directory within the checked-out caller repository.
+        description: Generated dashboard directory within the checked-out caller repository.
         required: false
         default: "dist/intelligence"
         type: string
@@ -24,9 +24,9 @@ on:
         default: ".reports"
         type: string
       default-branch:
-        description: Caller repository default branch.
+        description: Optional caller default-branch override.
         required: false
-        default: "main"
+        default: ""
         type: string
       activity-since:
         description: Deterministic Git history window.
@@ -50,7 +50,7 @@ on:
   workflow_dispatch:
     inputs:
       output-directory:
-        description: Public dashboard directory.
+        description: Generated dashboard directory.
         required: true
         default: "dist/intelligence"
         type: string
@@ -65,9 +65,9 @@ on:
         default: ".reports"
         type: string
       default-branch:
-        description: Repository default branch.
-        required: true
-        default: "main"
+        description: Optional repository default-branch override.
+        required: false
+        default: ""
         type: string
       activity-since:
         description: Deterministic Git history window.
@@ -94,7 +94,7 @@ concurrency:
 
 jobs:
   generate:
-    name: Generate public repository intelligence artifact
+    name: Generate repository intelligence artifact
     runs-on: ubuntu-latest
     timeout-minutes: 15
     outputs:
@@ -127,6 +127,39 @@ jobs:
           max-depth: "${{ inputs.max-depth }}"
           require-full-history: "true"
 
+      - name: Verify reusable-workflow generator provenance
+        shell: bash
+        env:
+          EXPECTED_WORKFLOW_REF: "${{ job.workflow_ref }}"
+          EXPECTED_WORKFLOW_REPOSITORY: "${{ job.workflow_repository }}"
+          EXPECTED_WORKFLOW_SHA: "${{ job.workflow_sha }}"
+          PROVENANCE_PATH: "${{ inputs.output-directory }}/provenance.json"
+        run: |
+          set -euo pipefail
+          python3 - "${PROVENANCE_PATH}" <<'PYTHON'
+          import json
+          import os
+          from pathlib import Path
+          import re
+          import sys
+
+          provenance = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          generator = provenance["generator"]
+          expected_ref = os.environ["EXPECTED_WORKFLOW_REF"]
+          expected_repository = os.environ["EXPECTED_WORKFLOW_REPOSITORY"]
+          expected_sha = os.environ["EXPECTED_WORKFLOW_SHA"]
+          immutable = re.search(r"@([0-9a-f]{40})$", expected_ref)
+          if generator != {
+              "name": "egohygiene/relay/actions/repository-intelligence",
+              "version": generator["version"],
+              "repository": expected_repository,
+              "source_ref": expected_ref,
+              "source_commit": expected_sha,
+              "immutable": bool(immutable and immutable.group(1) == expected_sha),
+          }:
+              raise SystemExit("Reusable-workflow generator provenance is inconsistent")
+          PYTHON
+
       - name: Define artifact metadata
         id: metadata
         shell: bash
@@ -135,7 +168,7 @@ jobs:
           printf 'artifact-name=repository-intelligence-%s-%s\n' \
             "${GITHUB_RUN_ID}" "${GITHUB_RUN_ATTEMPT}" >> "${GITHUB_OUTPUT}"
 
-      - name: Upload public dashboard artifact
+      - name: Upload generated dashboard artifact
         # actions/upload-artifact v7.0.1
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:

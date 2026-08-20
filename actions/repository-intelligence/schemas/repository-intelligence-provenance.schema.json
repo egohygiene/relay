@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/repository-intelligence-provenance/v1/schema.json",
+  "title": "Relay Repository Intelligence provenance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "generator",
+    "consumer",
+    "contracts",
+    "generated_at",
+    "timestamp_source",
+    "projection"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.relay.repository-intelligence-provenance/v1"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version",
+        "repository",
+        "source_ref",
+        "source_commit",
+        "immutable"
+      ],
+      "properties": {
+        "name": {
+          "const": "egohygiene/relay/actions/repository-intelligence"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]*\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+        },
+        "repository": {
+          "const": "egohygiene/relay"
+        },
+        "source_ref": {
+          "type": "string"
+        },
+        "source_commit": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "immutable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "consumer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "source_commit", "visibility"],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "pattern": "^(?!\\.{1,2}/)(?![^/]+/\\.{1,2}$)[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "visibility": {
+          "enum": ["public", "private", "internal", "unknown"]
+        }
+      }
+    },
+    "contracts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dashboard", "analytics", "repository_tree", "repository_report"],
+      "properties": {
+        "dashboard": {"$ref": "#/$defs/contract"},
+        "analytics": {"$ref": "#/$defs/contract"},
+        "repository_tree": {"$ref": "#/$defs/contract"},
+        "repository_report": {"$ref": "#/$defs/contract"}
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "timestamp_source": {
+      "enum": ["consumer-source-commit", "explicit-input"]
+    },
+    "projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["route", "classification", "deployment_authority"],
+      "properties": {
+        "route": {
+          "const": "/intelligence/"
+        },
+        "classification": {
+          "enum": ["public-safe", "internal-only"]
+        },
+        "deployment_authority": {
+          "const": "consumer"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "schema_version"],
+      "properties": {
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        },
+        "schema_version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

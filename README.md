@@ -8,14 +8,17 @@ can be installed everywhere without copying implementation between repositories.
 Each consumer keeps ownership of its configuration, permissions, site build,
 and deployment.
 
-## First release surface
+## Release surface
 
-| Capability | Consumer reference |
-| ---------- | ------------------ |
+| Capability | Discovery alias |
+| ---------- | --------------- |
 | Repository intelligence dashboard | `egohygiene/relay/actions/repository-intelligence@v1` |
 | Scanner report normalization | `egohygiene/relay/actions/normalize-repository-report@v1` |
 | Guarded report snapshot publication | `egohygiene/relay/actions/publish-report-snapshot@v1` |
 | Opinionated intelligence artifact workflow | `egohygiene/relay/.github/workflows/repository-intelligence.yml@v1` |
+
+These moving aliases advertise the release surface. Production consumers use a
+reviewed full commit SHA, as shown below.
 
 The complete inventory and release contract live in
 [`action-catalog.json`](action-catalog.json) and [`actions/README.md`](actions/README.md).
@@ -33,11 +36,8 @@ The complete inventory and release contract live in
   run: pnpm run build
 
 - name: Add repository intelligence
-  # relay repository-intelligence v1.0.0
+  # egohygiene/relay repository-intelligence v1.1.0
   uses: egohygiene/relay/actions/repository-intelligence@<full-commit-sha>
-  with:
-    output-directory: dist/intelligence
-    default-branch: "${{ github.event.repository.default_branch }}"
 
 - name: Upload one composed Pages artifact
   uses: actions/upload-pages-artifact@<full-commit-sha>
@@ -46,19 +46,38 @@ The complete inventory and release contract live in
 ```
 
 Relay writes `dist/intelligence/` but never deploys it. That preserves one Pages
-owner per repository and yields canary URLs such as:
+owner per repository. A consumer that uploads `dist/` at its configured domain
+will make the subtree available at a route such as:
 
 ```text
-https://akashic.egohygiene.io/intelligence/
-https://optiflow.egohygiene.io/intelligence/
+https://repository.example/intelligence/
 ```
 
-Empathy retains its current GitHub Pages URL until its custom-domain DNS is
-configured; the build and action contract do not depend on either hostname.
+The action contract does not depend on a custom domain or a specific root-site
+stack.
+
+For a standalone, reviewable artifact instead of a Pages composition, call the
+reusable workflow at the same immutable Relay commit:
+
+```yaml
+jobs:
+  intelligence:
+    # egohygiene/relay repository-intelligence v1.1.0
+    uses: egohygiene/relay/.github/workflows/repository-intelligence.yml@<full-commit-sha>
+```
+
+Both entry points produce the same framework-free, visibility-aware subtree.
+The bundle contains exactly `index.html`, `summary.json`, `provenance.json`,
+`styles.css`, and `explorer.js`. Private collection data remains in the
+configured work directory—`.cache/repository-intelligence/` by default—and
+must never be uploaded as site content. Only a bundle whose provenance is
+classified `public-safe` is eligible for public-site composition.
 
 ## Architecture boundary
 
 - **Relay** owns reusable action/workflow implementation and releases.
+- **Hygiene** owns organization eligibility, route and privacy requirements,
+  and reviewed exceptions.
 - **Consumer repositories** own inputs, permissions, final Pages composition,
   identity, and deployment.
 - **Holon** can install thin callers into future repositories.
@@ -90,8 +109,8 @@ Relay publishes all cataloged actions together:
 - moving major alias: `v1`;
 - recommended consumer reference: full commit SHA.
 
-The reviewed [`release.json`](release.json) manifest requests the initial
-`v1.0.0` release when merged to `main`. The `Release Relay actions` workflow
+The current [`release.json`](release.json) manifest requests `v1.1.0`; the
+existing `v1.0.0` tag remains immutable. The `Release Relay actions` workflow
 also supports manual dispatch. In both cases it validates an unused exact
 `vMAJOR.MINOR.PATCH`, verifies the current default-branch commit, creates the
 immutable tag and GitHub Release, and then advances the matching major alias.
@@ -99,6 +118,8 @@ If tag creation succeeds but release creation is interrupted, a rerun resumes
 only when that immutable tag still resolves to the same validated commit.
 Subdirectory actions are directly consumable without Marketplace publication;
 a future Marketplace entry can improve discovery without changing distribution.
+The moving `v1` alias is for discovery and controlled refresh tooling, not for
+production consumer workflows.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for structural boundaries and
 [ROADMAP.md](ROADMAP.md) for extraction and adoption sequencing.

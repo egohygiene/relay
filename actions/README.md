@@ -13,12 +13,13 @@ documentation, implementation, contracts, and tests.
 ## Consumption
 
 Subdirectory actions are directly consumable from a public GitHub repository;
-they do not require separate packages or Marketplace listings:
+they do not require separate packages or Marketplace listings. Their package
+paths are:
 
-```yaml
-- uses: egohygiene/relay/actions/repository-intelligence@v1
-- uses: egohygiene/relay/actions/normalize-repository-report@v1
-- uses: egohygiene/relay/actions/publish-report-snapshot@v1
+```text
+egohygiene/relay/actions/repository-intelligence
+egohygiene/relay/actions/normalize-repository-report
+egohygiene/relay/actions/publish-report-snapshot
 ```
 
 GitHub Marketplace is a discovery surface, not the distribution mechanism for
@@ -29,7 +30,7 @@ the semantic release in a comment:
 
 ```yaml
 - name: Build repository intelligence
-  # egohygiene/relay repository-intelligence v1.0.0
+  # egohygiene/relay repository-intelligence v1.1.0
   uses: egohygiene/relay/actions/repository-intelligence@0123456789abcdef0123456789abcdef01234567
 ```
 
@@ -43,6 +44,10 @@ action and reusable workflow at the same exact commit.
 - Full commit SHA is the recommended consumer pin.
 - `action-catalog.json` is the machine-readable inventory for documentation,
   release validation, Holon installation, and future Pace reconciliation.
+
+Moving aliases support discovery and controlled fleet refreshes. Production
+consumer workflows use reviewed full-SHA pins so an implementation update
+cannot enter a repository silently.
 
 The reviewed root `release.json` manifest or a manual dispatch triggers the
 release workflow. It validates the complete catalog and test suite, creates the
