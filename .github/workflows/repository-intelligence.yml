@@ -1,0 +1,146 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Reusable repository intelligence artifact
+
+on:
+  workflow_call:
+    inputs:
+      output-directory:
+        description: Public dashboard directory within the checked-out caller repository.
+        required: false
+        default: "dist/intelligence"
+        type: string
+      work-directory:
+        description: Private collection workspace within the caller repository.
+        required: false
+        default: ".cache/repository-intelligence"
+        type: string
+      reports-directory:
+        description: Optional normalized report-summary root.
+        required: false
+        default: ".reports"
+        type: string
+      default-branch:
+        description: Caller repository default branch.
+        required: false
+        default: "main"
+        type: string
+      activity-since:
+        description: Deterministic Git history window.
+        required: false
+        default: "1 year ago"
+        type: string
+      max-depth:
+        description: Maximum repository tree depth.
+        required: false
+        default: "10"
+        type: string
+      artifact-retention-days:
+        description: Retention for the generated public dashboard artifact.
+        required: false
+        default: 30
+        type: number
+    outputs:
+      artifact-name:
+        description: Name of the uploaded dashboard artifact.
+        value: "${{ jobs.generate.outputs.artifact-name }}"
+  workflow_dispatch:
+    inputs:
+      output-directory:
+        description: Public dashboard directory.
+        required: true
+        default: "dist/intelligence"
+        type: string
+      work-directory:
+        description: Private collection workspace.
+        required: true
+        default: ".cache/repository-intelligence"
+        type: string
+      reports-directory:
+        description: Optional normalized report-summary root.
+        required: true
+        default: ".reports"
+        type: string
+      default-branch:
+        description: Repository default branch.
+        required: true
+        default: "main"
+        type: string
+      activity-since:
+        description: Deterministic Git history window.
+        required: true
+        default: "1 year ago"
+        type: string
+      max-depth:
+        description: Maximum repository tree depth.
+        required: true
+        default: "10"
+        type: string
+      artifact-retention-days:
+        description: Artifact retention in days.
+        required: true
+        default: 30
+        type: number
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "relay-intelligence-${{ github.repository }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    name: Generate public repository intelligence artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      artifact-name: "${{ steps.metadata.outputs.artifact-name }}"
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Checkout caller repository with complete history
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Generate repository intelligence
+        uses: $/actions/repository-intelligence
+        with:
+          output-directory: "${{ inputs.output-directory }}"
+          work-directory: "${{ inputs.work-directory }}"
+          reports-directory: "${{ inputs.reports-directory }}"
+          repository: "${{ github.repository }}"
+          default-branch: "${{ inputs.default-branch }}"
+          source-commit: "${{ github.sha }}"
+          activity-since: "${{ inputs.activity-since }}"
+          max-depth: "${{ inputs.max-depth }}"
+          require-full-history: "true"
+
+      - name: Define artifact metadata
+        id: metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'artifact-name=repository-intelligence-%s-%s\n' \
+            "${GITHUB_RUN_ID}" "${GITHUB_RUN_ATTEMPT}" >> "${GITHUB_OUTPUT}"
+
+      - name: Upload public dashboard artifact
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "${{ steps.metadata.outputs.artifact-name }}"
+          path: "${{ inputs.output-directory }}"
+          if-no-files-found: error
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9

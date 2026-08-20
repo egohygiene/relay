@@ -1,0 +1,294 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-action.json
+
+name: "🧠 Repository Intelligence"
+description: >-
+  Build a deterministic, public-safe repository intelligence dashboard with
+  analytics, statistical snapshots, normalized report cards, and a searchable
+  source tree. The action writes static files but never deploys them.
+
+inputs:
+  output-directory:
+    description: "Repository-relative directory receiving the public static dashboard bundle."
+    required: false
+    default: "dist/intelligence"
+  work-directory:
+    description: >-
+      Repository-relative private working directory for source contracts and
+      diagnostic activity reports. Do not publish this directory wholesale.
+    required: false
+    default: ".cache/repository-intelligence"
+  reports-directory:
+    description: >-
+      Repository-relative root containing optional normalized summaries at
+      <producer>/summary.json. A missing directory renders honest unavailable states.
+    required: false
+    default: ".reports"
+  repository:
+    description: "Repository in owner/name form. Defaults to the workflow repository."
+    required: false
+    default: ""
+  default-branch:
+    description: "Default branch shown by the repository vitality card."
+    required: false
+    default: "main"
+  source-commit:
+    description: >-
+      Full commit SHA represented by the dashboard. Defaults to the commit
+      resolved from activity-ref.
+    required: false
+    default: ""
+  as-of:
+    description: >-
+      Optional RFC 3339 instant for deterministic freshness evaluation.
+      Defaults to the represented commit timestamp.
+    required: false
+    default: ""
+  activity-ref:
+    description: "Branch, tag, or revision inspected by repository collectors."
+    required: false
+    default: "HEAD"
+  activity-since:
+    description: >-
+      ISO-8601 date/timestamp or deterministic relative window such as
+      '1 year ago', anchored to the represented commit.
+    required: false
+    default: "1 year ago"
+  activity-author:
+    description: "Optional Git author pattern used to filter private diagnostic activity."
+    required: false
+    default: ""
+  max-depth:
+    description: "Maximum repository depth represented by tree artifacts."
+    required: false
+    default: "10"
+  excluded-paths:
+    description: "Comma-separated paths or directory names excluded from the repository tree."
+    required: false
+    default: ".git,.staging,.cache,.venv,docs/generated,node_modules,vendor,dist,build,coverage,__pycache__,site"
+  analytics-excluded-paths:
+    description: >-
+      Comma-separated generated, cached, or vendored paths excluded from
+      public analytics while remaining eligible for the repository tree.
+    required: false
+    default: ".git,.staging,.cache,.venv,.tox,.mypy_cache,.ruff_cache,.reports,docs/generated,node_modules,vendor,dist,build,coverage,__pycache__,site,target"
+  require-full-history:
+    description: "Fail rather than publishing incomplete activity from a shallow checkout."
+    required: false
+    default: "true"
+
+outputs:
+  output-directory:
+    description: "Repository-relative directory containing the public dashboard bundle."
+    value: "${{ inputs.output-directory }}"
+  index:
+    description: "Repository-relative path to the dashboard entry point."
+    value: "${{ inputs.output-directory }}/index.html"
+  summary:
+    description: "Repository-relative path to the aggregate public dashboard contract."
+    value: "${{ inputs.output-directory }}/summary.json"
+  analytics-summary:
+    description: "Repository-relative path to the public repository analytics contract."
+    value: "${{ inputs.work-directory }}/analytics/summary.json"
+  repository-tree:
+    description: "Repository-relative path to the commit-scoped repository tree contract."
+    value: "${{ inputs.work-directory }}/tree/repo.json"
+  diagnostics-directory:
+    description: >-
+      Repository-relative directory containing private diagnostic activity data;
+      contributor identity and commit messages may be present.
+    value: "${{ inputs.work-directory }}/activity"
+
+branding:
+  icon: "activity"
+  color: "purple"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "🔎 Validate inputs and resolve source metadata"
+      id: metadata
+      shell: bash
+      env:
+        INPUT_ACTIVITY_REF: "${{ inputs.activity-ref }}"
+        INPUT_AS_OF: "${{ inputs.as-of }}"
+        INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
+        INPUT_MAX_DEPTH: "${{ inputs.max-depth }}"
+        INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
+        INPUT_REPORTS_DIRECTORY: "${{ inputs.reports-directory }}"
+        INPUT_REPOSITORY: "${{ inputs.repository }}"
+        INPUT_REQUIRE_FULL_HISTORY: "${{ inputs.require-full-history }}"
+        INPUT_SOURCE_COMMIT: "${{ inputs.source-commit }}"
+        INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
+      run: |
+        set -euo pipefail
+
+        validate_relative_path() {
+          local label="$1"
+          local value="$2"
+          if [[ ! "${value}" =~ ^[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$ ]] \
+            || "/${value}/" == */./* \
+            || "/${value}/" == */../*; then
+            printf '%s must use canonical, literal repository-relative path segments: %q\n' \
+              "${label}" "${value}" >&2
+            return 2
+          fi
+        }
+
+        validate_relative_path "output-directory" "${INPUT_OUTPUT_DIRECTORY}"
+        validate_relative_path "work-directory" "${INPUT_WORK_DIRECTORY}"
+        validate_relative_path "reports-directory" "${INPUT_REPORTS_DIRECTORY}"
+
+        case "${INPUT_OUTPUT_DIRECTORY%%/*}" in
+          .git | .github | actions | schemas | scripts | tests)
+            printf 'output-directory must not replace a protected repository area: %s\n' \
+              "${INPUT_OUTPUT_DIRECTORY}" >&2
+            exit 2
+            ;;
+          *) ;;
+        esac
+
+        if [[ "${INPUT_WORK_DIRECTORY}/" == "${INPUT_OUTPUT_DIRECTORY}/"* \
+          || "${INPUT_OUTPUT_DIRECTORY}/" == "${INPUT_WORK_DIRECTORY}/"* ]]; then
+          printf 'work-directory and output-directory must not overlap; private diagnostics could be published\n' >&2
+          exit 2
+        fi
+        if [[ "${INPUT_REPORTS_DIRECTORY}/" == "${INPUT_OUTPUT_DIRECTORY}/"* \
+          || "${INPUT_OUTPUT_DIRECTORY}/" == "${INPUT_REPORTS_DIRECTORY}/"* ]]; then
+          printf 'reports-directory and output-directory must not overlap; report evidence must remain outside the public output\n' >&2
+          exit 2
+        fi
+        if [[ ! "${INPUT_MAX_DEPTH}" =~ ^[0-9]+$ ]] || (( INPUT_MAX_DEPTH < 1 || INPUT_MAX_DEPTH > 20 )); then
+          printf 'max-depth must be an integer from 1 through 20: %s\n' "${INPUT_MAX_DEPTH}" >&2
+          exit 2
+        fi
+        if [[ "${INPUT_REQUIRE_FULL_HISTORY}" != "true" && "${INPUT_REQUIRE_FULL_HISTORY}" != "false" ]]; then
+          printf 'require-full-history must be true or false: %s\n' "${INPUT_REQUIRE_FULL_HISTORY}" >&2
+          exit 2
+        fi
+
+        source_commit="${INPUT_SOURCE_COMMIT}"
+        if [[ -z "${source_commit}" ]]; then
+          source_commit="$(git -C "${GITHUB_WORKSPACE}" rev-parse "${INPUT_ACTIVITY_REF}^{commit}")"
+        fi
+        if [[ ! "${source_commit}" =~ ^[0-9a-f]{40}$ ]]; then
+          printf 'source-commit must resolve to a full lowercase Git SHA: %s\n' "${source_commit}" >&2
+          exit 2
+        fi
+        resolved_ref_commit="$(git -C "${GITHUB_WORKSPACE}" rev-parse "${INPUT_ACTIVITY_REF}^{commit}")"
+        if [[ "${source_commit}" != "${resolved_ref_commit}" ]]; then
+          printf 'source-commit (%s) must match activity-ref (%s -> %s)\n' \
+            "${source_commit}" "${INPUT_ACTIVITY_REF}" "${resolved_ref_commit}" >&2
+          exit 2
+        fi
+
+        repository="${INPUT_REPOSITORY:-${GITHUB_REPOSITORY:-}}"
+        if [[ -z "${repository}" ]]; then
+          repository="local/$(basename "${GITHUB_WORKSPACE}")"
+        fi
+        if [[ ! "${repository}" =~ ^[^/[:space:]]+/[^/[:space:]]+$ ]]; then
+          printf 'repository must use owner/name form: %s\n' "${repository}" >&2
+          exit 2
+        fi
+
+        as_of="${INPUT_AS_OF}"
+        if [[ -z "${as_of}" ]]; then
+          as_of="$(git -C "${GITHUB_WORKSPACE}" show --no-patch --format=%cI "${source_commit}")"
+        fi
+
+        mkdir -p "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}/activity"
+        mkdir -p "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}/analytics"
+        mkdir -p "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}/tree"
+        mkdir -p "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}/visualization"
+        printf 'source-commit=%s\n' "${source_commit}" >> "${GITHUB_OUTPUT}"
+        printf 'repository=%s\n' "${repository}" >> "${GITHUB_OUTPUT}"
+        printf 'as-of=%s\n' "${as_of}" >> "${GITHUB_OUTPUT}"
+
+    - name: "🌳 Generate commit-scoped repository tree"
+      shell: bash
+      env:
+        INPUT_ACTIVITY_REF: "${{ inputs.activity-ref }}"
+        INPUT_EXCLUDED_PATHS: "${{ inputs.excluded-paths }}"
+        INPUT_MAX_DEPTH: "${{ inputs.max-depth }}"
+        INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
+        INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
+      run: |
+        set -euo pipefail
+        python3 "${GITHUB_ACTION_PATH}/scripts/generate_repository_intelligence.py" \
+          --repo-root "${GITHUB_WORKSPACE}" \
+          --output-root "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}" \
+          --ref "${INPUT_ACTIVITY_REF}" \
+          --max-depth "${INPUT_MAX_DEPTH}" \
+          --excluded-paths "${INPUT_EXCLUDED_PATHS},${INPUT_WORK_DIRECTORY},${INPUT_OUTPUT_DIRECTORY}"
+
+    - name: "📊 Generate private diagnostic activity"
+      shell: bash
+      env:
+        INPUT_ACTIVITY_AUTHOR: "${{ inputs.activity-author }}"
+        INPUT_ACTIVITY_REF: "${{ inputs.activity-ref }}"
+        INPUT_ACTIVITY_SINCE: "${{ inputs.activity-since }}"
+        INPUT_REQUIRE_FULL_HISTORY: "${{ inputs.require-full-history }}"
+        INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
+      run: |
+        set -euo pipefail
+        arguments=(
+          --repo "${GITHUB_WORKSPACE}"
+          --output "${INPUT_WORK_DIRECTORY}/activity"
+          --since "${INPUT_ACTIVITY_SINCE}"
+          --ref "${INPUT_ACTIVITY_REF}"
+          --color never
+        )
+        if [[ -n "${INPUT_ACTIVITY_AUTHOR}" ]]; then
+          arguments+=(--author "${INPUT_ACTIVITY_AUTHOR}")
+        fi
+        if [[ "${INPUT_REQUIRE_FULL_HISTORY}" == "true" ]]; then
+          arguments+=(--require-full-history)
+        fi
+        bash "${GITHUB_ACTION_PATH}/scripts/repo-activity" "${arguments[@]}"
+
+    - name: "🪩 Generate public-safe repository analytics"
+      shell: bash
+      env:
+        INPUT_ACTIVITY_REF: "${{ inputs.activity-ref }}"
+        INPUT_ACTIVITY_SINCE: "${{ inputs.activity-since }}"
+        INPUT_ANALYTICS_EXCLUDED_PATHS: "${{ inputs.analytics-excluded-paths }}"
+        INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
+        INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
+      run: |
+        set -euo pipefail
+        python3 "${GITHUB_ACTION_PATH}/scripts/generate_repository_analytics.py" \
+          --repo-root "${GITHUB_WORKSPACE}" \
+          --output "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}/analytics/summary.json" \
+          --ref "${INPUT_ACTIVITY_REF}" \
+          --since "${INPUT_ACTIVITY_SINCE}" \
+          --excluded-paths "${INPUT_ANALYTICS_EXCLUDED_PATHS},${INPUT_WORK_DIRECTORY},${INPUT_OUTPUT_DIRECTORY}"
+
+    - name: "✨ Render static intelligence dashboard"
+      shell: bash
+      env:
+        INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
+        INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
+        INPUT_REPORTS_DIRECTORY: "${{ inputs.reports-directory }}"
+        INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
+        RESOLVED_AS_OF: "${{ steps.metadata.outputs.as-of }}"
+        RESOLVED_REPOSITORY: "${{ steps.metadata.outputs.repository }}"
+        RESOLVED_SOURCE_COMMIT: "${{ steps.metadata.outputs.source-commit }}"
+      run: |
+        set -euo pipefail
+        python3 "${GITHUB_ACTION_PATH}/scripts/prepare_output_directory.py" \
+          --repository-root "${GITHUB_WORKSPACE}" \
+          --output-directory "${INPUT_OUTPUT_DIRECTORY}"
+        python3 "${GITHUB_ACTION_PATH}/scripts/generate_repository_intelligence_dashboard.py" \
+          --repository-root "${GITHUB_WORKSPACE}" \
+          --reports-root "${GITHUB_WORKSPACE}/${INPUT_REPORTS_DIRECTORY}" \
+          --analytics-summary "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}/analytics/summary.json" \
+          --repository-tree "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}/tree/repo.json" \
+          --output-root "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}" \
+          --repository "${RESOLVED_REPOSITORY}" \
+          --default-branch "${INPUT_DEFAULT_BRANCH}" \
+          --source-commit "${RESOLVED_SOURCE_COMMIT}" \
+          --as-of "${RESOLVED_AS_OF}" \
+          --stylesheet-source "${GITHUB_ACTION_PATH}/assets/dashboard.css" \
+          --script-source "${GITHUB_ACTION_PATH}/assets/explorer.js"

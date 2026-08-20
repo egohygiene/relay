@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "runs": [
+    {
+      "results": [
+        {
+          "message": { "text": "score is 4: branch protection is incomplete" },
+          "ruleId": "BranchProtectionID",
+          "ruleIndex": 0
+        },
+        {
+          "message": { "text": "score is 7: signed releases were not detected" },
+          "ruleId": "SignedReleasesID",
+          "ruleIndex": 1
+        }
+      ],
+      "tool": {
+        "driver": {
+          "informationUri": "https://github.com/ossf/scorecard",
+          "name": "Scorecard",
+          "rules": [
+            {
+              "helpUri": "https://github.com/ossf/scorecard/blob/main/docs/checks.md#branch-protection",
+              "id": "BranchProtectionID",
+              "name": "Branch-Protection",
+              "properties": { "security-severity": "9.0" }
+            },
+            {
+              "helpUri": "https://github.com/ossf/scorecard/blob/main/docs/checks.md#signed-releases",
+              "id": "SignedReleasesID",
+              "name": "Signed-Releases",
+              "properties": { "security-severity": "4.0" }
+            },
+            {
+              "helpUri": "https://github.com/ossf/scorecard/blob/main/docs/checks.md#security-policy",
+              "id": "SecurityPolicyID",
+              "name": "Security-Policy",
+              "properties": { "security-severity": "7.0" }
+            }
+          ],
+          "semanticVersion": "5.5.0"
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}

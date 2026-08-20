@@ -1,0 +1,56 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-action.json
+
+name: "📌 Publish Report Snapshot"
+description: >-
+  Guard, stage, commit, and push stable .reports snapshots from an explicitly
+  trusted default-branch workflow job.
+
+inputs:
+  paths:
+    description: "One existing .reports/-relative literal path per line."
+    required: true
+  commit-message:
+    description: "Commit message used when the curated snapshot changed."
+    required: true
+  default-branch:
+    description: "Repository default branch the trusted publication job may update."
+    required: true
+  author-name:
+    description: "Git author and committer name."
+    required: false
+    default: "github-actions[bot]"
+  author-email:
+    description: "Git author and committer email."
+    required: false
+    default: "41898282+github-actions[bot]@users.noreply.github.com"
+
+outputs:
+  changed:
+    description: "Whether the action created and pushed a report commit."
+    value: "${{ steps.publish.outputs.changed }}"
+  commit-sha:
+    description: "Created commit SHA, or an empty string when nothing changed."
+    value: "${{ steps.publish.outputs.commit-sha }}"
+
+branding:
+  icon: "git-commit"
+  color: "green"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "📌 Publish curated report snapshot"
+      id: publish
+      shell: bash
+      env:
+        INPUT_AUTHOR_EMAIL: "${{ inputs.author-email }}"
+        INPUT_AUTHOR_NAME: "${{ inputs.author-name }}"
+        INPUT_COMMIT_MESSAGE: "${{ inputs.commit-message }}"
+        INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
+        INPUT_PATHS: "${{ inputs.paths }}"
+      run: |
+        set -euo pipefail
+        bash "${GITHUB_ACTION_PATH}/scripts/publish_report_snapshot.sh"

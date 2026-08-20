@@ -32,6 +32,8 @@ This roadmap describes capability evolution, not promised dates or an issue queu
 
 ## Phase 1: Inventory proven Empathy actions
 
+**Status:** Complete for the initial Repository Intelligence capability.
+
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 
 **Exit signals:**
@@ -43,6 +45,8 @@ This roadmap describes capability evolution, not promised dates or an issue queu
 - Remaining uncertainty is visible.
 
 ## Phase 2: Define action and workflow contracts
+
+**Status:** Complete for v1 beta.
 
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 
@@ -56,6 +60,8 @@ This roadmap describes capability evolution, not promised dates or an issue queu
 
 ## Phase 3: Extract and test reusable components
 
+**Status:** Complete locally; cross-repository CI evidence remains required.
+
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 
 **Exit signals:**
@@ -68,6 +74,8 @@ This roadmap describes capability evolution, not promised dates or an issue queu
 
 ## Phase 4: Publish immutable releases
 
+**Status:** Release workflow implemented; first `v1.0.0` publication pending.
+
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 
 **Exit signals:**
@@ -79,6 +87,8 @@ This roadmap describes capability evolution, not promised dates or an issue queu
 - Remaining uncertainty is visible.
 
 ## Phase 5: Migrate repository consumers
+
+**Status:** Pending proof in Empathy, Akashic, and Optiflow.
 
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 

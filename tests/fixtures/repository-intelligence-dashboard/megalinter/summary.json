@@ -1,0 +1,47 @@
+{
+  "commit": "1111111111111111111111111111111111111111",
+  "execution": {
+    "message": "MegaLinter completed with a runner-level failure.",
+    "state": "failure"
+  },
+  "findings": {
+    "advisory": 0,
+    "blocking": 0,
+    "by_severity": {},
+    "state": "clear",
+    "total": 0
+  },
+  "freshness": {
+    "expires_at": "2026-08-13T12:00:00Z",
+    "stale_after_days": 8
+  },
+  "generated_at": "2026-08-05T12:00:00Z",
+  "links": {
+    "detail": "https://github.com/example/repository/tree/1111111111111111111111111111111111111111/.reports/megalinter",
+    "security": "https://github.com/example/repository/security/code-scanning",
+    "source": "https://github.com/example/repository/commit/1111111111111111111111111111111111111111",
+    "workflow": "https://github.com/example/repository/actions/runs/102"
+  },
+  "megalinter": {
+    "diagnostics": {
+      "errors": 1,
+      "warnings": 3
+    },
+    "profile": "all",
+    "tools": {
+      "active": 4,
+      "blocking": 0,
+      "passed": 4
+    }
+  },
+  "producer": "megalinter",
+  "provenance": {
+    "event": "push",
+    "run_attempt": 1,
+    "run_id": "102",
+    "workflow": "MegaLinter"
+  },
+  "repository": "example/repository",
+  "schema": "egohygiene.repository-report-summary/v1",
+  "schema_version": 1
+}

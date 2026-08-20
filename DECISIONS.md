@@ -40,6 +40,8 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - ADR-001: Package reusable behavior outside templates
 - ADR-002: Default to least-privilege permissions
 - ADR-003: Require immutable references in consumer workflows
+- ADR-004: Preserve extracted Intelligence contract identities
+- ADR-005: Release the action catalog as one repository unit
 
 ## ADR-001: Package reusable behavior outside templates
 
@@ -68,9 +70,26 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - **Consequences:** The choice improves ownership and predictability while requiring maintained contracts, validation, and migration discipline.
 - **Reconsider when:** New evidence shows that the boundary prevents standalone usefulness, safety, portability, or maintainability.
 
+## ADR-004: Preserve extracted Intelligence contract identities
+
+- **Status:** Accepted for Intelligence v1
+- **Date:** 2026-08-19
+- **Context:** Empathy already emitted four named public contracts before their implementation moved into Relay. Their JSON Schema `$id` values use two historical namespaces: `egohygiene.github.io/contracts` for repository analytics and tree data, and `egohygiene.dev/schemas` for normalized reports and the dashboard aggregate.
+- **Decision:** Preserve those `$id` values and schema names byte-compatibly for v1. Implementation ownership moving to Relay does not rename the data contract. New Relay-only contracts use the `egohygiene.github.io/relay/contracts` namespace.
+- **Consequences:** Existing snapshots and consumers remain compatible. The historical namespace split is explicit rather than accidental. A future unified namespace requires a versioned v2 contract and documented compatibility aliases.
+- **Reconsider when:** The organization can publish permanent redirects and a deliberate v2 migration plan.
+
+## ADR-005: Release the action catalog as one repository unit
+
+- **Status:** Accepted for Relay v1
+- **Date:** 2026-08-19
+- **Context:** GitHub resolves a subdirectory action from a repository ref, so independent folder tags do not provide independent version graphs inside one repository.
+- **Decision:** Validate and release every cataloged action at one immutable repository SemVer tag. Maintain an optional moving major alias for convenience while recommending full commit SHAs to consumers.
+- **Consequences:** One release proves compatibility across actions and reusable workflows. A change to any public package advances the Relay repository version.
+- **Reconsider when:** An action needs an incompatible cadence or trust boundary substantial enough to justify a separate repository.
+
 ## Open decisions
 
-- Release and compatibility policy for the first stable version.
 - Exact self-hosted, managed, and organization-integrated deployment boundaries.
 - Which target systems must exist before the architecture status may become active.
 

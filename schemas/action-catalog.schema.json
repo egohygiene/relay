@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/action-catalog/v1/schema.json",
+  "title": "Relay action catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schema_version", "release_model", "actions", "workflows"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "schema": {"const": "egohygiene.relay-action-catalog/v1"},
+    "schema_version": {"const": 1},
+    "release_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit", "immutable", "moving_alias", "recommended_consumer_pin"],
+      "properties": {
+        "unit": {"const": "repository"},
+        "immutable": {"type": "string"},
+        "moving_alias": {"type": "string"},
+        "recommended_consumer_pin": {"const": "full-commit-sha"}
+      }
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/action"}
+    },
+    "workflows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/workflow"}
+    }
+  },
+  "$defs": {
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "path",
+        "name",
+        "summary",
+        "status",
+        "runtime",
+        "permissions",
+        "side_effects",
+        "consumer_ref"
+      ],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+        "path": {"type": "string", "pattern": "^actions/[a-z0-9]+(?:-[a-z0-9]+)*$"},
+        "name": {"type": "string", "minLength": 1},
+        "summary": {"type": "string", "minLength": 1},
+        "status": {"enum": ["experimental", "beta", "stable", "deprecated"]},
+        "runtime": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "permissions": {
+          "type": "object",
+          "additionalProperties": {"enum": ["read", "write"]}
+        },
+        "side_effects": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "consumer_ref": {"type": "string", "pattern": "^egohygiene/relay/actions/.+@v[0-9]+$"}
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "name", "summary", "status", "permissions", "consumer_ref"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+        "path": {"type": "string", "pattern": "^\\.github/workflows/.+\\.yml$"},
+        "name": {"type": "string", "minLength": 1},
+        "summary": {"type": "string", "minLength": 1},
+        "status": {"enum": ["experimental", "beta", "stable", "deprecated"]},
+        "permissions": {
+          "type": "object",
+          "additionalProperties": {"enum": ["read", "write"]}
+        },
+        "consumer_ref": {
+          "type": "string",
+          "pattern": "^egohygiene/relay/\\.github/workflows/.+@v[0-9]+$"
+        }
+      }
+    }
+  }
+}

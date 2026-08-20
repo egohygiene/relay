@@ -1,0 +1,299 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.dev/schemas/repository-intelligence-dashboard/v3.json",
+  "title": "Ego Hygiene repository intelligence dashboard",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "generated_at",
+    "repository",
+    "states",
+    "producers",
+    "analytics",
+    "anatomy",
+    "vitality"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.repository-intelligence-dashboard/v3"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "default_branch", "source_commit"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "default_branch": { "type": "string", "minLength": 1 },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "states": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["availability", "execution", "findings", "freshness"],
+      "properties": {
+        "availability": { "$ref": "#/$defs/stateCounts" },
+        "execution": { "$ref": "#/$defs/stateCounts" },
+        "findings": { "$ref": "#/$defs/stateCounts" },
+        "freshness": { "$ref": "#/$defs/stateCounts" }
+      }
+    },
+    "producers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["osv", "megalinter", "scorecard"],
+      "properties": {
+        "osv": { "$ref": "#/$defs/producer" },
+        "megalinter": { "$ref": "#/$defs/producer" },
+        "scorecard": { "$ref": "#/$defs/producer" }
+      }
+    },
+    "analytics": {
+      "$ref": "#/$defs/analyticsProjection"
+    },
+    "anatomy": {
+      "$ref": "#/$defs/anatomyProjection"
+    },
+    "vitality": {
+      "type": "object",
+      "required": [
+        "execution",
+        "repository",
+        "default_branch",
+        "source_commit",
+        "metrics"
+      ],
+      "properties": {
+        "execution": { "$ref": "#/$defs/status" },
+        "repository": { "type": "string" },
+        "default_branch": { "type": "string" },
+        "source_commit": { "type": "string" },
+        "latest_commit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["short_sha", "committed_at"],
+          "properties": {
+            "short_sha": { "type": "string", "pattern": "^[0-9a-f]{12}$" },
+            "committed_at": { "type": "string", "format": "date-time" }
+          }
+        },
+        "metrics": { "type": "object" }
+      }
+    }
+  },
+  "$defs": {
+    "stateCounts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "message"],
+      "properties": {
+        "state": { "type": "string" },
+        "message": { "type": "string" }
+      }
+    },
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "producer",
+        "name",
+        "availability",
+        "generated_at",
+        "commit",
+        "execution",
+        "findings",
+        "freshness",
+        "links",
+        "metrics"
+      ],
+      "properties": {
+        "producer": { "enum": ["osv", "megalinter", "scorecard"] },
+        "name": { "type": "string" },
+        "availability": { "enum": ["available", "unavailable", "invalid"] },
+        "generated_at": { "type": ["string", "null"] },
+        "commit": { "type": ["string", "null"] },
+        "execution": { "$ref": "#/$defs/status" },
+        "findings": {
+          "type": "object",
+          "required": ["state", "total", "blocking", "advisory", "by_severity"],
+          "properties": {
+            "state": { "enum": ["clear", "attention", "blocked", "unknown"] },
+            "total": { "type": ["integer", "null"], "minimum": 0 },
+            "blocking": { "type": ["integer", "null"], "minimum": 0 },
+            "advisory": { "type": ["integer", "null"], "minimum": 0 },
+            "by_severity": { "type": "object" }
+          }
+        },
+        "freshness": { "$ref": "#/$defs/freshness" },
+        "links": { "type": "object" },
+        "metrics": { "type": "object" }
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "message",
+        "expires_at",
+        "stale_after_days",
+        "elapsed_percent",
+        "remaining_days"
+      ],
+      "properties": {
+        "state": { "enum": ["fresh", "stale", "unknown"] },
+        "message": { "type": "string" },
+        "expires_at": { "type": ["string", "null"] },
+        "stale_after_days": { "type": ["integer", "null"], "minimum": 1 },
+        "elapsed_percent": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "remaining_days": { "type": ["integer", "null"] }
+      }
+    },
+    "analyticsProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["availability", "message", "summary"],
+      "properties": {
+        "availability": { "enum": ["available", "unavailable", "invalid"] },
+        "message": { "type": "string" },
+        "summary": { "type": ["object", "null"] }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "availability": { "const": "available" } },
+            "required": ["availability"]
+          },
+          "then": { "properties": { "summary": { "type": "object" } } },
+          "else": { "properties": { "summary": { "type": "null" } } }
+        }
+      ]
+    },
+    "anatomyProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["availability", "message", "summary"],
+      "properties": {
+        "availability": { "enum": ["available", "unavailable", "invalid"] },
+        "message": { "type": "string" },
+        "summary": {
+          "oneOf": [{ "$ref": "#/$defs/anatomySummary" }, { "type": "null" }]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "availability": { "const": "available" } },
+            "required": ["availability"]
+          },
+          "then": {
+            "properties": {
+              "summary": { "$ref": "#/$defs/anatomySummary" }
+            }
+          },
+          "else": { "properties": { "summary": { "type": "null" } } }
+        }
+      ]
+    },
+    "anatomySummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "counts", "node_count", "max_depth", "tree"],
+      "properties": {
+        "source": { "$ref": "#/$defs/treeSource" },
+        "counts": { "$ref": "#/$defs/treeCounts" },
+        "node_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+        },
+        "max_depth": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 20
+        },
+        "tree": { "$ref": "#/$defs/treeNode" }
+      }
+    },
+    "treeSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "ref", "committed_at"],
+      "properties": {
+        "revision": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "ref": { "type": "string", "minLength": 1 },
+        "committed_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "treeCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["directories", "files", "symlinks", "submodules"],
+      "properties": {
+        "directories": { "type": "integer", "minimum": 0 },
+        "files": { "type": "integer", "minimum": 0 },
+        "symlinks": { "type": "integer", "minimum": 0 },
+        "submodules": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "treeNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "path", "type"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "type": {
+          "enum": ["directory", "file", "symlink", "submodule"]
+        },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/treeNode" }
+        },
+        "descendants": { "$ref": "#/$defs/treeCounts" },
+        "truncated": { "const": true }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "const": "directory" } },
+            "required": ["type"]
+          },
+          "then": { "required": ["children", "descendants"] },
+          "else": {
+            "not": {
+              "anyOf": [
+                { "required": ["children"] },
+                { "required": ["descendants"] },
+                { "required": ["truncated"] }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

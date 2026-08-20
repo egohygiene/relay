@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/release/v1/schema.json",
+  "title": "Relay reviewed release request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "version", "update_major_alias"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "schema": {"const": "egohygiene.relay-release/v1"},
+    "version": {
+      "type": "string",
+      "pattern": "^v[1-9][0-9]*\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "update_major_alias": {"type": "boolean"}
+  }
+}

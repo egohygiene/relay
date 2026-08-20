@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/contracts/repository-analytics/v1/schema.json",
+  "title": "Ego Hygiene public repository analytics",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "source",
+    "scope",
+    "privacy",
+    "repository",
+    "activity",
+    "changes",
+    "filters"
+  ],
+  "properties": {
+    "schema": { "const": "egohygiene.repository-analytics/v1" },
+    "schema_version": { "const": 1 },
+    "source": { "$ref": "#/$defs/source" },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["since", "resolved_since"],
+      "properties": {
+        "since": { "type": "string", "minLength": 1 },
+        "resolved_since": { "type": "string", "format": "date-time" }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["public_safe", "contributor_identities_included", "commit_messages_included"],
+      "properties": {
+        "public_safe": { "const": true },
+        "contributor_identities_included": { "const": false },
+        "commit_messages_included": { "const": false }
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tracked_files", "areas", "extensions"],
+      "properties": {
+        "tracked_files": { "$ref": "#/$defs/nonNegativeInteger" },
+        "areas": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/fileCount" }
+        },
+        "extensions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/fileCount" }
+        }
+      }
+    },
+    "activity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commits",
+        "merges",
+        "contributors",
+        "first_commit_at",
+        "last_commit_at",
+        "weekly"
+      ],
+      "properties": {
+        "commits": { "$ref": "#/$defs/nonNegativeInteger" },
+        "merges": { "$ref": "#/$defs/nonNegativeInteger" },
+        "contributors": { "$ref": "#/$defs/nonNegativeInteger" },
+        "first_commit_at": { "$ref": "#/$defs/nullableDateTime" },
+        "last_commit_at": { "$ref": "#/$defs/nullableDateTime" },
+        "weekly": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["week", "commits", "merges"],
+            "properties": {
+              "week": { "type": "string", "format": "date" },
+              "commits": { "$ref": "#/$defs/nonNegativeInteger" },
+              "merges": { "$ref": "#/$defs/nonNegativeInteger" }
+            }
+          }
+        }
+      }
+    },
+    "changes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files_changed", "insertions", "deletions", "net_lines", "areas", "hotspots"],
+      "properties": {
+        "files_changed": { "$ref": "#/$defs/nonNegativeInteger" },
+        "insertions": { "$ref": "#/$defs/nonNegativeInteger" },
+        "deletions": { "$ref": "#/$defs/nonNegativeInteger" },
+        "net_lines": { "type": "integer" },
+        "areas": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/changeArea" }
+        },
+        "hotspots": {
+          "type": "array",
+          "maxItems": 20,
+          "items": { "$ref": "#/$defs/hotspot" }
+        }
+      }
+    },
+    "filters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["excluded_paths", "excluded_tracked_files", "excluded_change_records"],
+      "properties": {
+        "excluded_paths": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "excluded_tracked_files": { "$ref": "#/$defs/nonNegativeInteger" },
+        "excluded_change_records": { "$ref": "#/$defs/nonNegativeInteger" }
+      }
+    }
+  },
+  "$defs": {
+    "nonNegativeInteger": { "type": "integer", "minimum": 0 },
+    "nullableDateTime": {
+      "oneOf": [{ "type": "string", "format": "date-time" }, { "type": "null" }]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "ref", "committed_at"],
+      "properties": {
+        "revision": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "ref": { "type": "string", "minLength": 1 },
+        "committed_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "fileCount": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "file_count"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "file_count": { "$ref": "#/$defs/nonNegativeInteger" }
+      }
+    },
+    "changeArea": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "commit_touches", "insertions", "deletions", "binary_changes"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "commit_touches": { "$ref": "#/$defs/nonNegativeInteger" },
+        "insertions": { "$ref": "#/$defs/nonNegativeInteger" },
+        "deletions": { "$ref": "#/$defs/nonNegativeInteger" },
+        "binary_changes": { "$ref": "#/$defs/nonNegativeInteger" }
+      }
+    },
+    "hotspot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "commit_touches", "insertions", "deletions", "binary_changes"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "commit_touches": { "$ref": "#/$defs/nonNegativeInteger" },
+        "insertions": { "$ref": "#/$defs/nonNegativeInteger" },
+        "deletions": { "$ref": "#/$defs/nonNegativeInteger" },
+        "binary_changes": { "$ref": "#/$defs/nonNegativeInteger" }
+      }
+    }
+  }
+}
