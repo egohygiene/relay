@@ -1,0 +1,209 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Release Relay actions
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - release.json
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Unused immutable semantic version tag, for example v1.0.0."
+        required: true
+        type: string
+      update-major-alias:
+        description: "Advance the matching moving major alias after release creation."
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: relay-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Validate and publish every Relay action
+    if: "${{ github.ref_name == github.event.repository.default_branch }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Checkout exact default-branch commit
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Validate release request
+        id: release
+        shell: bash
+        env:
+          DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
+          EVENT_NAME: "${{ github.event_name }}"
+          MANUAL_UPDATE_MAJOR_ALIAS: "${{ inputs.update-major-alias }}"
+          MANUAL_VERSION: "${{ inputs.version }}"
+        run: |
+          set -euo pipefail
+          if [[ "${EVENT_NAME}" == "push" ]]; then
+            readarray -t release_values < <(
+              python3 - <<'PYTHON'
+              import json
+              from pathlib import Path
+
+              release = json.loads(Path("release.json").read_text(encoding="utf-8"))
+              if release.get("schema") != "egohygiene.relay-release/v1":
+                  raise SystemExit("release.json uses an unsupported schema")
+              print(release.get("version", ""))
+              print(str(release.get("update_major_alias", False)).lower())
+              PYTHON
+            )
+            version="${release_values[0]:-}"
+            update_major_alias="${release_values[1]:-false}"
+          else
+            version="${MANUAL_VERSION}"
+            update_major_alias="${MANUAL_UPDATE_MAJOR_ALIAS}"
+          fi
+          if [[ "${GITHUB_REF_NAME}" != "${DEFAULT_BRANCH}" ]]; then
+            printf 'Releases must run from default branch %s; received %s.\n' \
+              "${DEFAULT_BRANCH}" "${GITHUB_REF_NAME}" >&2
+            exit 2
+          fi
+          if [[ ! "${version}" =~ ^v([1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            printf 'version must be an exact vMAJOR.MINOR.PATCH value: %s\n' "${version}" >&2
+            exit 2
+          fi
+          if [[ "${update_major_alias}" != "true" && "${update_major_alias}" != "false" ]]; then
+            printf 'update-major-alias must resolve to true or false: %s\n' \
+              "${update_major_alias}" >&2
+            exit 2
+          fi
+          git fetch origin "${DEFAULT_BRANCH}"
+          default_commit="$(git rev-parse "origin/${DEFAULT_BRANCH}^{commit}")"
+          current_commit="$(git rev-parse "HEAD^{commit}")"
+          if [[ "${current_commit}" != "${default_commit}" ]]; then
+            printf 'Release commit %s is not current default-branch head %s.\n' \
+              "${current_commit}" "${default_commit}" >&2
+            exit 2
+          fi
+          tag_exists="false"
+          if git ls-remote --exit-code --tags origin "refs/tags/${version}" >/dev/null 2>&1; then
+            git fetch --force origin "refs/tags/${version}:refs/tags/${version}"
+            existing_commit="$(git rev-parse "${version}^{commit}")"
+            if [[ "${existing_commit}" != "${current_commit}" ]]; then
+              printf 'Immutable release tag %s already targets another commit: %s\n' \
+                "${version}" "${existing_commit}" >&2
+              exit 2
+            fi
+            tag_exists="true"
+          fi
+          major_alias="${version%%.*}"
+          printf 'major-alias=%s\n' "${major_alias}" >> "${GITHUB_OUTPUT}"
+          printf 'commit=%s\n' "${current_commit}" >> "${GITHUB_OUTPUT}"
+          printf 'update-major-alias=%s\n' "${update_major_alias}" >> "${GITHUB_OUTPUT}"
+          printf 'version=%s\n' "${version}" >> "${GITHUB_OUTPUT}"
+          printf 'tag-exists=%s\n' "${tag_exists}" >> "${GITHUB_OUTPUT}"
+
+      - name: Validate action catalog and metadata
+        run: python3 scripts/validate_actions.py
+
+      - name: Run complete test suite
+        run: >-
+          python3 -m unittest discover
+          --start-directory tests
+          --pattern "test_*.py"
+          --verbose
+
+      - name: Compile Python sources
+        run: python3 -m compileall -q actions scripts tests
+
+      - name: Validate Bash syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r script; do
+            bash -n "${script}"
+          done < <(find actions scripts -type f \( -name "*.sh" -o -name "repo-activity" \) -print | sort)
+
+      - name: Parse JSON contracts and fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYTHON'
+          import json
+          from pathlib import Path
+
+          paths = [Path("action-catalog.json"), Path("release.json")]
+          paths.extend(sorted(
+              path
+              for root in (Path("actions"), Path("schemas"), Path("tests/fixtures"))
+              for path in root.rglob("*.json")
+          ))
+          for path in paths:
+              json.loads(path.read_text(encoding="utf-8"))
+          print(f"Parsed {len(paths)} JSON documents")
+          PYTHON
+
+      - name: Parse action and workflow YAML metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          ruby -e '
+            require "psych"
+            paths = Dir["actions/*/action.yml", ".github/workflows/*.{yml,yaml}"].sort
+            paths.each { |path| Psych.parse_file(path) }
+            puts "Parsed #{paths.length} YAML metadata documents"
+          '
+
+      - name: Create immutable tag and GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          TAG_EXISTS: "${{ steps.release.outputs.tag-exists }}"
+          VERSION: "${{ steps.release.outputs.version }}"
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [[ "${TAG_EXISTS}" != "true" ]]; then
+            git tag --annotate "${VERSION}" --message "Relay ${VERSION}"
+            git push origin "refs/tags/${VERSION}"
+          fi
+          if gh release view "${VERSION}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            printf 'GitHub Release already exists for %s; retaining it.\n' "${VERSION}"
+          else
+            gh release create "${VERSION}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --title "Relay ${VERSION}" \
+              --generate-notes \
+              --verify-tag
+          fi
+
+      - name: Advance moving major alias
+        if: "${{ steps.release.outputs.update-major-alias == 'true' }}"
+        shell: bash
+        env:
+          MAJOR_ALIAS: "${{ steps.release.outputs.major-alias }}"
+          RELEASE_COMMIT: "${{ steps.release.outputs.commit }}"
+          VERSION: "${{ steps.release.outputs.version }}"
+        run: |
+          set -euo pipefail
+          git tag --force --annotate "${MAJOR_ALIAS}" "${RELEASE_COMMIT}" \
+            --message "Relay ${MAJOR_ALIAS} tracks ${VERSION}"
+          git push --force origin "refs/tags/${MAJOR_ALIAS}"

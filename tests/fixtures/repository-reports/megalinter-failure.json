@@ -1,0 +1,35 @@
+{
+  "active_linters": [
+    {
+      "name": "PYTHON_RUFF",
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "name": "ACTION_ACTIONLINT",
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 2,
+      "total_number_warnings": 0
+    },
+    {
+      "name": "PYTHON_PYLINT",
+      "return_code": 0,
+      "status": "warning",
+      "total_number_errors": 0,
+      "total_number_warnings": 3
+    },
+    {
+      "name": "RUST_CLIPPY",
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    }
+  ],
+  "return_code": 1,
+  "status": "error",
+  "validate_all_code_base": true
+}

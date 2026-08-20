@@ -60,6 +60,25 @@ flowchart LR
 
 The diagram is conceptual. [SYSTEM.md](SYSTEM.md) remains authoritative for responsibilities and implementation evidence determines current availability.
 
+## Implemented v1 package topology
+
+```text
+actions/
+├── repository-intelligence/      # read-only collector and static renderer
+├── normalize-repository-report/  # producer contract adapter
+└── publish-report-snapshot/      # guarded default-branch writer
+
+.github/workflows/
+├── repository-intelligence.yml   # reusable artifact orchestration
+├── validate.yml                  # pull-request and default-branch gate
+└── release.yml                   # reviewed manifest or manual SemVer publication
+```
+
+The dashboard builder never deploys Pages. Consumers compose its output into
+their one authoritative site artifact. The snapshot publisher is isolated as a
+separate action because it requires `contents: write`; all other v1 action jobs
+operate with read-only repository permissions.
+
 ## Dependency rules
 
 - Sibling domain capabilities integrate through versioned public contracts, not direct access to internals.
@@ -83,7 +102,7 @@ The architecture favors independently usable local and self-hosted operation. Op
 
 ## Evidence and uncertainty
 
-- **Observed:** The repository README establishes the intended boundary as the reusable GitHub Actions, workflows, automation components, and CI orchestration library for the organization; significant implementation remains incomplete.
+- **Observed:** Relay now contains a machine-readable action catalog, three independently consumable composite actions, a reusable artifact workflow, validation gates, and a reviewed `release.json`-driven release workflow with manual recovery. Cross-repository consumer proof remains pending.
 - **Decided for this draft:** The repository owns the bounded concern described here and participates through versioned contracts.
 - **Proposed:** Target systems and later roadmap phases remain proposals until accepted and implemented.
-- **Open question:** Which parts of this draft should become active in the first independently versioned release?
+- **Open question:** Which additional reusable producers should join the repository-wide release unit after v1?

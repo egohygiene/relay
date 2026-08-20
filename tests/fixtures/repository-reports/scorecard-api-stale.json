@@ -1,0 +1,9 @@
+{
+  "checks": [],
+  "date": "2026-08-07T12:00:00Z",
+  "repo": {
+    "commit": "3333333333333333333333333333333333333333",
+    "name": "github.com/example/repository"
+  },
+  "score": 10.0
+}

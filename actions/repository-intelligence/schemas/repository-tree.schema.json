@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/contracts/repository-tree/v1/schema.json",
+  "title": "Ego Hygiene commit-scoped repository tree",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schema_version", "source", "tree"],
+  "properties": {
+    "schema": { "const": "egohygiene.repository-tree/v1" },
+    "schema_version": { "const": 1 },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "ref", "committed_at"],
+      "properties": {
+        "revision": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "ref": { "type": "string", "minLength": 1 },
+        "committed_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "tree": { "$ref": "#/$defs/node" }
+  },
+  "$defs": {
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["directories", "files", "symlinks", "submodules"],
+      "properties": {
+        "directories": { "type": "integer", "minimum": 0 },
+        "files": { "type": "integer", "minimum": 0 },
+        "symlinks": { "type": "integer", "minimum": 0 },
+        "submodules": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "path", "type"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "type": {
+          "enum": ["directory", "file", "symlink", "submodule"]
+        },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node" }
+        },
+        "descendants": { "$ref": "#/$defs/counts" },
+        "truncated": { "const": true }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "const": "directory" } },
+            "required": ["type"]
+          },
+          "then": { "required": ["children", "descendants"] },
+          "else": {
+            "not": {
+              "anyOf": [
+                { "required": ["children"] },
+                { "required": ["descendants"] },
+                { "required": ["truncated"] }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

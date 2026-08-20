@@ -1,0 +1,54 @@
+{
+  "commit": "1111111111111111111111111111111111111111",
+  "execution": {
+    "message": "OSV completed and validated its canonical outputs.",
+    "state": "success"
+  },
+  "findings": {
+    "advisory": 2,
+    "blocking": 0,
+    "by_severity": {
+      "critical": 0,
+      "high": 0,
+      "medium": 2
+    },
+    "state": "attention",
+    "total": 2
+  },
+  "freshness": {
+    "expires_at": "2026-08-22T12:00:00Z",
+    "stale_after_days": 8
+  },
+  "generated_at": "2026-08-14T12:00:00Z",
+  "links": {
+    "detail": "https://github.com/example/repository/tree/1111111111111111111111111111111111111111/.reports/osv",
+    "security": "https://github.com/example/repository/security/code-scanning",
+    "source": "https://github.com/example/repository/commit/1111111111111111111111111111111111111111",
+    "workflow": "https://github.com/example/repository/actions/runs/101"
+  },
+  "osv": {
+    "discovery": {
+      "ecosystem_count": 3
+    },
+    "scan": {
+      "affected_packages": 2,
+      "severity": {
+        "critical": 0,
+        "high": 0,
+        "medium": 2
+      },
+      "vulnerabilities": 2
+    },
+    "severity_threshold": "high"
+  },
+  "producer": "osv",
+  "provenance": {
+    "event": "push",
+    "run_attempt": 1,
+    "run_id": "101",
+    "workflow": "OSV Vulnerability Scan"
+  },
+  "repository": "example/repository",
+  "schema": "egohygiene.repository-report-summary/v1",
+  "schema_version": 1
+}

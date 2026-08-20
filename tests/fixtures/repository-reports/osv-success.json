@@ -1,0 +1,40 @@
+{
+  "commit": "1111111111111111111111111111111111111111",
+  "discovery": {
+    "artifact_count": 2,
+    "artifacts": ["Cargo.lock", "package-lock.json"],
+    "ecosystem_count": 2,
+    "ecosystems": ["Rust", "Node.js"]
+  },
+  "event": "push",
+  "generated_at": "2026-08-14T12:00:00Z",
+  "reports": {
+    "json": ".reports/osv/latest.json",
+    "markdown": ".reports/osv/latest.md",
+    "sarif": ".reports/osv/latest.sarif"
+  },
+  "repository": "example/repository",
+  "scan": {
+    "affected_packages": 3,
+    "files_scanned": ["Cargo.lock", "package-lock.json"],
+    "files_skipped": [],
+    "severity": {
+      "critical": 0,
+      "high": 1,
+      "low": 0,
+      "medium": 2,
+      "total": 3,
+      "unknown": 0
+    },
+    "vulnerabilities": 3
+  },
+  "scan_duration_seconds": 4,
+  "scanner": { "name": "osv-scanner", "version": "2.5.0" },
+  "scanner_step_outcomes": {
+    "json": "failure",
+    "markdown": "failure",
+    "sarif": "failure"
+  },
+  "schema_version": 1,
+  "severity_threshold": "high"
+}

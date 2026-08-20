@@ -1,0 +1,32 @@
+{
+  "checks": [
+    {
+      "documentation": { "url": "https://example.test/branch-protection" },
+      "name": "Branch-Protection",
+      "reason": "branch protection is incomplete",
+      "score": 4
+    },
+    {
+      "documentation": { "url": "https://example.test/security-policy" },
+      "name": "Security-Policy",
+      "reason": "security policy detected",
+      "score": 10
+    },
+    {
+      "documentation": { "url": "https://example.test/signed-releases" },
+      "name": "Signed-Releases",
+      "reason": "signed releases were not detected",
+      "score": 7
+    }
+  ],
+  "date": "2026-08-14T12:00:00Z",
+  "repo": {
+    "commit": "1111111111111111111111111111111111111111",
+    "name": "github.com/example/repository"
+  },
+  "score": 6.4,
+  "scorecard": {
+    "commit": "2222222222222222222222222222222222222222",
+    "version": "v5.5.0"
+  }
+}

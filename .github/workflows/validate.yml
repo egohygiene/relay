@@ -1,0 +1,105 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Validate Relay actions
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "relay-validation-${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate catalog, contracts, implementations, and metadata
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Checkout Relay
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Validate action catalog and metadata
+        run: python3 scripts/validate_actions.py
+
+      - name: Run unit and integration tests
+        run: >-
+          python3 -m unittest discover
+          --start-directory tests
+          --pattern "test_*.py"
+          --verbose
+
+      - name: Compile Python sources
+        run: python3 -m compileall -q actions scripts tests
+
+      - name: Validate Bash syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r script; do
+            bash -n "${script}"
+          done < <(find actions scripts -type f \( -name "*.sh" -o -name "repo-activity" \) -print | sort)
+
+      - name: Parse JSON contracts and fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYTHON'
+          import json
+          from pathlib import Path
+
+          paths = [Path("action-catalog.json"), Path("release.json")]
+          paths.extend(sorted(
+              path
+              for root in (Path("actions"), Path("schemas"), Path("tests/fixtures"))
+              for path in root.rglob("*.json")
+          ))
+          for path in paths:
+              json.loads(path.read_text(encoding="utf-8"))
+          print(f"Parsed {len(paths)} JSON documents")
+          PYTHON
+
+      - name: Parse action and workflow YAML metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          ruby -e '
+            require "psych"
+            paths = Dir["actions/*/action.yml", ".github/workflows/*.{yml,yaml}"].sort
+            paths.each { |path| Psych.parse_file(path) }
+            puts "Parsed #{paths.length} YAML metadata documents"
+          '
+
+  intelligence-smoke:
+    name: Exercise reusable workflow without producer reports
+    needs: validate
+    permissions:
+      contents: read
+    uses: $/.github/workflows/repository-intelligence.yml
+    with:
+      output-directory: "dist/intelligence"
+      work-directory: ".cache/repository-intelligence"
+      reports-directory: ".reports"
+      default-branch: "main"
+      activity-since: "1 year ago"
+      max-depth: "10"
+      artifact-retention-days: 1

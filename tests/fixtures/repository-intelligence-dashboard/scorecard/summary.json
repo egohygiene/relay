@@ -1,0 +1,50 @@
+{
+  "commit": "1111111111111111111111111111111111111111",
+  "execution": {
+    "message": "Scorecard SARIF and API projections were validated.",
+    "state": "success"
+  },
+  "findings": {
+    "advisory": 2,
+    "blocking": 0,
+    "by_severity": {
+      "warning": 2
+    },
+    "state": "attention",
+    "total": 2
+  },
+  "freshness": {
+    "expires_at": "2026-08-22T12:00:00Z",
+    "stale_after_days": 8
+  },
+  "generated_at": "2026-08-14T12:00:00Z",
+  "links": {
+    "detail": "https://github.com/example/repository/security/code-scanning",
+    "security": "https://github.com/example/repository/security/code-scanning",
+    "source": "https://github.com/example/repository/commit/1111111111111111111111111111111111111111",
+    "workflow": "https://github.com/example/repository/actions/runs/103"
+  },
+  "producer": "scorecard",
+  "provenance": {
+    "event": "schedule",
+    "run_attempt": 1,
+    "run_id": "103",
+    "workflow": "OpenSSF Scorecard"
+  },
+  "repository": "example/repository",
+  "schema": "egohygiene.repository-report-summary/v1",
+  "schema_version": 1,
+  "scorecard": {
+    "aggregate_score": 4.1,
+    "aggregate_source": "api",
+    "api_status": "matched",
+    "checks_needing_attention": 2,
+    "checks_total": 18,
+    "weakest_checks": [
+      {
+        "name": "Branch-Protection",
+        "score": 2
+      }
+    ]
+  }
+}

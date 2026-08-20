@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.dev/schemas/repository-report-summary/v1.json",
+  "title": "Ego Hygiene repository report summary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "producer",
+    "repository",
+    "commit",
+    "generated_at",
+    "freshness",
+    "execution",
+    "findings",
+    "provenance",
+    "links"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.repository-report-summary/v1"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "producer": {
+      "enum": ["osv", "megalinter", "scorecard"]
+    },
+    "repository": {
+      "type": "string",
+      "minLength": 1
+    },
+    "commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expires_at", "stale_after_days"],
+      "properties": {
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "stale_after_days": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "message"],
+      "properties": {
+        "state": {
+          "enum": ["success", "failure", "cancelled", "unknown"]
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "findings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "total", "blocking", "advisory", "by_severity"],
+      "properties": {
+        "state": {
+          "enum": ["clear", "attention", "blocked", "unknown"]
+        },
+        "total": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "blocking": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "advisory": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "by_severity": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event", "workflow", "run_id", "run_attempt"],
+      "properties": {
+        "event": { "type": "string" },
+        "workflow": { "type": "string" },
+        "run_id": { "type": ["string", "null"] },
+        "run_attempt": { "type": ["integer", "null"], "minimum": 1 }
+      }
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["detail", "workflow", "security", "source"],
+      "properties": {
+        "detail": { "type": "string" },
+        "workflow": { "type": "string" },
+        "security": { "type": "string" },
+        "source": { "type": "string" }
+      }
+    },
+    "osv": { "type": "object" },
+    "megalinter": { "type": "object" },
+    "scorecard": { "type": "object" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "producer": { "const": "osv" } } },
+      "then": { "required": ["osv"] }
+    },
+    {
+      "if": { "properties": { "producer": { "const": "megalinter" } } },
+      "then": { "required": ["megalinter"] }
+    },
+    {
+      "if": { "properties": { "producer": { "const": "scorecard" } } },
+      "then": { "required": ["scorecard"] }
+    }
+  ]
+}

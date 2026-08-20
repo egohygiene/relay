@@ -1,0 +1,57 @@
+{
+  "$schema": "./schemas/action-catalog.schema.json",
+  "schema": "egohygiene.relay-action-catalog/v1",
+  "schema_version": 1,
+  "release_model": {
+    "unit": "repository",
+    "immutable": "vMAJOR.MINOR.PATCH",
+    "moving_alias": "vMAJOR",
+    "recommended_consumer_pin": "full-commit-sha"
+  },
+  "actions": [
+    {
+      "id": "normalize-repository-report",
+      "path": "actions/normalize-repository-report",
+      "name": "Normalize Repository Report",
+      "summary": "Normalize OSV, MegaLinter, and Scorecard output into one public report contract.",
+      "status": "beta",
+      "runtime": ["bash", "python3"],
+      "permissions": {},
+      "side_effects": ["workspace-write"],
+      "consumer_ref": "egohygiene/relay/actions/normalize-repository-report@v1"
+    },
+    {
+      "id": "publish-report-snapshot",
+      "path": "actions/publish-report-snapshot",
+      "name": "Publish Report Snapshot",
+      "summary": "Publish guarded, stable .reports snapshots from trusted default-branch jobs.",
+      "status": "beta",
+      "runtime": ["bash", "git"],
+      "permissions": {"contents": "write"},
+      "side_effects": ["git-commit", "git-push", "repository-write"],
+      "consumer_ref": "egohygiene/relay/actions/publish-report-snapshot@v1"
+    },
+    {
+      "id": "repository-intelligence",
+      "path": "actions/repository-intelligence",
+      "name": "Repository Intelligence",
+      "summary": "Build a deterministic static intelligence dashboard for one repository.",
+      "status": "beta",
+      "runtime": ["bash", "git", "python3"],
+      "permissions": {"contents": "read"},
+      "side_effects": ["workspace-write"],
+      "consumer_ref": "egohygiene/relay/actions/repository-intelligence@v1"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "repository-intelligence",
+      "path": ".github/workflows/repository-intelligence.yml",
+      "name": "Repository Intelligence Artifact",
+      "summary": "Build and upload a repository intelligence dashboard as a workflow artifact.",
+      "status": "beta",
+      "permissions": {"contents": "read"},
+      "consumer_ref": "egohygiene/relay/.github/workflows/repository-intelligence.yml@v1"
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-action.json
+
+name: "🧭 Normalize Repository Report"
+description: >-
+  Convert OSV, MegaLinter, or OpenSSF Scorecard output into the versioned
+  repository-intelligence summary contract while preserving native reports.
+
+inputs:
+  producer:
+    description: "Supported producer: osv, megalinter, or scorecard."
+    required: true
+  input:
+    description: "Repository-relative path to the producer's canonical JSON or SARIF input."
+    required: true
+  output:
+    description: "Repository-relative destination for the normalized summary."
+    required: true
+  policy-input:
+    description: "MegaLinter-only repository-relative policy/tool-matrix path."
+    required: false
+    default: ""
+  scorecard-api-input:
+    description: "Optional repository-relative cached OpenSSF Scorecard API response."
+    required: false
+    default: ""
+  stale-after-days:
+    description: "Days after generation when the evidence becomes stale."
+    required: false
+    default: "8"
+  generated-at:
+    description: "Optional RFC 3339 generation instant; defaults to the current UTC time."
+    required: false
+    default: ""
+  detail-url:
+    description: "Optional canonical HTTPS detail URL override."
+    required: false
+    default: ""
+  repository:
+    description: "Repository in owner/name form; defaults to the workflow repository."
+    required: false
+    default: ""
+  commit:
+    description: "Full source commit SHA; defaults to the workflow SHA."
+    required: false
+    default: ""
+
+outputs:
+  summary:
+    description: "Repository-relative path to the normalized summary."
+    value: "${{ inputs.output }}"
+
+branding:
+  icon: "refresh-cw"
+  color: "blue"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "🧭 Normalize producer report"
+      shell: bash
+      env:
+        INPUT_COMMIT: "${{ inputs.commit }}"
+        INPUT_DETAIL_URL: "${{ inputs.detail-url }}"
+        INPUT_GENERATED_AT: "${{ inputs.generated-at }}"
+        INPUT_PATH: "${{ inputs.input }}"
+        INPUT_OUTPUT: "${{ inputs.output }}"
+        INPUT_POLICY_PATH: "${{ inputs.policy-input }}"
+        INPUT_PRODUCER: "${{ inputs.producer }}"
+        INPUT_REPOSITORY: "${{ inputs.repository }}"
+        INPUT_SCORECARD_API_PATH: "${{ inputs.scorecard-api-input }}"
+        INPUT_STALE_AFTER_DAYS: "${{ inputs.stale-after-days }}"
+      run: |
+        set -euo pipefail
+
+        validate_relative_path() {
+          local label="$1"
+          local value="$2"
+          if [[ -z "${value}" || "${value}" == "." || "${value}" == /* || "/${value}/" == */../* ]]; then
+            printf '%s must be a non-empty repository-relative path without .. components: %s\n' \
+              "${label}" "${value}" >&2
+            return 2
+          fi
+        }
+
+        case "${INPUT_PRODUCER}" in
+          osv | megalinter | scorecard) ;;
+          *)
+            printf 'producer must be osv, megalinter, or scorecard: %s\n' "${INPUT_PRODUCER}" >&2
+            exit 2
+            ;;
+        esac
+        validate_relative_path "input" "${INPUT_PATH}"
+        validate_relative_path "output" "${INPUT_OUTPUT}"
+        if [[ -n "${INPUT_POLICY_PATH}" ]]; then
+          validate_relative_path "policy-input" "${INPUT_POLICY_PATH}"
+        fi
+        if [[ -n "${INPUT_SCORECARD_API_PATH}" ]]; then
+          validate_relative_path "scorecard-api-input" "${INPUT_SCORECARD_API_PATH}"
+        fi
+        if [[ "${INPUT_PRODUCER}" == "megalinter" && -z "${INPUT_POLICY_PATH}" ]]; then
+          printf 'policy-input is required for MegaLinter normalization\n' >&2
+          exit 2
+        fi
+        if [[ ! "${INPUT_STALE_AFTER_DAYS}" =~ ^[0-9]+$ ]] || (( INPUT_STALE_AFTER_DAYS < 1 )); then
+          printf 'stale-after-days must be a positive integer: %s\n' "${INPUT_STALE_AFTER_DAYS}" >&2
+          exit 2
+        fi
+
+        repository="${INPUT_REPOSITORY:-${GITHUB_REPOSITORY:-}}"
+        commit="${INPUT_COMMIT:-${GITHUB_SHA:-}}"
+        if [[ ! "${repository}" =~ ^[^/[:space:]]+/[^/[:space:]]+$ ]]; then
+          printf 'repository must use owner/name form: %s\n' "${repository}" >&2
+          exit 2
+        fi
+        if [[ ! "${commit}" =~ ^[0-9a-f]{40}$ ]]; then
+          printf 'commit must be a full lowercase Git SHA: %s\n' "${commit}" >&2
+          exit 2
+        fi
+        if [[ -n "${INPUT_DETAIL_URL}" && ! "${INPUT_DETAIL_URL}" =~ ^https://[^[:space:]]+$ ]]; then
+          printf 'detail-url must be an absolute HTTPS URL: %s\n' "${INPUT_DETAIL_URL}" >&2
+          exit 2
+        fi
+
+        arguments=(
+          --producer "${INPUT_PRODUCER}"
+          --workspace "${GITHUB_WORKSPACE}"
+          --input "${INPUT_PATH}"
+          --output "${INPUT_OUTPUT}"
+          --repository "${repository}"
+          --commit "${commit}"
+          --event "${GITHUB_EVENT_NAME:-}"
+          --workflow "${GITHUB_WORKFLOW:-}"
+          --server-url "${GITHUB_SERVER_URL:-https://github.com}"
+          --stale-after-days "${INPUT_STALE_AFTER_DAYS}"
+        )
+        if [[ -n "${GITHUB_RUN_ID:-}" ]]; then
+          arguments+=(--run-id "${GITHUB_RUN_ID}")
+        fi
+        if [[ -n "${GITHUB_RUN_ATTEMPT:-}" ]]; then
+          arguments+=(--run-attempt "${GITHUB_RUN_ATTEMPT}")
+        fi
+        if [[ -n "${INPUT_POLICY_PATH}" ]]; then
+          arguments+=(--policy-input "${INPUT_POLICY_PATH}")
+        fi
+        if [[ -n "${INPUT_SCORECARD_API_PATH}" ]]; then
+          arguments+=(--scorecard-api-input "${INPUT_SCORECARD_API_PATH}")
+        fi
+        if [[ -n "${INPUT_GENERATED_AT}" ]]; then
+          arguments+=(--generated-at "${INPUT_GENERATED_AT}")
+        fi
+        if [[ -n "${INPUT_DETAIL_URL}" ]]; then
+          arguments+=(--detail-url "${INPUT_DETAIL_URL}")
+        fi
+
+        python3 "${GITHUB_ACTION_PATH}/scripts/normalize_repository_report.py" "${arguments[@]}"
