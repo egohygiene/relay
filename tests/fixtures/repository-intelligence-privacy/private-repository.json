@@ -1,0 +1,6 @@
+{
+  "visibility": "private",
+  "repository": "example/private-repository",
+  "expected_classification": "internal-only",
+  "private_repository_metadata": "PRIVATE-REPOSITORY-METADATA-SENTINEL"
+}

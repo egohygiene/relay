@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-08-19
+updated: 2026-08-20
 governed_by:
   - architecture-roadmap
 depends_on:
@@ -46,7 +46,8 @@ This roadmap describes capability evolution, not promised dates or an issue queu
 
 ## Phase 2: Define action and workflow contracts
 
-**Status:** Complete for v1 beta.
+**Status:** Complete for the v1 contract; additive hardening continues within
+the accepted compatibility boundary.
 
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 
@@ -60,7 +61,8 @@ This roadmap describes capability evolution, not promised dates or an issue queu
 
 ## Phase 3: Extract and test reusable components
 
-**Status:** Complete locally; cross-repository CI evidence remains required.
+**Status:** Complete for the central implementation, fixtures, and test suite;
+consumer evidence is tracked in Phase 5.
 
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 
@@ -74,7 +76,8 @@ This roadmap describes capability evolution, not promised dates or an issue queu
 
 ## Phase 4: Publish immutable releases
 
-**Status:** Release workflow implemented; first `v1.0.0` publication pending.
+**Status:** `v1.0.0` is published immutably. The current release manifest
+requests the additive `v1.1.0` hardening release.
 
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 
@@ -88,7 +91,9 @@ This roadmap describes capability evolution, not promised dates or an issue queu
 
 ## Phase 5: Migrate repository consumers
 
-**Status:** Pending proof in Empathy, Akashic, and Optiflow.
+**Status:** Empathy, Akashic, and Optiflow have existing immutable-SHA v1.0
+consumer integrations. Their migrations to one approved hardened Relay SHA and
+public-route verification remain planned, repository-specific pilot work.
 
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 
@@ -114,7 +119,10 @@ Optional managed services, enterprise controls, marketplaces, and the conversati
 
 ## Evidence and uncertainty
 
-- **Observed:** The repository README establishes the intended boundary as the reusable GitHub Actions, workflows, automation components, and CI orchestration library for the organization; significant implementation remains incomplete.
+- **Observed:** Relay owns the reusable Repository Intelligence implementation,
+  framework-free template, public contracts, reusable artifact workflow,
+  privacy fixtures, and validation suite. `v1.0.0` is published; the additive
+  `v1.1.0` hardening release and consumer pin migrations remain under review.
 - **Decided for this draft:** The repository owns the bounded concern described here and participates through versioned contracts.
 - **Proposed:** Target systems and later roadmap phases remain proposals until accepted and implemented.
-- **Open question:** Which parts of this draft should become active in the first independently versioned release?
+- **Open question:** Which consumer-specific constraints will surface during the three hardened pilot migrations?

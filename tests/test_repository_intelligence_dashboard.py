@@ -116,6 +116,14 @@ class RepositoryIntelligenceDashboardTests(unittest.TestCase):
 
         reports_root = self.repository_root / ".reports"
         shutil.copytree(FIXTURE_ROOT, reports_root)
+        for summary_path in sorted(reports_root.glob("*/summary.json")):
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
+            summary["commit"] = self.source_commit
+            summary["links"] = {
+                key: value.replace("1" * 40, self.source_commit)
+                for key, value in summary["links"].items()
+            }
+            summary_path.write_text(json.dumps(summary), encoding="utf-8")
         return reports_root
 
     def write_analytics_summary(self) -> Path:
@@ -368,6 +376,22 @@ class RepositoryIntelligenceDashboardTests(unittest.TestCase):
         self.assertEqual(scorecard["execution"]["state"], "failure")
         self.assertEqual(scorecard["findings"]["state"], "unknown")
 
+    def test_symlinked_report_is_invalid_and_not_read(self) -> None:
+        reports_root = self.repository_root / ".reports"
+        producer_root = reports_root / "osv"
+        producer_root.mkdir(parents=True)
+        outside = Path(self.temporary_directory.name) / "private.json"
+        outside.write_text(
+            json.dumps({"private_metadata": "must not be read"}),
+            encoding="utf-8",
+        )
+        (producer_root / "summary.json").symlink_to(outside)
+
+        dashboard = self.build(reports_root)
+
+        self.assertEqual(dashboard["producers"]["osv"]["availability"], "invalid")
+        self.assertIn("symbolic links", dashboard["producers"]["osv"]["execution"]["message"])
+
     def test_stale_boundary_is_inclusive(self) -> None:
         reports_root = self.copy_reports()
         osv_path = reports_root / "osv/summary.json"
@@ -380,22 +404,95 @@ class RepositoryIntelligenceDashboardTests(unittest.TestCase):
 
         self.assertEqual(dashboard["producers"]["osv"]["freshness"]["state"], "stale")
 
+    def test_report_for_another_commit_is_invalid_and_not_rendered(self) -> None:
+        reports_root = self.copy_reports()
+        osv_path = reports_root / "osv/summary.json"
+        osv = json.loads(osv_path.read_text(encoding="utf-8"))
+        osv["commit"] = "b" * 40
+        osv_path.write_text(json.dumps(osv), encoding="utf-8")
+
+        dashboard = self.build(reports_root)
+        projection = dashboard["producers"]["osv"]
+
+        self.assertEqual(projection["availability"], "invalid")
+        self.assertEqual(projection["execution"]["state"], "failure")
+        self.assertEqual(projection["findings"]["state"], "unknown")
+        self.assertEqual(projection["metrics"], {})
+        self.assertIn("source commit", projection["execution"]["message"])
+
     def test_renderer_escapes_text_and_rejects_unsafe_links(self) -> None:
         reports_root = self.copy_reports()
         osv_path = reports_root / "osv/summary.json"
         osv = json.loads(osv_path.read_text(encoding="utf-8"))
         osv["execution"]["message"] = "<script>alert('no')</script>"
-        osv["links"]["detail"] = "javascript:alert(1)"
-        osv["links"]["workflow"] = "//example.invalid/phish"
+        osv["links"]["detail"] = "https://user:token@github.com/example/repository"
+        osv["links"]["workflow"] = "https://github.com/example/repository?token=fake"
+        osv["links"]["security"] = "./../../.cache/repository-intelligence/activity"
+        osv["links"]["source"] = "https://[broken/repository"
         osv_path.write_text(json.dumps(osv), encoding="utf-8")
 
         dashboard = self.build(reports_root)
         rendered = dashboard_builder.render_html(dashboard)
 
         self.assertNotIn("<script>", rendered)
-        self.assertNotIn("javascript:", rendered)
-        self.assertNotIn("example.invalid", rendered)
-        self.assertIn("&lt;script&gt;", rendered)
+        self.assertNotIn("user:token", rendered)
+        self.assertNotIn("?token=", rendered)
+        self.assertNotIn(".cache/repository-intelligence", rendered)
+        self.assertNotIn("[broken", rendered)
+        self.assertNotIn("&lt;script&gt;", rendered)
+        self.assertIn("evidence was normalized successfully", rendered)
+        for unsafe in (
+            "https://user:token@github.com/example/repository",
+            "https://github.com/example/repository?token=fake",
+            "./../../.cache/repository-intelligence/activity",
+            "./summary.json?token=fake",
+            "./summary.json#PRIVATE-ISSUE-BODY-SENTINEL-LEAK",
+            "https://github.com/example/repository#token",
+            "https://internal.example.invalid/private-report",
+            "https://127.0.0.1/report",
+            "https://github.com/%67%68%70%5fAAAAAAAAAAAAAAAAAAAA",
+            "https://github.com/egohygiene/private-repository/actions/runs/123",
+            "https://github.com:444/example/repository/actions/runs/123",
+            "https://scorecard.dev/viewer/?uri=github.com/../repo",
+            "https://scorecard.dev:444/viewer/?uri=github.com/example/repository",
+            "https://[broken/repository",
+        ):
+            with self.subTest(unsafe=unsafe):
+                self.assertEqual(dashboard_builder.safe_url(unsafe, REPOSITORY), "")
+
+    def test_report_links_must_match_the_dashboard_source_commit(self) -> None:
+        reports_root = self.copy_reports()
+        osv_path = reports_root / "osv/summary.json"
+        osv = json.loads(osv_path.read_text(encoding="utf-8"))
+        osv["links"]["source"] = f"https://github.com/{REPOSITORY}/commit/{'b' * 40}"
+        osv["links"]["detail"] = (
+            f"https://github.com/{REPOSITORY}/tree/{'b' * 40}/.reports/osv"
+        )
+        osv_path.write_text(json.dumps(osv), encoding="utf-8")
+
+        dashboard = self.build(reports_root)
+
+        self.assertNotIn("source", dashboard["producers"]["osv"]["links"])
+        self.assertNotIn("detail", dashboard["producers"]["osv"]["links"])
+
+    def test_absolute_analytics_hotspot_is_invalid(self) -> None:
+        analytics_path = self.write_analytics_summary()
+        analytics = json.loads(analytics_path.read_text(encoding="utf-8"))
+        analytics["changes"]["hotspots"] = [
+            {
+                "path": "/home/runner/work/private/source.py",
+                "commit_touches": 1,
+                "insertions": 1,
+                "deletions": 0,
+                "binary_changes": 0,
+            }
+        ]
+        analytics_path.write_text(json.dumps(analytics), encoding="utf-8")
+
+        dashboard = self.build(self.copy_reports(), analytics_path)
+
+        self.assertEqual(dashboard["analytics"]["availability"], "invalid")
+        self.assertIn("repository-relative", dashboard["analytics"]["message"])
 
     def test_bundle_is_deterministic_and_contains_no_contributor_identities(self) -> None:
         reports_root = self.copy_reports()
@@ -404,35 +501,63 @@ class RepositoryIntelligenceDashboardTests(unittest.TestCase):
         first = self.build(reports_root, analytics_summary, repository_tree)
         second = self.build(reports_root, analytics_summary, repository_tree)
         output_root = self.repository_root / "site/intelligence"
+        provenance = dashboard_builder.build_bundle_provenance(
+            repository=REPOSITORY,
+            source_commit=self.source_commit,
+            generated_at=AS_OF,
+            timestamp_source="consumer-source-commit",
+            generator_version="1.1.0",
+            generator_repository="egohygiene/relay",
+            generator_ref="a" * 40,
+            generator_commit="a" * 40,
+            generator_immutable=True,
+            consumer_visibility="public",
+        )
 
         dashboard_builder.write_dashboard_bundle(
             output_root,
             first,
             ACTION_ROOT / "assets/dashboard.css",
             ACTION_ROOT / "assets/explorer.js",
+            provenance,
         )
-        first_json = (output_root / "summary.json").read_text(encoding="utf-8")
-        first_html = (output_root / "index.html").read_text(encoding="utf-8")
+        first_files = {
+            path.name: path.read_bytes() for path in sorted(output_root.iterdir())
+        }
         dashboard_builder.write_dashboard_bundle(
             output_root,
             second,
             ACTION_ROOT / "assets/dashboard.css",
             ACTION_ROOT / "assets/explorer.js",
+            provenance,
         )
+        second_files = {
+            path.name: path.read_bytes() for path in sorted(output_root.iterdir())
+        }
 
-        self.assertEqual(first_json, (output_root / "summary.json").read_text(encoding="utf-8"))
-        self.assertEqual(first_html, (output_root / "index.html").read_text(encoding="utf-8"))
+        self.assertEqual(first_files, second_files)
+        self.assertEqual(
+            set(first_files),
+            {"explorer.js", "index.html", "provenance.json", "styles.css", "summary.json"},
+        )
+        first_json = first_files["summary.json"].decode("utf-8")
+        first_html = first_files["index.html"].decode("utf-8")
         self.assertNotIn("fixture@example.test", first_json)
         self.assertNotIn("fixture: initialize", first_json)
         self.assertNotIn("fixture: initialize", first_html)
         self.assertEqual(first["vitality"]["metrics"]["contributors_90_days"], 1)
         self.assertTrue((output_root / "styles.css").is_file())
         self.assertTrue((output_root / "explorer.js").is_file())
+        self.assertIn(self.source_commit, first_files["provenance.json"].decode("utf-8"))
 
     def test_output_preparation_removes_stale_files_without_leaving_repository(self) -> None:
         output_root = self.repository_root / "dist/intelligence"
         output_root.mkdir(parents=True)
         (output_root / "stale.txt").write_text("stale\n", encoding="utf-8")
+        root_index = self.repository_root / "dist/index.html"
+        cname = self.repository_root / "dist/CNAME"
+        root_index.write_text("root site\n", encoding="utf-8")
+        cname.write_text("example.test\n", encoding="utf-8")
 
         prepared = output_preparer.prepare_output_directory(
             self.repository_root,
@@ -441,20 +566,138 @@ class RepositoryIntelligenceDashboardTests(unittest.TestCase):
 
         self.assertEqual(prepared, output_root)
         self.assertEqual(list(prepared.iterdir()), [])
+        self.assertEqual(root_index.read_text(encoding="utf-8"), "root site\n")
+        self.assertEqual(cname.read_text(encoding="utf-8"), "example.test\n")
 
         outside = Path(self.temporary_directory.name) / "outside"
         outside.mkdir()
         symlink = self.repository_root / "linked-output"
         symlink.symlink_to(outside, target_is_directory=True)
-        with self.assertRaisesRegex(ValueError, "outside the repository"):
+        with self.assertRaisesRegex(ValueError, "symbolic-link components"):
             output_preparer.prepare_output_directory(
                 self.repository_root,
                 "linked-output/intelligence",
             )
+        protected_target = self.repository_root / ".github/intelligence"
+        protected_target.mkdir()
+        victim = protected_target / "victim.txt"
+        victim.write_text("preserve me\n", encoding="utf-8")
+        internal_link = self.repository_root / "linked-protected"
+        internal_link.symlink_to(self.repository_root / ".github", target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, "symbolic-link components"):
+            output_preparer.prepare_output_directory(
+                self.repository_root,
+                "linked-protected/intelligence",
+            )
+        self.assertEqual(victim.read_text(encoding="utf-8"), "preserve me\n")
         with self.assertRaisesRegex(ValueError, "canonical repository-relative"):
             output_preparer.prepare_output_directory(self.repository_root, "../intelligence")
+        for noncanonical in ("dist//intelligence", "dist/intelligence/", "./dist"):
+            with self.subTest(noncanonical=noncanonical), self.assertRaisesRegex(
+                ValueError,
+                "canonical repository-relative",
+            ):
+                output_preparer.prepare_output_directory(
+                    self.repository_root,
+                    noncanonical,
+                )
         with self.assertRaisesRegex(ValueError, "protected repository area"):
             output_preparer.prepare_output_directory(self.repository_root, ".github/intelligence")
+
+    def test_directory_layout_separates_public_private_and_report_paths(self) -> None:
+        resolved = output_preparer.validate_directory_layout(
+            self.repository_root,
+            "dist/intelligence",
+            ".cache/repository-intelligence",
+            ".reports",
+        )
+
+        self.assertEqual(resolved["output-directory"], self.repository_root / "dist/intelligence")
+        for output, work, reports in (
+            ("dist/intelligence", "dist/intelligence/private", ".reports"),
+            ("dist/intelligence", ".cache", "dist/intelligence/reports"),
+        ):
+            with self.assertRaisesRegex(ValueError, "must not overlap"):
+                output_preparer.validate_directory_layout(
+                    self.repository_root,
+                    output,
+                    work,
+                    reports,
+                )
+        with self.assertRaisesRegex(ValueError, "site composition root"):
+            output_preparer.validate_directory_layout(
+                self.repository_root,
+                "dist/intelligence",
+                "dist/repository-intelligence",
+                ".reports",
+            )
+        with self.assertRaisesRegex(ValueError, "nested inside reports-directory"):
+            output_preparer.validate_directory_layout(
+                self.repository_root,
+                "dist/intelligence",
+                ".reports/private",
+                ".reports",
+            )
+        nested_reports = output_preparer.validate_directory_layout(
+            self.repository_root,
+            "dist/intelligence",
+            ".cache/repository-intelligence",
+            ".cache/repository-intelligence/reports",
+        )
+        self.assertEqual(
+            nested_reports["reports-directory"],
+            self.repository_root / ".cache/repository-intelligence/reports",
+        )
+        with self.assertRaisesRegex(ValueError, "subtree within a site composition root"):
+            output_preparer.validate_directory_layout(
+                self.repository_root,
+                "intelligence",
+                ".cache/repository-intelligence",
+                ".reports",
+            )
+        with self.assertRaisesRegex(ValueError, "end with the intelligence subtree"):
+            output_preparer.validate_directory_layout(
+                self.repository_root,
+                "dist/not-intelligence",
+                ".cache/repository-intelligence",
+                ".reports",
+            )
+        with self.assertRaisesRegex(ValueError, "protected repository area"):
+            output_preparer.validate_directory_layout(
+                self.repository_root,
+                "dist/intelligence",
+                ".git/intelligence",
+                ".reports",
+            )
+
+    def test_directory_layout_rejects_managed_child_and_report_symlinks(self) -> None:
+        work_root = self.repository_root / ".cache/repository-intelligence"
+        work_root.mkdir(parents=True)
+        public_root = self.repository_root / "dist"
+        public_root.mkdir()
+        (work_root / "activity").symlink_to(public_root, target_is_directory=True)
+
+        with self.assertRaisesRegex(ValueError, "symbolic-link components"):
+            output_preparer.validate_directory_layout(
+                self.repository_root,
+                "dist/intelligence",
+                ".cache/repository-intelligence",
+                ".reports",
+            )
+
+        (work_root / "activity").unlink()
+        report_root = self.repository_root / ".reports/osv"
+        report_root.mkdir(parents=True)
+        outside = Path(self.temporary_directory.name) / "private-summary.json"
+        outside.write_text("{}\n", encoding="utf-8")
+        (report_root / "summary.json").symlink_to(outside)
+        with self.assertRaisesRegex(ValueError, "symbolic-link components"):
+            output_preparer.validate_directory_layout(
+                self.repository_root,
+                "dist/intelligence",
+                ".cache/repository-intelligence",
+                ".reports",
+            )
 
     def test_vitality_uses_the_represented_commit_not_untracked_files(self) -> None:
         untracked_workflow = self.repository_root / ".github/workflows/untracked.yml"
@@ -495,6 +738,57 @@ class RepositoryIntelligenceDashboardTests(unittest.TestCase):
         )
 
         self.assertEqual(dashboard["vitality"]["metrics"]["test_artifacts"], 5)
+
+    def test_vitality_is_independent_of_dirty_mailmap_state(self) -> None:
+        second_file = self.repository_root / "second.txt"
+        second_file.write_text("second\n", encoding="utf-8")
+        git(self.repository_root, "add", "second.txt")
+        environment = os.environ.copy()
+        environment.update(
+            {
+                "GIT_AUTHOR_NAME": "Second Private Author",
+                "GIT_AUTHOR_EMAIL": "second@example.test",
+                "GIT_AUTHOR_DATE": "2026-08-14T11:00:00Z",
+                "GIT_COMMITTER_DATE": "2026-08-14T11:00:00Z",
+            }
+        )
+        git(
+            self.repository_root,
+            "commit",
+            "--quiet",
+            "--message",
+            "second private message",
+            environment=environment,
+        )
+        represented_commit = git(self.repository_root, "rev-parse", "HEAD")
+        first = dashboard_builder.collect_vitality(
+            self.repository_root,
+            REPOSITORY,
+            "main",
+            represented_commit,
+            AS_OF,
+        )
+        (self.repository_root / ".mailmap").write_text(
+            "Combined <combined@example.test> <fixture@example.test>\n"
+            "Combined <combined@example.test> <second@example.test>\n",
+            encoding="utf-8",
+        )
+        git(
+            self.repository_root,
+            "config",
+            "mailmap.file",
+            str(self.repository_root / ".mailmap"),
+        )
+        second = dashboard_builder.collect_vitality(
+            self.repository_root,
+            REPOSITORY,
+            "main",
+            represented_commit,
+            AS_OF,
+        )
+
+        self.assertEqual(first, second)
+        self.assertEqual(second["metrics"]["contributors_90_days"], 2)
 
     def test_checked_in_schema_declares_public_contract(self) -> None:
         schema = json.loads(

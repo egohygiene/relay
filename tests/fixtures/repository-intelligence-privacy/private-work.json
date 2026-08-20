@@ -1,0 +1,9 @@
+{
+  "visibility": "private",
+  "private_issue_body": "PRIVATE-ISSUE-BODY-SENTINEL",
+  "author_email": "private-author@example.test",
+  "commit_message": "PRIVATE-COMMIT-MESSAGE-SENTINEL",
+  "filesystem_path": "/home/runner/work/private-repository/private-source.txt",
+  "session": "PRIVATE-SESSION-SENTINEL",
+  "token": "PRIVATE-TOKEN-SENTINEL"
+}

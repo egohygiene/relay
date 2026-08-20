@@ -16,12 +16,40 @@ import re
 import subprocess
 import tempfile
 from typing import Any
-from urllib.parse import quote, urlparse
+from urllib.parse import quote, unquote, urlsplit
 
 DASHBOARD_SCHEMA = "egohygiene.repository-intelligence-dashboard/v3"
 REPORT_SCHEMA = "egohygiene.repository-report-summary/v1"
 ANALYTICS_SCHEMA = "egohygiene.repository-analytics/v1"
 TREE_SCHEMA = "egohygiene.repository-tree/v1"
+PROVENANCE_SCHEMA = "egohygiene.relay.repository-intelligence-provenance/v1"
+PROVENANCE_SCHEMA_VERSION = 1
+GENERATOR_NAME = "egohygiene/relay/actions/repository-intelligence"
+GENERATOR_REPOSITORY = "egohygiene/relay"
+CONSUMER_VISIBILITIES = {"public", "private", "internal", "unknown"}
+PUBLIC_SEVERITIES = {"unknown", "low", "medium", "high", "critical", "warning"}
+SCORECARD_CHECK_NAMES = {
+    "Binary-Artifacts",
+    "Branch-Protection",
+    "CI-Tests",
+    "CII-Best-Practices",
+    "Code-Review",
+    "Contributors",
+    "Dangerous-Workflow",
+    "Dependency-Update-Tool",
+    "Fuzzing",
+    "License",
+    "Maintained",
+    "Packaging",
+    "Pinned-Dependencies",
+    "SAST",
+    "SBOM",
+    "Security-Policy",
+    "Signed-Releases",
+    "Token-Permissions",
+    "Vulnerabilities",
+    "Webhooks",
+}
 TREE_NODE_TYPES = {"directory", "file", "symlink", "submodule"}
 MAX_TREE_DEPTH = 20
 MAX_TREE_NODES = 20_000
@@ -36,10 +64,28 @@ FINDING_STATES = {"clear", "attention", "blocked", "unknown"}
 AVAILABILITY_STATES = {"available", "unavailable", "invalid"}
 FRESHNESS_STATES = {"fresh", "stale", "unknown"}
 FULL_SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
+EMAIL_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"
+)
+REPOSITORY_PATTERN = re.compile(
+    r"^(?!\.{1,2}/)(?![^/]+/\.{1,2}$)[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+)
 
 
 class DashboardInputError(ValueError):
     """Raised when a dashboard or producer input violates its contract."""
+
+
+def decode_percent_layers(value: str, max_rounds: int = 8) -> str | None:
+    """Decode bounded percent-encoding layers or reject ambiguous deep encoding."""
+
+    decoded = value
+    for _ in range(max_rounds):
+        next_value = unquote(decoded)
+        if next_value == decoded:
+            return decoded
+        decoded = next_value
+    return None if unquote(decoded) != decoded else decoded
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -55,6 +101,13 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--default-branch", required=True)
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--as-of", required=True)
+    parser.add_argument("--timestamp-source", required=True)
+    parser.add_argument("--generator-version", required=True)
+    parser.add_argument("--generator-repository", required=True)
+    parser.add_argument("--generator-ref", default="")
+    parser.add_argument("--generator-commit", default="")
+    parser.add_argument("--generator-immutable", required=True)
+    parser.add_argument("--consumer-visibility", required=True)
     parser.add_argument("--stylesheet-source", required=True)
     parser.add_argument("--script-source", required=True)
     return parser.parse_args()
@@ -122,22 +175,119 @@ def scorecard_weakest_checks(value: Any) -> list[dict[str, Any]]:
             continue
         name = metric_string(candidate.get("name"))
         score = metric_score(candidate.get("score"))
-        if name is not None and score is not None:
+        if name in SCORECARD_CHECK_NAMES and score is not None:
             checks.append({"name": name, "score": score})
     return checks
 
 
-def safe_url(value: Any) -> str:
-    """Keep only public HTTPS or repository-relative links."""
+def canonical_github_reference(
+    path: str,
+    repository: str,
+    source_commit: str | None,
+) -> bool:
+    """Accept only source-pinned consumer links and reviewed GitHub route shapes."""
 
-    if not isinstance(value, str) or not value:
+    escaped_repository = re.escape(repository)
+    if re.fullmatch(
+        rf"/{escaped_repository}/(?:actions/runs/[0-9]+|security/code-scanning)",
+        path,
+    ):
+        return True
+    if source_commit is None or not FULL_SHA_PATTERN.fullmatch(source_commit):
+        return False
+    if path == f"/{repository}/commit/{source_commit}":
+        return True
+    source_match = re.fullmatch(
+        rf"/{escaped_repository}/(blob|tree)/({re.escape(source_commit)})(?:/(.+))?",
+        path,
+    )
+    if source_match is None:
+        return False
+    kind, _, encoded_path = source_match.groups()
+    if encoded_path is None:
+        return kind == "tree"
+    decoded_path = unquote(encoded_path)
+    if quote(decoded_path, safe="/") != encoded_path or "\\" in decoded_path:
+        return False
+    return all(part not in {"", ".", ".."} for part in decoded_path.split("/"))
+
+
+def safe_url(
+    value: Any,
+    repository: str | None = None,
+    source_commit: str | None = None,
+) -> str:
+    """Keep only credential-free HTTPS or canonical repository-relative links."""
+
+    if (
+        not isinstance(value, str)
+        or not value
+        or "\\" in value
+        or any(character.isspace() for character in value)
+    ):
         return ""
-    if value.startswith("./") or (value.startswith("/") and not value.startswith("//")):
+    try:
+        parsed = urlsplit(value)
+        parsed.port
+    except ValueError:
+        return ""
+    decoded_value = decode_percent_layers(value)
+    if decoded_value is None or EMAIL_PATTERN.search(decoded_value) or re.search(
+        r"(?i)(?:github_pat_|gh[pousr]_|(?:token|password|secret)\s*[:=])",
+        decoded_value or "",
+    ):
+        return ""
+    if value.startswith("./"):
+        encoded_path = parsed.path[2:]
+        decoded_path = unquote(encoded_path)
+        if (
+            parsed.scheme
+            or parsed.netloc
+            or parsed.query
+            or parsed.fragment
+            or not encoded_path
+            or quote(decoded_path, safe="/") != encoded_path
+            or "\\" in decoded_path
+            or any(part in {"", ".", ".."} for part in decoded_path.split("/"))
+        ):
+            return ""
         return value
-    parsed = urlparse(value)
-    if parsed.scheme == "https" and parsed.netloc:
+    if (
+        parsed.scheme != "https"
+        or not parsed.hostname
+        or parsed.port not in {None, 443}
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.fragment
+    ):
+        return ""
+    if parsed.hostname.casefold() not in {"github.com", "scorecard.dev"}:
+        return ""
+    hostname = parsed.hostname.casefold()
+    if hostname == "github.com":
+        if repository is None or parsed.query:
+            return ""
+        return value if canonical_github_reference(parsed.path, repository, source_commit) else ""
+    if (
+        hostname == "scorecard.dev"
+        and parsed.path == "/viewer/"
+        and repository is not None
+        and parsed.query == f"uri=github.com/{repository}"
+    ):
         return value
     return ""
+
+
+def public_execution_message(producer: str, state: str) -> str:
+    """Describe producer execution without copying untrusted diagnostic text."""
+
+    descriptions = {
+        "success": f"{PRODUCER_NAMES[producer]} evidence was normalized successfully.",
+        "failure": f"{PRODUCER_NAMES[producer]} evidence reported an execution failure.",
+        "cancelled": f"{PRODUCER_NAMES[producer]} evidence reported a cancelled execution.",
+        "unknown": f"{PRODUCER_NAMES[producer]} execution could not be determined.",
+    }
+    return descriptions[state]
 
 
 def unknown_status(state: str, message: str) -> dict[str, str]:
@@ -214,11 +364,14 @@ def producer_metrics(producer: str, payload: dict[str, Any]) -> dict[str, Any]:
             "ecosystems": metric_integer(discovery.get("ecosystem_count"))
             if isinstance(discovery, dict)
             else None,
-            "threshold": metric_string(payload.get("severity_threshold")),
+            "threshold": payload.get("severity_threshold")
+            if payload.get("severity_threshold") in {"low", "medium", "high", "critical", "none"}
+            else None,
             "severity": {
                 str(key): count
                 for key, value in sorted(severity.items())
-                if (count := metric_integer(value)) is not None
+                if key in PUBLIC_SEVERITIES
+                and (count := metric_integer(value)) is not None
             }
             if isinstance(severity, dict)
             else {},
@@ -227,26 +380,43 @@ def producer_metrics(producer: str, payload: dict[str, Any]) -> dict[str, Any]:
         tools = payload.get("tools", {})
         diagnostics = payload.get("diagnostics", {})
         return {
-            "profile": metric_string(payload.get("profile")),
+            "profile": payload.get("profile")
+            if payload.get("profile") in {"all", "holistic", "changed-files"}
+            else None,
             "tools": {
                 str(key): count
                 for key, value in sorted(tools.items())
-                if (count := metric_integer(value)) is not None
+                if key
+                in {
+                    "active",
+                    "passed",
+                    "with_findings",
+                    "execution_errors",
+                    "runner_failed",
+                    "blocking",
+                    "advisory",
+                }
+                and (count := metric_integer(value)) is not None
             }
             if isinstance(tools, dict)
             else {},
             "diagnostics": {
                 str(key): count
                 for key, value in sorted(diagnostics.items())
-                if (count := metric_integer(value)) is not None
+                if key in {"errors", "warnings"}
+                and (count := metric_integer(value)) is not None
             }
             if isinstance(diagnostics, dict)
             else {},
         }
     return {
         "aggregate_score": metric_score(payload.get("aggregate_score")),
-        "aggregate_source": metric_string(payload.get("aggregate_source")),
-        "api_status": metric_string(payload.get("api_status")),
+        "aggregate_source": payload.get("aggregate_source")
+        if payload.get("aggregate_source") in {"api", "official-api", "unavailable"}
+        else None,
+        "api_status": payload.get("api_status")
+        if payload.get("api_status") in {"matched", "unavailable", "invalid", "stale"}
+        else None,
         "checks_total": metric_integer(payload.get("checks_total")),
         "checks_needing_attention": metric_integer(payload.get("checks_needing_attention")),
         "weakest_checks": scorecard_weakest_checks(payload.get("weakest_checks")),
@@ -254,7 +424,11 @@ def producer_metrics(producer: str, payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def validate_report(
-    document: dict[str, Any], producer: str, repository: str, as_of: datetime
+    document: dict[str, Any],
+    producer: str,
+    repository: str,
+    source_commit: str,
+    as_of: datetime,
 ) -> dict[str, Any]:
     """Validate and project one normalized producer summary."""
 
@@ -267,6 +441,8 @@ def validate_report(
     commit = document.get("commit")
     if not isinstance(commit, str) or not FULL_SHA_PATTERN.fullmatch(commit):
         raise DashboardInputError("Summary commit must be a full lowercase SHA.")
+    if commit != source_commit:
+        raise DashboardInputError("Summary does not represent the dashboard source commit.")
     generated_at_raw = document.get("generated_at")
     if not isinstance(generated_at_raw, str):
         raise DashboardInputError("generated_at must be an RFC 3339 string.")
@@ -292,7 +468,9 @@ def validate_report(
     if not isinstance(by_severity, dict):
         raise DashboardInputError("findings.by_severity must be an object.")
     normalized_severity = {
-        str(key): safe_integer(value) for key, value in sorted(by_severity.items())
+        str(key): safe_integer(value)
+        for key, value in sorted(by_severity.items())
+        if key in PUBLIC_SEVERITIES
     }
 
     report_freshness = require_object(document, "freshness")
@@ -338,7 +516,10 @@ def validate_report(
         raise DashboardInputError(
             "links must declare detail, workflow, security, and source strings."
         )
-    links = {key: safe_url(report_links.get(key)) for key in link_keys}
+    links = {
+        key: safe_url(report_links.get(key), repository, source_commit)
+        for key in link_keys
+    }
     payload = require_object(document, producer)
     return {
         "producer": producer,
@@ -346,7 +527,10 @@ def validate_report(
         "availability": "available",
         "generated_at": format_timestamp(generated_at),
         "commit": commit,
-        "execution": {"state": execution_state, "message": execution["message"]},
+        "execution": {
+            "state": execution_state,
+            "message": public_execution_message(producer, execution_state),
+        },
         "findings": {
             "state": finding_state,
             "total": total,
@@ -368,21 +552,27 @@ def validate_report(
 
 
 def load_report(
-    reports_root: Path, producer: str, repository: str, as_of: datetime
+    reports_root: Path,
+    producer: str,
+    repository: str,
+    source_commit: str,
+    as_of: datetime,
 ) -> dict[str, Any]:
     """Load one producer summary with explicit unavailable and invalid fallbacks."""
 
     path = reports_root / producer / "summary.json"
+    if (reports_root / producer).is_symlink() or path.is_symlink():
+        return invalid_projection(producer, "Summary path must not use symbolic links.")
     if not path.is_file() or path.stat().st_size == 0:
         return unavailable_projection(producer)
     try:
         document = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
+    except (OSError, json.JSONDecodeError, RecursionError):
         return invalid_projection(producer, "Summary is malformed JSON.")
     if not isinstance(document, dict):
         return invalid_projection(producer, "Summary must contain a JSON object.")
     try:
-        return validate_report(document, producer, repository, as_of)
+        return validate_report(document, producer, repository, source_commit, as_of)
     except DashboardInputError as error:
         return invalid_projection(producer, str(error))
 
@@ -428,6 +618,19 @@ def analytics_rows(
         identity = candidate.get(identity_key)
         if not isinstance(identity, str) or not identity:
             raise DashboardInputError(f"{label}[{index}].{identity_key} must be non-empty.")
+        if identity_key == "path":
+            parts = identity.split("/")
+            if identity.startswith("/") or "\\" in identity or any(
+                part in {"", ".", ".."} for part in parts
+            ):
+                raise DashboardInputError(f"{label}[{index}].path must be repository-relative.")
+        if identity_key == "week":
+            try:
+                datetime.strptime(identity, "%Y-%m-%d")
+            except ValueError as error:
+                raise DashboardInputError(
+                    f"{label}[{index}].week must use YYYY-MM-DD."
+                ) from error
         row: dict[str, Any] = {identity_key: identity}
         for metric_key in metric_keys:
             row[metric_key] = analytics_integer(
@@ -593,7 +796,7 @@ def load_analytics(path: Path | None, source_commit: str) -> dict[str, Any]:
         )
     try:
         document = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
+    except (OSError, json.JSONDecodeError, RecursionError):
         return analytics_projection("invalid", "Repository analytics is malformed JSON.")
     if not isinstance(document, dict):
         return analytics_projection("invalid", "Repository analytics must be an object.")
@@ -788,7 +991,7 @@ def load_repository_tree(path: Path | None, source_commit: str) -> dict[str, Any
         )
     try:
         document = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
+    except (OSError, json.JSONDecodeError, RecursionError):
         return anatomy_projection("invalid", "Repository tree is malformed JSON.")
     if not isinstance(document, dict):
         return anatomy_projection("invalid", "Repository tree must be an object.")
@@ -871,7 +1074,7 @@ def collect_vitality(
             "log",
             f"--since={since_90_days}",
             f"--until={until}",
-            "--format=%aE",
+            "--format=%ae",
             resolved_commit,
         ).splitlines()
         contributors_90_days = len(
@@ -967,10 +1170,19 @@ def build_dashboard(
 
     if not FULL_SHA_PATTERN.fullmatch(source_commit):
         raise DashboardInputError("source-commit must be a full lowercase SHA")
-    if not repository or not default_branch:
-        raise DashboardInputError("repository and default-branch must be non-empty")
+    if not REPOSITORY_PATTERN.fullmatch(repository) or not default_branch:
+        raise DashboardInputError(
+            "repository must use owner/name form and default-branch must be non-empty"
+        )
     producers = {
-        producer: load_report(reports_root, producer, repository, as_of) for producer in PRODUCERS
+        producer: load_report(
+            reports_root,
+            producer,
+            repository,
+            source_commit,
+            as_of,
+        )
+        for producer in PRODUCERS
     }
     vitality = collect_vitality(repository_root, repository, default_branch, source_commit, as_of)
     return {
@@ -987,6 +1199,75 @@ def build_dashboard(
         "analytics": load_analytics(analytics_summary, source_commit),
         "anatomy": load_repository_tree(repository_tree, source_commit),
         "vitality": vitality,
+    }
+
+
+def build_bundle_provenance(
+    *,
+    repository: str,
+    source_commit: str,
+    generated_at: datetime,
+    timestamp_source: str,
+    generator_version: str,
+    generator_repository: str,
+    generator_ref: str,
+    generator_commit: str,
+    generator_immutable: bool,
+    consumer_visibility: str,
+) -> dict[str, Any]:
+    """Build deterministic Relay and consumer provenance outside dashboard v3."""
+
+    if timestamp_source not in {"consumer-source-commit", "explicit-input"}:
+        raise DashboardInputError("timestamp-source is unsupported")
+    if generator_repository != GENERATOR_REPOSITORY:
+        raise DashboardInputError("generator-repository must identify egohygiene/relay")
+    if not re.fullmatch(
+        r"[1-9][0-9]*\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)",
+        generator_version,
+    ):
+        raise DashboardInputError("generator-version must use MAJOR.MINOR.PATCH")
+    if generator_commit and not FULL_SHA_PATTERN.fullmatch(generator_commit):
+        raise DashboardInputError("generator-commit must be empty or a full lowercase SHA")
+    exact_ref_match = re.search(r"(?:^|@)([0-9a-f]{40})$", generator_ref)
+    exact_ref_commit = exact_ref_match.group(1) if exact_ref_match else None
+    if exact_ref_commit is not None and exact_ref_commit != generator_commit:
+        raise DashboardInputError("immutable generator-ref must match generator-commit")
+    if not isinstance(generator_immutable, bool) or generator_immutable is not bool(
+        exact_ref_commit
+    ):
+        raise DashboardInputError("generator immutable state does not match generator-ref")
+    if consumer_visibility not in CONSUMER_VISIBILITIES:
+        raise DashboardInputError("consumer-visibility is unsupported")
+    classification = "public-safe" if consumer_visibility == "public" else "internal-only"
+    return {
+        "schema": PROVENANCE_SCHEMA,
+        "schema_version": PROVENANCE_SCHEMA_VERSION,
+        "generator": {
+            "name": GENERATOR_NAME,
+            "version": generator_version,
+            "repository": generator_repository,
+            "source_ref": generator_ref,
+            "source_commit": generator_commit or None,
+            "immutable": generator_immutable,
+        },
+        "consumer": {
+            "repository": repository,
+            "source_commit": source_commit,
+            "visibility": consumer_visibility,
+        },
+        "contracts": {
+            "dashboard": {"schema": DASHBOARD_SCHEMA, "schema_version": 1},
+            "analytics": {"schema": ANALYTICS_SCHEMA, "schema_version": 1},
+            "repository_tree": {"schema": TREE_SCHEMA, "schema_version": 1},
+            "repository_report": {"schema": REPORT_SCHEMA, "schema_version": 1},
+        },
+        "generated_at": format_timestamp(generated_at),
+        "timestamp_source": timestamp_source,
+        "projection": {
+            "route": "/intelligence/",
+            "classification": classification,
+            "deployment_authority": "consumer",
+        },
     }
 
 
@@ -1849,7 +2130,7 @@ def render_html(dashboard: dict[str, Any]) -> str:
           <p class="card-kicker">Provenance</p>
           <p><code>{escaped(repository["source_commit"])}</code></p>
         </div>
-        <p><a href="./summary.json">View public JSON</a></p>
+        <p><a href="./summary.json">View public JSON</a> · <a href="./provenance.json">View provenance</a></p>
       </aside>
     </main>
     <script src="./explorer.js" defer></script>
@@ -1890,6 +2171,7 @@ def write_dashboard_bundle(
     dashboard: dict[str, Any],
     stylesheet_source: Path,
     script_source: Path,
+    provenance: dict[str, Any] | None = None,
 ) -> None:
     """Write the public JSON, HTML, and stylesheet as one static bundle."""
 
@@ -1900,6 +2182,11 @@ def write_dashboard_bundle(
     atomic_write_text(output_root / "index.html", render_html(dashboard))
     atomic_write_text(output_root / "styles.css", stylesheet_source.read_text(encoding="utf-8"))
     atomic_write_text(output_root / "explorer.js", script_source.read_text(encoding="utf-8"))
+    if provenance is not None:
+        atomic_write_text(
+            output_root / "provenance.json",
+            json.dumps(provenance, allow_nan=False, indent=2, sort_keys=True) + "\n",
+        )
 
 
 def main() -> int:
@@ -1926,6 +2213,8 @@ def main() -> int:
         raise SystemExit(f"Stylesheet source is unavailable: {stylesheet_source}")
     if not script_source.is_file():
         raise SystemExit(f"Explorer script source is unavailable: {script_source}")
+    if args.generator_immutable not in {"true", "false"}:
+        raise SystemExit("generator-immutable must be true or false")
     as_of = parse_timestamp(args.as_of, "as-of")
     dashboard = build_dashboard(
         repository_root=repository_root,
@@ -1937,7 +2226,25 @@ def main() -> int:
         analytics_summary=analytics_summary,
         repository_tree=repository_tree,
     )
-    write_dashboard_bundle(output_root, dashboard, stylesheet_source, script_source)
+    provenance = build_bundle_provenance(
+        repository=args.repository,
+        source_commit=args.source_commit,
+        generated_at=as_of,
+        timestamp_source=args.timestamp_source,
+        generator_version=args.generator_version,
+        generator_repository=args.generator_repository,
+        generator_ref=args.generator_ref,
+        generator_commit=args.generator_commit,
+        generator_immutable=args.generator_immutable == "true",
+        consumer_visibility=args.consumer_visibility,
+    )
+    write_dashboard_bundle(
+        output_root,
+        dashboard,
+        stylesheet_source,
+        script_source,
+        provenance,
+    )
     print(
         f"Generated repository intelligence dashboard at {output_root} "
         f"for {args.repository}@{args.source_commit[:12]}"

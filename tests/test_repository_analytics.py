@@ -133,6 +133,43 @@ class RepositoryAnalyticsTests(unittest.TestCase):
             self.assertNotIn("private@example.test", serialized)
             self.assertNotIn("generated.json", serialized)
 
+    def test_dirty_or_configured_mailmap_does_not_change_commit_scoped_output(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            repository_root = Path(temporary_directory)
+            git(repository_root, "init", "--initial-branch", "main")
+            git(repository_root, "config", "user.name", "First Private Author")
+            git(repository_root, "config", "user.email", "first@example.test")
+            (repository_root / "one.txt").write_text("one\n", encoding="utf-8")
+            git(repository_root, "add", "one.txt")
+            git(repository_root, "commit", "--message", "first", date="2026-08-13T12:00:00Z")
+            git(repository_root, "config", "user.name", "Second Private Author")
+            git(repository_root, "config", "user.email", "second@example.test")
+            (repository_root / "two.txt").write_text("two\n", encoding="utf-8")
+            git(repository_root, "add", "two.txt")
+            git(repository_root, "commit", "--message", "second", date="2026-08-14T12:00:00Z")
+
+            first = repository_analytics.generate_summary(
+                repo_root=repository_root,
+                ref="HEAD",
+                since_value="1 year ago",
+                excluded_paths=repository_analytics.DEFAULT_EXCLUDED_PATHS,
+            )
+            (repository_root / ".mailmap").write_text(
+                "Combined <combined@example.test> <first@example.test>\n"
+                "Combined <combined@example.test> <second@example.test>\n",
+                encoding="utf-8",
+            )
+            git(repository_root, "config", "mailmap.file", str(repository_root / ".mailmap"))
+            second = repository_analytics.generate_summary(
+                repo_root=repository_root,
+                ref="HEAD",
+                since_value="1 year ago",
+                excluded_paths=repository_analytics.DEFAULT_EXCLUDED_PATHS,
+            )
+
+            self.assertEqual(first, second)
+            self.assertEqual(second["activity"]["contributors"], 2)
+
     def test_repo_activity_reports_oldest_and_newest_matching_commits(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             repository_root = Path(temporary_directory)

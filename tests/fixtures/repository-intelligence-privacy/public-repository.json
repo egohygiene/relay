@@ -1,0 +1,12 @@
+{
+  "visibility": "public",
+  "repository": "example/public-repository",
+  "expected_route": "/intelligence/",
+  "expected_files": [
+    "explorer.js",
+    "index.html",
+    "provenance.json",
+    "styles.css",
+    "summary.json"
+  ]
+}

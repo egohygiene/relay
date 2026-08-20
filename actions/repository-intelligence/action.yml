@@ -5,13 +5,13 @@
 
 name: "🧠 Repository Intelligence"
 description: >-
-  Build a deterministic, public-safe repository intelligence dashboard with
+  Build a deterministic, visibility-aware repository intelligence dashboard with
   analytics, statistical snapshots, normalized report cards, and a searchable
   source tree. The action writes static files but never deploys them.
 
 inputs:
   output-directory:
-    description: "Repository-relative directory receiving the public static dashboard bundle."
+    description: "Repository-relative directory receiving the validated static dashboard subtree."
     required: false
     default: "dist/intelligence"
   work-directory:
@@ -27,13 +27,23 @@ inputs:
     required: false
     default: ".reports"
   repository:
-    description: "Repository in owner/name form. Defaults to the workflow repository."
+    description: >-
+      Repository in owner/name form for local contexts. It cannot override the
+      workflow repository when GitHub supplies repository metadata.
+    required: false
+    default: ""
+  repository-visibility:
+    description: >-
+      Consumer visibility for local contexts without repository event metadata.
+      It cannot override GitHub's public, private, or internal classification.
     required: false
     default: ""
   default-branch:
-    description: "Default branch shown by the repository vitality card."
+    description: >-
+      Default branch shown by the repository vitality card. Defaults to the
+      workflow repository default branch, then main when event metadata is absent.
     required: false
-    default: "main"
+    default: ""
   source-commit:
     description: >-
       Full commit SHA represented by the dashboard. Defaults to the commit
@@ -67,13 +77,13 @@ inputs:
   excluded-paths:
     description: "Comma-separated paths or directory names excluded from the repository tree."
     required: false
-    default: ".git,.staging,.cache,.venv,docs/generated,node_modules,vendor,dist,build,coverage,__pycache__,site"
+    default: ".git,.staging,.cache,.venv,.reports,.site,docs/generated,node_modules,vendor,dist,build,coverage,__pycache__"
   analytics-excluded-paths:
     description: >-
       Comma-separated generated, cached, or vendored paths excluded from
       public analytics while remaining eligible for the repository tree.
     required: false
-    default: ".git,.staging,.cache,.venv,.tox,.mypy_cache,.ruff_cache,.reports,docs/generated,node_modules,vendor,dist,build,coverage,__pycache__,site,target"
+    default: ".git,.staging,.cache,.venv,.tox,.mypy_cache,.ruff_cache,.reports,.site,docs/generated,node_modules,vendor,dist,build,coverage,__pycache__,target"
   require-full-history:
     description: "Fail rather than publishing incomplete activity from a shallow checkout."
     required: false
@@ -81,14 +91,17 @@ inputs:
 
 outputs:
   output-directory:
-    description: "Repository-relative directory containing the public dashboard bundle."
+    description: "Repository-relative directory containing the generated dashboard bundle."
     value: "${{ inputs.output-directory }}"
   index:
     description: "Repository-relative path to the dashboard entry point."
     value: "${{ inputs.output-directory }}/index.html"
   summary:
-    description: "Repository-relative path to the aggregate public dashboard contract."
+    description: "Repository-relative path to the aggregate dashboard projection."
     value: "${{ inputs.output-directory }}/summary.json"
+  provenance:
+    description: "Repository-relative path to deterministic generator and source provenance."
+    value: "${{ inputs.output-directory }}/provenance.json"
   analytics-summary:
     description: "Repository-relative path to the public repository analytics contract."
     value: "${{ inputs.work-directory }}/analytics/summary.json"
@@ -112,6 +125,9 @@ runs:
       id: metadata
       shell: bash
       env:
+        EVENT_DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
+        EVENT_REPOSITORY_PRIVATE: "${{ github.event.repository.private }}"
+        EVENT_REPOSITORY_VISIBILITY: "${{ github.event.repository.visibility }}"
         INPUT_ACTIVITY_REF: "${{ inputs.activity-ref }}"
         INPUT_AS_OF: "${{ inputs.as-of }}"
         INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
@@ -119,9 +135,15 @@ runs:
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
         INPUT_REPORTS_DIRECTORY: "${{ inputs.reports-directory }}"
         INPUT_REPOSITORY: "${{ inputs.repository }}"
+        INPUT_REPOSITORY_VISIBILITY: "${{ inputs.repository-visibility }}"
         INPUT_REQUIRE_FULL_HISTORY: "${{ inputs.require-full-history }}"
         INPUT_SOURCE_COMMIT: "${{ inputs.source-commit }}"
         INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
+        RELAY_ACTION_REF: "${{ github.action_ref }}"
+        RELAY_ACTION_REPOSITORY: "${{ github.action_repository }}"
+        RELAY_WORKFLOW_REF: "${{ job.workflow_ref }}"
+        RELAY_WORKFLOW_REPOSITORY: "${{ job.workflow_repository }}"
+        RELAY_WORKFLOW_SHA: "${{ job.workflow_sha }}"
       run: |
         set -euo pipefail
 
@@ -145,6 +167,14 @@ runs:
           .git | .github | actions | schemas | scripts | tests)
             printf 'output-directory must not replace a protected repository area: %s\n' \
               "${INPUT_OUTPUT_DIRECTORY}" >&2
+            exit 2
+            ;;
+          *) ;;
+        esac
+        case "${INPUT_WORK_DIRECTORY%%/*}" in
+          .git | .github | actions | schemas | scripts | tests)
+            printf 'work-directory must not replace a protected repository area: %s\n' \
+              "${INPUT_WORK_DIRECTORY}" >&2
             exit 2
             ;;
           *) ;;
@@ -184,19 +214,115 @@ runs:
           exit 2
         fi
 
-        repository="${INPUT_REPOSITORY:-${GITHUB_REPOSITORY:-}}"
+        if [[ -n "${GITHUB_REPOSITORY:-}" \
+          && -n "${INPUT_REPOSITORY}" \
+          && "${INPUT_REPOSITORY,,}" != "${GITHUB_REPOSITORY,,}" ]]; then
+          printf 'repository must not override the GitHub workflow repository\n' >&2
+          exit 2
+        fi
+        repository="${GITHUB_REPOSITORY:-${INPUT_REPOSITORY:-}}"
         if [[ -z "${repository}" ]]; then
           repository="local/$(basename "${GITHUB_WORKSPACE}")"
         fi
-        if [[ ! "${repository}" =~ ^[^/[:space:]]+/[^/[:space:]]+$ ]]; then
+        if [[ ! "${repository}" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
           printf 'repository must use owner/name form: %s\n' "${repository}" >&2
+          exit 2
+        fi
+        if [[ "${repository%%/*}" == "." \
+          || "${repository%%/*}" == ".." \
+          || "${repository#*/}" == "." \
+          || "${repository#*/}" == ".." ]]; then
+          printf 'repository owner and name must not be dot segments\n' >&2
           exit 2
         fi
 
         as_of="${INPUT_AS_OF}"
+        timestamp_source="explicit-input"
         if [[ -z "${as_of}" ]]; then
           as_of="$(git -C "${GITHUB_WORKSPACE}" show --no-patch --format=%cI "${source_commit}")"
+          timestamp_source="consumer-source-commit"
         fi
+        python3 - "${as_of}" <<'PYTHON'
+        from datetime import datetime
+        import sys
+
+        value = sys.argv[1]
+        normalized = value[:-1] + "+00:00" if value.endswith("Z") else value
+        parsed = datetime.fromisoformat(normalized)
+        if parsed.tzinfo is None:
+            raise SystemExit("as-of must be an RFC 3339 timestamp with a timezone")
+        PYTHON
+
+        default_branch="${INPUT_DEFAULT_BRANCH:-${EVENT_DEFAULT_BRANCH:-main}}"
+        if [[ ! "${default_branch}" =~ ^[^[:space:][:cntrl:]]+$ ]]; then
+          printf 'default-branch must be a non-empty Git ref without whitespace\n' >&2
+          exit 2
+        fi
+        generator_repository="${RELAY_ACTION_REPOSITORY}"
+        generator_ref="${RELAY_ACTION_REF}"
+        generator_commit=""
+        generator_immutable="false"
+        if [[ "${RELAY_WORKFLOW_REPOSITORY}" == "egohygiene/relay" \
+          && "${RELAY_WORKFLOW_REF}" == egohygiene/relay/.github/workflows/repository-intelligence.yml@* \
+          && "${RELAY_WORKFLOW_SHA}" =~ ^[0-9a-f]{40}$ ]]; then
+          generator_repository="${RELAY_WORKFLOW_REPOSITORY}"
+          generator_ref="${RELAY_WORKFLOW_REF}"
+          generator_commit="${RELAY_WORKFLOW_SHA}"
+          if [[ "${generator_ref}" =~ @([0-9a-f]{40})$ \
+            && "${BASH_REMATCH[1]}" == "${generator_commit}" ]]; then
+            generator_immutable="true"
+          fi
+        elif [[ "${generator_repository}" == "egohygiene/relay" \
+          && "${generator_ref}" =~ ^[0-9a-f]{40}$ ]]; then
+          generator_commit="${generator_ref}"
+          generator_immutable="true"
+        fi
+        if [[ "${generator_repository}" != "egohygiene/relay" ]]; then
+          printf 'Repository Intelligence generator must resolve to egohygiene/relay\n' >&2
+          exit 2
+        fi
+        generator_version="$(python3 - "${GITHUB_ACTION_PATH}/../../release.json" <<'PYTHON'
+        import json
+        from pathlib import Path
+        import sys
+
+        release = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+        version = release.get("version", "")
+        if not isinstance(version, str) or not version.startswith("v"):
+            raise SystemExit("Relay release.json has no exact version")
+        print(version[1:])
+        PYTHON
+        )"
+
+        event_visibility="${EVENT_REPOSITORY_VISIBILITY}"
+        if [[ -z "${event_visibility}" ]]; then
+          case "${EVENT_REPOSITORY_PRIVATE}" in
+            true) event_visibility="private" ;;
+            false) event_visibility="public" ;;
+            *) ;;
+          esac
+        fi
+        if [[ -n "${event_visibility}" \
+          && -n "${INPUT_REPOSITORY_VISIBILITY}" \
+          && "${INPUT_REPOSITORY_VISIBILITY}" != "${event_visibility}" ]]; then
+          printf 'repository-visibility must not override GitHub repository visibility\n' >&2
+          exit 2
+        fi
+        repository_visibility="${event_visibility:-${INPUT_REPOSITORY_VISIBILITY:-unknown}}"
+        case "${repository_visibility}" in
+          public | private | internal | unknown) ;;
+          *)
+            printf 'repository-visibility must be public, private, internal, or unknown\n' >&2
+            exit 2
+            ;;
+        esac
+
+        python3 "${GITHUB_ACTION_PATH}/scripts/prepare_output_directory.py" \
+          --repository-root "${GITHUB_WORKSPACE}" \
+          --output-directory "${INPUT_OUTPUT_DIRECTORY}" \
+          --work-directory "${INPUT_WORK_DIRECTORY}" \
+          --reports-directory "${INPUT_REPORTS_DIRECTORY}" \
+          --validate-layout-only
 
         mkdir -p "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}/activity"
         mkdir -p "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}/analytics"
@@ -204,7 +330,15 @@ runs:
         mkdir -p "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}/visualization"
         printf 'source-commit=%s\n' "${source_commit}" >> "${GITHUB_OUTPUT}"
         printf 'repository=%s\n' "${repository}" >> "${GITHUB_OUTPUT}"
+        printf 'repository-visibility=%s\n' "${repository_visibility}" >> "${GITHUB_OUTPUT}"
         printf 'as-of=%s\n' "${as_of}" >> "${GITHUB_OUTPUT}"
+        printf 'default-branch=%s\n' "${default_branch}" >> "${GITHUB_OUTPUT}"
+        printf 'timestamp-source=%s\n' "${timestamp_source}" >> "${GITHUB_OUTPUT}"
+        printf 'generator-version=%s\n' "${generator_version}" >> "${GITHUB_OUTPUT}"
+        printf 'generator-repository=%s\n' "${generator_repository}" >> "${GITHUB_OUTPUT}"
+        printf 'generator-ref=%s\n' "${generator_ref}" >> "${GITHUB_OUTPUT}"
+        printf 'generator-commit=%s\n' "${generator_commit}" >> "${GITHUB_OUTPUT}"
+        printf 'generator-immutable=%s\n' "${generator_immutable}" >> "${GITHUB_OUTPUT}"
 
     - name: "🌳 Generate commit-scoped repository tree"
       shell: bash
@@ -213,6 +347,7 @@ runs:
         INPUT_EXCLUDED_PATHS: "${{ inputs.excluded-paths }}"
         INPUT_MAX_DEPTH: "${{ inputs.max-depth }}"
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
+        INPUT_REPORTS_DIRECTORY: "${{ inputs.reports-directory }}"
         INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
       run: |
         set -euo pipefail
@@ -221,7 +356,7 @@ runs:
           --output-root "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}" \
           --ref "${INPUT_ACTIVITY_REF}" \
           --max-depth "${INPUT_MAX_DEPTH}" \
-          --excluded-paths "${INPUT_EXCLUDED_PATHS},${INPUT_WORK_DIRECTORY},${INPUT_OUTPUT_DIRECTORY}"
+          --excluded-paths "${INPUT_EXCLUDED_PATHS},${INPUT_WORK_DIRECTORY},${INPUT_REPORTS_DIRECTORY},${INPUT_OUTPUT_DIRECTORY}"
 
     - name: "📊 Generate private diagnostic activity"
       shell: bash
@@ -255,6 +390,7 @@ runs:
         INPUT_ACTIVITY_SINCE: "${{ inputs.activity-since }}"
         INPUT_ANALYTICS_EXCLUDED_PATHS: "${{ inputs.analytics-excluded-paths }}"
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
+        INPUT_REPORTS_DIRECTORY: "${{ inputs.reports-directory }}"
         INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
       run: |
         set -euo pipefail
@@ -263,18 +399,25 @@ runs:
           --output "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}/analytics/summary.json" \
           --ref "${INPUT_ACTIVITY_REF}" \
           --since "${INPUT_ACTIVITY_SINCE}" \
-          --excluded-paths "${INPUT_ANALYTICS_EXCLUDED_PATHS},${INPUT_WORK_DIRECTORY},${INPUT_OUTPUT_DIRECTORY}"
+          --excluded-paths "${INPUT_ANALYTICS_EXCLUDED_PATHS},${INPUT_WORK_DIRECTORY},${INPUT_REPORTS_DIRECTORY},${INPUT_OUTPUT_DIRECTORY}"
 
     - name: "✨ Render static intelligence dashboard"
       shell: bash
       env:
-        INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
         INPUT_REPORTS_DIRECTORY: "${{ inputs.reports-directory }}"
         INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
         RESOLVED_AS_OF: "${{ steps.metadata.outputs.as-of }}"
+        RESOLVED_DEFAULT_BRANCH: "${{ steps.metadata.outputs.default-branch }}"
+        RESOLVED_GENERATOR_COMMIT: "${{ steps.metadata.outputs.generator-commit }}"
+        RESOLVED_GENERATOR_IMMUTABLE: "${{ steps.metadata.outputs.generator-immutable }}"
+        RESOLVED_GENERATOR_REF: "${{ steps.metadata.outputs.generator-ref }}"
+        RESOLVED_GENERATOR_REPOSITORY: "${{ steps.metadata.outputs.generator-repository }}"
+        RESOLVED_GENERATOR_VERSION: "${{ steps.metadata.outputs.generator-version }}"
         RESOLVED_REPOSITORY: "${{ steps.metadata.outputs.repository }}"
+        RESOLVED_REPOSITORY_VISIBILITY: "${{ steps.metadata.outputs.repository-visibility }}"
         RESOLVED_SOURCE_COMMIT: "${{ steps.metadata.outputs.source-commit }}"
+        RESOLVED_TIMESTAMP_SOURCE: "${{ steps.metadata.outputs.timestamp-source }}"
       run: |
         set -euo pipefail
         python3 "${GITHUB_ACTION_PATH}/scripts/prepare_output_directory.py" \
@@ -287,8 +430,39 @@ runs:
           --repository-tree "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}/tree/repo.json" \
           --output-root "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}" \
           --repository "${RESOLVED_REPOSITORY}" \
-          --default-branch "${INPUT_DEFAULT_BRANCH}" \
+          --default-branch "${RESOLVED_DEFAULT_BRANCH}" \
           --source-commit "${RESOLVED_SOURCE_COMMIT}" \
           --as-of "${RESOLVED_AS_OF}" \
+          --timestamp-source "${RESOLVED_TIMESTAMP_SOURCE}" \
+          --generator-version "${RESOLVED_GENERATOR_VERSION}" \
+          --generator-repository "${RESOLVED_GENERATOR_REPOSITORY}" \
+          --generator-ref "${RESOLVED_GENERATOR_REF}" \
+          --generator-commit "${RESOLVED_GENERATOR_COMMIT}" \
+          --generator-immutable "${RESOLVED_GENERATOR_IMMUTABLE}" \
+          --consumer-visibility "${RESOLVED_REPOSITORY_VISIBILITY}" \
           --stylesheet-source "${GITHUB_ACTION_PATH}/assets/dashboard.css" \
           --script-source "${GITHUB_ACTION_PATH}/assets/explorer.js"
+
+    - name: "🛡️ Validate generated intelligence bundle"
+      shell: bash
+      env:
+        INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
+        RESOLVED_GENERATOR_COMMIT: "${{ steps.metadata.outputs.generator-commit }}"
+        RESOLVED_GENERATOR_IMMUTABLE: "${{ steps.metadata.outputs.generator-immutable }}"
+        RESOLVED_GENERATOR_REF: "${{ steps.metadata.outputs.generator-ref }}"
+        RESOLVED_GENERATOR_VERSION: "${{ steps.metadata.outputs.generator-version }}"
+        RESOLVED_REPOSITORY: "${{ steps.metadata.outputs.repository }}"
+        RESOLVED_REPOSITORY_VISIBILITY: "${{ steps.metadata.outputs.repository-visibility }}"
+        RESOLVED_SOURCE_COMMIT: "${{ steps.metadata.outputs.source-commit }}"
+      run: |
+        set -euo pipefail
+        python3 "${GITHUB_ACTION_PATH}/scripts/validate_repository_intelligence_bundle.py" \
+          --repository-root "${GITHUB_WORKSPACE}" \
+          --output-root "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}" \
+          --repository "${RESOLVED_REPOSITORY}" \
+          --repository-visibility "${RESOLVED_REPOSITORY_VISIBILITY}" \
+          --source-commit "${RESOLVED_SOURCE_COMMIT}" \
+          --generator-version "${RESOLVED_GENERATOR_VERSION}" \
+          --generator-source-ref "${RESOLVED_GENERATOR_REF}" \
+          --generator-source-commit "${RESOLVED_GENERATOR_COMMIT}" \
+          --generator-immutable "${RESOLVED_GENERATOR_IMMUTABLE}"
