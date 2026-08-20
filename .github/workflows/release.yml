@@ -63,16 +63,7 @@ jobs:
           set -euo pipefail
           if [[ "${EVENT_NAME}" == "push" ]]; then
             readarray -t release_values < <(
-              python3 - <<'PYTHON'
-              import json
-              from pathlib import Path
-
-              release = json.loads(Path("release.json").read_text(encoding="utf-8"))
-              if release.get("schema") != "egohygiene.relay-release/v1":
-                  raise SystemExit("release.json uses an unsupported schema")
-              print(release.get("version", ""))
-              print(str(release.get("update_major_alias", False)).lower())
-              PYTHON
+              python3 -c 'import json, sys; from pathlib import Path; release = json.loads(Path("release.json").read_text(encoding="utf-8")); sys.exit("release.json uses an unsupported schema") if release.get("schema") != "egohygiene.relay-release/v1" else None; print(release.get("version", "")); print(str(release.get("update_major_alias", False)).lower())'
             )
             version="${release_values[0]:-}"
             update_major_alias="${release_values[1]:-false}"
