@@ -59,6 +59,45 @@ jobs:
             bash -n "${script}"
           done < <(find actions scripts -type f \( -name "*.sh" -o -name "repo-activity" \) -print | sort)
 
+      - name: Validate inline Bash syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          destination="${RUNNER_TEMP}/relay-inline-shell"
+          mkdir -p "${destination}"
+          ruby -r psych -e '
+            destination = ARGV.fetch(0)
+            scripts = []
+            Dir["actions/*/action.yml"].sort.each do |path|
+              document = Psych.safe_load_file(path, aliases: true)
+              Array(document.dig("runs", "steps")).each_with_index do |step, index|
+                if step.is_a?(Hash) && step["shell"] == "bash" && step["run"]
+                  scripts << [path, "step #{index + 1}", step["run"]]
+                end
+              end
+            end
+            Dir[".github/workflows/*.{yml,yaml}"].sort.each do |path|
+              document = Psych.safe_load_file(path, aliases: true)
+              (document["jobs"] || {}).each do |job_name, job|
+                Array(job["steps"]).each_with_index do |step, index|
+                  if step.is_a?(Hash) && step["run"]
+                    scripts << [path, "#{job_name} step #{index + 1}", step["run"]]
+                  end
+                end
+              end
+            end
+            scripts.each_with_index do |(path, label, script), index|
+              File.write(
+                File.join(destination, format("%03d.sh", index)),
+                "# #{path}: #{label}\n#{script}\n",
+              )
+            end
+            puts "Extracted #{scripts.length} inline shell blocks"
+          ' "${destination}"
+          while IFS= read -r script; do
+            bash -n "${script}"
+          done < <(find "${destination}" -type f -name "*.sh" -print | sort)
+
       - name: Parse JSON contracts and fixtures
         shell: bash
         run: |
