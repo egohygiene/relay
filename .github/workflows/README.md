@@ -1,5 +1,9 @@
 # Reusable workflows
 
+The complete current and internal workflow inventory lives in
+[`workflow-catalog.json`](../../workflow-catalog.json); its security and caller
+contract is explained in [`WORKFLOW_CATALOG.md`](../../WORKFLOW_CATALOG.md).
+
 Relay workflows are opinionated orchestration layers over the smaller actions
 in [`actions/`](../../actions/). The repository-intelligence workflow checks
 out complete caller history, invokes the action from the exact called Relay
@@ -34,3 +38,5 @@ the caller's site directory:
 
 Production callers pin the full Relay commit SHA. The moving `v1` alias is a
 discovery and controlled-update target, not an immutable consumer reference.
+See the [complete pinned caller](../../examples/workflows/repository-intelligence.yml)
+for an adoption-ready workflow.

@@ -1,0 +1,164 @@
+{
+  "$schema": "./schemas/workflow-catalog.schema.json",
+  "schema": "egohygiene.relay-workflow-catalog/v1",
+  "schema_version": 1,
+  "owner": "egohygiene/relay",
+  "release_model": {
+    "unit": "repository",
+    "immutable": "vMAJOR.MINOR.PATCH",
+    "moving_alias": "vMAJOR",
+    "recommended_consumer_pin": "full-commit-sha"
+  },
+  "security_policy": {
+    "default_permissions": {"contents": "read"},
+    "write_permissions": "job-scoped-and-purpose-bound",
+    "remote_dependencies": "full-commit-sha",
+    "reusable_local_dependencies": "exact-called-relay-revision",
+    "forbidden_triggers": ["pull_request_target"]
+  },
+  "workflows": [
+    {
+      "id": "relay-validation",
+      "path": ".github/workflows/validate.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Validate catalog, contracts, implementations, metadata, and the reusable-workflow smoke path.",
+      "audience": "internal",
+      "status": "stable",
+      "triggers": ["pull_request", "push", "workflow_dispatch"],
+      "permissions": {"contents": "read"},
+      "timeout_minutes": 15,
+      "concurrency": {
+        "group": "relay-validation-${{ github.workflow }}-${{ github.ref }}",
+        "cancel_in_progress": true
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Any failed validation or reusable-workflow smoke job fails the workflow; newer work on the same ref cancels stale validation."
+      },
+      "inputs": [],
+      "outputs": [],
+      "consumer_ref": null
+    },
+    {
+      "id": "relay-release",
+      "path": ".github/workflows/release.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Validate and publish one immutable repository-wide Relay release, then optionally advance its major discovery alias.",
+      "audience": "internal",
+      "status": "stable",
+      "triggers": ["push", "workflow_dispatch"],
+      "permissions": {"contents": "write"},
+      "timeout_minutes": 20,
+      "concurrency": {
+        "group": "relay-release",
+        "cancel_in_progress": false
+      },
+      "failure_semantics": {
+        "mode": "resume-verified-release",
+        "partial_success": false,
+        "retry": "matching-commit-only",
+        "description": "A rerun resumes only when an existing immutable tag resolves to the same validated default-branch commit; contradictory state fails closed."
+      },
+      "inputs": [
+        {
+          "name": "version",
+          "type": "string",
+          "required": true,
+          "description": "Unused immutable vMAJOR.MINOR.PATCH release tag."
+        },
+        {
+          "name": "update-major-alias",
+          "type": "boolean",
+          "required": true,
+          "default": true,
+          "description": "Advance the matching moving major alias after release creation."
+        }
+      ],
+      "outputs": [],
+      "consumer_ref": null
+    },
+    {
+      "id": "repository-intelligence",
+      "path": ".github/workflows/repository-intelligence.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Build, provenance-check, and upload one repository intelligence dashboard as a bounded workflow artifact.",
+      "audience": "reusable",
+      "status": "beta",
+      "triggers": ["workflow_call", "workflow_dispatch"],
+      "permissions": {"contents": "read"},
+      "timeout_minutes": 15,
+      "concurrency": {
+        "group": "relay-intelligence-${{ github.repository }}-${{ github.ref }}",
+        "cancel_in_progress": true
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Generation, provenance validation, missing output, or upload failure prevents the artifact output from being reported."
+      },
+      "inputs": [
+        {
+          "name": "output-directory",
+          "type": "string",
+          "required": false,
+          "default": "dist/intelligence",
+          "description": "Generated dashboard directory within the checked-out caller repository."
+        },
+        {
+          "name": "work-directory",
+          "type": "string",
+          "required": false,
+          "default": ".cache/repository-intelligence",
+          "description": "Private collection workspace within the caller repository."
+        },
+        {
+          "name": "reports-directory",
+          "type": "string",
+          "required": false,
+          "default": ".reports",
+          "description": "Optional normalized report-summary root."
+        },
+        {
+          "name": "default-branch",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional caller default-branch override."
+        },
+        {
+          "name": "activity-since",
+          "type": "string",
+          "required": false,
+          "default": "1 year ago",
+          "description": "Deterministic Git history window."
+        },
+        {
+          "name": "max-depth",
+          "type": "string",
+          "required": false,
+          "default": "10",
+          "description": "Maximum repository tree depth."
+        },
+        {
+          "name": "artifact-retention-days",
+          "type": "number",
+          "required": false,
+          "default": 30,
+          "description": "Retention for the generated public dashboard artifact."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "artifact-name",
+          "type": "string",
+          "required": true,
+          "description": "Unique name of the uploaded dashboard artifact."
+        }
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/repository-intelligence.yml@v1"
+    }
+  ]
+}

@@ -106,7 +106,11 @@ jobs:
           import json
           from pathlib import Path
 
-          paths = [Path("action-catalog.json"), Path("release.json")]
+          paths = [
+              Path("action-catalog.json"),
+              Path("workflow-catalog.json"),
+              Path("release.json"),
+          ]
           paths.extend(sorted(
               path
               for root in (Path("actions"), Path("schemas"), Path("tests/fixtures"))
