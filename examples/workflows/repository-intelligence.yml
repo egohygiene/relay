@@ -1,0 +1,26 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Repository intelligence artifact
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "repository-intelligence-${{ github.repository }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  intelligence:
+    name: Build reviewable repository intelligence
+    permissions:
+      contents: read
+    # egohygiene/relay repository-intelligence v1.1.0
+    uses: egohygiene/relay/.github/workflows/repository-intelligence.yml@46cf1d66a7e66ca5a35d2c99cbaed5ccfb67573f
+    with:
+      artifact-retention-days: 30

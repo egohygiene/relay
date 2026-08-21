@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/workflow-catalog/v1/schema.json",
+  "title": "Relay workflow catalog v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema",
+    "schema_version",
+    "owner",
+    "release_model",
+    "security_policy",
+    "workflows"
+  ],
+  "properties": {
+    "$schema": {"type": "string"},
+    "schema": {"const": "egohygiene.relay-workflow-catalog/v1"},
+    "schema_version": {"const": 1},
+    "owner": {"const": "egohygiene/relay"},
+    "release_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit", "immutable", "moving_alias", "recommended_consumer_pin"],
+      "properties": {
+        "unit": {"const": "repository"},
+        "immutable": {"const": "vMAJOR.MINOR.PATCH"},
+        "moving_alias": {"const": "vMAJOR"},
+        "recommended_consumer_pin": {"const": "full-commit-sha"}
+      }
+    },
+    "security_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default_permissions",
+        "write_permissions",
+        "remote_dependencies",
+        "reusable_local_dependencies",
+        "forbidden_triggers"
+      ],
+      "properties": {
+        "default_permissions": {"const": {"contents": "read"}},
+        "write_permissions": {"const": "job-scoped-and-purpose-bound"},
+        "remote_dependencies": {"const": "full-commit-sha"},
+        "reusable_local_dependencies": {"const": "exact-called-relay-revision"},
+        "forbidden_triggers": {
+          "type": "array",
+          "contains": {"const": "pull_request_target"},
+          "uniqueItems": true
+        }
+      }
+    },
+    "workflows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/workflow"}
+    }
+  },
+  "$defs": {
+    "permissions": {
+      "type": "object",
+      "additionalProperties": {"enum": ["none", "read", "write"]}
+    },
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type", "required", "description"],
+      "properties": {
+        "name": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+        "type": {"enum": ["boolean", "number", "string"]},
+        "required": {"type": "boolean"},
+        "default": {},
+        "description": {"type": "string", "minLength": 1}
+      }
+    },
+    "concurrency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["group", "cancel_in_progress"],
+      "properties": {
+        "group": {"type": "string", "minLength": 1},
+        "cancel_in_progress": {"type": "boolean"}
+      }
+    },
+    "failure_semantics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "partial_success", "retry", "description"],
+      "properties": {
+        "mode": {"enum": ["fail-closed", "resume-verified-release"]},
+        "partial_success": {"type": "boolean"},
+        "retry": {"enum": ["fresh-run", "matching-commit-only"]},
+        "description": {"type": "string", "minLength": 1}
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "path",
+        "owner",
+        "purpose",
+        "audience",
+        "status",
+        "triggers",
+        "permissions",
+        "timeout_minutes",
+        "concurrency",
+        "failure_semantics",
+        "inputs",
+        "outputs",
+        "consumer_ref"
+      ],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+        "path": {"type": "string", "pattern": "^\\.github/workflows/.+\\.(yml|yaml)$"},
+        "owner": {"const": "egohygiene/relay"},
+        "purpose": {"type": "string", "minLength": 1},
+        "audience": {"enum": ["internal", "reusable"]},
+        "status": {"enum": ["experimental", "beta", "stable", "deprecated"]},
+        "triggers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": ["pull_request", "push", "workflow_call", "workflow_dispatch"]
+          },
+          "uniqueItems": true
+        },
+        "permissions": {"$ref": "#/$defs/permissions"},
+        "timeout_minutes": {"type": "integer", "minimum": 1, "maximum": 60},
+        "concurrency": {"$ref": "#/$defs/concurrency"},
+        "failure_semantics": {"$ref": "#/$defs/failure_semantics"},
+        "inputs": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/parameter"}
+        },
+        "outputs": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/parameter"}
+        },
+        "consumer_ref": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "string",
+              "pattern": "^egohygiene/relay/\\.github/workflows/.+@v[0-9]+$"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

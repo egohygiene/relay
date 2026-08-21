@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-08-20
+updated: 2026-08-21
 governed_by:
   - architecture-architecture
 depends_on:
@@ -72,7 +72,16 @@ actions/
 ├── repository-intelligence.yml   # reusable artifact orchestration
 ├── validate.yml                  # pull-request and default-branch gate
 └── release.yml                   # reviewed manifest or manual SemVer publication
+
+action-catalog.json               # public composite-action surface
+workflow-catalog.json             # complete owner, authority, and failure inventory
+examples/workflows/               # immutable-pin caller examples
 ```
+
+The workflow catalog is the machine-readable authority boundary for every
+current workflow. It records owner, purpose, audience, permissions, caller
+parameters, timeout, concurrency, and failure semantics. CI rejects uncataloged
+workflow files and unsafe dependency or trigger forms.
 
 The dashboard builder never deploys Pages. Consumers compose its output into
 their one authoritative site artifact. The snapshot publisher is isolated as a
@@ -102,11 +111,12 @@ The architecture favors independently usable local and self-hosted operation. Op
 
 ## Evidence and uncertainty
 
-- **Observed:** Relay contains a machine-readable action catalog, three
+- **Observed:** Relay contains machine-readable action and workflow catalogs, three
   independently consumable composite actions, a reusable artifact workflow,
-  validation gates, and a `release.json`-driven release workflow with manual
-  recovery. Empathy, Akashic, and Optiflow have existing Repository Intelligence
-  integrations; their migrations remain planned pilots for the hardened package.
+  immutable-pin adoption example, security validation gates, and a
+  `release.json`-driven release workflow with verified recovery. Empathy,
+  Akashic, and Optiflow have existing Repository Intelligence integrations;
+  their migrations remain planned pilots for the hardened package.
 - **Decided for this draft:** The repository owns the bounded concern described here and participates through versioned contracts.
 - **Proposed:** Target systems and later roadmap phases remain proposals until accepted and implemented.
 - **Open question:** Which additional reusable producers should join the repository-wide release unit after v1?

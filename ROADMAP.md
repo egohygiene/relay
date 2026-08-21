@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-08-20
+updated: 2026-08-21
 governed_by:
   - architecture-roadmap
 depends_on:
@@ -46,8 +46,9 @@ This roadmap describes capability evolution, not promised dates or an issue queu
 
 ## Phase 2: Define action and workflow contracts
 
-**Status:** Complete for the v1 contract; additive hardening continues within
-the accepted compatibility boundary.
+**Status:** Complete for the v1 action and workflow contracts. Every current
+workflow is inventoried by owner and purpose with machine-checked permissions,
+timeouts, concurrency, parameters, and failure semantics.
 
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 
@@ -76,8 +77,8 @@ consumer evidence is tracked in Phase 5.
 
 ## Phase 4: Publish immutable releases
 
-**Status:** `v1.0.0` is published immutably. The current release manifest
-requests the additive `v1.1.0` hardening release.
+**Status:** `v1.0.0` and `v1.1.0` are published immutably. The current release
+manifest requests the additive `v1.2.0` workflow-catalog release.
 
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 
@@ -121,8 +122,9 @@ Optional managed services, enterprise controls, marketplaces, and the conversati
 
 - **Observed:** Relay owns the reusable Repository Intelligence implementation,
   framework-free template, public contracts, reusable artifact workflow,
-  privacy fixtures, and validation suite. `v1.0.0` is published; the additive
-  `v1.1.0` hardening release and consumer pin migrations remain under review.
+  complete workflow catalog, immutable-pin adoption example, privacy fixtures,
+  and validation suite. `v1.0.0` and `v1.1.0` are published; the additive
+  `v1.2.0` catalog release and consumer pin migrations remain under review.
 - **Decided for this draft:** The repository owns the bounded concern described here and participates through versioned contracts.
 - **Proposed:** Target systems and later roadmap phases remain proposals until accepted and implemented.
 - **Open question:** Which consumer-specific constraints will surface during the three hardened pilot migrations?

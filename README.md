@@ -20,8 +20,11 @@ and deployment.
 These moving aliases advertise the release surface. Production consumers use a
 reviewed full commit SHA, as shown below.
 
-The complete inventory and release contract live in
-[`action-catalog.json`](action-catalog.json) and [`actions/README.md`](actions/README.md).
+The complete action and workflow inventories live in
+[`action-catalog.json`](action-catalog.json) and
+[`workflow-catalog.json`](workflow-catalog.json). See
+[`actions/README.md`](actions/README.md) and
+[`WORKFLOW_CATALOG.md`](WORKFLOW_CATALOG.md) for their human contracts.
 
 ## Compose Intelligence into an existing site
 
@@ -109,8 +112,8 @@ Relay publishes all cataloged actions together:
 - moving major alias: `v1`;
 - recommended consumer reference: full commit SHA.
 
-The current [`release.json`](release.json) manifest requests `v1.1.0`; the
-existing `v1.0.0` tag remains immutable. The `Release Relay actions` workflow
+The current [`release.json`](release.json) manifest requests `v1.2.0`; the
+existing `v1.0.0` and `v1.1.0` tags remain immutable. The `Release Relay actions` workflow
 also supports manual dispatch. In both cases it validates an unused exact
 `vMAJOR.MINOR.PATCH`, verifies the current default-branch commit, creates the
 immutable tag and GitHub Release, and then advances the matching major alias.

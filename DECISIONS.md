@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-08-19
+updated: 2026-08-21
 governed_by:
   - architecture-decisions
 depends_on:
@@ -42,6 +42,7 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - ADR-003: Require immutable references in consumer workflows
 - ADR-004: Preserve extracted Intelligence contract identities
 - ADR-005: Release the action catalog as one repository unit
+- ADR-006: Catalog workflow authority and failure semantics
 
 ## ADR-001: Package reusable behavior outside templates
 
@@ -87,6 +88,15 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - **Decision:** Validate and release every cataloged action at one immutable repository SemVer tag. Maintain an optional moving major alias for convenience while recommending full commit SHAs to consumers.
 - **Consequences:** One release proves compatibility across actions and reusable workflows. A change to any public package advances the Relay repository version.
 - **Reconsider when:** An action needs an incompatible cadence or trust boundary substantial enough to justify a separate repository.
+
+## ADR-006: Catalog workflow authority and failure semantics
+
+- **Status:** Accepted for Relay v1
+- **Date:** 2026-08-21
+- **Context:** Workflow YAML exposes executable behavior but does not provide one stable inventory for ownership, caller parameters, permission ceilings, runtime bounds, concurrency, or failure behavior. Security review and future Pace reconciliation need that contract without inferring intent from implementation text.
+- **Decision:** Maintain `workflow-catalog.json` as the complete inventory of current internal and reusable workflows. Require explicit owner, purpose, audience, permissions, timeout, concurrency, inputs, outputs, and failure semantics. Reject uncataloged workflows, mutable remote dependencies, `write-all`, `pull_request_target`, and runnable jobs without timeouts.
+- **Consequences:** Reviewers and automation can compare declared authority with implementation. Adding a workflow becomes an explicit contract change. The catalog duplicates a bounded amount of YAML metadata and therefore requires executable drift checks.
+- **Reconsider when:** GitHub provides a portable native workflow manifest with equivalent closed, versioned semantics that Pace and offline validators can consume.
 
 ## Open decisions
 
