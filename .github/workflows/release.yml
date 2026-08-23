@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - main
+      - master
     paths:
       - release.json
   workflow_dispatch:
