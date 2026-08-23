@@ -10,6 +10,7 @@ on:
   push:
     branches:
       - main
+      - master
   workflow_dispatch:
 
 permissions:
@@ -142,7 +143,6 @@ jobs:
       output-directory: "dist/intelligence"
       work-directory: ".cache/repository-intelligence"
       reports-directory: ".reports"
-      default-branch: "main"
       activity-since: "1 year ago"
       max-depth: "10"
       artifact-retention-days: 1
