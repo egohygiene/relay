@@ -1,0 +1,60 @@
+{
+  "schema": "egohygiene.relay-default-branch-fixtures/v1",
+  "cases": [
+    {
+      "id": "main-default",
+      "repository_branches": ["main"],
+      "input_default_branch": "",
+      "event_default_branch": "main",
+      "current_ref": "main",
+      "event_name": "push",
+      "fork": false,
+      "expected_default_branch": "main",
+      "release_authorized": true
+    },
+    {
+      "id": "master-default",
+      "repository_branches": ["master"],
+      "input_default_branch": "",
+      "event_default_branch": "master",
+      "current_ref": "master",
+      "event_name": "push",
+      "fork": false,
+      "expected_default_branch": "master",
+      "release_authorized": true
+    },
+    {
+      "id": "both-branches-master-default",
+      "repository_branches": ["main", "master"],
+      "input_default_branch": "",
+      "event_default_branch": "master",
+      "current_ref": "main",
+      "event_name": "push",
+      "fork": false,
+      "expected_default_branch": "master",
+      "release_authorized": false
+    },
+    {
+      "id": "non-default-release-branch",
+      "repository_branches": ["main", "release/v2"],
+      "input_default_branch": "",
+      "event_default_branch": "main",
+      "current_ref": "release/v2",
+      "event_name": "push",
+      "fork": false,
+      "expected_default_branch": "main",
+      "release_authorized": false
+    },
+    {
+      "id": "fork-pull-request",
+      "repository_branches": ["main", "master"],
+      "input_default_branch": "",
+      "event_default_branch": "master",
+      "current_ref": "42/merge",
+      "event_name": "pull_request",
+      "fork": true,
+      "expected_default_branch": "master",
+      "release_authorized": false
+    }
+  ]
+}

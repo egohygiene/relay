@@ -72,6 +72,36 @@ class WorkflowCatalogTests(unittest.TestCase):
             "workflow-catalog/v1/schema.json",
         )
 
+    def test_conventional_primary_branch_triggers_support_main_and_master(self) -> None:
+        validation = (
+            REPOSITORY_ROOT / ".github/workflows/validate.yml"
+        ).read_text(encoding="utf-8")
+        release = (
+            REPOSITORY_ROOT / ".github/workflows/release.yml"
+        ).read_text(encoding="utf-8")
+        compatible_trigger = "  push:\n    branches:\n      - main\n      - master\n"
+
+        self.assertIn(compatible_trigger, validation)
+        self.assertIn(compatible_trigger, release)
+        self.assertNotIn('default-branch: "main"', validation)
+
+    def test_release_branch_compatibility_preserves_default_branch_gate(self) -> None:
+        release = (
+            REPOSITORY_ROOT / ".github/workflows/release.yml"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(
+            'if: "${{ github.ref_name == github.event.repository.default_branch }}"',
+            release,
+        )
+        self.assertIn(
+            'DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"',
+            release,
+        )
+        self.assertIn('git fetch origin "${DEFAULT_BRANCH}"', release)
+        self.assertNotIn('git fetch origin "main"', release)
+        self.assertNotIn('git fetch origin "master"', release)
+
     def test_mutable_adoption_reference_fails_validation(self) -> None:
         temporary, root = self.copied_repository()
         self.addCleanup(temporary.cleanup)
