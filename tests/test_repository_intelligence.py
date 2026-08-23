@@ -12,6 +12,7 @@ import unittest
 
 ACTION_ROOT = Path(__file__).parents[1] / "actions/repository-intelligence"
 MODULE_PATH = ACTION_ROOT / "scripts/generate_repository_intelligence.py"
+FIXTURE_PATH = Path(__file__).parent / "fixtures/default-branch-cases.json"
 SPEC = importlib.util.spec_from_file_location("repository_intelligence", MODULE_PATH)
 assert SPEC is not None
 assert SPEC.loader is not None
@@ -28,6 +29,34 @@ def git(repository_root: Path, *arguments: str) -> str:
     ).stdout.strip()
 
 
+def resolve_default_branch_from_action(
+    input_default_branch: str,
+    event_default_branch: str,
+    current_ref: str,
+) -> str:
+    action = (ACTION_ROOT / "action.yml").read_text(encoding="utf-8")
+    resolution_line = next(
+        line.strip()
+        for line in action.splitlines()
+        if line.strip().startswith("default_branch=")
+    )
+    script = f"""set -euo pipefail
+{resolution_line}
+printf "%s" "${{default_branch}}"
+"""
+    return subprocess.run(
+        ["bash", "-c", script],
+        check=True,
+        capture_output=True,
+        text=True,
+        env={
+            "EVENT_DEFAULT_BRANCH": event_default_branch,
+            "GITHUB_REF_NAME": current_ref,
+            "INPUT_DEFAULT_BRANCH": input_default_branch,
+        },
+    ).stdout
+
+
 class RepositoryIntelligenceTests(unittest.TestCase):
     def test_action_surfaces_public_tree_and_analytics_contracts(self) -> None:
         action = (ACTION_ROOT / "action.yml").read_text(encoding="utf-8")
@@ -35,6 +64,58 @@ class RepositoryIntelligenceTests(unittest.TestCase):
         self.assertIn("repository-tree:", action)
         self.assertIn("analytics-summary:", action)
         self.assertIn("generate_repository_analytics.py", action)
+
+    def test_default_branch_compatibility_fixtures(self) -> None:
+        fixtures = json.loads(FIXTURE_PATH.read_text(encoding="utf-8"))
+
+        self.assertEqual(
+            fixtures["schema"],
+            "egohygiene.relay-default-branch-fixtures/v1",
+        )
+        cases = fixtures["cases"]
+        self.assertEqual(
+            {case["id"] for case in cases},
+            {
+                "main-default",
+                "master-default",
+                "both-branches-master-default",
+                "non-default-release-branch",
+                "fork-pull-request",
+            },
+        )
+
+        for case in cases:
+            with self.subTest(case=case["id"]):
+                resolved = resolve_default_branch_from_action(
+                    input_default_branch=case["input_default_branch"],
+                    event_default_branch=case["event_default_branch"],
+                    current_ref=case["current_ref"],
+                )
+                self.assertEqual(resolved, case["expected_default_branch"])
+                self.assertEqual(
+                    case["current_ref"] == case["expected_default_branch"],
+                    case["release_authorized"],
+                )
+
+    def test_default_branch_explicit_input_precedes_event_metadata(self) -> None:
+        self.assertEqual(
+            resolve_default_branch_from_action(
+                input_default_branch="stable",
+                event_default_branch="master",
+                current_ref="master",
+            ),
+            "stable",
+        )
+
+    def test_default_branch_falls_back_to_main_without_metadata(self) -> None:
+        self.assertEqual(
+            resolve_default_branch_from_action(
+                input_default_branch="",
+                event_default_branch="",
+                current_ref="feature/example",
+            ),
+            "main",
+        )
 
     def test_normalizes_and_removes_empty_exclusions(self) -> None:
         self.assertEqual(
