@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-08-21
+updated: 2026-08-24
 governed_by:
   - architecture-roadmap
 depends_on:
@@ -25,6 +25,154 @@ supersedes: []
 ---
 
 # Relay Roadmap
+
+<!-- BEGIN ROADMAP EXECUTION SNAPSHOT -->
+<!-- roadmap-manifest
+schema: hygiene.roadmap/v1alpha1
+repository: egohygiene/relay
+visibility: public
+publication: central
+route: /roadmap/relay/
+updated: 2026-08-24
+-->
+## 2026-08-24 execution snapshot
+
+> This evidence-reconciled snapshot is the issue-generation and visual-roadmap handoff. The longer-horizon strategy below remains canonical context; generated HTML, JSON, progress, issue plans, and commit lists are projections.
+
+**Lifecycle:** active released product  
+**Current gate:** Reconcile the stale roadmap with shipped v1.0-v1.2 behavior, then define and prove the reusable roadmap build workflow.  
+**North-star outcome:** Immutable, reusable CI building blocks that repositories can pin, verify, and upgrade safely.
+
+### Visual roadmap publication
+
+**Mode:** `central`  
+**Route:** `/roadmap/relay/`  
+**Current publication evidence:** Versioned GitHub releases and reusable workflow distribution; v1.0 through v1.2 observed.
+
+Publish the public-safe projection through egohygiene.io at /roadmap/relay/. This repository owns intent and acceptance evidence; it does not add a second site deployment.
+
+### Quest line
+
+<!-- roadmap-step
+id: REL-Q01
+status: complete
+depends_on: []
+issues: []
+-->
+#### REL-Q01 — Ship the reusable workflow foundation
+
+**State:** `complete`  
+**Depends on:** None
+
+**Outcome:** Relay provides released and green reusable CI behavior.
+
+**Exit criteria:**
+
+- [x] Tagged releases are available.
+- [x] Default-branch validation is green.
+
+**Current evidence:**
+
+- Releases v1.0, v1.1, and v1.2 were observed.
+- Latest audited commit 8837ab6862ab was associated with a healthy released repository.
+
+<!-- roadmap-step
+id: REL-Q02
+status: active
+depends_on: [REL-Q01]
+issues: []
+-->
+#### REL-Q02 — Reconcile roadmap and release history
+
+**State:** `active`  
+**Depends on:** `REL-Q01`
+
+**Outcome:** The roadmap describes current capabilities, remaining gaps, and supported upgrade paths.
+
+**Exit criteria:**
+
+- [ ] Shipped v1.0-v1.2 items are marked from acceptance evidence.
+- [ ] Stale or duplicated future work is removed.
+
+**Current evidence:**
+
+- ROADMAP.md was stale relative to the released product.
+
+<!-- roadmap-step
+id: REL-Q03
+status: ready
+depends_on: [REL-Q02]
+issues: []
+-->
+#### REL-Q03 — Define the roadmap build contract
+
+**State:** `ready`  
+**Depends on:** `REL-Q02`
+
+**Outcome:** A reusable workflow validates canonical roadmap data and emits a static quest-site artifact.
+
+**Exit criteria:**
+
+- [ ] Inputs, permissions, outputs, and failure modes are versioned.
+- [ ] The workflow emits both machine-readable validation evidence and a static artifact.
+
+**Current evidence:**
+
+- Existing dist and intelligence workflows provide a precedent; no roadmap workflow was observed.
+
+<!-- roadmap-step
+id: REL-Q04
+status: planned
+depends_on: [REL-Q03]
+issues: []
+-->
+#### REL-Q04 — Pilot the roadmap workflow
+
+**State:** `planned`  
+**Depends on:** `REL-Q03`
+
+**Outcome:** Representative docs-only, application, and private repositories consume one pinned Relay workflow.
+
+**Exit criteria:**
+
+- [ ] At least three repository classes pass the workflow.
+- [ ] Private repositories publish only explicitly allowed evidence.
+
+**Current evidence:**
+
+- No cross-repository roadmap workflow pilot was observed.
+
+<!-- roadmap-step
+id: REL-Q05
+status: planned
+depends_on: [REL-Q04]
+issues: []
+-->
+#### REL-Q05 — Release the roadmap automation
+
+**State:** `planned`  
+**Depends on:** `REL-Q04`
+
+**Outcome:** A tagged Relay release makes roadmap validation and publication safely reusable.
+
+**Exit criteria:**
+
+- [ ] Consumers pin an immutable release reference.
+- [ ] Upgrade and rollback instructions are tested.
+
+**Current evidence:**
+
+- Current releases predate the proposed roadmap automation.
+
+### Roadmap-to-issue handoff
+
+- A step is complete only when its exit criteria and required evidence are satisfied; commit count never determines progress.
+- Ready or planned steps without an issue are candidates for the private, duplicate-aware roadmap.issue-plan.json dry run.
+- Issue creation or reconciliation requires human approval or an explicitly authorized Pace operation and returns issue references through a reviewable roadmap pull request.
+- Pull requests and commits should include Roadmap-Step: <ID>; historical evidence may be linked through existing issue and pull-request relationships.
+- Public rendering uses only allowlisted build-time evidence and never places a GitHub token or private issue plan in the browser artifact.
+
+<!-- END ROADMAP EXECUTION SNAPSHOT -->
 
 ## Strategic context
 
