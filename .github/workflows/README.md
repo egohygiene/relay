@@ -7,7 +7,7 @@ contract is explained in [`WORKFLOW_CATALOG.md`](../../WORKFLOW_CATALOG.md).
 Relay workflows are opinionated orchestration layers over the smaller actions
 in [`actions/`](../../actions/). The repository-intelligence workflow checks
 out complete caller history, invokes the action from the exact called Relay
-revision through GitHub's `$/` syntax, builds the dashboard, and uploads it as
+revision through GitHub's `$/` syntax, builds the routed site, and uploads it as
 an ordinary workflow artifact.
 
 ## Default branch compatibility
@@ -63,6 +63,12 @@ deploys Pages and never uploads the private work directory. The caller may
 override retention, output layout, or canonical input settings, but the
 defaults require no configuration.
 
+When an Observatory materialization is already present in the checkout, pass
+its repository-relative path through `observatory-snapshot`. Relay requires the
+read model to match both the caller repository and represented commit. Without
+that input, `/now/` remains useful as a truthful shell and displays operational
+state as unavailable rather than deriving it from unrelated metrics.
+
 Use the composite action directly when the dashboard must be composed into an
 existing Pages build. Workflow artifacts live in another job and cannot mutate
 the caller's site directory:
@@ -73,6 +79,7 @@ the caller's site directory:
   uses: egohygiene/relay/actions/repository-intelligence@<full-commit-sha>
   with:
     output-directory: dist/intelligence
+    observatory-snapshot: .cache/observatory/repository-intelligence.json
 ```
 
 Production callers pin the full Relay commit SHA. The moving `v1` alias is a

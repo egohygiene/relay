@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-08-24
+updated: 2026-08-25
 governed_by:
   - architecture-roadmap
 depends_on:
@@ -33,9 +33,9 @@ repository: egohygiene/relay
 visibility: public
 publication: central
 route: /roadmap/relay/
-updated: 2026-08-24
+updated: 2026-08-25
 -->
-## 2026-08-24 execution snapshot
+## 2026-08-25 execution snapshot
 
 > This evidence-reconciled snapshot is the issue-generation and visual-roadmap handoff. The longer-horizon strategy below remains canonical context; generated HTML, JSON, progress, issue plans, and commit lists are projections.
 
@@ -61,7 +61,7 @@ issues: []
 -->
 #### REL-Q01 — Ship the reusable workflow foundation
 
-**State:** `complete`  
+**State:** `complete`
 **Depends on:** None
 
 **Outcome:** Relay provides released and green reusable CI behavior.
@@ -84,7 +84,7 @@ issues: []
 -->
 #### REL-Q02 — Reconcile roadmap and release history
 
-**State:** `active`  
+**State:** `active`
 **Depends on:** `REL-Q01`
 
 **Outcome:** The roadmap describes current capabilities, remaining gaps, and supported upgrade paths.
@@ -106,7 +106,7 @@ issues: []
 -->
 #### REL-Q03 — Define the roadmap build contract
 
-**State:** `ready`  
+**State:** `ready`
 **Depends on:** `REL-Q02`
 
 **Outcome:** A reusable workflow validates canonical roadmap data and emits a static quest-site artifact.
@@ -163,6 +163,128 @@ issues: []
 **Current evidence:**
 
 - Current releases predate the proposed roadmap automation.
+
+### Repository Intelligence experience track
+
+This track turns the validated organization read model into a low-cognitive-load
+repository story. It is additive to the release-automation quest line above and
+follows the dependency order defined in Relay issue #27.
+
+<!-- roadmap-step
+id: REL-RI-001
+status: complete
+depends_on: []
+issues: [27]
+-->
+#### REL-RI-001 — Establish the experience and contract boundaries
+
+**State:** `complete`
+**Depends on:** None
+
+**Outcome:** Observatory owns normalized truth, Holon owns visual primitives,
+and Relay owns route composition and static publication artifacts.
+
+**Exit criteria:**
+
+- [x] The complete route map and interaction principles are captured.
+- [x] The Observatory read model and Holon component package are versioned.
+- [x] Relay records the sibling boundary and immutable contract evidence.
+
+<!-- roadmap-step
+id: REL-RI-002
+status: active
+depends_on: [REL-RI-001]
+issues: [28]
+-->
+#### REL-RI-002 — Ship the shared shell and operational Now view
+
+**State:** `active`
+**Depends on:** `REL-RI-001`
+
+**Outcome:** `/now/` immediately shows meaningful change, active quests,
+blockers, newly broken checks, pending decisions, and the next grounded moves.
+
+**Exit criteria:**
+
+- [ ] Desktop, mobile, keyboard, screen-reader, reduced-motion, and print contracts pass.
+- [ ] Repository identity, represented commit, freshness, build evidence, and canonical sources stay visible.
+- [ ] URL-backed filters and transparent browser-local resume behavior are verified.
+
+<!-- roadmap-step
+id: REL-RI-003
+status: ready
+depends_on: [REL-RI-002]
+issues: [31]
+-->
+#### REL-RI-003 — Render the roadmap as an explorable quest line
+
+**State:** `ready`
+**Depends on:** `REL-RI-002`
+
+**Outcome:** `/roadmap/` makes progress, dependencies, exit criteria, and linked
+commit evidence legible without replacing `ROADMAP.md` as canonical intent.
+
+**Exit criteria:**
+
+- [ ] Long quest lines remain scrollable, keyboard reachable, and printable.
+- [ ] Expanding a quest exposes its linked commits and other evidence.
+
+<!-- roadmap-step
+id: REL-RI-004
+status: ready
+depends_on: [REL-RI-002]
+issues: [30]
+-->
+#### REL-RI-004 — Render ADR lineage as decision history
+
+**State:** `ready`
+**Depends on:** `REL-RI-002`
+
+**Outcome:** `/decisions/` preserves proposal, acceptance, implementation, and
+supersession as a navigable historical chain.
+
+**Exit criteria:**
+
+- [ ] ADR status, scope, implementation, and supersession remain distinct.
+- [ ] Decision evidence links back to canonical records and affected quests.
+
+<!-- roadmap-step
+id: REL-RI-005
+status: planned
+depends_on: [REL-RI-003, REL-RI-004]
+issues: [32]
+-->
+#### REL-RI-005 — Unify commits and delivery evidence as a journey
+
+**State:** `planned`
+**Depends on:** `REL-RI-003`, `REL-RI-004`
+
+**Outcome:** `/journey/` relates commits to quests, decisions, issues, checks,
+releases, and deployments across meaningful epochs.
+
+**Exit criteria:**
+
+- [ ] Long histories virtualize interactively without truncating static output.
+- [ ] Time, state, and evidence filters remain URL-shareable.
+
+<!-- roadmap-step
+id: REL-RI-006
+status: planned
+depends_on: [REL-RI-005]
+issues: [29, 33]
+-->
+#### REL-RI-006 — Complete supporting views and the intelligence dashboard
+
+**State:** `planned`
+**Depends on:** `REL-RI-005`
+
+**Outcome:** Dependencies, Health, Releases, Work, Search, Compare, and the
+organization dashboard form one consistent evidence-navigation system.
+
+**Exit criteria:**
+
+- [ ] Every supporting view preserves the shared shell and evidence vocabulary.
+- [ ] Consumer publication refreshes deterministically through one pinned workflow.
 
 ### Roadmap-to-issue handoff
 

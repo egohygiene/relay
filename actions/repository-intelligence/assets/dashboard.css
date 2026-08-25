@@ -85,6 +85,37 @@ a:focus-visible,
   transform: translateY(0);
 }
 
+.experience-nav {
+  position: sticky;
+  z-index: 8;
+  top: 0;
+  display: flex;
+  overflow-x: auto;
+  gap: 0.35rem;
+  padding: 0.65rem max(1rem, calc((100% - 76rem) / 2));
+  border-bottom: 1px solid var(--border);
+  background: rgba(7, 10, 18, 0.88);
+  backdrop-filter: blur(18px);
+}
+
+.experience-nav a {
+  flex: 0 0 auto;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid transparent;
+  border-radius: 0.55rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.experience-nav a:hover,
+.experience-nav a[aria-current="page"] {
+  border-color: var(--border);
+  color: var(--cyan);
+  background: rgba(94, 231, 226, 0.08);
+}
+
 .shell {
   width: min(76rem, calc(100% - 2rem));
   margin: 0 auto;

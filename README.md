@@ -12,7 +12,7 @@ and deployment.
 
 | Capability | Discovery alias |
 | ---------- | --------------- |
-| Repository intelligence dashboard | `egohygiene/relay/actions/repository-intelligence@v1` |
+| Repository Intelligence site | `egohygiene/relay/actions/repository-intelligence@v1` |
 | Scanner report normalization | `egohygiene/relay/actions/normalize-repository-report@v1` |
 | Guarded report snapshot publication | `egohygiene/relay/actions/publish-report-snapshot@v1` |
 | Opinionated intelligence artifact workflow | `egohygiene/relay/.github/workflows/repository-intelligence.yml@v1` |
@@ -41,6 +41,9 @@ The complete action and workflow inventories live in
 - name: Add repository intelligence
   # egohygiene/relay repository-intelligence v1.1.0
   uses: egohygiene/relay/actions/repository-intelligence@<full-commit-sha>
+  # When an earlier step materializes Observatory's commit-matched read model:
+  # with:
+  #   observatory-snapshot: .cache/observatory/repository-intelligence.json
 
 - name: Upload one composed Pages artifact
   uses: actions/upload-pages-artifact@<full-commit-sha>
@@ -50,10 +53,12 @@ The complete action and workflow inventories live in
 
 Relay writes `dist/intelligence/` but never deploys it. That preserves one Pages
 owner per repository. A consumer that uploads `dist/` at its configured domain
-will make the subtree available at a route such as:
+will make the operational entry and its routed views available at URLs such as:
 
 ```text
 https://repository.example/intelligence/
+https://repository.example/intelligence/now/
+https://repository.example/intelligence/dashboard/
 ```
 
 The action contract does not depend on a custom domain or a specific root-site
@@ -70,8 +75,16 @@ jobs:
 ```
 
 Both entry points produce the same framework-free, visibility-aware subtree.
-The bundle contains exactly `index.html`, `summary.json`, `provenance.json`,
-`styles.css`, and `explorer.js`. Private collection data remains in the
+The root and `/now/` are equivalent operational entry points; the previous
+analytics experience remains available at `/dashboard/`. The shell reserves
+stable routes for Roadmap, Decisions, Journey, Dependencies, Health, Releases,
+Work, Search, and Compare so focused follow-up work can fill them without
+changing navigation contracts.
+
+Supplying `observatory-snapshot` projects the commit-matched public-safe
+`egohygiene.observatory.repository-intelligence-read-model/v1` into `/now/`.
+Omitting it remains valid and renders an explicit unavailable state; Relay does
+not infer active work from analytics. Private collection data remains in the
 configured work directory—`.cache/repository-intelligence/` by default—and
 must never be uploaded as site content. Only a bundle whose provenance is
 classified `public-safe` is eligible for public-site composition.
@@ -83,10 +96,11 @@ classified `public-safe` is eligible for public-site composition.
   and reviewed exceptions.
 - **Consumer repositories** own inputs, permissions, final Pages composition,
   identity, and deployment.
-- **Holon** can install thin callers into future repositories.
+- **Holon** owns the static-first visual component vocabulary; Relay owns route
+  composition, action execution, and publication artifacts.
 - **Pace** can detect outdated pins and reconcile consumers.
-- **Observatory** can later aggregate each public dashboard contract across the
-  organization.
+- **Observatory** owns normalized Repository Intelligence read models; Relay
+  accepts only a repository- and commit-matched public-safe snapshot.
 
 The Intelligence builder requires only Bash, Git, and Python 3. It has no
 network calls, package installation, framework runtime, or deployment side
