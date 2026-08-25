@@ -83,7 +83,7 @@
       "id": "repository-intelligence",
       "path": ".github/workflows/repository-intelligence.yml",
       "owner": "egohygiene/relay",
-      "purpose": "Build, provenance-check, and upload one repository intelligence dashboard as a bounded workflow artifact.",
+      "purpose": "Build, provenance-check, and upload one routed repository intelligence site as a bounded workflow artifact.",
       "audience": "reusable",
       "status": "beta",
       "triggers": ["workflow_call", "workflow_dispatch"],
@@ -105,7 +105,7 @@
           "type": "string",
           "required": false,
           "default": "dist/intelligence",
-          "description": "Generated dashboard directory within the checked-out caller repository."
+          "description": "Generated Repository Intelligence site directory within the checked-out caller repository."
         },
         {
           "name": "work-directory",
@@ -120,6 +120,13 @@
           "required": false,
           "default": ".reports",
           "description": "Optional normalized report-summary root."
+        },
+        {
+          "name": "observatory-snapshot",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional public-safe Observatory read model for the represented commit."
         },
         {
           "name": "default-branch",
@@ -155,7 +162,7 @@
           "name": "artifact-name",
           "type": "string",
           "required": true,
-          "description": "Unique name of the uploaded dashboard artifact."
+          "description": "Unique name of the uploaded Repository Intelligence site artifact."
         }
       ],
       "consumer_ref": "egohygiene/relay/.github/workflows/repository-intelligence.yml@v1"

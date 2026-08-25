@@ -5,9 +5,9 @@
 
 name: "🧠 Repository Intelligence"
 description: >-
-  Build a deterministic, visibility-aware repository intelligence dashboard with
-  analytics, statistical snapshots, normalized report cards, and a searchable
-  source tree. The action writes static files but never deploys them.
+  Build a deterministic, visibility-aware Repository Intelligence site with a
+  shared shell, operational Now view, analytics dashboard, and searchable source
+  tree. The action writes static files but never deploys them.
 
 inputs:
   output-directory:
@@ -26,6 +26,13 @@ inputs:
       <producer>/summary.json. A missing directory renders honest unavailable states.
     required: false
     default: ".reports"
+  observatory-snapshot:
+    description: >-
+      Optional repository-relative path to a public-safe Observatory Repository
+      Intelligence read model for the represented commit. When omitted, /now/
+      renders an explicit unavailable state instead of inferring operational work.
+    required: false
+    default: ""
   repository:
     description: >-
       Repository in owner/name form for local contexts. It cannot override the
@@ -91,11 +98,17 @@ inputs:
 
 outputs:
   output-directory:
-    description: "Repository-relative directory containing the generated dashboard bundle."
+    description: "Repository-relative directory containing the routed Repository Intelligence bundle."
     value: "${{ inputs.output-directory }}"
   index:
-    description: "Repository-relative path to the dashboard entry point."
+    description: "Repository-relative path to the default operational entry point."
     value: "${{ inputs.output-directory }}/index.html"
+  now:
+    description: "Repository-relative path to the routed Now view."
+    value: "${{ inputs.output-directory }}/now/index.html"
+  dashboard:
+    description: "Repository-relative path to the compatibility analytics dashboard."
+    value: "${{ inputs.output-directory }}/dashboard/index.html"
   summary:
     description: "Repository-relative path to the aggregate dashboard projection."
     value: "${{ inputs.output-directory }}/summary.json"
@@ -133,6 +146,7 @@ runs:
         INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
         INPUT_MAX_DEPTH: "${{ inputs.max-depth }}"
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
+        INPUT_OBSERVATORY_SNAPSHOT: "${{ inputs.observatory-snapshot }}"
         INPUT_REPORTS_DIRECTORY: "${{ inputs.reports-directory }}"
         INPUT_REPOSITORY: "${{ inputs.repository }}"
         INPUT_REPOSITORY_VISIBILITY: "${{ inputs.repository-visibility }}"
@@ -162,6 +176,14 @@ runs:
         validate_relative_path "output-directory" "${INPUT_OUTPUT_DIRECTORY}"
         validate_relative_path "work-directory" "${INPUT_WORK_DIRECTORY}"
         validate_relative_path "reports-directory" "${INPUT_REPORTS_DIRECTORY}"
+        if [[ -n "${INPUT_OBSERVATORY_SNAPSHOT}" ]]; then
+          validate_relative_path "observatory-snapshot" "${INPUT_OBSERVATORY_SNAPSHOT}"
+          if [[ "${INPUT_OBSERVATORY_SNAPSHOT}/" == "${INPUT_OUTPUT_DIRECTORY}/"* \
+            || "${INPUT_OUTPUT_DIRECTORY}/" == "${INPUT_OBSERVATORY_SNAPSHOT}/"* ]]; then
+            printf 'observatory-snapshot and output-directory must not overlap\n' >&2
+            exit 2
+          fi
+        fi
 
         case "${INPUT_OUTPUT_DIRECTORY%%/*}" in
           .git | .github | actions | schemas | scripts | tests)
@@ -401,9 +423,10 @@ runs:
           --since "${INPUT_ACTIVITY_SINCE}" \
           --excluded-paths "${INPUT_ANALYTICS_EXCLUDED_PATHS},${INPUT_WORK_DIRECTORY},${INPUT_REPORTS_DIRECTORY},${INPUT_OUTPUT_DIRECTORY}"
 
-    - name: "✨ Render static intelligence dashboard"
+    - name: "✨ Render static intelligence site"
       shell: bash
       env:
+        INPUT_OBSERVATORY_SNAPSHOT: "${{ inputs.observatory-snapshot }}"
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
         INPUT_REPORTS_DIRECTORY: "${{ inputs.reports-directory }}"
         INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
@@ -441,7 +464,24 @@ runs:
           --generator-immutable "${RESOLVED_GENERATOR_IMMUTABLE}" \
           --consumer-visibility "${RESOLVED_REPOSITORY_VISIBILITY}" \
           --stylesheet-source "${GITHUB_ACTION_PATH}/assets/dashboard.css" \
-          --script-source "${GITHUB_ACTION_PATH}/assets/explorer.js"
+          --script-source "${GITHUB_ACTION_PATH}/assets/explorer.js" \
+          --dashboard-subdirectory "dashboard"
+        snapshot_arguments=()
+        if [[ -n "${INPUT_OBSERVATORY_SNAPSHOT}" ]]; then
+          snapshot_arguments+=(
+            --snapshot "${GITHUB_WORKSPACE}/${INPUT_OBSERVATORY_SNAPSHOT}"
+          )
+        fi
+        python3 "${GITHUB_ACTION_PATH}/scripts/generate_repository_intelligence_site.py" \
+          --repository-root "${GITHUB_WORKSPACE}" \
+          --output-root "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}" \
+          --summary "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/summary.json" \
+          --provenance "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/provenance.json" \
+          --repository "${RESOLVED_REPOSITORY}" \
+          --source-commit "${RESOLVED_SOURCE_COMMIT}" \
+          --stylesheet-source "${GITHUB_ACTION_PATH}/assets/site.css" \
+          --script-source "${GITHUB_ACTION_PATH}/assets/site.js" \
+          "${snapshot_arguments[@]}"
 
     - name: "🛡️ Validate generated intelligence bundle"
       shell: bash

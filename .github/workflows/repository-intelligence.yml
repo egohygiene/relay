@@ -3,13 +3,13 @@
 # SPDX-License-Identifier: MIT
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 
-name: Reusable repository intelligence artifact
+name: Reusable Repository Intelligence site artifact
 
 on:
   workflow_call:
     inputs:
       output-directory:
-        description: Generated dashboard directory within the checked-out caller repository.
+        description: Generated Repository Intelligence site directory within the checked-out caller repository.
         required: false
         default: "dist/intelligence"
         type: string
@@ -22,6 +22,11 @@ on:
         description: Optional normalized report-summary root.
         required: false
         default: ".reports"
+        type: string
+      observatory-snapshot:
+        description: Optional public-safe Observatory read model for the represented commit.
+        required: false
+        default: ""
         type: string
       default-branch:
         description: Optional caller default-branch override.
@@ -50,7 +55,7 @@ on:
   workflow_dispatch:
     inputs:
       output-directory:
-        description: Generated dashboard directory.
+        description: Generated Repository Intelligence site directory.
         required: true
         default: "dist/intelligence"
         type: string
@@ -63,6 +68,11 @@ on:
         description: Optional normalized report-summary root.
         required: true
         default: ".reports"
+        type: string
+      observatory-snapshot:
+        description: Optional public-safe Observatory read model for the represented commit.
+        required: false
+        default: ""
         type: string
       default-branch:
         description: Optional repository default-branch override.
@@ -94,7 +104,7 @@ concurrency:
 
 jobs:
   generate:
-    name: Generate repository intelligence artifact
+    name: Generate Repository Intelligence site artifact
     runs-on: ubuntu-latest
     timeout-minutes: 15
     outputs:
@@ -114,12 +124,13 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Generate repository intelligence
+      - name: Generate Repository Intelligence site
         uses: $/actions/repository-intelligence
         with:
           output-directory: "${{ inputs.output-directory }}"
           work-directory: "${{ inputs.work-directory }}"
           reports-directory: "${{ inputs.reports-directory }}"
+          observatory-snapshot: "${{ inputs.observatory-snapshot }}"
           repository: "${{ github.repository }}"
           default-branch: "${{ inputs.default-branch }}"
           source-commit: "${{ github.sha }}"
@@ -168,7 +179,7 @@ jobs:
           printf 'artifact-name=repository-intelligence-%s-%s\n' \
             "${GITHUB_RUN_ID}" "${GITHUB_RUN_ATTEMPT}" >> "${GITHUB_OUTPUT}"
 
-      - name: Upload generated dashboard artifact
+      - name: Upload generated Repository Intelligence site artifact
         # actions/upload-artifact v7.0.1
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:

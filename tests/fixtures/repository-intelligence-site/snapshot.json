@@ -1,0 +1,172 @@
+{
+  "schema": "egohygiene.observatory.repository-intelligence-read-model/v1",
+  "snapshot_id": "example/repository@1111111111111111111111111111111111111111",
+  "represented_commit": "1111111111111111111111111111111111111111",
+  "observed_at": "2026-08-25T14:00:00Z",
+  "repository": {
+    "id": "ri:example/repository:repository:example/repository",
+    "key": "example/repository",
+    "title": "Repository",
+    "kind": "repository",
+    "state": "active",
+    "freshness": "current",
+    "canonical_url": "https://github.com/example/repository"
+  },
+  "coverage": {
+    "status": "current"
+  },
+  "views": {
+    "now": {
+      "coverage_status": "current",
+      "recent_events": [
+        {
+          "id": "event:commit-created",
+          "type": "commit.created",
+          "occurred_at": "2026-08-25T13:55:00Z",
+          "changes": [],
+          "subject_entity": {
+            "id": "ri:example/repository:commit:1111111111111111111111111111111111111111",
+            "key": "1111111111111111111111111111111111111111",
+            "title": "feat(intelligence): make the Now view operational",
+            "kind": "commit",
+            "state": "recorded",
+            "canonical_url": "https://github.com/example/repository/commit/1111111111111111111111111111111111111111"
+          }
+        },
+        {
+          "id": "event:check-regressed",
+          "type": "check.completed",
+          "occurred_at": "2026-08-25T13:50:00Z",
+          "changes": [
+            {
+              "field": "state.value",
+              "from": "success",
+              "to": "failure"
+            }
+          ],
+          "subject_entity": {
+            "id": "ri:example/repository:check:validation-99",
+            "key": "validation-99",
+            "title": "Repository validation",
+            "kind": "check",
+            "state": "failure",
+            "canonical_url": "https://github.com/example/repository/actions/runs/99"
+          }
+        }
+      ],
+      "current_focus": [
+        {
+          "id": "ri:example/repository:roadmap-step:EX-Q02",
+          "key": "EX-Q02",
+          "title": "Wire the operational shell",
+          "kind": "roadmap_step",
+          "state": "active",
+          "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md#ex-q02"
+        }
+      ],
+      "blockers": [
+        {
+          "id": "ri:example/repository:issue:44",
+          "key": "44",
+          "title": "Await the public evidence contract",
+          "kind": "issue",
+          "state": "blocked",
+          "canonical_url": "https://github.com/example/repository/issues/44"
+        }
+      ],
+      "next_ready": [
+        {
+          "id": "ri:example/repository:roadmap-step:EX-Q04",
+          "key": "EX-Q04",
+          "title": "Publish the visual roadmap",
+          "kind": "roadmap_step",
+          "state": "ready",
+          "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md#ex-q04"
+        }
+      ]
+    },
+    "roadmap": {
+      "roots": [
+        "ri:example/repository:roadmap-step:EX-Q01"
+      ],
+      "steps": [
+        {
+          "entity": {
+            "id": "ri:example/repository:roadmap-step:EX-Q01",
+            "key": "EX-Q01",
+            "title": "Establish the evidence contract",
+            "kind": "roadmap_step",
+            "state": "complete",
+            "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md#ex-q01"
+          },
+          "outcome": "A versioned public-safe read model is available.",
+          "readiness": {
+            "value": "complete",
+            "reasons": []
+          },
+          "dependencies": []
+        },
+        {
+          "entity": {
+            "id": "ri:example/repository:roadmap-step:EX-Q04",
+            "key": "EX-Q04",
+            "title": "Publish the visual roadmap",
+            "kind": "roadmap_step",
+            "state": "ready",
+            "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md#ex-q04"
+          },
+          "outcome": "Readers can traverse roadmap intent as a quest line.",
+          "readiness": {
+            "value": "ready",
+            "reasons": [
+              "The shared shell is available",
+              "The evidence contract is complete"
+            ]
+          },
+          "dependencies": [
+            {
+              "id": "ri:example/repository:roadmap-step:EX-Q01",
+              "key": "EX-Q01",
+              "title": "Establish the evidence contract",
+              "kind": "roadmap_step",
+              "state": "complete",
+              "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md#ex-q01"
+            }
+          ]
+        }
+      ]
+    },
+    "decisions": {
+      "decisions": [
+        {
+          "entity": {
+            "id": "ri:example/repository:architecture-decision:ADR-009",
+            "key": "ADR-009",
+            "title": "Select the publication boundary",
+            "kind": "architecture_decision",
+            "state": "proposed",
+            "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/docs/decisions/ADR-009.md"
+          },
+          "implementation_status": "pending"
+        }
+      ]
+    },
+    "health": {
+      "check_states": {
+        "failure": 1
+      },
+      "checks": []
+    },
+    "work": {
+      "open_issues": [],
+      "open_pull_requests": [],
+      "roadmap_queues": {
+        "active": [],
+        "blocked": [],
+        "ready": [],
+        "unknown": [],
+        "waiting": []
+      }
+    }
+  }
+}

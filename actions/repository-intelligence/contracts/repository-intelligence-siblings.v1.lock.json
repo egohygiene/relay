@@ -1,0 +1,18 @@
+{
+  "schema": "egohygiene.relay.sibling-contract-lock/v1",
+  "observatory": {
+    "owner": "egohygiene/observatory",
+    "source_commit": "3cb3555f56b9b110e98e295c1201e8d9af641297",
+    "contract": "egohygiene.observatory.repository-intelligence-read-model/v1",
+    "boundary": "Observatory normalizes provider evidence, applies visibility rules, and computes readiness before Relay renders the snapshot."
+  },
+  "holon": {
+    "owner": "egohygiene/holon",
+    "source_commit": "215867f83c64001a743b6f24239d553872522f63",
+    "package": "@egohygiene/repository-intelligence@0.1.0-alpha.1",
+    "package_manifest_sha256": "7f45cfbe453eafb354217e17963782eb800545d82b36609428d1116a8ab63edc",
+    "style_contract_sha256": "ebc865cb28edc74f924ce597355c3c3814361e57efd11796e8a8ff57afd51ab9",
+    "boundary": "Holon owns the framework-neutral component vocabulary; Relay owns route composition and static publication artifacts."
+  },
+  "consumer_boundary": "Relay validates and renders commit-matched public-safe evidence without collecting provider state, calculating readiness, or deploying the consumer site."
+}

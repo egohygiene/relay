@@ -110,6 +110,11 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--consumer-visibility", required=True)
     parser.add_argument("--stylesheet-source", required=True)
     parser.add_argument("--script-source", required=True)
+    parser.add_argument(
+        "--dashboard-subdirectory",
+        default="",
+        help="Optional route receiving the compatibility dashboard HTML and assets.",
+    )
     return parser.parse_args()
 
 
@@ -2019,7 +2024,12 @@ def render_anatomy_section(dashboard: dict[str, Any]) -> str:
 </section>"""
 
 
-def render_html(dashboard: dict[str, Any]) -> str:
+def render_html(
+    dashboard: dict[str, Any],
+    asset_prefix: str = "./",
+    stylesheet_name: str = "styles.css",
+    include_shell_navigation: bool = False,
+) -> str:
     """Render the complete framework-free dashboard document."""
 
     repository = dashboard["repository"]
@@ -2055,6 +2065,19 @@ def render_html(dashboard: dict[str, Any]) -> str:
 </article>"""
         for label, value, description in vitality_items
     )
+    shell_navigation = ""
+    if include_shell_navigation:
+        shell_navigation = f'''<nav class="experience-nav" aria-label="Repository Intelligence views">
+      <a href="{escaped(asset_prefix)}now/">Now</a>
+      <a href="{escaped(asset_prefix)}roadmap/">Roadmap</a>
+      <a href="{escaped(asset_prefix)}decisions/">Decisions</a>
+      <a href="{escaped(asset_prefix)}journey/">Journey</a>
+      <a href="{escaped(asset_prefix)}health/">Health</a>
+      <a href="{escaped(asset_prefix)}work/">Work</a>
+      <a href="{escaped(asset_prefix)}search/">Search</a>
+      <a href="{escaped(asset_prefix)}compare/">Compare</a>
+      <a aria-current="page" href="./">Dashboard</a>
+    </nav>'''
     return f"""<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -2063,10 +2086,11 @@ def render_html(dashboard: dict[str, Any]) -> str:
     <meta name="color-scheme" content="dark" />
     <meta name="description" content="Repository intelligence for {escaped(repository["name"])}." />
     <title>Repository intelligence · {escaped(repository["name"])}</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="{escaped(asset_prefix + stylesheet_name)}" />
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to dashboard</a>
+    {shell_navigation}
     <header class="hero">
       <div class="shell">
         <p class="eyebrow">{escaped(repository["name"])}</p>
@@ -2130,10 +2154,10 @@ def render_html(dashboard: dict[str, Any]) -> str:
           <p class="card-kicker">Provenance</p>
           <p><code>{escaped(repository["source_commit"])}</code></p>
         </div>
-        <p><a href="./summary.json">View public JSON</a> · <a href="./provenance.json">View provenance</a></p>
+        <p><a href="{escaped(asset_prefix)}summary.json">View public JSON</a> · <a href="{escaped(asset_prefix)}provenance.json">View provenance</a></p>
       </aside>
     </main>
-    <script src="./explorer.js" defer></script>
+    <script src="{escaped(asset_prefix)}explorer.js" defer></script>
   </body>
 </html>
 """
@@ -2172,6 +2196,7 @@ def write_dashboard_bundle(
     stylesheet_source: Path,
     script_source: Path,
     provenance: dict[str, Any] | None = None,
+    dashboard_subdirectory: str = "",
 ) -> None:
     """Write the public JSON, HTML, and stylesheet as one static bundle."""
 
@@ -2179,8 +2204,19 @@ def write_dashboard_bundle(
         output_root / "summary.json",
         json.dumps(dashboard, allow_nan=False, indent=2, sort_keys=True) + "\n",
     )
-    atomic_write_text(output_root / "index.html", render_html(dashboard))
-    atomic_write_text(output_root / "styles.css", stylesheet_source.read_text(encoding="utf-8"))
+    dashboard_root = output_root / dashboard_subdirectory if dashboard_subdirectory else output_root
+    asset_prefix = "../" if dashboard_subdirectory else "./"
+    stylesheet_name = "styles.css"
+    atomic_write_text(
+        dashboard_root / "index.html",
+        render_html(
+            dashboard,
+            asset_prefix,
+            stylesheet_name,
+            include_shell_navigation=bool(dashboard_subdirectory),
+        ),
+    )
+    atomic_write_text(output_root / stylesheet_name, stylesheet_source.read_text(encoding="utf-8"))
     atomic_write_text(output_root / "explorer.js", script_source.read_text(encoding="utf-8"))
     if provenance is not None:
         atomic_write_text(
@@ -2244,6 +2280,7 @@ def main() -> int:
         stylesheet_source,
         script_source,
         provenance,
+        args.dashboard_subdirectory,
     )
     print(
         f"Generated repository intelligence dashboard at {output_root} "

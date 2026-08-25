@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-08-21
+updated: 2026-08-25
 governed_by:
   - architecture-decisions
 depends_on:
@@ -43,6 +43,7 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - ADR-004: Preserve extracted Intelligence contract identities
 - ADR-005: Release the action catalog as one repository unit
 - ADR-006: Catalog workflow authority and failure semantics
+- ADR-007: Compose Repository Intelligence from bounded sibling contracts
 
 ## ADR-001: Package reusable behavior outside templates
 
@@ -97,6 +98,15 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - **Decision:** Maintain `workflow-catalog.json` as the complete inventory of current internal and reusable workflows. Require explicit owner, purpose, audience, permissions, timeout, concurrency, inputs, outputs, and failure semantics. Reject uncataloged workflows, mutable remote dependencies, `write-all`, `pull_request_target`, and runnable jobs without timeouts.
 - **Consequences:** Reviewers and automation can compare declared authority with implementation. Adding a workflow becomes an explicit contract change. The catalog duplicates a bounded amount of YAML metadata and therefore requires executable drift checks.
 - **Reconsider when:** GitHub provides a portable native workflow manifest with equivalent closed, versioned semantics that Pace and offline validators can consume.
+
+## ADR-007: Compose Repository Intelligence from bounded sibling contracts
+
+- **Status:** Accepted for the Repository Intelligence experience
+- **Date:** 2026-08-25
+- **Context:** The operational site needs normalized cross-provider truth, reusable visual primitives, deterministic route composition, and consumer-owned publication. Combining those concerns in one repository would duplicate authority and make generated browser state look canonical.
+- **Decision:** Observatory owns the versioned public-safe read model, Holon owns framework-neutral visual primitives, and Relay owns the static route shell, action/workflow execution, bundle validation, and publication artifact. Relay accepts only a repository- and commit-matched snapshot, renders missing evidence explicitly, keeps browser resume state local-only, and retains one consumer-owned deployment boundary.
+- **Consequences:** `/now/` can answer operational questions without scraping providers or manufacturing readiness. Sibling changes require pinned contract evidence and compatibility tests. The routed shell may reserve future pages before their focused projections exist, but those pages must state that limitation honestly.
+- **Reconsider when:** A versioned shared site runtime can preserve the same offline determinism, privacy boundary, and consumer-owned publication with less duplicated composition code.
 
 ## Open decisions
 

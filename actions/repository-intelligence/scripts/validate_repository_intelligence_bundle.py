@@ -9,12 +9,32 @@ import argparse
 from datetime import datetime
 from html.parser import HTMLParser
 import json
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 import re
 from typing import Any
 from urllib.parse import quote, unquote, urlsplit
 
-BUNDLE_FILES = {
+ROUTED_BUNDLE_FILES = {
+    "compare/index.html",
+    "dashboard/index.html",
+    "decisions/index.html",
+    "dependencies/index.html",
+    "explorer.js",
+    "health/index.html",
+    "index.html",
+    "journey/index.html",
+    "now/index.html",
+    "provenance.json",
+    "releases/index.html",
+    "roadmap/index.html",
+    "search/index.html",
+    "site.css",
+    "site.js",
+    "styles.css",
+    "summary.json",
+    "work/index.html",
+}
+LEGACY_BUNDLE_FILES = {
     "explorer.js",
     "index.html",
     "provenance.json",
@@ -31,6 +51,18 @@ ALLOWED_LOCAL_FRAGMENTS = {
 PROVENANCE_SCHEMA = "egohygiene.relay.repository-intelligence-provenance/v1"
 DASHBOARD_SCHEMA = "egohygiene.repository-intelligence-dashboard/v3"
 FULL_SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
+SHELL_ROUTES = (
+    "now",
+    "roadmap",
+    "decisions",
+    "journey",
+    "dependencies",
+    "health",
+    "releases",
+    "work",
+    "search",
+    "compare",
+)
 REPOSITORY_PATTERN = re.compile(
     r"^(?!\.{1,2}/)(?![^/]+/\.{1,2}$)[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
 )
@@ -195,18 +227,22 @@ def canonical_output_root(repository_root: Path, output_root: Path) -> tuple[Pat
 
 
 def collect_bundle_files(output_root: Path) -> set[str]:
-    """Return a flat bundle allowlist and reject symlinks or nested output."""
+    """Return the routed bundle allowlist and reject symbolic links."""
 
     discovered: set[str] = set()
-    for path in output_root.iterdir():
+    for path in output_root.rglob("*"):
         if path.is_symlink():
-            raise BundleValidationError(f"generated bundle contains a symbolic link: {path.name}")
-        if not path.is_file():
-            raise BundleValidationError(f"generated bundle contains a nested path: {path.name}")
-        discovered.add(path.name)
-    if discovered != BUNDLE_FILES:
-        missing = sorted(BUNDLE_FILES - discovered)
-        unexpected = sorted(discovered - BUNDLE_FILES)
+            raise BundleValidationError(
+                f"generated bundle contains a symbolic link: {path.relative_to(output_root)}"
+            )
+        if path.is_file():
+            discovered.add(path.relative_to(output_root).as_posix())
+    expected = (
+        ROUTED_BUNDLE_FILES if (output_root / "now/index.html").is_file() else LEGACY_BUNDLE_FILES
+    )
+    if discovered != expected:
+        missing = sorted(expected - discovered)
+        unexpected = sorted(discovered - expected)
         details = []
         if missing:
             details.append(f"missing {', '.join(missing)}")
@@ -961,8 +997,14 @@ def validate_github_reference(path: str, repository: str, source_commit: str) ->
     """Require a reviewed same-consumer route pinned to the represented commit."""
 
     escaped_repository = re.escape(repository)
+    if path == "/egohygiene" or re.fullmatch(r"/egohygiene/relay/issues/[0-9]+", path):
+        return
+    if path in {f"/{repository}", f"/{repository}/"}:
+        return
+    if path == f"/{repository.split('/', 1)[0]}":
+        return
     if re.fullmatch(
-        rf"/{escaped_repository}/(?:actions/runs/[0-9]+|security/code-scanning)",
+        rf"/{escaped_repository}/(?:actions/runs/[0-9]+|security/code-scanning|issues/[0-9]+|pull/[0-9]+|deployments/[0-9]+|releases/tag/[^/]+)",
         path,
     ):
         return
@@ -1002,8 +1044,8 @@ def validate_https_reference(value: str, repository: str, source_commit: str) ->
         raise BundleValidationError("external reference uses a nonstandard HTTPS port")
     if parsed.hostname.casefold() not in {"github.com", "scorecard.dev"}:
         raise BundleValidationError("external reference uses an unsupported public origin")
-    if parsed.username is not None or parsed.password is not None or parsed.fragment:
-        raise BundleValidationError("external reference contains credentials or a fragment")
+    if parsed.username is not None or parsed.password is not None:
+        raise BundleValidationError("external reference contains credentials")
     decoded = decode_percent_layers(value)
     if decoded is None:
         raise BundleValidationError("external reference uses excessive percent encoding")
@@ -1017,8 +1059,12 @@ def validate_https_reference(value: str, repository: str, source_commit: str) ->
     if hostname == "github.com":
         if parsed.query:
             raise BundleValidationError("GitHub reference contains an unsupported query")
+        if parsed.fragment and not re.fullmatch(r"[A-Za-z0-9._-]+", parsed.fragment):
+            raise BundleValidationError("GitHub reference contains an invalid source fragment")
         validate_github_reference(parsed.path, repository, source_commit)
         return
+    if parsed.fragment:
+        raise BundleValidationError("external reference contains a fragment")
     if parsed.query:
         allowed_scorecard_query = (
             hostname == "scorecard.dev"
@@ -1036,6 +1082,7 @@ def resolve_local_reference(
     value: str,
     repository: str,
     source_commit: str,
+    document_root: Path | None = None,
 ) -> Path | None:
     """Resolve a relative bundle reference as if the site were served at /intelligence/."""
 
@@ -1052,17 +1099,17 @@ def resolve_local_reference(
     decoded = unquote(parsed.path)
     if decoded.startswith("/") or "\\" in decoded:
         raise BundleValidationError("local bundle references must be relative to /intelligence/")
-    relative = PurePosixPath(decoded)
-    if ".." in relative.parts:
-        raise BundleValidationError("local bundle reference contains traversal")
-    if any(part in {"", ".", ".."} for part in relative.parts):
-        if decoded.startswith("./"):
-            relative = PurePosixPath(decoded[2:])
-        else:
-            raise BundleValidationError("local bundle reference is not canonical")
-    if any(part in {"", ".", ".."} for part in relative.parts):
-        raise BundleValidationError("local bundle reference contains traversal")
-    destination = output_root.joinpath(*relative.parts)
+    if not decoded:
+        return (document_root or output_root) / "index.html"
+    destination = ((document_root or output_root) / decoded).resolve()
+    try:
+        destination.relative_to(output_root)
+    except ValueError as error:
+        raise BundleValidationError(
+            "local bundle reference contains traversal outside /intelligence/"
+        ) from error
+    if destination.is_dir():
+        destination /= "index.html"
     if not destination.is_file() or destination.is_symlink():
         raise BundleValidationError(f"local bundle reference is broken: {value}")
     return destination
@@ -1075,23 +1122,36 @@ def validate_html_references(
 ) -> None:
     """Validate every HTML href/src and the required framework-free assets."""
 
-    html_text = (output_root / "index.html").read_text(encoding="utf-8")
-    collector = ReferenceCollector()
-    collector.feed(html_text)
-    destinations = {
-        destination.name
-        for _, value in collector.references
-        if (
-            destination := resolve_local_reference(
+    destinations: set[str] = set()
+    expected_files = (
+        ROUTED_BUNDLE_FILES if (output_root / "now/index.html").is_file() else LEGACY_BUNDLE_FILES
+    )
+    for relative_name in sorted(name for name in expected_files if name.endswith(".html")):
+        html_path = output_root / relative_name
+        collector = ReferenceCollector()
+        collector.feed(html_path.read_text(encoding="utf-8"))
+        for _, value in collector.references:
+            destination = resolve_local_reference(
                 output_root,
                 value,
                 repository,
                 source_commit,
+                html_path.parent,
             )
-        )
-        is not None
-    }
-    required = {"explorer.js", "provenance.json", "styles.css", "summary.json"}
+            if destination is not None:
+                destinations.add(destination.relative_to(output_root).as_posix())
+    required = (
+        {
+            "explorer.js",
+            "provenance.json",
+            "site.css",
+            "site.js",
+            "styles.css",
+            "summary.json",
+        }
+        if expected_files is ROUTED_BUNDLE_FILES
+        else {"explorer.js", "provenance.json", "styles.css", "summary.json"}
+    )
     if not required.issubset(destinations):
         missing = ", ".join(sorted(required - destinations))
         raise BundleValidationError(f"index.html does not reference required bundle files: {missing}")
@@ -1101,10 +1161,19 @@ def validate_canonical_assets(output_root: Path) -> None:
     """Require generated client assets to match Relay's sole canonical sources."""
 
     assets_root = Path(__file__).resolve().parents[1] / "assets"
-    expected = {
-        "explorer.js": assets_root / "explorer.js",
-        "styles.css": assets_root / "dashboard.css",
-    }
+    expected = (
+        {
+            "explorer.js": assets_root / "explorer.js",
+            "site.css": assets_root / "site.css",
+            "site.js": assets_root / "site.js",
+            "styles.css": assets_root / "dashboard.css",
+        }
+        if (output_root / "now/index.html").is_file()
+        else {
+            "explorer.js": assets_root / "explorer.js",
+            "styles.css": assets_root / "dashboard.css",
+        }
+    )
     for output_name, source in expected.items():
         try:
             source_bytes = source.read_bytes()
@@ -1157,7 +1226,10 @@ def validate_privacy(
             if any(pattern.search(value) for pattern in SECRET_PATTERNS):
                 raise BundleValidationError(f"public JSON contains a secret-like value: {path}")
     repository_path = str(repository_root)
-    for name in sorted(BUNDLE_FILES):
+    bundle_files = (
+        ROUTED_BUNDLE_FILES if (output_root / "now/index.html").is_file() else LEGACY_BUNDLE_FILES
+    )
+    for name in sorted(bundle_files):
         text = (output_root / name).read_text(encoding="utf-8")
         decoded_text = decode_percent_layers(text)
         if decoded_text is None:
@@ -1196,6 +1268,46 @@ def validate_intelligence_route(
     validate_html_references(output_root, repository, source_commit)
 
 
+def validate_routed_shell(
+    output_root: Path,
+    repository: str,
+    source_commit: str,
+) -> None:
+    """Require the operational entry and every reserved route to share one shell."""
+
+    if not (output_root / "now/index.html").is_file():
+        return
+    for route in SHELL_ROUTES:
+        rendered = (output_root / route / "index.html").read_text(encoding="utf-8")
+        markers = {
+            f'data-ri-route="{route}"',
+            f'data-ri-repository="{repository}"',
+            f'data-ri-commit="{source_commit}"',
+            'class="ri-route-nav"',
+            'data-local-resume',
+            'data-filter-query',
+            'aria-current="page"',
+        }
+        missing = sorted(marker for marker in markers if marker not in rendered)
+        if missing:
+            raise BundleValidationError(
+                f"{route}/ does not implement the shared shell: {', '.join(missing)}"
+            )
+    root = (output_root / "index.html").read_text(encoding="utf-8")
+    now = (output_root / "now/index.html").read_text(encoding="utf-8")
+    for label, rendered in (("index.html", root), ("now/index.html", now)):
+        for marker in (
+            'data-ri-route="now"',
+            'id="now-heading"',
+            'data-filter-results aria-live="polite"',
+        ):
+            if marker not in rendered:
+                raise BundleValidationError(f"{label} is not an operational Now entry")
+    dashboard = (output_root / "dashboard/index.html").read_text(encoding="utf-8")
+    if 'aria-label="Repository Intelligence views"' not in dashboard:
+        raise BundleValidationError("dashboard/index.html does not link into the shared views")
+
+
 def validate_bundle(
     *,
     repository_root: Path,
@@ -1229,6 +1341,7 @@ def validate_bundle(
         generator_immutable=generator_immutable,
     )
     validate_intelligence_route(output, repository, source_commit)
+    validate_routed_shell(output, repository, source_commit)
     validate_canonical_assets(output)
     validate_privacy(output, root, documents)
 

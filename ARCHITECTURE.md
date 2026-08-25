@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-08-21
+updated: 2026-08-25
 governed_by:
   - architecture-architecture
 depends_on:
@@ -83,8 +83,18 @@ current workflow. It records owner, purpose, audience, permissions, caller
 parameters, timeout, concurrency, and failure semantics. CI rejects uncataloged
 workflow files and unsafe dependency or trigger forms.
 
-The dashboard builder never deploys Pages. Consumers compose its output into
-their one authoritative site artifact. The snapshot publisher is isolated as a
+The Repository Intelligence builder never deploys Pages. Consumers compose its
+output into their one authoritative site artifact. Relay owns the shared route
+shell and static bundle assembly; Observatory owns the normalized public-safe
+read model, and Holon owns the framework-neutral visual component vocabulary.
+Relay accepts a snapshot only when its repository identity and represented
+commit match the generated dashboard. Missing input remains an explicit
+unavailable state, and browser-local resume state never becomes canonical
+evidence.
+The tested Observatory and Holon boundaries are pinned in
+[`repository-intelligence-siblings.v1.lock.json`](actions/repository-intelligence/contracts/repository-intelligence-siblings.v1.lock.json).
+
+The snapshot publisher is isolated as a
 separate action because it requires `contents: write`; all other v1 action jobs
 operate with read-only repository permissions.
 
@@ -103,7 +113,8 @@ operate with read-only repository permissions.
 - Realm image publishing
 - Hygiene policy
 - Pace synchronization
-- Observatory reports
+- Observatory Repository Intelligence read models
+- Holon Repository Intelligence component contracts
 
 ## Deployment and portability
 
