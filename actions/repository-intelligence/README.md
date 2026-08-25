@@ -166,7 +166,10 @@ without a separate reviewed authorization.
 | Output                  | Contents                                                               |
 | ----------------------- | ---------------------------------------------------------------------- |
 | `output-directory`      | Complete validated bundle                                               |
-| `index`                 | Dashboard `index.html`                                                  |
+| `index`                 | Default operational `index.html`                                        |
+| `now`                   | Operational `/now/` entry                                               |
+| `roadmap`               | Scrollable `/roadmap/` quest line                                       |
+| `dashboard`             | Compatibility analytics `/dashboard/` entry                            |
 | `summary`               | `egohygiene.repository-intelligence-dashboard/v3` aggregate            |
 | `provenance`            | `egohygiene.relay.repository-intelligence-provenance/v1` metadata       |
 | `analytics-summary`     | `egohygiene.repository-analytics/v1` public-safe analytics              |
@@ -201,11 +204,33 @@ The generated output directory has one exact, validated shape:
 ```text
 dist/intelligence/
 ├── index.html
+├── now/index.html
+├── roadmap/index.html
+├── decisions/index.html
+├── journey/index.html
+├── dependencies/index.html
+├── health/index.html
+├── releases/index.html
+├── work/index.html
+├── search/index.html
+├── compare/index.html
+├── dashboard/index.html
 ├── summary.json
 ├── provenance.json
+├── site.css
+├── site.js
 ├── styles.css
 └── explorer.js
 ```
+
+The root and `/now/` are the operational entry. `/roadmap/` renders the
+commit-matched Observatory roadmap view as a static-first quest line. Declared
+roots form chapters; stable step IDs form durable fragments; dependencies and
+blockers link in both display directions; and each native evidence drawer keeps
+ADRs, issues, pull requests, commits, checks, releases, deployments, and changed
+files attached to canonical sources. Large evidence drawers virtualize only
+after browser enhancement, so the static HTML and print projection remain
+complete. Progress uses declared state and exit criteria, never commit volume.
 
 `provenance.json` records the generator name/version, the requested Relay source
 ref, its resolved commit when GitHub exposes one, whether the requested ref was

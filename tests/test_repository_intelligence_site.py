@@ -218,6 +218,9 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
         self.assertIn("URLSearchParams", script)
         self.assertIn("history.replaceState", script)
         self.assertIn("localStorage", script)
+        self.assertIn("scrollY", script)
+        self.assertIn("window.scrollTo", script)
+        self.assertIn('searchParams.set("resume", "1")', script)
         self.assertIn("ArrowDown", script)
         self.assertIn('event.key === "/"', script)
         self.assertIn("Resume data stays in this browser", rendered)
@@ -229,12 +232,175 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
         self.assertNotIn("localStorage", (output / "summary.json").read_text(encoding="utf-8"))
         self.assertNotIn("resume.v1", (output / "provenance.json").read_text(encoding="utf-8"))
 
+    def test_roadmap_renders_stable_quests_progress_and_full_evidence(self) -> None:
+        output = self.build("dist/intelligence")
+        rendered = (output / "roadmap/index.html").read_text(encoding="utf-8")
+        foundation_id = "ri:example/repository:roadmap-step:EX-Q01"
+        roadmap_id = "ri:example/repository:roadmap-step:EX-Q04"
+        foundation_anchor = site_builder.stable_fragment("quest", foundation_id)
+        roadmap_anchor = site_builder.stable_fragment("quest", roadmap_id)
+        self.assertIn('aria-label="Roadmap chapters and quests"', rendered)
+        self.assertIn(f'id="{foundation_anchor}"', rendered)
+        self.assertIn(f'href="#{roadmap_anchor}"', rendered)
+        self.assertIn("How progress is determined", rendered)
+        self.assertIn("1/2 criteria · 50%", rendered)
+        self.assertIn("Commits and other linked records are evidence, never progress units", rendered)
+        self.assertIn("Unlocks", rendered)
+        self.assertIn("Depends on", rendered)
+        self.assertIn("Open canonical ROADMAP.md step", rendered)
+        for label in (
+            "Architecture Decision",
+            "Issue",
+            "Pull Request",
+            "Commit",
+            "Check",
+            "Release",
+            "Deployment",
+            "File",
+        ):
+            self.assertIn(label, rendered)
+        self.assertIn("Assertion", rendered)
+        self.assertIn("Confidence", rendered)
+        self.assertIn("Freshness", rendered)
+        self.assertNotIn("View intentionally not materialized yet", rendered)
+
+    def test_large_roadmap_keeps_static_completeness_and_virtualization_hooks(self) -> None:
+        snapshot = json.loads(json.dumps(self.snapshot))
+        template = snapshot["views"]["roadmap"]["steps"][1]
+        steps = []
+        states = [
+            "planned",
+            "ready",
+            "active",
+            "blocked",
+            "complete",
+            "deferred",
+            "superseded",
+        ]
+        for index in range(120):
+            step = json.loads(json.dumps(template))
+            identifier = f"ri:example/repository:roadmap-step:EX-LARGE-{index:03d}"
+            step["entity"].update(
+                {
+                    "id": identifier,
+                    "key": f"EX-LARGE-{index:03d}",
+                    "title": f"Large roadmap quest {index:03d}",
+                    "state": states[index % len(states)],
+                    "canonical_url": (
+                        "https://github.com/example/repository/blob/"
+                        f"{self.source_commit}/ROADMAP.md#ex-large-{index:03d}"
+                    ),
+                }
+            )
+            step["dependencies"] = [] if index == 0 else [steps[-1]["entity"]]
+            step["blocked_by"] = []
+            step["evidence"] = []
+            step["informed_by"] = []
+            step["tracked_by"] = []
+            step["verified_by"] = []
+            step["releases"] = []
+            step["deployments"] = []
+            step["changed_files"] = []
+            step["exit_criteria"] = [
+                {"complete": index % 2 == 0, "text": f"Criterion {index:03d}"}
+            ]
+            steps.append(step)
+        steps[-1]["verified_by"] = [
+            {
+                "assertion": "authoritative",
+                "canonical_url": f"https://github.com/example/repository/actions/runs/{9000 + index}",
+                "confidence": "authoritative",
+                "freshness": "current",
+                "id": f"ri:example/repository:check:large-{index:03d}",
+                "key": f"large-{index:03d}",
+                "kind": "check",
+                "repository": "example/repository",
+                "state": "success",
+                "title": f"Large evidence record {index:03d}",
+            }
+            for index in range(90)
+        ]
+        snapshot["views"]["roadmap"]["steps"] = steps
+        snapshot["views"]["roadmap"]["roots"] = [steps[0]["entity"]["id"]]
+        self.snapshot = snapshot
+        output = self.build("dist/intelligence")
+        rendered = (output / "roadmap/index.html").read_text(encoding="utf-8")
+        script = (output / "site.js").read_text(encoding="utf-8")
+        self.assertEqual(rendered.count("data-roadmap-quest"), 120)
+        self.assertIn('data-evidence-total="91"', rendered)
+        self.assertEqual(rendered.count("Large evidence record"), 90)
+        self.assertIn("requestAnimationFrame", script)
+        self.assertIn("data-evidence-viewport", script)
+        self.assertIn("IntersectionObserver", script)
+        self.assertIn("aria-posinset", rendered)
+        self.assertIn("aria-setsize", rendered)
+
+    def test_roadmap_contract_rejects_duplicate_ids_and_unresolved_roots(self) -> None:
+        duplicate = json.loads(json.dumps(self.snapshot))
+        duplicate["views"]["roadmap"]["steps"][1]["entity"]["id"] = duplicate[
+            "views"
+        ]["roadmap"]["steps"][0]["entity"]["id"]
+        with self.assertRaisesRegex(site_builder.SiteInputError, "unique"):
+            site_builder.validate_snapshot(
+                duplicate,
+                "example/repository",
+                self.source_commit,
+            )
+        unresolved = json.loads(json.dumps(self.snapshot))
+        unresolved["views"]["roadmap"]["roots"] = ["ri:missing"]
+        with self.assertRaisesRegex(site_builder.SiteInputError, "unresolved"):
+            site_builder.validate_snapshot(
+                unresolved,
+                "example/repository",
+                self.source_commit,
+            )
+
+    def test_bundle_validation_rejects_a_broken_quest_deep_link(self) -> None:
+        output = self.build("dist/intelligence")
+        roadmap = output / "roadmap/index.html"
+        rendered = roadmap.read_text(encoding="utf-8")
+        anchor = site_builder.stable_fragment(
+            "quest",
+            "ri:example/repository:roadmap-step:EX-Q04",
+        )
+        roadmap.write_text(
+            rendered.replace(f'href="#{anchor}"', 'href="#quest-missing"', 1),
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(
+            bundle_validator.BundleValidationError,
+            "unsupported fragment",
+        ):
+            bundle_validator.validate_bundle(
+                repository_root=self.repository,
+                output_root=output,
+                repository="example/repository",
+                repository_visibility="public",
+                source_commit=self.source_commit,
+                generator_version="1.2.0",
+                generator_source_ref=GENERATOR_COMMIT,
+                generator_source_commit=GENERATOR_COMMIT,
+                generator_immutable=True,
+            )
+
+    def test_empty_roadmap_is_an_explicit_valid_state(self) -> None:
+        self.snapshot["views"]["roadmap"] = {"roots": [], "steps": []}
+        self.snapshot["views"]["now"]["next_ready"] = []
+        output = self.build("dist/intelligence")
+        rendered = (output / "roadmap/index.html").read_text(encoding="utf-8")
+        self.assertIn("No roadmap quests projected", rendered)
+        self.assertIn("ROADMAP.md remains canonical", rendered)
+        self.assertNotIn("data-roadmap-quest", rendered)
+
     def test_missing_snapshot_is_honest_not_green(self) -> None:
         output = self.build("dist/intelligence", include_snapshot=False)
         rendered = (output / "now/index.html").read_text(encoding="utf-8")
         self.assertIn("Observatory snapshot unavailable", rendered)
         self.assertIn("cannot be asserted", rendered)
         self.assertIn('data-state="unknown"', rendered)
+        roadmap = (output / "roadmap/index.html").read_text(encoding="utf-8")
+        self.assertIn("Observatory roadmap unavailable", roadmap)
+        self.assertIn("never infers roadmap state", roadmap)
 
     def test_snapshot_identity_and_commit_are_required(self) -> None:
         wrong = json.loads(json.dumps(self.snapshot))

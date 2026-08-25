@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import UTC, datetime
+import hashlib
 import html
 import json
 import os
@@ -34,6 +35,30 @@ EMAIL = re.compile(r"(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z
 SECRET = re.compile(r"(?i)(?:github_pat_|gh[pousr]_|(?:token|password|secret)\s*[:=])")
 BROKEN_STATES = {"error", "failed", "failure", "timed_out"}
 PENDING_DECISION_STATES = {"draft", "pending", "proposed"}
+ROADMAP_STATES = {
+    "active",
+    "blocked",
+    "cancelled",
+    "complete",
+    "deferred",
+    "planned",
+    "ready",
+    "superseded",
+}
+ROADMAP_EVIDENCE_FIELDS = (
+    ("blocked_by", "blocked by"),
+    ("dependencies", "depends on"),
+    ("informed_by", "informed by"),
+    ("tracked_by", "tracked by"),
+    ("verified_by", "verified by"),
+    ("evidence", "evidence"),
+    ("releases", "released by"),
+    ("deployments", "deployed by"),
+    ("changed_files", "changed file"),
+    ("files", "changed file"),
+    ("supersedes", "supersedes"),
+    ("superseded_by", "superseded by"),
+)
 
 
 class SiteInputError(ValueError):
@@ -130,6 +155,79 @@ def entity(record: Any) -> dict[str, Any]:
     return require_object(nested) if isinstance(nested, dict) else item
 
 
+def stable_fragment(prefix: str, value: Any) -> str:
+    """Build a readable fragment whose identity does not depend on display order."""
+
+    identity = str(value or "record")
+    slug = re.sub(r"[^a-z0-9]+", "-", identity.casefold()).strip("-") or "record"
+    digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:10]
+    return f"{prefix}-{slug[:72]}-{digest}"
+
+
+def validate_roadmap_view(roadmap: dict[str, Any]) -> None:
+    """Validate the display boundary needed for durable quest-line rendering."""
+
+    roots = require_list(roadmap.get("roots"))
+    if any(not isinstance(root, str) or not root for root in roots):
+        raise SiteInputError("snapshot views.roadmap.roots must contain stable IDs")
+    if len(roots) != len(set(roots)):
+        raise SiteInputError("snapshot views.roadmap.roots must be unique")
+    identifiers: set[str] = set()
+    keys: set[str] = set()
+    fragments: set[str] = set()
+    for index, candidate in enumerate(require_list(roadmap.get("steps"))):
+        step = require_object(candidate)
+        if not step:
+            raise SiteInputError(f"snapshot views.roadmap.steps[{index}] must be an object")
+        step_entity = entity(step)
+        for member in ("id", "key", "title", "kind", "state"):
+            if not isinstance(step_entity.get(member), str) or not step_entity[member]:
+                raise SiteInputError(
+                    f"snapshot views.roadmap.steps[{index}].entity.{member} "
+                    "must be a non-empty string"
+                )
+        if normalize_state(step_entity.get("kind")) != "roadmap_step":
+            raise SiteInputError(
+                f"snapshot views.roadmap.steps[{index}] must describe a roadmap_step"
+            )
+        state = normalize_state(step_entity.get("state"))
+        if state not in ROADMAP_STATES:
+            raise SiteInputError(
+                f"snapshot views.roadmap.steps[{index}] uses unsupported state {state}"
+            )
+        identifier = str(step_entity["id"])
+        key = str(step_entity["key"])
+        fragment = stable_fragment("quest", identifier)
+        if identifier in identifiers or key in keys or fragment in fragments:
+            raise SiteInputError("roadmap step IDs, keys, and fragments must be unique")
+        identifiers.add(identifier)
+        keys.add(key)
+        fragments.add(fragment)
+        for field, _ in ROADMAP_EVIDENCE_FIELDS:
+            if field in step and not isinstance(step[field], list):
+                raise SiteInputError(
+                    f"snapshot views.roadmap.steps[{index}].{field} must be an array"
+                )
+        criteria = require_list(step.get("exit_criteria"))
+        for criterion_index, criterion_value in enumerate(criteria):
+            criterion = require_object(criterion_value)
+            if (
+                not isinstance(criterion.get("text"), str)
+                or not criterion["text"]
+                or not isinstance(criterion.get("complete"), bool)
+            ):
+                raise SiteInputError(
+                    "snapshot views.roadmap.steps"
+                    f"[{index}].exit_criteria[{criterion_index}] is invalid"
+                )
+    missing_roots = sorted(set(roots) - identifiers)
+    if missing_roots:
+        raise SiteInputError(
+            "snapshot views.roadmap.roots contain unresolved step IDs: "
+            + ", ".join(missing_roots)
+        )
+
+
 def validate_snapshot(
     snapshot: dict[str, Any], repository: str, source_commit: str
 ) -> dict[str, Any]:
@@ -185,6 +283,7 @@ def validate_snapshot(
                 )
     if not isinstance(views["work"].get("roadmap_queues"), dict):
         raise SiteInputError("snapshot views.work.roadmap_queues must be an object")
+    validate_roadmap_view(require_object(views.get("roadmap")))
     return snapshot
 
 
@@ -374,6 +473,351 @@ def render_next_actions(snapshot: dict[str, Any]) -> str:
     return '<ol class="ri-action-list">' + "".join(cards) + "</ol>"
 
 
+def roadmap_index(
+    snapshot: dict[str, Any],
+) -> tuple[
+    list[dict[str, Any]],
+    dict[str, dict[str, Any]],
+    dict[str, str],
+    dict[str, list[dict[str, Any]]],
+    dict[str, list[dict[str, Any]]],
+]:
+    """Index roadmap steps and derive inverse display links without changing truth."""
+
+    roadmap = require_object(require_object(snapshot.get("views")).get("roadmap"))
+    steps = [require_object(step) for step in require_list(roadmap.get("steps"))]
+    by_id = {str(entity(step).get("id")): step for step in steps}
+    by_key = {str(entity(step).get("key")): step for step in steps}
+    anchors: dict[str, str] = {}
+    for step in steps:
+        step_entity = entity(step)
+        anchor = stable_fragment("quest", step_entity.get("id"))
+        anchors[str(step_entity.get("id"))] = anchor
+        anchors[str(step_entity.get("key"))] = anchor
+    dependents: dict[str, list[dict[str, Any]]] = {identifier: [] for identifier in by_id}
+    blocks: dict[str, list[dict[str, Any]]] = {identifier: [] for identifier in by_id}
+    for step in steps:
+        step_entity = entity(step)
+        for dependency_value in require_list(step.get("dependencies")):
+            dependency = entity(dependency_value)
+            dependency_id = str(dependency.get("id") or "")
+            dependency_step = by_id.get(dependency_id) or by_key.get(
+                str(dependency.get("key") or "")
+            )
+            if dependency_step is not None:
+                dependents[str(entity(dependency_step).get("id"))].append(step_entity)
+        for blocker_value in require_list(step.get("blocked_by")):
+            blocker = entity(blocker_value)
+            blocker_id = str(blocker.get("id") or "")
+            blocker_step = by_id.get(blocker_id) or by_key.get(str(blocker.get("key") or ""))
+            if blocker_step is not None:
+                blocks[str(entity(blocker_step).get("id"))].append(step_entity)
+    return steps, by_id, anchors, dependents, blocks
+
+
+def roadmap_chapters(
+    snapshot: dict[str, Any], steps: list[dict[str, Any]], by_id: dict[str, dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Group the dependency forest by declared roots while retaining source order."""
+
+    roadmap = require_object(require_object(snapshot.get("views")).get("roadmap"))
+    order = {str(entity(step).get("id")): index for index, step in enumerate(steps)}
+    children: dict[str, list[str]] = {identifier: [] for identifier in by_id}
+    for step in steps:
+        step_id = str(entity(step).get("id"))
+        for dependency_value in require_list(step.get("dependencies")):
+            dependency = entity(dependency_value)
+            dependency_id = str(dependency.get("id") or "")
+            if dependency_id in children:
+                children[dependency_id].append(step_id)
+    for values in children.values():
+        values.sort(key=lambda identifier: order.get(identifier, len(order)))
+    declared_roots = [
+        str(identifier)
+        for identifier in require_list(roadmap.get("roots"))
+        if str(identifier) in by_id
+    ]
+    if not declared_roots and steps:
+        declared_roots = [str(entity(steps[0]).get("id"))]
+    assigned: set[str] = set()
+    chapters: list[dict[str, Any]] = []
+    for root_id in declared_roots:
+        queue = [root_id]
+        members: list[dict[str, Any]] = []
+        while queue:
+            identifier = queue.pop(0)
+            if identifier in assigned or identifier not in by_id:
+                continue
+            assigned.add(identifier)
+            members.append(by_id[identifier])
+            queue.extend(children.get(identifier, []))
+        if members:
+            members.sort(key=lambda step: order[str(entity(step).get("id"))])
+            chapters.append({"root": by_id[root_id], "steps": members})
+    remaining = [step for step in steps if str(entity(step).get("id")) not in assigned]
+    if remaining:
+        chapters.append({"root": remaining[0], "steps": remaining, "supplemental": True})
+    return chapters
+
+
+def roadmap_evidence(step: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
+    """Flatten the normalized, relationship-labelled evidence attached to one quest."""
+
+    records: list[tuple[str, dict[str, Any]]] = []
+    seen: set[tuple[str, str]] = set()
+    for field, relationship in ROADMAP_EVIDENCE_FIELDS:
+        for candidate in require_list(step.get(field)):
+            value = entity(candidate)
+            identifier = str(value.get("id") or value.get("canonical_url") or "")
+            marker = (relationship, identifier)
+            if not value or not identifier or marker in seen:
+                continue
+            seen.add(marker)
+            records.append((relationship, value))
+    return records
+
+
+def roadmap_reference_href(value: dict[str, Any], anchors: dict[str, str]) -> str:
+    internal = anchors.get(str(value.get("id") or "")) or anchors.get(
+        str(value.get("key") or "")
+    )
+    if internal:
+        return f"#{internal}"
+    return safe_href(value.get("canonical_url"))
+
+
+def render_roadmap_reference(
+    value: dict[str, Any], anchors: dict[str, str], relationship: str
+) -> str:
+    href = roadmap_reference_href(value, anchors)
+    label = value.get("title") or value.get("key") or "Untitled evidence"
+    content = (
+        f'<span class="ri-link-chip__relationship">{escaped(relationship)}</span>'
+        f'<span>{escaped(label)}</span>'
+    )
+    if href:
+        return f'<a class="ri-link-chip" href="{escaped(href)}">{content}</a>'
+    return f'<span class="ri-link-chip">{content}</span>'
+
+
+def render_roadmap_evidence_record(
+    relationship: str,
+    value: dict[str, Any],
+    anchors: dict[str, str],
+    index: int,
+    total: int,
+) -> str:
+    kind = normalize_state(value.get("kind"))
+    state = normalize_state(value.get("state"))
+    href = roadmap_reference_href(value, anchors)
+    title = value.get("title") or value.get("key") or "Untitled evidence"
+    search = " ".join(
+        str(item or "")
+        for item in (
+            relationship,
+            value.get("title"),
+            value.get("key"),
+            value.get("kind"),
+            value.get("state"),
+            value.get("repository"),
+        )
+    ).lower()
+    heading = (
+        f'<a href="{escaped(href)}">{escaped(title)} <span aria-hidden="true">↗</span></a>'
+        if href
+        else f"<span>{escaped(title)}</span>"
+    )
+    return f'''<li class="ri-evidence-record" data-evidence-item data-kind="{escaped(kind)}" data-state="{escaped(state)}" data-search="{escaped(search)}" aria-posinset="{index + 1}" aria-setsize="{total}">
+      <div class="ri-evidence-record__top"><span class="ri-evidence-kind">{escaped(state_label(kind))}</span>{status_pill(state)}</div>
+      <strong>{heading}</strong>
+      <p>{escaped(relationship.capitalize())} · {escaped(value.get("key") or "No identifier")}</p>
+      <dl class="ri-provenance"><div><dt>Assertion</dt><dd>{escaped(state_label(value.get("assertion")))}</dd></div><div><dt>Confidence</dt><dd>{escaped(state_label(value.get("confidence")))}</dd></div><div><dt>Freshness</dt><dd>{escaped(state_label(value.get("freshness")))}</dd></div><div><dt>Owner</dt><dd>{escaped(value.get("repository") or "Unknown")}</dd></div></dl>
+    </li>'''
+
+
+def render_exit_criteria(criteria: list[Any]) -> str:
+    if not criteria:
+        return '<p class="ri-muted">No exit criteria are projected for this quest.</p>'
+    items = []
+    for candidate in criteria:
+        criterion = require_object(candidate)
+        complete = bool(criterion.get("complete"))
+        items.append(
+            f'<li data-complete="{str(complete).lower()}"><span aria-hidden="true">'
+            f'{"✓" if complete else ""}</span><span>{escaped(criterion.get("text"))}</span></li>'
+        )
+    return '<ul class="ri-criteria" aria-label="Exit criteria">' + "".join(items) + "</ul>"
+
+
+def render_relationship_row(
+    label: str, values: list[Any], anchors: dict[str, str]
+) -> str:
+    records = [entity(value) for value in values if entity(value)]
+    if not records:
+        return ""
+    return (
+        f'<div class="ri-relationship-row"><strong>{escaped(label)}</strong><div>'
+        + "".join(render_roadmap_reference(value, anchors, label.casefold()) for value in records)
+        + "</div></div>"
+    )
+
+
+def render_quest_step(
+    step: dict[str, Any],
+    *,
+    index: int,
+    total: int,
+    anchors: dict[str, str],
+    dependents: dict[str, list[dict[str, Any]]],
+    blocks: dict[str, list[dict[str, Any]]],
+) -> str:
+    step_entity = entity(step)
+    step_id = str(step_entity.get("id"))
+    anchor = anchors[step_id]
+    state = normalize_state(step_entity.get("state"))
+    criteria = require_list(step.get("exit_criteria"))
+    complete_criteria = sum(
+        1 for candidate in criteria if require_object(candidate).get("complete") is True
+    )
+    percentage = (
+        round(complete_criteria * 100 / len(criteria))
+        if criteria
+        else (100 if state == "complete" else 0)
+    )
+    evidence_records = roadmap_evidence(step)
+    evidence_kinds = [normalize_state(value.get("kind")) for _, value in evidence_records]
+    evidence_states = [normalize_state(value.get("state")) for _, value in evidence_records]
+    kinds = sorted({"roadmap_step", *evidence_kinds})
+    states = sorted({state, *evidence_states})
+    search = " ".join(
+        [
+            str(step_entity.get("key") or ""),
+            str(step_entity.get("title") or ""),
+            str(step.get("outcome") or ""),
+            state,
+            *[
+                " ".join(
+                    str(item or "")
+                    for item in (
+                        relationship,
+                        value.get("title"),
+                        value.get("key"),
+                        value.get("kind"),
+                        value.get("state"),
+                    )
+                )
+                for relationship, value in evidence_records
+            ],
+        ]
+    ).lower()
+    kind_counts: dict[str, int] = {}
+    for kind in evidence_kinds:
+        kind_counts[kind] = kind_counts.get(kind, 0) + 1
+    evidence_summary = "".join(
+        f'<span><strong>{count}</strong> {escaped(state_label(kind))}</span>'
+        for kind, count in sorted(kind_counts.items())
+    ) or "<span>No linked evidence yet</span>"
+    evidence_items = "".join(
+        render_roadmap_evidence_record(relationship, value, anchors, evidence_index, len(evidence_records))
+        for evidence_index, (relationship, value) in enumerate(evidence_records)
+    )
+    canonical = source_link(step_entity, "Open canonical ROADMAP.md step")
+    return f'''<li class="ri-quest" id="{escaped(anchor)}" data-filter-item data-roadmap-quest data-state="{escaped(state)}" data-states="{escaped(" ".join(states))}" data-kind="roadmap_step" data-kinds="{escaped(" ".join(kinds))}" data-search="{escaped(search)}">
+      <div class="ri-quest__node" aria-hidden="true"><span>{index + 1:02d}</span></div>
+      <article class="ri-quest__card" tabindex="-1">
+        <header><div><a class="ri-quest__permalink" data-quest-link href="#{escaped(anchor)}">Quest {index + 1} of {total} · {escaped(step_entity.get("key"))}</a><h3>{escaped(step_entity.get("title"))}</h3></div>{status_pill(state)}</header>
+        <p class="ri-quest__outcome">{escaped(step.get("outcome") or "Outcome not yet described.")}</p>
+        <div class="ri-progress"><div role="progressbar" aria-label="Exit-criteria progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{percentage}"><span style="--ri-progress: {percentage}%"></span></div><strong>{complete_criteria}/{len(criteria)} criteria · {percentage}%</strong></div>
+        {render_exit_criteria(criteria)}
+        <div class="ri-relationship-grid">
+          {render_relationship_row("Depends on", require_list(step.get("dependencies")), anchors)}
+          {render_relationship_row("Unlocks", dependents.get(step_id, []), anchors)}
+          {render_relationship_row("Blocked by", require_list(step.get("blocked_by")), anchors)}
+          {render_relationship_row("Blocks", blocks.get(step_id, []), anchors)}
+        </div>
+        <div class="ri-quest__source">{canonical}<span>Assertion: {escaped(state_label(step_entity.get("assertion")))} · Freshness: {escaped(state_label(step_entity.get("freshness")))}</span></div>
+        <details class="ri-evidence" data-quest-evidence>
+          <summary><span><strong>Quest evidence</strong><small>{len(evidence_records)} linked {"record" if len(evidence_records) == 1 else "records"}</small></span><span aria-hidden="true">+</span></summary>
+          <div class="ri-evidence__summary">{evidence_summary}</div>
+          <div class="ri-evidence-viewport" data-evidence-viewport data-evidence-total="{len(evidence_records)}" data-row-height="150">
+            <ol class="ri-evidence-list">{evidence_items}</ol>
+          </div>
+        </details>
+      </article>
+    </li>'''
+
+
+def roadmap_body(snapshot: dict[str, Any] | None) -> str:
+    """Render a static-first, dependency-aware quest line from Observatory output."""
+
+    if snapshot is None:
+        return f'''<section class="ri-section ri-section--lead" aria-labelledby="roadmap-heading"><div class="ri-section-heading"><div><span class="ri-eyebrow">Canonical intent</span><h2 id="roadmap-heading">The quest line</h2></div><p>The page never infers roadmap state from repository activity.</p></div>{empty_state("Observatory roadmap unavailable", "Supply a repository- and commit-matched read model to render stable quests, progress, dependencies, and delivery evidence.", "partial")}</section>'''
+    steps, by_id, anchors, dependents, blocks = roadmap_index(snapshot)
+    if not steps:
+        return f'''<section class="ri-section ri-section--lead" aria-labelledby="roadmap-heading"><div class="ri-section-heading"><div><span class="ri-eyebrow">Canonical intent</span><h2 id="roadmap-heading">The quest line</h2></div><p>The supplied read model contains no roadmap steps.</p></div>{empty_state("No roadmap quests projected", "ROADMAP.md remains canonical. Add contract-valid stable steps there before expecting a generated path.", "empty")}</section>'''
+    chapters = roadmap_chapters(snapshot, steps, by_id)
+    complete = sum(1 for step in steps if normalize_state(entity(step).get("state")) == "complete")
+    active = sum(1 for step in steps if normalize_state(entity(step).get("state")) == "active")
+    blocked = sum(1 for step in steps if normalize_state(entity(step).get("state")) == "blocked")
+    completed_criteria = sum(
+        1
+        for step in steps
+        for criterion in require_list(step.get("exit_criteria"))
+        if require_object(criterion).get("complete") is True
+    )
+    total_criteria = sum(len(require_list(step.get("exit_criteria"))) for step in steps)
+    repository = str(require_object(snapshot.get("repository")).get("key"))
+    source_commit = str(snapshot.get("represented_commit"))
+    roadmap_url = f"https://github.com/{repository}/blob/{source_commit}/ROADMAP.md"
+    minimap = []
+    rendered_chapters = []
+    sequence = 0
+    for chapter_index, chapter in enumerate(chapters, start=1):
+        root_entity = entity(chapter["root"])
+        chapter_anchor = stable_fragment("chapter", root_entity.get("id"))
+        chapter_steps = chapter["steps"]
+        chapter_complete = sum(
+            1
+            for step in chapter_steps
+            if normalize_state(entity(step).get("state")) == "complete"
+        )
+        minimap_quests = "".join(
+            f'<li><a data-minimap-quest href="#{escaped(anchors[str(entity(step).get("id"))])}" data-state="{escaped(normalize_state(entity(step).get("state")))}"><span>{escaped(entity(step).get("key"))}</span><small>{escaped(entity(step).get("title"))}</small></a></li>'
+            for step in chapter_steps
+        )
+        minimap.append(
+            f'<li><a class="ri-map__chapter" href="#{escaped(chapter_anchor)}">Chapter {chapter_index:02d} · {escaped(root_entity.get("title"))}</a><ol>{minimap_quests}</ol></li>'
+        )
+        quest_html = []
+        for step in chapter_steps:
+            quest_html.append(
+                render_quest_step(
+                    step,
+                    index=sequence,
+                    total=len(steps),
+                    anchors=anchors,
+                    dependents=dependents,
+                    blocks=blocks,
+                )
+            )
+            sequence += 1
+        rendered_chapters.append(
+            f'''<section class="ri-roadmap-chapter" id="{escaped(chapter_anchor)}" aria-labelledby="{escaped(chapter_anchor)}-title">
+              <header class="ri-chapter-heading"><div><span>Chapter {chapter_index:02d}</span><h2 id="{escaped(chapter_anchor)}-title">{escaped(root_entity.get("title"))}</h2></div><p><strong>{chapter_complete}/{len(chapter_steps)}</strong> quests complete</p></header>
+              <ol class="ri-quest-line">{"".join(quest_html)}</ol>
+            </section>'''
+        )
+    return f'''<section class="ri-section ri-section--lead ri-roadmap-intro" aria-labelledby="roadmap-heading">
+      <div class="ri-section-heading"><div><span class="ri-eyebrow">Canonical intent</span><h2 id="roadmap-heading">The quest line</h2></div><p>Follow the dependency path, inspect delivery evidence, and return to the exact step in <a href="{escaped(roadmap_url)}">ROADMAP.md</a>.</p></div>
+      <div class="ri-roadmap-metrics" aria-label="Roadmap progress summary"><article><strong>{complete}/{len(steps)}</strong><span>verified complete</span></article><article><strong>{active}</strong><span>active now</span></article><article><strong>{blocked}</strong><span>explicitly blocked</span></article><article><strong>{completed_criteria}/{total_criteria}</strong><span>exit criteria met</span></article></div>
+      <details class="ri-progress-rules"><summary>How progress is determined</summary><p>Quest state comes from canonical roadmap declarations normalized by Observatory. Exit-criteria completion is the only percentage denominator. Commits and other linked records are evidence, never progress units. Missing, stale, inferred, and unknown evidence remain labelled.</p></details>
+    </section>
+    <div class="ri-roadmap-layout">
+      <nav class="ri-map" aria-label="Roadmap chapters and quests"><span class="ri-eyebrow">Quest map</span><p>{len(chapters)} {"chapter" if len(chapters) == 1 else "chapters"} · {len(steps)} quests</p><ol>{"".join(minimap)}</ol></nav>
+      <div class="ri-roadmap-story">{"".join(rendered_chapters)}</div>
+    </div>'''
+
+
 def build_status(summary: dict[str, Any]) -> tuple[str, str]:
     execution = require_object(require_object(summary.get("states")).get("execution"))
     if int(execution.get("failure", 0) or 0) > 0:
@@ -411,6 +855,14 @@ def shell_document(
     repository_url = f"https://github.com/{repository}"
     commit_url = f"{repository_url}/commit/{source_commit}"
     snapshot_label = "Observatory snapshot loaded" if snapshot_available else "Snapshot unavailable"
+    route_descriptions = {
+        "now": "See what changed, what needs attention, and the next grounded moves without flattening uncertainty.",
+        "roadmap": "Traverse canonical intent as a quest line, then open the evidence that makes each step true.",
+    }
+    route_description = route_descriptions.get(
+        route,
+        "Explore one commit-matched projection without replacing its canonical repository sources.",
+    )
     return f'''<!doctype html>
 <html lang="en">
   <head>
@@ -439,7 +891,7 @@ def shell_document(
       </aside>
       <div class="ri-page">
         <header class="ri-hero">
-          <div><span class="ri-kicker"><i aria-hidden="true"></i>{escaped(route_label)} view</span><h1>{escaped(repository.split("/", 1)[-1])}</h1><p>See what changed, what needs attention, and the next grounded moves without flattening uncertainty.</p></div>
+          <div><span class="ri-kicker"><i aria-hidden="true"></i>{escaped(route_label)} view</span><h1>{escaped(repository.split("/", 1)[-1])}</h1><p>{escaped(route_description)}</p></div>
           <div class="ri-orbit" data-state="{escaped(freshness)}" role="img" aria-label="Evidence freshness: {escaped(state_label(freshness))}"><span></span><strong>{escaped(state_label(freshness))}</strong><small>evidence</small></div>
         </header>
         <section class="ri-context" aria-label="Represented source and build context">
@@ -451,8 +903,8 @@ def shell_document(
         </section>
         <div class="ri-command-bar" data-filters>
           <label class="ri-search"><span class="ri-visually-hidden">Search this view</span><span aria-hidden="true">⌕</span><input type="search" data-filter-query placeholder="Search this view…" autocomplete="off"></label>
-          <label><span>State</span><select data-filter-state><option value="all">All states</option><option value="active">Active</option><option value="blocked">Blocked</option><option value="ready">Ready</option><option value="failure">Failure</option><option value="proposed">Proposed</option><option value="unknown">Unknown</option></select></label>
-          <label><span>Kind</span><select data-filter-kind><option value="all">All evidence</option><option value="roadmap_step">Quest</option><option value="architecture_decision">Decision</option><option value="check">Check</option><option value="commit">Commit</option><option value="issue">Issue</option><option value="pull_request">Pull request</option><option value="release">Release</option><option value="deployment">Deployment</option></select></label>
+          <label><span>State</span><select data-filter-state><option value="all">All states</option><option value="active">Active</option><option value="blocked">Blocked</option><option value="ready">Ready</option><option value="planned">Planned</option><option value="complete">Complete</option><option value="deferred">Deferred</option><option value="superseded">Superseded</option><option value="failure">Failure</option><option value="proposed">Proposed</option><option value="unknown">Unknown</option></select></label>
+          <label><span>Kind</span><select data-filter-kind><option value="all">All evidence</option><option value="roadmap_step">Quest</option><option value="architecture_decision">Decision</option><option value="check">Check</option><option value="commit">Commit</option><option value="issue">Issue</option><option value="pull_request">Pull request</option><option value="release">Release</option><option value="deployment">Deployment</option><option value="file">Changed file</option></select></label>
           <button class="ri-button ri-button--quiet" type="button" data-filter-reset>Reset</button>
           <output data-filter-results aria-live="polite">Showing the full view</output>
         </div>
@@ -545,12 +997,17 @@ def write_site(
         shell_document(route="now", route_label="Now", body=current, prefix="../", **shared),
     )
     for route, label in ROUTES[1:]:
+        body = (
+            roadmap_body(snapshot)
+            if route == "roadmap"
+            else placeholder_body(route, label, "../")
+        )
         atomic_write(
             output_root / route / "index.html",
             shell_document(
                 route=route,
                 route_label=label,
-                body=placeholder_body(route, label, "../"),
+                body=body,
                 prefix="../",
                 **shared,
             ),
