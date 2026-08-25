@@ -91,6 +91,12 @@ Relay accepts a snapshot only when its repository identity and represented
 commit match the generated dashboard. Missing input remains an explicit
 unavailable state, and browser-local resume state never becomes canonical
 evidence.
+The `/roadmap/` composer treats declared roadmap roots as display chapters and
+stable roadmap-step identities as durable fragments. It derives only inverse
+navigation and exit-criteria presentation from the normalized view: readiness
+and provider truth remain Observatory concerns, while `ROADMAP.md` remains the
+canonical owner of intent. Long evidence drawers retain complete static HTML
+and add browser-only windowing after enhancement.
 The tested Observatory and Holon boundaries are pinned in
 [`repository-intelligence-siblings.v1.lock.json`](actions/repository-intelligence/contracts/repository-intelligence-siblings.v1.lock.json).
 

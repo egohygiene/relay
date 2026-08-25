@@ -192,13 +192,13 @@ and Relay owns route composition and static publication artifacts.
 
 <!-- roadmap-step
 id: REL-RI-002
-status: active
+status: complete
 depends_on: [REL-RI-001]
 issues: [28]
 -->
 #### REL-RI-002 — Ship the shared shell and operational Now view
 
-**State:** `active`
+**State:** `complete`
 **Depends on:** `REL-RI-001`
 
 **Outcome:** `/now/` immediately shows meaningful change, active quests,
@@ -206,19 +206,19 @@ blockers, newly broken checks, pending decisions, and the next grounded moves.
 
 **Exit criteria:**
 
-- [ ] Desktop, mobile, keyboard, screen-reader, reduced-motion, and print contracts pass.
-- [ ] Repository identity, represented commit, freshness, build evidence, and canonical sources stay visible.
-- [ ] URL-backed filters and transparent browser-local resume behavior are verified.
+- [x] Desktop, mobile, keyboard, screen-reader, reduced-motion, and print contracts pass.
+- [x] Repository identity, represented commit, freshness, build evidence, and canonical sources stay visible.
+- [x] URL-backed filters and transparent browser-local resume behavior are verified.
 
 <!-- roadmap-step
 id: REL-RI-003
-status: ready
+status: active
 depends_on: [REL-RI-002]
 issues: [31]
 -->
 #### REL-RI-003 — Render the roadmap as an explorable quest line
 
-**State:** `ready`
+**State:** `active`
 **Depends on:** `REL-RI-002`
 
 **Outcome:** `/roadmap/` makes progress, dependencies, exit criteria, and linked
@@ -226,8 +226,9 @@ commit evidence legible without replacing `ROADMAP.md` as canonical intent.
 
 **Exit criteria:**
 
-- [ ] Long quest lines remain scrollable, keyboard reachable, and printable.
-- [ ] Expanding a quest exposes its linked commits and other evidence.
+- [x] Long quest lines remain scrollable, keyboard reachable, and printable.
+- [x] Expanding a quest exposes its linked commits and other evidence.
+- [ ] The implementation is reviewed and merged as the current Relay contract.
 
 <!-- roadmap-step
 id: REL-RI-004

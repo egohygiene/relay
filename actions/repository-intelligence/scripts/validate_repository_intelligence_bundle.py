@@ -155,6 +155,7 @@ class ReferenceCollector(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
         self.references: list[tuple[str, str]] = []
+        self.fragments: set[str] = set()
 
     def handle_starttag(
         self, tag: str, attrs: list[tuple[str, str | None]]
@@ -162,6 +163,8 @@ class ReferenceCollector(HTMLParser):
         for key, value in attrs:
             if key in {"href", "src"} and value is not None:
                 self.references.append((tag, value))
+            if key == "id" and value is not None:
+                self.fragments.add(value)
 
 
 def decode_percent_layers(value: str, max_rounds: int = 8) -> str | None:
@@ -1083,6 +1086,7 @@ def resolve_local_reference(
     repository: str,
     source_commit: str,
     document_root: Path | None = None,
+    allowed_fragments: set[str] | None = None,
 ) -> Path | None:
     """Resolve a relative bundle reference as if the site were served at /intelligence/."""
 
@@ -1093,7 +1097,8 @@ def resolve_local_reference(
     if parsed.query:
         raise BundleValidationError("local bundle references may not contain queries")
     if parsed.fragment:
-        if parsed.path or parsed.fragment not in ALLOWED_LOCAL_FRAGMENTS:
+        permitted = ALLOWED_LOCAL_FRAGMENTS | (allowed_fragments or set())
+        if parsed.path or parsed.fragment not in permitted:
             raise BundleValidationError("local bundle references contain an unsupported fragment")
         return None
     decoded = unquote(parsed.path)
@@ -1137,6 +1142,7 @@ def validate_html_references(
                 repository,
                 source_commit,
                 html_path.parent,
+                collector.fragments,
             )
             if destination is not None:
                 destinations.add(destination.relative_to(output_root).as_posix())
@@ -1306,6 +1312,27 @@ def validate_routed_shell(
     dashboard = (output_root / "dashboard/index.html").read_text(encoding="utf-8")
     if 'aria-label="Repository Intelligence views"' not in dashboard:
         raise BundleValidationError("dashboard/index.html does not link into the shared views")
+    roadmap = (output_root / "roadmap/index.html").read_text(encoding="utf-8")
+    if not any(
+        marker in roadmap
+        for marker in ("Observatory roadmap unavailable", "No roadmap quests projected")
+    ):
+        roadmap_markers = {
+            'class="ri-roadmap-layout"',
+            'aria-label="Roadmap chapters and quests"',
+            "data-roadmap-quest",
+            "data-quest-link",
+            "data-quest-evidence",
+            "data-evidence-viewport",
+            "How progress is determined",
+            "Open canonical ROADMAP.md step",
+        }
+        missing = sorted(marker for marker in roadmap_markers if marker not in roadmap)
+        if missing:
+            raise BundleValidationError(
+                "roadmap/ does not implement the quest-line contract: "
+                + ", ".join(missing)
+            )
 
 
 def validate_bundle(

@@ -6,7 +6,7 @@ documentation, implementation, contracts, and tests.
 
 | Action                                                        | Capability                                                  | Side effects                  |
 | ------------------------------------------------------------- | ----------------------------------------------------------- | ----------------------------- |
-| [`repository-intelligence`](repository-intelligence/)         | Build a routed Repository Intelligence site                 | Workspace files only          |
+| [`repository-intelligence`](repository-intelligence/)         | Build operational and roadmap Repository Intelligence views | Workspace files only          |
 | [`normalize-repository-report`](normalize-repository-report/) | Normalize OSV, MegaLinter, and Scorecard producer summaries | Workspace files only          |
 | [`publish-report-snapshot`](publish-report-snapshot/)         | Guard and publish stable `.reports` snapshots               | Git commit and default-branch push |
 

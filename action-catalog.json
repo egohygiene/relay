@@ -35,7 +35,7 @@
       "id": "repository-intelligence",
       "path": "actions/repository-intelligence",
       "name": "Repository Intelligence",
-      "summary": "Build a deterministic routed intelligence site for one repository.",
+      "summary": "Build a deterministic routed intelligence site with operational and roadmap quest-line views.",
       "status": "beta",
       "runtime": ["bash", "git", "python3"],
       "permissions": {"contents": "read"},
@@ -48,7 +48,7 @@
       "id": "repository-intelligence",
       "path": ".github/workflows/repository-intelligence.yml",
       "name": "Repository Intelligence Artifact",
-      "summary": "Build and upload a repository intelligence dashboard as a workflow artifact.",
+      "summary": "Build and upload a routed repository intelligence site as a workflow artifact.",
       "status": "beta",
       "permissions": {"contents": "read"},
       "consumer_ref": "egohygiene/relay/.github/workflows/repository-intelligence.yml@v1"

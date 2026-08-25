@@ -6,8 +6,9 @@
 name: "🧠 Repository Intelligence"
 description: >-
   Build a deterministic, visibility-aware Repository Intelligence site with a
-  shared shell, operational Now view, analytics dashboard, and searchable source
-  tree. The action writes static files but never deploys them.
+  shared shell, operational Now view, scrollable roadmap quest line, analytics
+  dashboard, and searchable source tree. The action writes static files but
+  never deploys them.
 
 inputs:
   output-directory:
@@ -106,6 +107,9 @@ outputs:
   now:
     description: "Repository-relative path to the routed Now view."
     value: "${{ inputs.output-directory }}/now/index.html"
+  roadmap:
+    description: "Repository-relative path to the scrollable roadmap quest-line view."
+    value: "${{ inputs.output-directory }}/roadmap/index.html"
   dashboard:
     description: "Repository-relative path to the compatibility analytics dashboard."
     value: "${{ inputs.output-directory }}/dashboard/index.html"

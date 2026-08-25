@@ -91,6 +91,7 @@
       ],
       "steps": [
         {
+          "blocked_by": [],
           "entity": {
             "id": "ri:example/repository:roadmap-step:EX-Q01",
             "key": "EX-Q01",
@@ -100,13 +101,37 @@
             "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md#ex-q01"
           },
           "outcome": "A versioned public-safe read model is available.",
+          "evidence": [
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/commit/1111111111111111111111111111111111111111",
+              "confidence": "authoritative",
+              "freshness": "not_applicable",
+              "id": "ri:example/repository:commit:1111111111111111111111111111111111111111",
+              "key": "1111111111111111111111111111111111111111",
+              "kind": "commit",
+              "repository": "example/repository",
+              "state": "recorded",
+              "title": "feat(intelligence): establish the evidence contract"
+            }
+          ],
+          "exit_criteria": [
+            {
+              "complete": true,
+              "text": "The public-safe read model validates."
+            }
+          ],
+          "informed_by": [],
           "readiness": {
             "value": "complete",
             "reasons": []
           },
-          "dependencies": []
+          "dependencies": [],
+          "tracked_by": [],
+          "verified_by": []
         },
         {
+          "blocked_by": [],
           "entity": {
             "id": "ri:example/repository:roadmap-step:EX-Q04",
             "key": "EX-Q04",
@@ -116,6 +141,126 @@
             "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md#ex-q04"
           },
           "outcome": "Readers can traverse roadmap intent as a quest line.",
+          "evidence": [
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/commit/1111111111111111111111111111111111111111",
+              "confidence": "authoritative",
+              "freshness": "not_applicable",
+              "id": "ri:example/repository:commit:1111111111111111111111111111111111111111",
+              "key": "1111111111111111111111111111111111111111",
+              "kind": "commit",
+              "repository": "example/repository",
+              "state": "recorded",
+              "title": "feat(intelligence): publish the visual roadmap"
+            }
+          ],
+          "exit_criteria": [
+            {
+              "complete": true,
+              "text": "Every stable step has a durable deep link."
+            },
+            {
+              "complete": false,
+              "text": "The public deployment is observed."
+            }
+          ],
+          "informed_by": [
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/docs/decisions/ADR-009.md",
+              "confidence": "authoritative",
+              "freshness": "current",
+              "id": "ri:example/repository:architecture-decision:ADR-009",
+              "key": "ADR-009",
+              "kind": "architecture_decision",
+              "repository": "example/repository",
+              "state": "accepted",
+              "title": "Select the publication boundary"
+            }
+          ],
+          "tracked_by": [
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/issues/44",
+              "confidence": "authoritative",
+              "freshness": "current",
+              "id": "ri:example/repository:issue:44",
+              "key": "44",
+              "kind": "issue",
+              "repository": "example/repository",
+              "state": "open",
+              "title": "Publish the visual roadmap"
+            },
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/pull/45",
+              "confidence": "authoritative",
+              "freshness": "current",
+              "id": "ri:example/repository:pull-request:45",
+              "key": "45",
+              "kind": "pull_request",
+              "repository": "example/repository",
+              "state": "open",
+              "title": "Build the visual roadmap"
+            }
+          ],
+          "verified_by": [
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/actions/runs/99",
+              "confidence": "authoritative",
+              "freshness": "current",
+              "id": "ri:example/repository:check:roadmap-99",
+              "key": "roadmap-99",
+              "kind": "check",
+              "repository": "example/repository",
+              "state": "success",
+              "title": "Roadmap validation"
+            }
+          ],
+          "releases": [
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/releases/tag/v1.2.0",
+              "confidence": "authoritative",
+              "freshness": "current",
+              "id": "ri:example/repository:release:v1.2.0",
+              "key": "v1.2.0",
+              "kind": "release",
+              "repository": "example/repository",
+              "state": "published",
+              "title": "Repository Intelligence v1.2.0"
+            }
+          ],
+          "deployments": [
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/deployments/101",
+              "confidence": "authoritative",
+              "freshness": "current",
+              "id": "ri:example/repository:deployment:101",
+              "key": "101",
+              "kind": "deployment",
+              "repository": "example/repository",
+              "state": "success",
+              "title": "GitHub Pages deployment"
+            }
+          ],
+          "changed_files": [
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md",
+              "confidence": "authoritative",
+              "freshness": "current",
+              "id": "ri:example/repository:file:ROADMAP.md",
+              "key": "ROADMAP.md",
+              "kind": "file",
+              "repository": "example/repository",
+              "state": "changed",
+              "title": "ROADMAP.md"
+            }
+          ],
           "readiness": {
             "value": "ready",
             "reasons": [
