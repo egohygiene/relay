@@ -169,6 +169,7 @@ without a separate reviewed authorization.
 | `index`                 | Default operational `index.html`                                        |
 | `now`                   | Operational `/now/` entry                                               |
 | `roadmap`               | Scrollable `/roadmap/` quest line                                       |
+| `decisions`             | Authority-aware `/decisions/` ADR ledger                                |
 | `dashboard`             | Compatibility analytics `/dashboard/` entry                            |
 | `summary`               | `egohygiene.repository-intelligence-dashboard/v3` aggregate            |
 | `provenance`            | `egohygiene.relay.repository-intelligence-provenance/v1` metadata       |
@@ -231,6 +232,16 @@ ADRs, issues, pull requests, commits, checks, releases, deployments, and changed
 files attached to canonical sources. Large evidence drawers virtualize only
 after browser enhancement, so the static HTML and print projection remain
 complete. Progress uses declared state and exit criteria, never commit volume.
+
+`/decisions/` renders the normalized ADR projection without copying or rewriting
+canonical records. Organization-scoped inheritance and repository-local
+authority occupy separate ledger sections; lifecycle status, implementation
+status, supersession, source assertion, freshness, and represented revision stay
+visually distinct. Stable fragments, affected-quest links, URL-backed facets,
+keyboard navigation, complete static evidence, print output, and an optional
+browser-enhanced compare table keep long histories usable. Missing date, domain,
+or affected-component facets remain explicitly “Not projected” until the pinned
+Observatory contract supplies them.
 
 `provenance.json` records the generator name/version, the requested Relay source
 ref, its resolved commit when GitHub exposes one, whether the requested ref was

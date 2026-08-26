@@ -59,6 +59,7 @@ will make the operational entry and its routed views available at URLs such as:
 https://repository.example/intelligence/
 https://repository.example/intelligence/now/
 https://repository.example/intelligence/roadmap/
+https://repository.example/intelligence/decisions/
 https://repository.example/intelligence/dashboard/
 ```
 
@@ -80,13 +81,16 @@ The root and `/now/` are equivalent operational entry points; the previous
 analytics experience remains available at `/dashboard/`. `/roadmap/` renders
 the normalized `ROADMAP.md` projection as a vertically scrollable quest line
 with stable step links, dependency chapters, declared progress, and expandable
-delivery evidence. The shell reserves stable routes for Decisions, Journey,
+delivery evidence. `/decisions/` renders inherited and repository-local ADRs as
+an authority-aware historical ledger with durable lineage, implementation
+state, affected-quest links, faceted filtering, evidence expansion, and optional
+side-by-side comparison. The shell reserves stable routes for Journey,
 Dependencies, Health, Releases, Work, Search, and Compare so focused follow-up
 work can fill them without changing navigation contracts.
 
 Supplying `observatory-snapshot` projects the commit-matched public-safe
-`egohygiene.observatory.repository-intelligence-read-model/v1` into `/now/` and
-`/roadmap/`.
+`egohygiene.observatory.repository-intelligence-read-model/v1` into `/now/`,
+`/roadmap/`, and `/decisions/`.
 Omitting it remains valid and renders an explicit unavailable state; Relay does
 not infer active work from analytics. Private collection data remains in the
 configured work directory—`.cache/repository-intelligence/` by default—and

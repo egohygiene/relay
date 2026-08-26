@@ -156,6 +156,7 @@ class ReferenceCollector(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.references: list[tuple[str, str]] = []
         self.fragments: set[str] = set()
+        self.source_repositories: set[str] = set()
 
     def handle_starttag(
         self, tag: str, attrs: list[tuple[str, str | None]]
@@ -165,6 +166,8 @@ class ReferenceCollector(HTMLParser):
                 self.references.append((tag, value))
             if key == "id" and value is not None:
                 self.fragments.add(value)
+            if key == "data-source-repository" and value is not None:
+                self.source_repositories.add(value)
 
 
 def decode_percent_layers(value: str, max_rounds: int = 8) -> str | None:
@@ -996,8 +999,13 @@ def validate_json_contracts(
     return summary, provenance
 
 
-def validate_github_reference(path: str, repository: str, source_commit: str) -> None:
-    """Require a reviewed same-consumer route pinned to the represented commit."""
+def validate_github_reference(
+    path: str,
+    repository: str,
+    source_commit: str,
+    allowed_external_repositories: set[str] | None = None,
+) -> None:
+    """Require a reviewed consumer or same-ecosystem canonical GitHub route."""
 
     escaped_repository = re.escape(repository)
     if path == "/egohygiene" or re.fullmatch(r"/egohygiene/relay/issues/[0-9]+", path):
@@ -1013,13 +1021,43 @@ def validate_github_reference(path: str, repository: str, source_commit: str) ->
         return
     if path == f"/{repository}/commit/{source_commit}":
         return
+    ecosystem_route = re.fullmatch(
+        r"/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)/(actions/runs/[0-9]+|commit/[0-9a-f]{40}|deployments/[0-9]+|issues/[0-9]+|pull/[0-9]+|releases/tag/[^/]+)",
+        path,
+    )
+    if ecosystem_route is not None:
+        target_repository = f"{ecosystem_route.group(1)}/{ecosystem_route.group(2)}"
+        if (
+            target_repository != repository
+            and target_repository in (allowed_external_repositories or set())
+            and REPOSITORY_PATTERN.fullmatch(target_repository)
+        ):
+            return
     source_match = re.fullmatch(
         rf"/{escaped_repository}/(blob|tree)/({re.escape(source_commit)})(?:/(.+))?",
         path,
     )
-    if source_match is None:
-        raise BundleValidationError("GitHub reference is outside the consumer contract")
-    kind, _, encoded_path = source_match.groups()
+    if source_match is not None:
+        kind, _, encoded_path = source_match.groups()
+    else:
+        ecosystem_match = re.fullmatch(
+            r"/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)/(blob|tree)/([0-9a-f]{40})(?:/(.+))?",
+            path,
+        )
+        if ecosystem_match is None:
+            raise BundleValidationError("GitHub reference is outside the consumer contract")
+        target_repository = f"{ecosystem_match.group(1)}/{ecosystem_match.group(2)}"
+        if target_repository == repository:
+            raise BundleValidationError("GitHub reference is outside the consumer contract")
+        if not REPOSITORY_PATTERN.fullmatch(target_repository):
+            raise BundleValidationError("GitHub reference repository is invalid")
+        if target_repository not in (allowed_external_repositories or set()):
+            raise BundleValidationError("GitHub reference is outside the consumer contract")
+        kind, _, encoded_path = (
+            ecosystem_match.group(3),
+            ecosystem_match.group(4),
+            ecosystem_match.group(5),
+        )
     if encoded_path is None:
         if kind == "tree":
             return
@@ -1031,7 +1069,12 @@ def validate_github_reference(path: str, repository: str, source_commit: str) ->
         raise BundleValidationError("GitHub source path contains traversal")
 
 
-def validate_https_reference(value: str, repository: str, source_commit: str) -> None:
+def validate_https_reference(
+    value: str,
+    repository: str,
+    source_commit: str,
+    allowed_external_repositories: set[str] | None = None,
+) -> None:
     """Reject credential-bearing or sensitive external links."""
 
     if "\\" in value or any(character.isspace() for character in value):
@@ -1064,7 +1107,12 @@ def validate_https_reference(value: str, repository: str, source_commit: str) ->
             raise BundleValidationError("GitHub reference contains an unsupported query")
         if parsed.fragment and not re.fullmatch(r"[A-Za-z0-9._-]+", parsed.fragment):
             raise BundleValidationError("GitHub reference contains an invalid source fragment")
-        validate_github_reference(parsed.path, repository, source_commit)
+        validate_github_reference(
+            parsed.path,
+            repository,
+            source_commit,
+            allowed_external_repositories,
+        )
         return
     if parsed.fragment:
         raise BundleValidationError("external reference contains a fragment")
@@ -1087,18 +1135,25 @@ def resolve_local_reference(
     source_commit: str,
     document_root: Path | None = None,
     allowed_fragments: set[str] | None = None,
+    document_fragments: dict[Path, set[str]] | None = None,
+    allowed_external_repositories: set[str] | None = None,
 ) -> Path | None:
     """Resolve a relative bundle reference as if the site were served at /intelligence/."""
 
     parsed = urlsplit(value)
     if parsed.scheme or parsed.netloc:
-        validate_https_reference(value, repository, source_commit)
+        validate_https_reference(
+            value,
+            repository,
+            source_commit,
+            allowed_external_repositories,
+        )
         return None
     if parsed.query:
         raise BundleValidationError("local bundle references may not contain queries")
-    if parsed.fragment:
+    if parsed.fragment and not parsed.path:
         permitted = ALLOWED_LOCAL_FRAGMENTS | (allowed_fragments or set())
-        if parsed.path or parsed.fragment not in permitted:
+        if parsed.fragment not in permitted:
             raise BundleValidationError("local bundle references contain an unsupported fragment")
         return None
     decoded = unquote(parsed.path)
@@ -1117,6 +1172,12 @@ def resolve_local_reference(
         destination /= "index.html"
     if not destination.is_file() or destination.is_symlink():
         raise BundleValidationError(f"local bundle reference is broken: {value}")
+    if parsed.fragment:
+        permitted = (document_fragments or {}).get(destination, set())
+        if parsed.fragment not in permitted:
+            raise BundleValidationError(
+                "local bundle references contain an unsupported fragment"
+            )
     return destination
 
 
@@ -1131,10 +1192,21 @@ def validate_html_references(
     expected_files = (
         ROUTED_BUNDLE_FILES if (output_root / "now/index.html").is_file() else LEGACY_BUNDLE_FILES
     )
+    collectors: dict[Path, ReferenceCollector] = {}
     for relative_name in sorted(name for name in expected_files if name.endswith(".html")):
         html_path = output_root / relative_name
         collector = ReferenceCollector()
         collector.feed(html_path.read_text(encoding="utf-8"))
+        collectors[html_path.resolve()] = collector
+    document_fragments = {
+        path: collector.fragments for path, collector in collectors.items()
+    }
+    for html_path, collector in collectors.items():
+        if any(
+            not REPOSITORY_PATTERN.fullmatch(repository_name)
+            for repository_name in collector.source_repositories
+        ):
+            raise BundleValidationError("generated source repository is invalid")
         for _, value in collector.references:
             destination = resolve_local_reference(
                 output_root,
@@ -1143,6 +1215,8 @@ def validate_html_references(
                 source_commit,
                 html_path.parent,
                 collector.fragments,
+                document_fragments,
+                collector.source_repositories,
             )
             if destination is not None:
                 destinations.add(destination.relative_to(output_root).as_posix())

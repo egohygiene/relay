@@ -83,7 +83,7 @@
       "id": "repository-intelligence",
       "path": ".github/workflows/repository-intelligence.yml",
       "owner": "egohygiene/relay",
-      "purpose": "Build, provenance-check, and upload one routed repository intelligence site, including its roadmap quest line, as a bounded workflow artifact.",
+      "purpose": "Build, provenance-check, and upload one routed repository intelligence site, including its roadmap quest line and ADR decision ledger, as a bounded workflow artifact.",
       "audience": "reusable",
       "status": "beta",
       "triggers": ["workflow_call", "workflow_dispatch"],

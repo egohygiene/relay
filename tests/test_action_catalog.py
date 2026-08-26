@@ -73,6 +73,10 @@ class ActionCatalogTests(unittest.TestCase):
             action,
         )
         self.assertIn("INPUT_MAX_DEPTH > 20", action)
+        self.assertIn(
+            'value: "${{ inputs.output-directory }}/decisions/index.html"',
+            action,
+        )
 
     def test_validation_and_release_gates_are_present(self) -> None:
         validation = (REPOSITORY_ROOT / ".github/workflows/validate.yml").read_text(

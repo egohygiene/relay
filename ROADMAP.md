@@ -212,13 +212,13 @@ blockers, newly broken checks, pending decisions, and the next grounded moves.
 
 <!-- roadmap-step
 id: REL-RI-003
-status: active
+status: complete
 depends_on: [REL-RI-002]
 issues: [31]
 -->
 #### REL-RI-003 — Render the roadmap as an explorable quest line
 
-**State:** `active`
+**State:** `complete`
 **Depends on:** `REL-RI-002`
 
 **Outcome:** `/roadmap/` makes progress, dependencies, exit criteria, and linked
@@ -228,17 +228,17 @@ commit evidence legible without replacing `ROADMAP.md` as canonical intent.
 
 - [x] Long quest lines remain scrollable, keyboard reachable, and printable.
 - [x] Expanding a quest exposes its linked commits and other evidence.
-- [ ] The implementation is reviewed and merged as the current Relay contract.
+- [x] The implementation is reviewed and merged as the current Relay contract.
 
 <!-- roadmap-step
 id: REL-RI-004
-status: ready
+status: active
 depends_on: [REL-RI-002]
 issues: [30]
 -->
 #### REL-RI-004 — Render ADR lineage as decision history
 
-**State:** `ready`
+**State:** `active`
 **Depends on:** `REL-RI-002`
 
 **Outcome:** `/decisions/` preserves proposal, acceptance, implementation, and
@@ -246,8 +246,9 @@ supersession as a navigable historical chain.
 
 **Exit criteria:**
 
-- [ ] ADR status, scope, implementation, and supersession remain distinct.
-- [ ] Decision evidence links back to canonical records and affected quests.
+- [x] ADR status, scope, implementation, and supersession remain distinct.
+- [x] Decision evidence links back to canonical records and affected quests.
+- [ ] The implementation is reviewed and merged as the current Relay contract.
 
 <!-- roadmap-step
 id: REL-RI-005

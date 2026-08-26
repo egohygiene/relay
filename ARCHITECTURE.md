@@ -97,6 +97,12 @@ navigation and exit-criteria presentation from the normalized view: readiness
 and provider truth remain Observatory concerns, while `ROADMAP.md` remains the
 canonical owner of intent. Long evidence drawers retain complete static HTML
 and add browser-only windowing after enhancement.
+The `/decisions/` composer retains Observatory order and normalized lineage,
+then separates organization-scoped inheritance from repository-local authority.
+ADR lifecycle and implementation state remain independent, optional absent
+facets remain explicitly unprojected, and cross-view quest links resolve only to
+stable generated fragments. Browser-enhanced comparison never creates a new
+decision claim or replaces canonical ADR Markdown.
 The tested Observatory and Holon boundaries are pinned in
 [`repository-intelligence-siblings.v1.lock.json`](actions/repository-intelligence/contracts/repository-intelligence-siblings.v1.lock.json).
 
