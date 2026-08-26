@@ -170,6 +170,7 @@ without a separate reviewed authorization.
 | `now`                   | Operational `/now/` entry                                               |
 | `roadmap`               | Scrollable `/roadmap/` quest line                                       |
 | `decisions`             | Authority-aware `/decisions/` ADR ledger                                |
+| `journey`               | Release-bounded `/journey/` semantic Git history                        |
 | `dashboard`             | Compatibility analytics `/dashboard/` entry                            |
 | `summary`               | `egohygiene.repository-intelligence-dashboard/v3` aggregate            |
 | `provenance`            | `egohygiene.relay.repository-intelligence-provenance/v1` metadata       |
@@ -242,6 +243,26 @@ keyboard navigation, complete static evidence, print output, and an optional
 browser-enhanced compare table keep long histories usable. Missing date, domain,
 or affected-component facets remain explicitly “Not projected” until the pinned
 Observatory contract supplies them.
+
+`/journey/` renders the normalized lifecycle-event projection as a semantic
+history rather than a raw commit list. Observatory's deterministic rule closes
+each chapter at a `release.published` event and places later events in an open
+chapter. Relay preserves that order, presents intent, work, code, proof, and
+delivery as calm visual lanes, and reverses only explicit roadmap/ADR evidence
+relationships for cross-view links. Orphaned work is labelled “Unclassified
+context” without assigning intent. Every event remains in static HTML while
+browser `content-visibility` keeps long histories responsive. Gaps of at least
+72 hours receive a neutral interval marker that never claims the repository was
+inactive during an unprojected period.
+
+Journey filters cover projected state, kind, time, chapter, release boundary,
+actor, assertion, freshness, quest, and decision context. The current
+public-safe contract does not project raw Git parents, branch names, or changed
+paths at event granularity; those filters remain explicitly unavailable. The
+browser-only chapter comparison reports structural counts rather than causality
+or productivity. Automatic replay is optional, stops when filters change, and
+is disabled when the operating system requests reduced motion; the manual
+scrubber remains available.
 
 `provenance.json` records the generator name/version, the requested Relay source
 ref, its resolved commit when GitHub exposes one, whether the requested ref was

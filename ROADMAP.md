@@ -232,13 +232,13 @@ commit evidence legible without replacing `ROADMAP.md` as canonical intent.
 
 <!-- roadmap-step
 id: REL-RI-004
-status: active
+status: complete
 depends_on: [REL-RI-002]
 issues: [30]
 -->
 #### REL-RI-004 — Render ADR lineage as decision history
 
-**State:** `active`
+**State:** `complete`
 **Depends on:** `REL-RI-002`
 
 **Outcome:** `/decisions/` preserves proposal, acceptance, implementation, and
@@ -248,17 +248,17 @@ supersession as a navigable historical chain.
 
 - [x] ADR status, scope, implementation, and supersession remain distinct.
 - [x] Decision evidence links back to canonical records and affected quests.
-- [ ] The implementation is reviewed and merged as the current Relay contract.
+- [x] The implementation is reviewed and merged as the current Relay contract.
 
 <!-- roadmap-step
 id: REL-RI-005
-status: planned
+status: active
 depends_on: [REL-RI-003, REL-RI-004]
 issues: [32]
 -->
 #### REL-RI-005 — Unify commits and delivery evidence as a journey
 
-**State:** `planned`
+**State:** `active`
 **Depends on:** `REL-RI-003`, `REL-RI-004`
 
 **Outcome:** `/journey/` relates commits to quests, decisions, issues, checks,
@@ -266,8 +266,12 @@ releases, and deployments across meaningful epochs.
 
 **Exit criteria:**
 
-- [ ] Long histories virtualize interactively without truncating static output.
-- [ ] Time, state, and evidence filters remain URL-shareable.
+- [x] Long histories virtualize interactively without truncating static output.
+- [x] Time, state, and evidence filters remain URL-shareable.
+- [x] Release chapters partition every event in deterministic chronological order.
+- [x] Explicit quest and ADR context is linked while orphaned work stays unclassified.
+- [x] Optional replay respects reduced-motion preferences and never changes evidence.
+- [ ] The implementation is reviewed and merged as the current Relay contract.
 
 <!-- roadmap-step
 id: REL-RI-006

@@ -560,6 +560,466 @@
         }
       ]
     },
+    "journey": {
+      "chapters": [
+        {
+          "boundary": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/releases/tag/v1.2.0",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:release:v1.2.0",
+            "key": "v1.2.0",
+            "kind": "release",
+            "repository": "example/repository",
+            "state": "published",
+            "title": "Repository Intelligence v1.2.0",
+            "visibility": "public"
+          },
+          "end_at": "2026-08-25T09:00:00Z",
+          "event_ids": [
+            "event:foundation-created",
+            "event:decision-proposed",
+            "event:decision-accepted",
+            "event:issue-opened",
+            "event:pr-opened",
+            "event:commit-created",
+            "event:check-regressed",
+            "event:pr-merged",
+            "event:release-published"
+          ],
+          "id": "chapter:through:v1.2.0",
+          "start_at": "2026-07-01T09:00:00Z",
+          "title": "Through Repository Intelligence v1.2.0"
+        },
+        {
+          "boundary": null,
+          "end_at": "2026-08-25T12:00:00Z",
+          "event_ids": [
+            "event:deployment-completed",
+            "event:quest-ready",
+            "event:orphan-commit"
+          ],
+          "id": "chapter:after:v1.2.0",
+          "start_at": "2026-08-25T10:00:00Z",
+          "title": "After Repository Intelligence v1.2.0"
+        }
+      ],
+      "events": [
+        {
+          "actor": null,
+          "assertion": "authoritative",
+          "changes": [],
+          "extensions": {},
+          "freshness": "current",
+          "id": "event:foundation-created",
+          "occurred_at": "2026-07-01T09:00:00Z",
+          "provenance": [
+            "source:roadmap"
+          ],
+          "recorded_at": "2026-08-25T14:00:00Z",
+          "subject": "ri:example/repository:roadmap-step:EX-Q01",
+          "subject_entity": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md#ex-q01",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:roadmap-step:EX-Q01",
+            "key": "EX-Q01",
+            "kind": "roadmap_step",
+            "repository": "example/repository",
+            "state": "complete",
+            "title": "Establish the evidence contract",
+            "visibility": "public"
+          },
+          "type": "roadmap_step.created",
+          "visibility": "public"
+        },
+        {
+          "actor": null,
+          "assertion": "authoritative",
+          "changes": [
+            {
+              "field": "state.value",
+              "from": null,
+              "to": "proposed"
+            }
+          ],
+          "extensions": {},
+          "freshness": "current",
+          "id": "event:decision-proposed",
+          "occurred_at": "2026-08-20T09:00:00Z",
+          "provenance": [
+            "source:adr-007"
+          ],
+          "recorded_at": "2026-08-25T14:00:00Z",
+          "subject": "ri:example/repository:architecture-decision:ADR-007",
+          "subject_entity": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/docs/decisions/ADR-007.md",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:architecture-decision:ADR-007",
+            "key": "ADR-007",
+            "kind": "architecture_decision",
+            "repository": "example/repository",
+            "state": "accepted",
+            "title": "Adopt a deterministic projection",
+            "visibility": "public"
+          },
+          "type": "architecture_decision.proposed",
+          "visibility": "public"
+        },
+        {
+          "actor": null,
+          "assertion": "authoritative",
+          "changes": [
+            {
+              "field": "state.value",
+              "from": "proposed",
+              "to": "accepted"
+            }
+          ],
+          "extensions": {},
+          "freshness": "current",
+          "id": "event:decision-accepted",
+          "occurred_at": "2026-08-21T09:00:00Z",
+          "provenance": [
+            "source:adr-007"
+          ],
+          "recorded_at": "2026-08-25T14:00:00Z",
+          "subject": "ri:example/repository:architecture-decision:ADR-007",
+          "subject_entity": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/docs/decisions/ADR-007.md",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:architecture-decision:ADR-007",
+            "key": "ADR-007",
+            "kind": "architecture_decision",
+            "repository": "example/repository",
+            "state": "accepted",
+            "title": "Adopt a deterministic projection",
+            "visibility": "public"
+          },
+          "type": "architecture_decision.accepted",
+          "visibility": "public"
+        },
+        {
+          "actor": null,
+          "assertion": "authoritative",
+          "changes": [
+            {
+              "field": "state.value",
+              "from": null,
+              "to": "open"
+            }
+          ],
+          "extensions": {},
+          "freshness": "current",
+          "id": "event:issue-opened",
+          "occurred_at": "2026-08-22T09:00:00Z",
+          "provenance": [
+            "source:issue-44"
+          ],
+          "recorded_at": "2026-08-25T14:00:00Z",
+          "subject": "ri:example/repository:issue:44",
+          "subject_entity": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/issues/44",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:issue:44",
+            "key": "44",
+            "kind": "issue",
+            "repository": "example/repository",
+            "state": "closed",
+            "title": "Publish the visual roadmap",
+            "visibility": "public"
+          },
+          "type": "issue.opened",
+          "visibility": "public"
+        },
+        {
+          "actor": null,
+          "assertion": "authoritative",
+          "changes": [
+            {
+              "field": "state.value",
+              "from": null,
+              "to": "open"
+            }
+          ],
+          "extensions": {},
+          "freshness": "current",
+          "id": "event:pr-opened",
+          "occurred_at": "2026-08-23T09:00:00Z",
+          "provenance": [
+            "source:pull-request-45"
+          ],
+          "recorded_at": "2026-08-25T14:00:00Z",
+          "subject": "ri:example/repository:pull-request:45",
+          "subject_entity": {
+            "assertion": "inferred",
+            "canonical_url": "https://github.com/example/repository/pull/45",
+            "confidence": "inferred",
+            "freshness": "current",
+            "id": "ri:example/repository:pull-request:45",
+            "key": "45",
+            "kind": "pull_request",
+            "repository": "example/repository",
+            "state": "merged",
+            "title": "Implement deterministic projection",
+            "visibility": "public"
+          },
+          "type": "pull_request.opened",
+          "visibility": "public"
+        },
+        {
+          "actor": null,
+          "assertion": "authoritative",
+          "changes": [],
+          "extensions": {},
+          "freshness": "not_applicable",
+          "id": "event:commit-created",
+          "occurred_at": "2026-08-24T10:00:00Z",
+          "provenance": [
+            "source:commit-represented"
+          ],
+          "recorded_at": "2026-08-25T14:00:00Z",
+          "subject": "ri:example/repository:commit:1111111111111111111111111111111111111111",
+          "subject_entity": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/commit/1111111111111111111111111111111111111111",
+            "confidence": "authoritative",
+            "freshness": "not_applicable",
+            "id": "ri:example/repository:commit:1111111111111111111111111111111111111111",
+            "key": "1111111111111111111111111111111111111111",
+            "kind": "commit",
+            "repository": "example/repository",
+            "state": "recorded",
+            "title": "feat(intelligence): adopt deterministic projection",
+            "visibility": "public"
+          },
+          "type": "commit.created",
+          "visibility": "public"
+        },
+        {
+          "actor": {
+            "assertion": "authoritative",
+            "id": "github-actions",
+            "kind": "bot",
+            "url": "https://github.com/features/actions"
+          },
+          "assertion": "authoritative",
+          "changes": [
+            {
+              "field": "state.value",
+              "from": "success",
+              "to": "failure"
+            }
+          ],
+          "extensions": {},
+          "freshness": "current",
+          "id": "event:check-regressed",
+          "occurred_at": "2026-08-24T10:05:00Z",
+          "provenance": [
+            "source:check-99"
+          ],
+          "recorded_at": "2026-08-25T14:00:00Z",
+          "subject": "ri:example/repository:check:roadmap-99",
+          "subject_entity": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/actions/runs/99",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:check:roadmap-99",
+            "key": "roadmap-99",
+            "kind": "check",
+            "repository": "example/repository",
+            "state": "failure",
+            "title": "Roadmap validation",
+            "visibility": "public"
+          },
+          "type": "check.completed",
+          "visibility": "public"
+        },
+        {
+          "actor": null,
+          "assertion": "authoritative",
+          "changes": [
+            {
+              "field": "state.value",
+              "from": "open",
+              "to": "merged"
+            }
+          ],
+          "extensions": {},
+          "freshness": "current",
+          "id": "event:pr-merged",
+          "occurred_at": "2026-08-24T11:00:00Z",
+          "provenance": [
+            "source:pull-request-45"
+          ],
+          "recorded_at": "2026-08-25T14:00:00Z",
+          "subject": "ri:example/repository:pull-request:45",
+          "subject_entity": {
+            "assertion": "inferred",
+            "canonical_url": "https://github.com/example/repository/pull/45",
+            "confidence": "inferred",
+            "freshness": "current",
+            "id": "ri:example/repository:pull-request:45",
+            "key": "45",
+            "kind": "pull_request",
+            "repository": "example/repository",
+            "state": "merged",
+            "title": "Implement deterministic projection",
+            "visibility": "public"
+          },
+          "type": "pull_request.merged",
+          "visibility": "public"
+        },
+        {
+          "actor": null,
+          "assertion": "authoritative",
+          "changes": [
+            {
+              "field": "state.value",
+              "from": null,
+              "to": "published"
+            }
+          ],
+          "extensions": {},
+          "freshness": "current",
+          "id": "event:release-published",
+          "occurred_at": "2026-08-25T09:00:00Z",
+          "provenance": [
+            "source:release-v1.2.0"
+          ],
+          "recorded_at": "2026-08-25T14:00:00Z",
+          "subject": "ri:example/repository:release:v1.2.0",
+          "subject_entity": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/releases/tag/v1.2.0",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:release:v1.2.0",
+            "key": "v1.2.0",
+            "kind": "release",
+            "repository": "example/repository",
+            "state": "published",
+            "title": "Repository Intelligence v1.2.0",
+            "visibility": "public"
+          },
+          "type": "release.published",
+          "visibility": "public"
+        },
+        {
+          "actor": {
+            "assertion": "authoritative",
+            "id": "github-actions",
+            "kind": "bot",
+            "url": "https://github.com/features/actions"
+          },
+          "assertion": "authoritative",
+          "changes": [
+            {
+              "field": "state.value",
+              "from": "in_progress",
+              "to": "success"
+            }
+          ],
+          "extensions": {},
+          "freshness": "current",
+          "id": "event:deployment-completed",
+          "occurred_at": "2026-08-25T10:00:00Z",
+          "provenance": [
+            "source:deployment-101"
+          ],
+          "recorded_at": "2026-08-25T14:00:00Z",
+          "subject": "ri:example/repository:deployment:101",
+          "subject_entity": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/deployments/101",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:deployment:101",
+            "key": "101",
+            "kind": "deployment",
+            "repository": "example/repository",
+            "state": "success",
+            "title": "GitHub Pages deployment",
+            "visibility": "public"
+          },
+          "type": "deployment.completed",
+          "visibility": "public"
+        },
+        {
+          "actor": null,
+          "assertion": "authoritative",
+          "changes": [
+            {
+              "field": "state.value",
+              "from": "planned",
+              "to": "ready"
+            }
+          ],
+          "extensions": {},
+          "freshness": "current",
+          "id": "event:quest-ready",
+          "occurred_at": "2026-08-25T11:00:00Z",
+          "provenance": [
+            "source:roadmap"
+          ],
+          "recorded_at": "2026-08-25T14:00:00Z",
+          "subject": "ri:example/repository:roadmap-step:EX-Q04",
+          "subject_entity": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md#ex-q04",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:roadmap-step:EX-Q04",
+            "key": "EX-Q04",
+            "kind": "roadmap_step",
+            "repository": "example/repository",
+            "state": "ready",
+            "title": "Publish the visual roadmap",
+            "visibility": "public"
+          },
+          "type": "roadmap_step.status_changed",
+          "visibility": "public"
+        },
+        {
+          "actor": null,
+          "assertion": "authoritative",
+          "changes": [],
+          "extensions": {},
+          "freshness": "not_applicable",
+          "id": "event:orphan-commit",
+          "occurred_at": "2026-08-25T12:00:00Z",
+          "provenance": [
+            "source:commit-2222222"
+          ],
+          "recorded_at": "2026-08-25T14:00:00Z",
+          "subject": "ri:example/repository:commit:2222222222222222222222222222222222222222",
+          "subject_entity": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/commit/2222222222222222222222222222222222222222",
+            "confidence": "authoritative",
+            "freshness": "not_applicable",
+            "id": "ri:example/repository:commit:2222222222222222222222222222222222222222",
+            "key": "2222222222222222222222222222222222222222",
+            "kind": "commit",
+            "repository": "example/repository",
+            "state": "recorded",
+            "title": "chore: preserve an unclassified historical commit",
+            "visibility": "public"
+          },
+          "type": "commit.created",
+          "visibility": "public"
+        }
+      ]
+    },
     "health": {
       "check_states": {
         "failure": 1

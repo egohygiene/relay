@@ -35,7 +35,7 @@
       "id": "repository-intelligence",
       "path": "actions/repository-intelligence",
       "name": "Repository Intelligence",
-      "summary": "Build a deterministic routed intelligence site with operational, roadmap, and ADR decision-ledger views.",
+      "summary": "Build a deterministic routed intelligence site with operational, roadmap, ADR decision-ledger, and semantic Git journey views.",
       "status": "beta",
       "runtime": ["bash", "git", "python3"],
       "permissions": {"contents": "read"},

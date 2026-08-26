@@ -1008,7 +1008,9 @@ def validate_github_reference(
     """Require a reviewed consumer or same-ecosystem canonical GitHub route."""
 
     escaped_repository = re.escape(repository)
-    if path == "/egohygiene" or re.fullmatch(r"/egohygiene/relay/issues/[0-9]+", path):
+    if path in {"/egohygiene", "/features/actions"} or re.fullmatch(
+        r"/egohygiene/relay/issues/[0-9]+", path
+    ):
         return
     if path in {f"/{repository}", f"/{repository}/"}:
         return
@@ -1019,7 +1021,9 @@ def validate_github_reference(
         path,
     ):
         return
-    if path == f"/{repository}/commit/{source_commit}":
+    # Journey evidence may link any immutable historical commit. Source blobs
+    # and trees remain restricted to the represented commit below.
+    if re.fullmatch(rf"/{escaped_repository}/commit/[0-9a-f]{{40}}", path):
         return
     ecosystem_route = re.fullmatch(
         r"/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)/(actions/runs/[0-9]+|commit/[0-9a-f]{40}|deployments/[0-9]+|issues/[0-9]+|pull/[0-9]+|releases/tag/[^/]+)",

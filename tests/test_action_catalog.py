@@ -77,6 +77,10 @@ class ActionCatalogTests(unittest.TestCase):
             'value: "${{ inputs.output-directory }}/decisions/index.html"',
             action,
         )
+        self.assertIn(
+            'value: "${{ inputs.output-directory }}/journey/index.html"',
+            action,
+        )
 
     def test_validation_and_release_gates_are_present(self) -> None:
         validation = (REPOSITORY_ROOT / ".github/workflows/validate.yml").read_text(

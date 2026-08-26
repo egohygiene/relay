@@ -24,6 +24,8 @@
     const resume = document.querySelector("[data-resume-link]");
     const clearResume = document.querySelector("[data-clear-resume]");
     const extraFilters = [...document.querySelectorAll("[data-filter-extra]")];
+    const journeyDateFrom = document.querySelector("[data-journey-date-from]");
+    const journeyDateTo = document.querySelector("[data-journey-date-to]");
 
     const readResume = () => {
         try {
@@ -46,6 +48,8 @@
                     filter.dataset.filterExtra,
                     filter.value || "all",
                 ])),
+                dateFrom: journeyDateFrom?.value || "",
+                dateTo: journeyDateTo?.value || "",
                 anchor: location.hash.startsWith("#") ? location.hash : "",
                 scrollY: Math.max(0, Math.round(window.scrollY)),
                 recordedAt: new Date().toISOString(),
@@ -64,6 +68,8 @@
         for (const [name, selected] of Object.entries(value.filters || {})) {
             if (selected && selected !== "all") target.searchParams.set(name, selected);
         }
+        if (value.dateFrom) target.searchParams.set("from", value.dateFrom);
+        if (value.dateTo) target.searchParams.set("to", value.dateTo);
         if (value.commit === commit && Number(value.scrollY) > 0) target.searchParams.set("resume", "1");
         if (value.anchor) target.hash = value.anchor;
         return target.href;
@@ -90,6 +96,8 @@
             filter.value = selected;
         }
     }
+    if (journeyDateFrom) journeyDateFrom.value = params.get("from") || "";
+    if (journeyDateTo) journeyDateTo.value = params.get("to") || "";
 
     const includesToken = (item, singular, plural, expected) => {
         if (expected === "all") return true;
@@ -167,6 +175,8 @@
             filter.dataset.filterExtra,
             filter.value || "all",
         ]));
+        const selectedFrom = journeyDateFrom?.value || "";
+        const selectedTo = journeyDateTo?.value || "";
         let visible = 0;
         for (const item of document.querySelectorAll("[data-filter-item]")) {
             const matchesExtras = Object.entries(selectedExtras).every(([name, expected]) => {
@@ -176,11 +186,16 @@
                     .filter(Boolean)
                     .includes(expected);
             });
+            const occurredDate = (item.dataset.journeyOccurredAt || "").slice(0, 10);
+            const matchesDate = !occurredDate || (
+                (!selectedFrom || occurredDate >= selectedFrom) &&
+                (!selectedTo || occurredDate <= selectedTo)
+            );
             const matches =
                 (!needle || (item.dataset.search || "").includes(needle)) &&
                 includesToken(item, "state", "states", selectedState) &&
                 includesToken(item, "kind", "kinds", selectedKind) &&
-                matchesExtras;
+                matchesExtras && matchesDate;
             item.hidden = !matches;
             if (matches) visible += 1;
         }
@@ -201,8 +216,16 @@
         for (const group of document.querySelectorAll("[data-decision-index-group]")) {
             group.hidden = !group.querySelector("[data-decision-index]:not([hidden])");
         }
+        for (const chapter of document.querySelectorAll("[data-journey-chapter]")) {
+            chapter.hidden = !chapter.querySelector("[data-journey-event]:not([hidden])");
+        }
+        for (const mapLink of document.querySelectorAll("[data-journey-index]")) {
+            const target = document.getElementById(mapLink.hash.slice(1));
+            mapLink.closest("li").hidden = Boolean(target?.hidden);
+        }
         const filtering = Boolean(
             needle || selectedState !== "all" || selectedKind !== "all" ||
+            selectedFrom || selectedTo ||
             Object.values(selectedExtras).some((value) => value !== "all")
         );
         if (output) output.value = filtering ? `${visible} matching records` : "Showing the full view";
@@ -215,20 +238,27 @@
             for (const [name, selected] of Object.entries(selectedExtras)) {
                 setOrDelete(next, name, selected, "all");
             }
+            setOrDelete(next, "from", selectedFrom);
+            setOrDelete(next, "to", selectedTo);
             history.replaceState(null, "", `${next.pathname}${next.search}${next.hash}`);
         }
         writeResume();
+        document.dispatchEvent(new CustomEvent("ri:filters-applied"));
     };
 
     query?.addEventListener("input", () => apply());
     state?.addEventListener("change", () => apply());
     kind?.addEventListener("change", () => apply());
     for (const filter of extraFilters) filter.addEventListener("change", () => apply());
+    journeyDateFrom?.addEventListener("change", () => apply());
+    journeyDateTo?.addEventListener("change", () => apply());
     reset?.addEventListener("click", () => {
         if (query) query.value = "";
         if (state) state.value = "all";
         if (kind) kind.value = "all";
         for (const filter of extraFilters) filter.value = "all";
+        if (journeyDateFrom) journeyDateFrom.value = "";
+        if (journeyDateTo) journeyDateTo.value = "";
         apply();
         query?.focus();
     });
@@ -282,6 +312,21 @@
         });
     }
 
+    const journeyLinks = [...document.querySelectorAll("[data-journey-link]")];
+    for (const [index, link] of journeyLinks.entries()) {
+        link.addEventListener("keydown", (event) => {
+            let next = null;
+            if (event.key === "ArrowDown" || event.key === "ArrowRight") next = Math.min(index + 1, journeyLinks.length - 1);
+            if (event.key === "ArrowUp" || event.key === "ArrowLeft") next = Math.max(index - 1, 0);
+            if (event.key === "Home") next = 0;
+            if (event.key === "End") next = journeyLinks.length - 1;
+            if (next !== null) {
+                event.preventDefault();
+                journeyLinks[next].focus();
+            }
+        });
+    }
+
     const minimapLinks = [...document.querySelectorAll("[data-minimap-quest]")];
     const markSelectedQuest = (identifier) => {
         for (const quest of document.querySelectorAll("[data-roadmap-quest]")) {
@@ -304,6 +349,21 @@
         }
     };
 
+    const journeyIndexLinks = [...document.querySelectorAll("[data-journey-index]")];
+    const markSelectedJourney = (identifier) => {
+        const selected = document.getElementById(identifier);
+        const selectedChapter = selected?.matches("[data-journey-chapter]")
+            ? selected
+            : selected?.closest("[data-journey-chapter]");
+        for (const event of document.querySelectorAll("[data-journey-event]")) {
+            event.toggleAttribute("data-selected", event.id === identifier);
+        }
+        for (const link of journeyIndexLinks) {
+            if (link.hash.slice(1) === selectedChapter?.id) link.setAttribute("aria-current", "step");
+            else link.removeAttribute("aria-current");
+        }
+    };
+
     const applyHashSelection = () => {
         const identifier = location.hash.slice(1);
         const selected = document.getElementById(identifier);
@@ -316,6 +376,14 @@
             markSelectedDecision(identifier);
             const evidence = selected.querySelector("[data-decision-evidence]");
             if (evidence) evidence.open = true;
+            writeResume();
+        } else if (selected?.matches("[data-journey-event]")) {
+            markSelectedJourney(identifier);
+            const evidence = selected.querySelector("[data-journey-evidence]");
+            if (evidence) evidence.open = true;
+            writeResume();
+        } else if (selected?.matches("[data-journey-chapter]")) {
+            markSelectedJourney(identifier);
             writeResume();
         }
     };
@@ -350,6 +418,19 @@
         });
     }
 
+    for (const details of document.querySelectorAll("[data-journey-evidence]")) {
+        details.addEventListener("toggle", () => {
+            if (!details.open) return;
+            const event = details.closest("[data-journey-event]");
+            if (!event) return;
+            const next = new URL(location.href);
+            next.hash = event.id;
+            history.replaceState(null, "", `${next.pathname}${next.search}${next.hash}`);
+            markSelectedJourney(event.id);
+            writeResume();
+        });
+    }
+
     if ("IntersectionObserver" in window && minimapLinks.length > 0) {
         const observer = new IntersectionObserver((entries) => {
             const current = entries
@@ -369,6 +450,18 @@
         }, { rootMargin: "-18% 0px -68%", threshold: [0.05, 0.25, 0.6] });
         for (const decision of document.querySelectorAll("[data-decision-record]")) {
             observer.observe(decision);
+        }
+    }
+
+    if ("IntersectionObserver" in window && journeyIndexLinks.length > 0) {
+        const observer = new IntersectionObserver((entries) => {
+            const current = entries
+                .filter((entry) => entry.isIntersecting && !entry.target.hidden)
+                .sort((left, right) => right.intersectionRatio - left.intersectionRatio)[0];
+            if (current && !location.hash) markSelectedJourney(current.target.id);
+        }, { rootMargin: "-18% 0px -68%", threshold: [0.05, 0.25, 0.6] });
+        for (const chapter of document.querySelectorAll("[data-journey-chapter]")) {
+            observer.observe(chapter);
         }
     }
 
@@ -464,6 +557,176 @@
         });
         renderComparison({ updateUrl: false });
     }
+
+    const journeyCompare = document.querySelector("[data-journey-compare]");
+    const journeyCompareLeft = journeyCompare?.querySelector("[data-journey-compare-left]");
+    const journeyCompareRight = journeyCompare?.querySelector("[data-journey-compare-right]");
+    const journeyCompareOutput = journeyCompare?.querySelector("[data-journey-compare-output]");
+    const journeyCompareSwap = journeyCompare?.querySelector("[data-journey-compare-swap]");
+    const journeyChapters = new Map(
+        [...document.querySelectorAll("[data-journey-chapter]")].map((chapter) => [
+            chapter.dataset.journeyChapterId,
+            chapter,
+        ]),
+    );
+
+    const renderJourneyComparison = ({ updateUrl = true } = {}) => {
+        if (!journeyCompareLeft || !journeyCompareRight || !journeyCompareOutput) return;
+        const left = journeyChapters.get(journeyCompareLeft.value);
+        const right = journeyChapters.get(journeyCompareRight.value);
+        journeyCompareOutput.replaceChildren();
+        if (!left || !right || left === right) {
+            const message = document.createElement("p");
+            message.textContent = "Choose two different chapters to compare their projected structure.";
+            journeyCompareOutput.append(message);
+        } else {
+            const counts = (chapter) => {
+                try { return JSON.parse(chapter.dataset.journeyCounts || "{}"); }
+                catch { return {}; }
+            };
+            const leftCounts = counts(left);
+            const rightCounts = counts(right);
+            const table = document.createElement("table");
+            const caption = document.createElement("caption");
+            caption.textContent = "Projected chapter comparison; differences do not imply causality or productivity.";
+            table.append(caption);
+            const head = document.createElement("thead");
+            const headRow = document.createElement("tr");
+            headRow.append(document.createElement("th"));
+            for (const chapter of [left, right]) {
+                const heading = document.createElement("th");
+                heading.scope = "col";
+                const link = document.createElement("a");
+                link.href = `#${chapter.id}`;
+                link.textContent = chapter.dataset.journeyChapterTitle || "Untitled chapter";
+                heading.append(link);
+                headRow.append(heading);
+            }
+            head.append(headRow);
+            table.append(head);
+            const tableBody = document.createElement("tbody");
+            const rows = [
+                ["Time window", (chapter) => `${chapter.dataset.journeyStart || "Unknown"} → ${chapter.dataset.journeyEnd || "Unknown"}`],
+                ["Release boundary", (chapter) => chapter.dataset.journeyBoundary || "Open chapter"],
+                ["Events", (_, values) => values.events ?? 0],
+                ["Linked quests", (_, values) => values.quests ?? 0],
+                ["Linked decisions", (_, values) => values.decisions ?? 0],
+                ["Commits", (_, values) => values.commits ?? 0],
+                ["Merged pull requests", (_, values) => values.merged_pull_requests ?? 0],
+                ["Checks", (_, values) => values.checks ?? 0],
+                ["Failing states", (_, values) => values.failures ?? 0],
+                ["Releases and deployments", (_, values) => values.deliveries ?? 0],
+                ["Unclassified events", (_, values) => values.unclassified ?? 0],
+            ];
+            for (const [label, value] of rows) {
+                const row = document.createElement("tr");
+                const heading = document.createElement("th");
+                heading.scope = "row";
+                heading.textContent = label;
+                row.append(heading);
+                for (const [chapter, values] of [[left, leftCounts], [right, rightCounts]]) {
+                    const cell = document.createElement("td");
+                    cell.textContent = String(value(chapter, values));
+                    row.append(cell);
+                }
+                tableBody.append(row);
+            }
+            table.append(tableBody);
+            journeyCompareOutput.append(table);
+        }
+        if (updateUrl) {
+            const next = new URL(location.href);
+            setOrDelete(next, "journey-left", journeyCompareLeft.value);
+            setOrDelete(next, "journey-right", journeyCompareRight.value);
+            history.replaceState(null, "", `${next.pathname}${next.search}${next.hash}`);
+        }
+    };
+
+    if (journeyCompareLeft && journeyCompareRight) {
+        const leftParameter = params.get("journey-left");
+        const rightParameter = params.get("journey-right");
+        if ([...journeyCompareLeft.options].some((option) => option.value === leftParameter)) {
+            journeyCompareLeft.value = leftParameter;
+        }
+        if ([...journeyCompareRight.options].some((option) => option.value === rightParameter)) {
+            journeyCompareRight.value = rightParameter;
+        } else if (journeyCompareRight.options.length > 1) {
+            journeyCompareRight.selectedIndex = 1;
+        }
+        journeyCompareLeft.addEventListener("change", () => renderJourneyComparison());
+        journeyCompareRight.addEventListener("change", () => renderJourneyComparison());
+        journeyCompareSwap?.addEventListener("click", () => {
+            [journeyCompareLeft.value, journeyCompareRight.value] = [journeyCompareRight.value, journeyCompareLeft.value];
+            renderJourneyComparison();
+        });
+        renderJourneyComparison({ updateUrl: false });
+    }
+
+    const replayButton = document.querySelector("[data-journey-replay]");
+    const replayScrubber = document.querySelector("[data-journey-scrubber]");
+    const replayOutput = document.querySelector("[data-journey-replay-output]");
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let replayTimer = null;
+    let replayEvents = [];
+
+    const stopReplay = () => {
+        if (replayTimer !== null) window.clearInterval(replayTimer);
+        replayTimer = null;
+        if (replayButton && !motionPreference.matches) replayButton.textContent = "Replay journey";
+    };
+
+    const setReplayPosition = (position, { scroll = false } = {}) => {
+        if (!replayScrubber || !replayOutput || replayEvents.length === 0) return;
+        const bounded = Math.max(0, Math.min(position, replayEvents.length - 1));
+        replayScrubber.value = String(bounded + 1);
+        for (const [index, event] of replayEvents.entries()) {
+            event.dataset.replayState = index < bounded ? "past" : index === bounded ? "current" : "future";
+        }
+        const current = replayEvents[bounded];
+        replayOutput.value = `${bounded + 1} of ${replayEvents.length} · ${current.dataset.journeyEventTitle || "Untitled event"}`;
+        if (scroll) current.scrollIntoView({ block: "center", behavior: motionPreference.matches ? "auto" : "smooth" });
+    };
+
+    const syncReplayEvents = () => {
+        stopReplay();
+        replayEvents = [...document.querySelectorAll("[data-journey-event]:not([hidden])")];
+        if (!replayButton || !replayScrubber || !replayOutput) return;
+        replayScrubber.max = String(Math.max(1, replayEvents.length));
+        replayScrubber.disabled = replayEvents.length === 0;
+        replayButton.disabled = replayEvents.length === 0 || motionPreference.matches;
+        replayButton.textContent = motionPreference.matches ? "Automatic replay disabled" : "Replay journey";
+        if (replayEvents.length === 0) {
+            replayOutput.value = "No visible events to replay";
+            return;
+        }
+        replayScrubber.value = String(replayEvents.length);
+        for (const event of replayEvents) event.removeAttribute("data-replay-state");
+        replayOutput.value = `${replayEvents.length} visible events ready`;
+    };
+
+    replayScrubber?.addEventListener("input", () => {
+        stopReplay();
+        setReplayPosition(Number(replayScrubber.value) - 1, { scroll: true });
+    });
+    replayButton?.addEventListener("click", () => {
+        if (motionPreference.matches || replayEvents.length === 0) return;
+        if (replayTimer !== null) {
+            stopReplay();
+            return;
+        }
+        setReplayPosition(0, { scroll: true });
+        replayButton.textContent = "Pause replay";
+        replayTimer = window.setInterval(() => {
+            const next = Number(replayScrubber?.value || 1);
+            if (next >= replayEvents.length) {
+                stopReplay();
+                return;
+            }
+            setReplayPosition(next, { scroll: true });
+        }, 900);
+    });
+    motionPreference.addEventListener?.("change", syncReplayEvents);
+    document.addEventListener("ri:filters-applied", syncReplayEvents);
 
     document.addEventListener("keydown", (event) => {
         const editing = ["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement?.tagName);

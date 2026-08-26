@@ -103,6 +103,15 @@ ADR lifecycle and implementation state remain independent, optional absent
 facets remain explicitly unprojected, and cross-view quest links resolve only to
 stable generated fragments. Browser-enhanced comparison never creates a new
 decision claim or replaces canonical ADR Markdown.
+The `/journey/` composer preserves Observatory's chronological event order and
+release boundaries. It reverses only explicit roadmap and ADR references for
+cross-view navigation, classifies display lanes from entity kinds, and labels
+events with no projected intent relationship as unclassified. Pull-request
+merge events remain distinct from raw Git parent topology: branch names, commit
+parents, paths, and causal explanations stay unavailable until a reviewed
+public-safe contract supplies them. Browser replay and chapter comparison are
+disposable local presentation state, while every static event remains present
+for no-script, print, and assistive-technology access.
 The tested Observatory and Holon boundaries are pinned in
 [`repository-intelligence-siblings.v1.lock.json`](actions/repository-intelligence/contracts/repository-intelligence-siblings.v1.lock.json).
 
