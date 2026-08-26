@@ -1,7 +1,7 @@
 # Copyright 2026 Ego Hygiene
 # SPDX-License-Identifier: MIT
 
-"""Compose the routed Repository Intelligence shell and operational Now view."""
+"""Compose routed operational, roadmap, decision, and journey intelligence."""
 
 from __future__ import annotations
 
@@ -81,6 +81,35 @@ DECISION_RELATIONSHIP_FIELDS = (
     ("supersedes", "supersedes"),
     ("superseded_by", "superseded by"),
 )
+JOURNEY_EVENT_TYPES = {
+    "architecture_decision.accepted",
+    "architecture_decision.deprecated",
+    "architecture_decision.proposed",
+    "architecture_decision.superseded",
+    "check.completed",
+    "commit.created",
+    "deployment.completed",
+    "issue.closed",
+    "issue.opened",
+    "issue.reopened",
+    "pull_request.closed",
+    "pull_request.merged",
+    "pull_request.opened",
+    "release.published",
+    "repository.observed",
+    "roadmap_step.created",
+    "roadmap_step.status_changed",
+}
+JOURNEY_LANES = (
+    ("intent", "Intent", {"architecture_decision", "roadmap_step"}),
+    ("work", "Work", {"issue", "pull_request"}),
+    ("code", "Code", {"commit"}),
+    ("proof", "Proof", {"check"}),
+    ("delivery", "Delivery", {"deployment", "release", "repository"}),
+)
+JOURNEY_ASSERTIONS = {"authoritative", "inferred", "unknown"}
+JOURNEY_FRESHNESS = {"current", "not_applicable", "stale", "unknown"}
+JOURNEY_VISIBILITIES = {"internal", "private", "public"}
 
 
 class SiteInputError(ValueError):
@@ -159,6 +188,19 @@ def format_calendar_date(value: Any) -> str:
         return datetime.strptime(value, "%Y-%m-%d").strftime("%b %d, %Y")
     except ValueError:
         return value
+
+
+def parse_rfc3339(value: Any, label: str) -> datetime:
+    """Parse a timezone-aware contract timestamp or fail at the display boundary."""
+
+    normalized = value[:-1] + "+00:00" if isinstance(value, str) and value.endswith("Z") else value
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except (TypeError, ValueError) as error:
+        raise SiteInputError(f"{label} must be an RFC 3339 timestamp") from error
+    if parsed.tzinfo is None:
+        raise SiteInputError(f"{label} must be an RFC 3339 timestamp")
+    return parsed
 
 
 def safe_href(value: Any) -> str:
@@ -368,6 +410,230 @@ def validate_decisions_view(decisions_view: dict[str, Any]) -> None:
                 ) from error
 
 
+def validate_journey_view(journey: dict[str, Any]) -> None:
+    """Validate chronological events and their deterministic release chapters."""
+
+    events = require_list(journey.get("events"))
+    chapters = require_list(journey.get("chapters"))
+    event_ids: set[str] = set()
+    fragments: set[str] = set()
+    event_index: dict[str, dict[str, Any]] = {}
+    chronological: list[tuple[datetime, str]] = []
+    for index, candidate in enumerate(events):
+        event = require_object(candidate)
+        if not event:
+            raise SiteInputError(f"snapshot views.journey.events[{index}] must be an object")
+        for member in ("id", "type", "subject", "occurred_at", "recorded_at"):
+            if not isinstance(event.get(member), str) or not event[member]:
+                raise SiteInputError(
+                    f"snapshot views.journey.events[{index}].{member} must be a non-empty string"
+                )
+        identifier = str(event["id"])
+        fragment = stable_fragment("event", identifier)
+        if identifier in event_ids or fragment in fragments:
+            raise SiteInputError("journey event IDs and fragments must be unique")
+        event_ids.add(identifier)
+        fragments.add(fragment)
+        event_index[identifier] = event
+        event_type = str(event.get("type"))
+        if event_type not in JOURNEY_EVENT_TYPES:
+            raise SiteInputError(
+                f"snapshot views.journey.events[{index}] uses unsupported type {event_type}"
+            )
+        occurred_at = parse_rfc3339(
+            event.get("occurred_at"),
+            f"snapshot views.journey.events[{index}].occurred_at",
+        )
+        parse_rfc3339(
+            event.get("recorded_at"),
+            f"snapshot views.journey.events[{index}].recorded_at",
+        )
+        chronological.append((occurred_at, identifier))
+        for member in ("changes", "provenance"):
+            if not isinstance(event.get(member), list):
+                raise SiteInputError(
+                    f"snapshot views.journey.events[{index}].{member} must be an array"
+                )
+        for change_index, candidate_change in enumerate(event["changes"]):
+            change = require_object(candidate_change)
+            if (
+                not change
+                or not isinstance(change.get("field"), str)
+                or not change["field"]
+                or "from" not in change
+                or "to" not in change
+                or (change["from"] is None and change["to"] is None)
+            ):
+                raise SiteInputError(
+                    "snapshot views.journey.events"
+                    f"[{index}].changes[{change_index}] is invalid"
+                )
+        provenance = event["provenance"]
+        if (
+            not provenance
+            or any(not isinstance(value, str) or not value for value in provenance)
+            or len(provenance) != len(set(provenance))
+        ):
+            raise SiteInputError(
+                f"snapshot views.journey.events[{index}].provenance must contain unique source IDs"
+            )
+        if not isinstance(event.get("extensions"), dict):
+            raise SiteInputError(
+                f"snapshot views.journey.events[{index}].extensions must be an object"
+            )
+        if event.get("actor") is not None:
+            actor = require_object(event.get("actor"))
+            if not actor:
+                raise SiteInputError(
+                    f"snapshot views.journey.events[{index}].actor must be an object or null"
+                )
+            for member in ("assertion", "id", "kind", "url"):
+                if not isinstance(actor.get(member), str) or not actor[member]:
+                    raise SiteInputError(
+                        "snapshot views.journey.events"
+                        f"[{index}].actor.{member} must be a non-empty string"
+                    )
+            if actor.get("assertion") not in JOURNEY_ASSERTIONS:
+                raise SiteInputError(
+                    f"snapshot views.journey.events[{index}].actor.assertion is unsupported"
+                )
+        if event.get("assertion") not in JOURNEY_ASSERTIONS:
+            raise SiteInputError(
+                f"snapshot views.journey.events[{index}].assertion is unsupported"
+            )
+        if event.get("freshness") not in JOURNEY_FRESHNESS:
+            raise SiteInputError(
+                f"snapshot views.journey.events[{index}].freshness is unsupported"
+            )
+        if event.get("visibility") not in JOURNEY_VISIBILITIES:
+            raise SiteInputError(
+                f"snapshot views.journey.events[{index}].visibility is unsupported"
+            )
+        subject = require_object(event.get("subject_entity"))
+        for member in (
+            "assertion",
+            "canonical_url",
+            "freshness",
+            "id",
+            "key",
+            "kind",
+            "repository",
+            "state",
+            "visibility",
+        ):
+            if not isinstance(subject.get(member), str) or not subject[member]:
+                raise SiteInputError(
+                    "snapshot views.journey.events"
+                    f"[{index}].subject_entity.{member} must be a non-empty string"
+                )
+        if subject.get("title") is not None and (
+            not isinstance(subject.get("title"), str) or not subject["title"]
+        ):
+            raise SiteInputError(
+                f"snapshot views.journey.events[{index}].subject_entity.title is invalid"
+            )
+        if subject.get("assertion") not in JOURNEY_ASSERTIONS:
+            raise SiteInputError(
+                f"snapshot views.journey.events[{index}].subject_entity.assertion is unsupported"
+            )
+        if subject.get("freshness") not in JOURNEY_FRESHNESS:
+            raise SiteInputError(
+                f"snapshot views.journey.events[{index}].subject_entity.freshness is unsupported"
+            )
+        if subject.get("visibility") not in JOURNEY_VISIBILITIES:
+            raise SiteInputError(
+                f"snapshot views.journey.events[{index}].subject_entity.visibility is unsupported"
+            )
+        if event["subject"] != subject.get("id"):
+            raise SiteInputError(
+                f"snapshot views.journey.events[{index}] subject does not match subject_entity"
+            )
+    if chronological != sorted(chronological):
+        raise SiteInputError("snapshot views.journey.events must be ordered by occurred_at then id")
+
+    chapter_ids: set[str] = set()
+    flattened_event_ids: list[str] = []
+    for index, candidate in enumerate(chapters):
+        chapter = require_object(candidate)
+        if not chapter:
+            raise SiteInputError(f"snapshot views.journey.chapters[{index}] must be an object")
+        for member in ("id", "title", "start_at", "end_at"):
+            if not isinstance(chapter.get(member), str) or not chapter[member]:
+                raise SiteInputError(
+                    f"snapshot views.journey.chapters[{index}].{member} must be a non-empty string"
+                )
+        chapter_id = str(chapter["id"])
+        if chapter_id in chapter_ids:
+            raise SiteInputError("journey chapter IDs must be unique")
+        chapter_ids.add(chapter_id)
+        members = chapter.get("event_ids")
+        if (
+            not isinstance(members, list)
+            or not members
+            or any(not isinstance(value, str) or not value for value in members)
+            or len(members) != len(set(members))
+        ):
+            raise SiteInputError(
+                f"snapshot views.journey.chapters[{index}].event_ids must contain unique event IDs"
+            )
+        unresolved = [value for value in members if value not in event_index]
+        if unresolved:
+            raise SiteInputError(
+                "snapshot views.journey.chapters contain unresolved event IDs: "
+                + ", ".join(unresolved)
+            )
+        selected = [event_index[value] for value in members]
+        if chapter["start_at"] != selected[0]["occurred_at"] or chapter["end_at"] != selected[-1]["occurred_at"]:
+            raise SiteInputError("journey chapter boundaries must match their first and last events")
+        parse_rfc3339(
+            chapter.get("start_at"),
+            f"snapshot views.journey.chapters[{index}].start_at",
+        )
+        parse_rfc3339(
+            chapter.get("end_at"),
+            f"snapshot views.journey.chapters[{index}].end_at",
+        )
+        boundary = chapter.get("boundary")
+        if boundary is None:
+            if index != len(chapters) - 1:
+                raise SiteInputError("only the final journey chapter may be open")
+            if any(event["type"] == "release.published" for event in selected):
+                raise SiteInputError("an open journey chapter cannot contain a release boundary")
+        else:
+            boundary_entity = require_object(boundary)
+            if normalize_state(boundary_entity.get("kind")) != "release":
+                raise SiteInputError("journey chapter boundary must describe a release")
+            last_event = selected[-1]
+            if (
+                last_event["type"] != "release.published"
+                or last_event["subject"] != boundary_entity.get("id")
+            ):
+                raise SiteInputError("journey release chapter must close on its boundary event")
+            boundary_subject = entity(last_event.get("subject_entity"))
+            for member in (
+                "assertion",
+                "canonical_url",
+                "freshness",
+                "id",
+                "key",
+                "kind",
+                "repository",
+                "state",
+                "title",
+                "visibility",
+            ):
+                if boundary_entity.get(member) != boundary_subject.get(member):
+                    raise SiteInputError(
+                        "journey release chapter boundary must match its release event entity"
+                    )
+        flattened_event_ids.extend(members)
+    expected_event_ids = [str(event["id"]) for event in events]
+    if flattened_event_ids != expected_event_ids:
+        raise SiteInputError("journey chapters must partition every event in canonical order")
+    if bool(events) != bool(chapters):
+        raise SiteInputError("journey chapters and events must either both be empty or both be present")
+
+
 def validate_snapshot(
     snapshot: dict[str, Any], repository: str, source_commit: str
 ) -> dict[str, Any]:
@@ -404,13 +670,14 @@ def validate_snapshot(
     }:
         raise SiteInputError("snapshot coverage.status uses an unsupported state")
     views = require_object(snapshot.get("views"))
-    for name in ("now", "roadmap", "decisions", "health", "work"):
+    for name in ("now", "roadmap", "decisions", "journey", "health", "work"):
         if not isinstance(views.get(name), dict):
             raise SiteInputError(f"snapshot views.{name} must be an object")
     required_arrays = {
         "now": ("blockers", "current_focus", "next_ready", "recent_events"),
         "roadmap": ("roots", "steps"),
         "decisions": ("decisions",),
+        "journey": ("chapters", "events"),
         "health": ("checks",),
         "work": ("open_issues", "open_pull_requests"),
     }
@@ -425,6 +692,7 @@ def validate_snapshot(
         raise SiteInputError("snapshot views.work.roadmap_queues must be an object")
     validate_roadmap_view(require_object(views.get("roadmap")))
     validate_decisions_view(require_object(views.get("decisions")))
+    validate_journey_view(require_object(views.get("journey")))
     return snapshot
 
 
@@ -1458,6 +1726,457 @@ def decisions_body(snapshot: dict[str, Any] | None) -> str:
     </div>'''
 
 
+def journey_lane(kind: Any) -> tuple[str, str]:
+    """Map one projected entity kind to a deterministic semantic delivery lane."""
+
+    normalized = normalize_state(kind)
+    for lane, label, kinds in JOURNEY_LANES:
+        if normalized in kinds:
+            return lane, label
+    return "other", "Other"
+
+
+def journey_event_label(event: dict[str, Any]) -> str:
+    event_type = event.get("type")
+    if event_type == "check.completed":
+        transitions = [require_object(change) for change in require_list(event.get("changes"))]
+        if any(normalize_state(change.get("to")) in BROKEN_STATES for change in transitions):
+            return "Check regressed"
+        if any(
+            normalize_state(change.get("from")) in BROKEN_STATES
+            and normalize_state(change.get("to")) == "success"
+            for change in transitions
+        ):
+            return "Check recovered"
+    labels = {
+        "architecture_decision.accepted": "Decision accepted",
+        "architecture_decision.deprecated": "Decision deprecated",
+        "architecture_decision.proposed": "Decision proposed",
+        "architecture_decision.superseded": "Decision superseded",
+        "check.completed": "Check completed",
+        "commit.created": "Commit recorded",
+        "deployment.completed": "Deployment completed",
+        "issue.closed": "Issue closed",
+        "issue.opened": "Issue opened",
+        "issue.reopened": "Issue reopened",
+        "pull_request.closed": "Pull request closed",
+        "pull_request.merged": "Pull request merged",
+        "pull_request.opened": "Pull request opened",
+        "release.published": "Release published",
+        "repository.observed": "Repository observed",
+        "roadmap_step.created": "Quest created",
+        "roadmap_step.status_changed": "Quest state changed",
+    }
+    return labels.get(str(event_type), state_label(event_type))
+
+
+def journey_context_index(snapshot: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Reverse explicit roadmap and ADR relationships for journey drill-down."""
+
+    index: dict[str, dict[str, Any]] = {}
+
+    def add_context(
+        subject_id: Any,
+        context_kind: str,
+        context_entity: dict[str, Any],
+        *,
+        changed_files: list[Any] | None = None,
+    ) -> None:
+        if not isinstance(subject_id, str) or not subject_id:
+            return
+        record = index.setdefault(
+            subject_id,
+            {"roadmap": {}, "decisions": {}, "changed_files": {}},
+        )
+        context_id = str(context_entity.get("id") or "")
+        if context_id:
+            record[context_kind][context_id] = context_entity
+        for file_reference in changed_files or []:
+            file_entity = entity(file_reference)
+            file_id = str(file_entity.get("id") or "")
+            if file_id:
+                record["changed_files"][file_id] = file_entity
+
+    views = require_object(snapshot.get("views"))
+    roadmap = require_object(views.get("roadmap"))
+    for step in require_list(roadmap.get("steps")):
+        step_record = require_object(step)
+        step_entity = entity(step_record)
+        changed_files = require_list(step_record.get("changed_files")) + require_list(
+            step_record.get("files")
+        )
+        related_ids = {str(step_entity.get("id") or "")}
+        for field, _ in ROADMAP_EVIDENCE_FIELDS:
+            related_ids.update(
+                str(entity(reference).get("id") or "")
+                for reference in require_list(step_record.get(field))
+            )
+        for related_id in sorted(related_ids):
+            add_context(
+                related_id,
+                "roadmap",
+                step_entity,
+                changed_files=changed_files,
+            )
+    decisions = require_object(views.get("decisions"))
+    for decision in require_list(decisions.get("decisions")):
+        decision_record = require_object(decision)
+        decision_entity = entity(decision_record)
+        related_ids = {str(decision_entity.get("id") or "")}
+        for field, _ in DECISION_RELATIONSHIP_FIELDS:
+            related_ids.update(
+                str(entity(reference).get("id") or "")
+                for reference in require_list(decision_record.get(field))
+            )
+        for related_id in sorted(related_ids):
+            add_context(related_id, "decisions", decision_entity)
+    return index
+
+
+def journey_select(
+    label: str,
+    parameter: str,
+    options: list[tuple[str, str]],
+) -> str:
+    rendered_options = ['<option value="all">All</option>']
+    rendered_options.extend(
+        f'<option value="{escaped(value)}">{escaped(option_label)}</option>'
+        for value, option_label in options
+    )
+    return f'''<label><span>{escaped(label)}</span><select data-filter-extra="{escaped(parameter)}">{"".join(rendered_options)}</select></label>'''
+
+
+def render_journey_filter_controls(
+    chapters: list[dict[str, Any]],
+    events: list[dict[str, Any]],
+    contexts: dict[str, dict[str, Any]],
+) -> str:
+    chapter_options = [
+        (filter_token(chapter.get("id")), str(chapter.get("title")))
+        for chapter in chapters
+    ]
+    release_options: dict[str, str] = {}
+    roadmap_options: dict[str, str] = {"unclassified": "Unclassified"}
+    decision_options: dict[str, str] = {"unclassified": "Unclassified"}
+    actor_options: dict[str, str] = {"unattributed": "Unattributed"}
+    assertions: dict[str, str] = {}
+    freshness_values: dict[str, str] = {}
+    for chapter in chapters:
+        boundary = require_object(chapter.get("boundary"))
+        release_key = str(boundary.get("key") or "unreleased")
+        release_options[filter_token(release_key)] = str(
+            boundary.get("title") or boundary.get("key") or "Unreleased"
+        )
+    for event in events:
+        subject = entity(event.get("subject_entity"))
+        context = contexts.get(str(subject.get("id") or ""), {})
+        for kind, target in (("roadmap", roadmap_options), ("decisions", decision_options)):
+            for reference in require_object(context.get(kind)).values():
+                target[filter_token(reference.get("id"))] = str(
+                    reference.get("key") or reference.get("title")
+                )
+        actor = require_object(event.get("actor"))
+        if actor:
+            actor_id = str(actor.get("id") or actor.get("kind") or "unknown")
+            actor_options[filter_token(actor_id)] = actor_id
+        assertion = str(event.get("assertion") or "unknown")
+        freshness = str(event.get("freshness") or "unknown")
+        assertions[assertion] = state_label(assertion)
+        freshness_values[freshness] = state_label(freshness)
+    return f'''<details class="ri-journey-filters"><summary>Refine the journey</summary><div>
+      {journey_select("Chapter", "chapter", chapter_options)}
+      {journey_select("Release boundary", "release", sorted(release_options.items(), key=lambda item: item[1].casefold()))}
+      {journey_select("Quest context", "roadmap", sorted(roadmap_options.items(), key=lambda item: item[1].casefold()))}
+      {journey_select("Decision context", "decision", sorted(decision_options.items(), key=lambda item: item[1].casefold()))}
+      {journey_select("Actor", "actor", sorted(actor_options.items(), key=lambda item: item[1].casefold()))}
+      {journey_select("Assertion", "assertion", sorted(assertions.items()))}
+      {journey_select("Freshness", "freshness", sorted(freshness_values.items()))}
+      <label><span>From date</span><input type="date" data-journey-date-from></label>
+      <label><span>Through date</span><input type="date" data-journey-date-to></label>
+    </div><p>Branch names and file paths are not projected by the current public-safe journey contract. They remain unavailable instead of being reconstructed from titles or commit messages.</p></details>'''
+
+
+def render_journey_context_links(
+    context: dict[str, Any],
+    roadmap_anchors: dict[str, str],
+    decision_anchors: dict[str, str],
+) -> str:
+    links = []
+    for reference in require_object(context.get("roadmap")).values():
+        anchor = roadmap_anchors.get(str(reference.get("id") or ""))
+        if anchor:
+            links.append(
+                f'<a class="ri-journey-context" data-context-kind="roadmap" href="../roadmap/#{escaped(anchor)}"><span>Quest</span>{escaped(reference.get("key") or reference.get("title"))}</a>'
+            )
+    for reference in require_object(context.get("decisions")).values():
+        anchor = decision_anchors.get(str(reference.get("id") or ""))
+        if anchor:
+            links.append(
+                f'<a class="ri-journey-context" data-context-kind="decision" href="../decisions/#{escaped(anchor)}"><span>ADR</span>{escaped(reference.get("key") or reference.get("title"))}</a>'
+            )
+    if links:
+        return f'<div class="ri-journey-contexts" aria-label="Explicitly linked intent">{"".join(links)}</div>'
+    return '<p class="ri-journey-unclassified"><strong>Unclassified context.</strong> No roadmap or ADR relationship is projected for this event.</p>'
+
+
+def render_journey_changes(event: dict[str, Any]) -> str:
+    changes = require_list(event.get("changes"))
+    if not changes:
+        return '<p>No field transition is projected for this event.</p>'
+    rows = []
+    for change in changes:
+        record = require_object(change)
+        before = record.get("from")
+        after = record.get("to")
+        rows.append(
+            f'<li><code>{escaped(record.get("field") or "unknown field")}</code><span>{escaped(before if before is not None else "not previously projected")} → {escaped(after if after is not None else "not subsequently projected")}</span></li>'
+        )
+    return f'<ul class="ri-journey-changes">{"".join(rows)}</ul>'
+
+
+def render_journey_files(context: dict[str, Any]) -> str:
+    files = list(require_object(context.get("changed_files")).values())
+    if not files:
+        return ""
+    records = []
+    for file_entity in files:
+        url = safe_href(file_entity.get("canonical_url"))
+        title = file_entity.get("title") or file_entity.get("key") or "Changed file"
+        records.append(
+            f'<li>{f"<a href=\"{escaped(url)}\">{escaped(title)}</a>" if url else escaped(title)}</li>'
+        )
+    return f'''<section><h4>Quest-level changed files</h4><p>These files belong to an explicitly linked quest; the journey does not claim that this individual event changed each file.</p><ul>{"".join(records)}</ul></section>'''
+
+
+def render_journey_event(
+    event: dict[str, Any],
+    *,
+    index: int,
+    total: int,
+    chapter: dict[str, Any],
+    context: dict[str, Any],
+    release_token: str,
+    roadmap_anchors: dict[str, str],
+    decision_anchors: dict[str, str],
+) -> str:
+    subject = entity(event.get("subject_entity"))
+    identifier = str(event.get("id") or "")
+    anchor = stable_fragment("event", identifier)
+    lane, lane_label = journey_lane(subject.get("kind"))
+    title = subject.get("title") or subject.get("key") or "Untitled event"
+    state = normalize_state(subject.get("state"))
+    kind = normalize_state(subject.get("kind"))
+    assertion = normalize_state(event.get("assertion"))
+    freshness = normalize_state(event.get("freshness"))
+    actor = require_object(event.get("actor"))
+    actor_id = str(actor.get("id") or actor.get("kind") or "unattributed")
+    actor_token = filter_token(actor_id) if actor else "unattributed"
+    roadmap = list(require_object(context.get("roadmap")).values())
+    decisions = list(require_object(context.get("decisions")).values())
+    roadmap_tokens = " ".join(filter_token(record.get("id")) for record in roadmap) or "unclassified"
+    decision_tokens = " ".join(filter_token(record.get("id")) for record in decisions) or "unclassified"
+    occurred_at = str(event.get("occurred_at") or "")
+    canonical_url = safe_href(subject.get("canonical_url"))
+    provenance = require_list(event.get("provenance"))
+    search = " ".join(
+        str(value)
+        for value in (
+            event.get("type"),
+            title,
+            subject.get("key"),
+            subject.get("kind"),
+            subject.get("state"),
+            actor_id,
+            chapter.get("title"),
+            *(record.get("key") for record in roadmap),
+            *(record.get("title") for record in roadmap),
+            *(record.get("key") for record in decisions),
+            *(record.get("title") for record in decisions),
+            *provenance,
+        )
+        if value is not None
+    ).casefold()
+    changes_text = " ".join(
+        str(value)
+        for change in require_list(event.get("changes"))
+        for value in require_object(change).values()
+        if value is not None
+    ).casefold()
+    node_symbol = {
+        "intent": "◇",
+        "work": "□",
+        "code": "⌘",
+        "proof": "✓" if state not in BROKEN_STATES else "!",
+        "delivery": "◎",
+        "other": "·",
+    }[lane]
+    source = (
+        f'<a class="ri-button ri-button--quiet" href="{escaped(canonical_url)}">Open canonical {escaped(state_label(kind))} <span aria-hidden="true">↗</span></a>'
+        if canonical_url
+        else '<span class="ri-status" data-state="unknown"><span></span>Canonical source unavailable</span>'
+    )
+    actor_url = safe_href(actor.get("url"))
+    actor_value = (
+        f'<a href="{escaped(actor_url)}">{escaped(actor_id)}</a>'
+        if actor_url
+        else escaped(actor_id)
+    )
+    return f'''<li class="ri-journey-event" id="{escaped(anchor)}" data-filter-item data-journey-event data-journey-event-id="{escaped(identifier)}" data-journey-event-title="{escaped(title)}" data-journey-occurred-at="{escaped(occurred_at)}" data-lane="{escaped(lane)}" data-state="{escaped(state)}" data-kind="{escaped(kind)}" data-filter-chapter="{escaped(filter_token(chapter.get("id")))}" data-filter-release="{escaped(release_token)}" data-filter-roadmap="{escaped(roadmap_tokens)}" data-filter-decision="{escaped(decision_tokens)}" data-filter-actor="{escaped(actor_token)}" data-filter-assertion="{escaped(assertion)}" data-filter-freshness="{escaped(freshness)}" data-search="{escaped(search + " " + changes_text)}" data-context-status="{("linked" if roadmap or decisions else "unclassified")}" aria-posinset="{index + 1}" aria-setsize="{total}">
+      <div class="ri-journey-event__lane"><span>{escaped(lane_label)}</span><i aria-hidden="true">{escaped(node_symbol)}</i></div>
+      <article class="ri-journey-event__card"><header><div><span class="ri-eyebrow">{escaped(journey_event_label(event))}</span><h3>{f"<a href=\"{escaped(canonical_url)}\">{escaped(title)}</a>" if canonical_url else escaped(title)}</h3><p><time datetime="{escaped(occurred_at)}">{escaped(format_date(occurred_at))}</time> · {status_pill(state)} · {escaped(subject.get("key"))}</p></div><a class="ri-journey-permalink" data-journey-link href="#{escaped(anchor)}" aria-label="Link to {escaped(title)}">#{index + 1:03d}</a></header>
+      {render_journey_context_links(context, roadmap_anchors, decision_anchors)}
+      <details data-journey-evidence><summary>Inspect event evidence</summary><div class="ri-journey-evidence"><section><h4>Recorded transition</h4>{render_journey_changes(event)}</section><section><h4>Provenance</h4><dl><div><dt>Assertion</dt><dd>{escaped(state_label(assertion))}</dd></div><div><dt>Freshness</dt><dd>{escaped(state_label(freshness))}</dd></div><div><dt>Actor</dt><dd>{actor_value}</dd></div><div><dt>Recorded</dt><dd>{escaped(format_date(event.get("recorded_at")))}</dd></div></dl><p>Source IDs: {escaped(", ".join(str(value) for value in provenance))}</p></section>{render_journey_files(context)}</div><footer>{source}</footer></details></article>
+    </li>'''
+
+
+def render_journey_gap(previous: dict[str, Any], current: dict[str, Any]) -> str:
+    """Expose a large projected time gap without claiming repository inactivity."""
+
+    before = parse_rfc3339(previous.get("occurred_at"), "journey previous event")
+    after = parse_rfc3339(current.get("occurred_at"), "journey current event")
+    seconds = (after - before).total_seconds()
+    if seconds < 72 * 60 * 60:
+        return ""
+    days = seconds / (24 * 60 * 60)
+    label = f"{days:.1f}".rstrip("0").rstrip(".")
+    return f'''<li class="ri-journey-gap"><span>{escaped(label)} days between projected lifecycle events</span><small>This gap is not evidence that no repository work occurred.</small></li>'''
+
+
+def journey_chapter_counts(
+    events: list[dict[str, Any]],
+    contexts: dict[str, dict[str, Any]],
+) -> dict[str, int]:
+    counts = {
+        "events": len(events),
+        "quests": 0,
+        "decisions": 0,
+        "commits": 0,
+        "merged_pull_requests": 0,
+        "checks": 0,
+        "failures": 0,
+        "deliveries": 0,
+        "unclassified": 0,
+    }
+    quest_ids: set[str] = set()
+    decision_ids: set[str] = set()
+    for event in events:
+        subject = entity(event.get("subject_entity"))
+        kind = normalize_state(subject.get("kind"))
+        state = normalize_state(subject.get("state"))
+        context = contexts.get(str(subject.get("id") or ""), {})
+        quest_ids.update(require_object(context.get("roadmap")))
+        decision_ids.update(require_object(context.get("decisions")))
+        counts["commits"] += int(kind == "commit")
+        counts["merged_pull_requests"] += int(event.get("type") == "pull_request.merged")
+        counts["checks"] += int(kind == "check")
+        regressed = any(
+            normalize_state(require_object(change).get("to")) in BROKEN_STATES
+            for change in require_list(event.get("changes"))
+        )
+        counts["failures"] += int(state in BROKEN_STATES or regressed)
+        counts["deliveries"] += int(kind in {"deployment", "release"})
+        counts["unclassified"] += int(not context.get("roadmap") and not context.get("decisions"))
+    counts["quests"] = len(quest_ids)
+    counts["decisions"] = len(decision_ids)
+    return counts
+
+
+def render_journey_compare(chapters: list[dict[str, Any]]) -> str:
+    if len(chapters) < 2:
+        return f'''<section class="ri-journey-compare" data-journey-compare aria-labelledby="journey-compare-heading"><div><span class="ri-eyebrow">Then and now</span><h2 id="journey-compare-heading">Compare delivery chapters</h2><p>At least two release-bounded chapters are needed for a structural comparison. This never infers causality.</p></div></section>'''
+    options = "".join(
+        f'<option value="{escaped(chapter.get("id"))}">{escaped(chapter.get("title"))}</option>'
+        for chapter in chapters
+    )
+    return f'''<section class="ri-journey-compare" data-journey-compare aria-labelledby="journey-compare-heading"><div><span class="ri-eyebrow">Then and now</span><h2 id="journey-compare-heading">Compare delivery chapters</h2><p>Place two projected chapters side by side. Counts describe structure, not causality or productivity.</p></div><div class="ri-journey-compare__controls"><label><span>Earlier chapter</span><select data-journey-compare-left>{options}</select></label><button class="ri-button ri-button--quiet" type="button" data-journey-compare-swap>Swap</button><label><span>Later chapter</span><select data-journey-compare-right>{options}</select></label></div><div class="ri-journey-compare__output" data-journey-compare-output aria-live="polite"><p>Choose two different chapters to compare.</p></div></section>'''
+
+
+def journey_body(snapshot: dict[str, Any] | None) -> str:
+    if snapshot is None:
+        unavailable = empty_state(
+            "Observatory journey unavailable",
+            "Relay never reconstructs semantic history from raw Git output when the commit-matched lifecycle projection is absent.",
+            "partial",
+        )
+        return f'''<section class="ri-section ri-section--lead" aria-labelledby="journey-heading"><div class="ri-section-heading"><div><span class="ri-eyebrow">Semantic history</span><h2 id="journey-heading">The repository journey</h2></div><p>Unknown history remains visible until the Observatory journey view is supplied.</p></div>{unavailable}</section>'''
+    views = require_object(snapshot.get("views"))
+    journey = require_object(views.get("journey"))
+    events = [require_object(value) for value in require_list(journey.get("events"))]
+    chapters = [require_object(value) for value in require_list(journey.get("chapters"))]
+    if not events:
+        return f'''<section class="ri-section ri-section--lead" aria-labelledby="journey-heading"><div class="ri-section-heading"><div><span class="ri-eyebrow">Semantic history</span><h2 id="journey-heading">The repository journey</h2></div><p>No lifecycle event is projected for this represented commit.</p></div>{empty_state("No journey events projected", "This is not evidence that the repository has no Git history. The public-safe Observatory projection is empty for this snapshot.", "not_applicable")}</section>'''
+    contexts = journey_context_index(snapshot)
+    roadmap = require_object(views.get("roadmap"))
+    roadmap_anchors = {
+        str(entity(step).get("id")): stable_fragment("quest", entity(step).get("id"))
+        for step in require_list(roadmap.get("steps"))
+    }
+    decisions_view = require_object(views.get("decisions"))
+    decision_anchors = {
+        str(entity(decision).get("id")): stable_fragment("decision", entity(decision).get("id"))
+        for decision in require_list(decisions_view.get("decisions"))
+    }
+    events_by_id = {str(event.get("id")): event for event in events}
+    rendered_chapters = []
+    index_links = []
+    sequence = 0
+    release_count = 0
+    unclassified = 0
+    for chapter_number, chapter in enumerate(chapters, start=1):
+        chapter_events = [events_by_id[str(identifier)] for identifier in chapter["event_ids"]]
+        boundary = require_object(chapter.get("boundary"))
+        release_key = str(boundary.get("key") or "unreleased")
+        release_token = filter_token(release_key)
+        if boundary:
+            release_count += 1
+            reason = f"Closed by the authoritative {release_key} release event."
+        elif release_count:
+            reason = "Open chapter containing events after the latest projected release boundary."
+        else:
+            reason = "No release boundary is projected, so the events remain one unreleased chapter."
+        anchor = stable_fragment("chapter", chapter.get("id"))
+        index_links.append(
+            f'<li><a data-journey-index href="#{escaped(anchor)}"><span>{chapter_number:02d}</span><small>{escaped(chapter.get("title"))}</small></a></li>'
+        )
+        rendered_events = []
+        previous_event: dict[str, Any] | None = None
+        for event in chapter_events:
+            if previous_event is not None:
+                gap = render_journey_gap(previous_event, event)
+                if gap:
+                    rendered_events.append(gap)
+            subject = entity(event.get("subject_entity"))
+            context = contexts.get(
+                str(subject.get("id") or ""),
+                {"roadmap": {}, "decisions": {}, "changed_files": {}},
+            )
+            unclassified += int(not context.get("roadmap") and not context.get("decisions"))
+            rendered_events.append(
+                render_journey_event(
+                    event,
+                    index=sequence,
+                    total=len(events),
+                    chapter=chapter,
+                    context=context,
+                    release_token=release_token,
+                    roadmap_anchors=roadmap_anchors,
+                    decision_anchors=decision_anchors,
+                )
+            )
+            sequence += 1
+            previous_event = event
+        counts = journey_chapter_counts(chapter_events, contexts)
+        boundary_label = str(boundary.get("title") or boundary.get("key") or "Open chapter")
+        rendered_chapters.append(
+            f'''<section class="ri-journey-chapter" id="{escaped(anchor)}" data-journey-chapter data-journey-chapter-id="{escaped(chapter.get("id"))}" data-journey-chapter-title="{escaped(chapter.get("title"))}" data-journey-start="{escaped(chapter.get("start_at"))}" data-journey-end="{escaped(chapter.get("end_at"))}" data-journey-boundary="{escaped(boundary_label)}" data-journey-counts="{escaped(json.dumps(counts, sort_keys=True, separators=(",", ":")))}"><header class="ri-journey-chapter__heading"><div><span class="ri-eyebrow">Chapter {chapter_number:02d}</span><h2>{escaped(chapter.get("title"))}</h2><p><time datetime="{escaped(chapter.get("start_at"))}">{escaped(format_date(chapter.get("start_at")))}</time> — <time datetime="{escaped(chapter.get("end_at"))}">{escaped(format_date(chapter.get("end_at")))}</time></p></div><div class="ri-journey-boundary"><span>Grouping rule</span><strong>{escaped(boundary_label)}</strong><p>{escaped(reason)}</p></div></header><div class="ri-journey-chapter__metrics" aria-label="Chapter composition"><span><strong>{counts["events"]}</strong> events</span><span><strong>{counts["quests"]}</strong> quests</span><span><strong>{counts["decisions"]}</strong> decisions</span><span><strong>{counts["commits"]}</strong> commits</span><span><strong>{counts["deliveries"]}</strong> deliveries</span></div><ol class="ri-journey-events" data-journey-viewport data-virtualization="content-visibility">{"".join(rendered_events)}</ol></section>'''
+        )
+    lane_legend = "".join(
+        f'<li data-lane="{escaped(lane)}"><i aria-hidden="true"></i><span>{escaped(label)}</span></li>'
+        for lane, label, _ in JOURNEY_LANES
+    )
+    return f'''<section class="ri-section ri-section--lead ri-journey-intro" aria-labelledby="journey-heading"><div class="ri-section-heading"><div><span class="ri-eyebrow">Semantic Git history</span><h2 id="journey-heading">The repository journey</h2></div><p>Release-bounded chapters turn lifecycle evidence into a readable story while every event remains source-linked and independently inspectable.</p></div><div class="ri-roadmap-metrics" aria-label="Journey summary"><article><strong>{len(chapters)}</strong><span>delivery chapters</span></article><article><strong>{len(events)}</strong><span>lifecycle events</span></article><article><strong>{release_count}</strong><span>release boundaries</span></article><article><strong>{unclassified}</strong><span>unclassified events</span></article></div><div class="ri-journey-contract"><article><span class="ri-eyebrow">Grouping</span><strong>Deterministic chapters</strong><p>Each release closes a chapter; later events form the current chapter.</p></article><article><span class="ri-eyebrow">Topology</span><strong>Only projected merges</strong><p>PR merges are shown. Raw Git parents, private branches, and paths are never invented.</p></article><article><span class="ri-eyebrow">Meaning</span><strong>Explicit links only</strong><p>Unlinked work stays visible as unclassified rather than being assigned intent.</p></article></div><ul class="ri-journey-lanes" aria-label="Semantic delivery lanes">{lane_legend}</ul>{render_journey_filter_controls(chapters, events, contexts)}</section><details class="ri-journey-tools"><summary>Open playback and chapter comparison tools</summary><div><section class="ri-journey-replay" aria-labelledby="journey-replay-heading"><div><span class="ri-eyebrow">Optional replay</span><h2 id="journey-replay-heading">Traverse the projected sequence</h2><p>Scrub manually or replay visible events. Reduced-motion preferences disable automatic playback.</p></div><div class="ri-journey-replay__controls"><button class="ri-button" type="button" data-journey-replay>Replay journey</button><label><span class="ri-visually-hidden">Journey replay position</span><input type="range" min="1" max="{len(events)}" value="{len(events)}" data-journey-scrubber></label><output data-journey-replay-output aria-live="polite">Showing all {len(events)} events</output></div></section>{render_journey_compare(chapters)}</div></details><div class="ri-journey-layout"><nav class="ri-map ri-journey-map" aria-label="Journey chapters"><span class="ri-eyebrow">Journey map</span><p>{len(chapters)} chronological chapters · release boundaries remain authoritative</p><ol>{"".join(index_links)}</ol></nav><div class="ri-journey-story">{"".join(rendered_chapters)}</div></div>'''
+
+
 def build_status(summary: dict[str, Any]) -> tuple[str, str]:
     execution = require_object(require_object(summary.get("states")).get("execution"))
     if int(execution.get("failure", 0) or 0) > 0:
@@ -1499,6 +2218,7 @@ def shell_document(
         "now": "See what changed, what needs attention, and the next grounded moves without flattening uncertainty.",
         "roadmap": "Traverse canonical intent as a quest line, then open the evidence that makes each step true.",
         "decisions": "Trace why the architecture changed, what each ADR authorized, and how its evidence and successors remain connected.",
+        "journey": "Move through release-bounded chapters that connect intent, work, code, proof, and delivery without inventing missing history.",
     }
     route_description = route_descriptions.get(
         route,
@@ -1643,6 +2363,8 @@ def write_site(
             if route == "roadmap"
             else decisions_body(snapshot)
             if route == "decisions"
+            else journey_body(snapshot)
+            if route == "journey"
             else placeholder_body(route, label, "../")
         )
         atomic_write(

@@ -1,11 +1,11 @@
 # Copyright 2026 Ego Hygiene
 # SPDX-License-Identifier: MIT
 
-"""Tests for the routed Repository Intelligence shell and operational Now view."""
+"""Tests for the routed Repository Intelligence evidence views."""
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 import importlib.util
 import json
 import os
@@ -426,6 +426,216 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
         self.assertIn("data-decision-index", script)
         self.assertIn("ArrowDown", script)
 
+    def test_journey_renders_release_chapters_lanes_context_and_controls(self) -> None:
+        output = self.build("dist/intelligence")
+        rendered = (output / "journey/index.html").read_text(encoding="utf-8")
+        script = (output / "site.js").read_text(encoding="utf-8")
+        chapter_anchor = site_builder.stable_fragment(
+            "chapter",
+            "chapter:through:v1.2.0",
+        )
+        event_anchor = site_builder.stable_fragment(
+            "event",
+            "event:commit-created",
+        )
+        roadmap_anchor = site_builder.stable_fragment(
+            "quest",
+            "ri:example/repository:roadmap-step:EX-Q04",
+        )
+        decision_anchor = site_builder.stable_fragment(
+            "decision",
+            "ri:example/repository:architecture-decision:ADR-007",
+        )
+        self.assertIn("The repository journey", rendered)
+        self.assertIn("Deterministic chapters", rendered)
+        self.assertIn("Only projected merges", rendered)
+        self.assertIn("Unclassified context", rendered)
+        self.assertIn(f'id="{chapter_anchor}"', rendered)
+        self.assertIn(f'id="{event_anchor}"', rendered)
+        self.assertIn(f'href="../roadmap/#{roadmap_anchor}"', rendered)
+        self.assertIn(f'href="../decisions/#{decision_anchor}"', rendered)
+        self.assertIn("Closed by the authoritative v1.2.0 release event", rendered)
+        self.assertIn("Open chapter containing events after the latest", rendered)
+        self.assertIn("days between projected lifecycle events", rendered)
+        self.assertIn("not evidence that no repository work occurred", rendered)
+        self.assertIn("Pull request merged", rendered)
+        self.assertIn("Check regressed", rendered)
+        self.assertIn("Quest-level changed files", rendered)
+        self.assertIn("does not claim that this individual event changed each file", rendered)
+        for lane in ("Intent", "Work", "Code", "Proof", "Delivery"):
+            self.assertIn(lane, rendered)
+        self.assertIn("data-journey-replay", rendered)
+        self.assertIn("data-journey-scrubber", rendered)
+        self.assertIn("data-journey-compare", rendered)
+        self.assertIn("Open playback and chapter comparison tools", rendered)
+        self.assertIn("data-journey-date-from", rendered)
+        self.assertIn("data-journey-date-to", rendered)
+        self.assertIn("Branch names and file paths are not projected", rendered)
+        self.assertIn("prefers-reduced-motion", script)
+        self.assertIn("setInterval", script)
+        self.assertIn("journey-left", script)
+        self.assertNotIn("View intentionally not materialized yet", rendered)
+
+    def test_large_journey_keeps_every_static_event_and_browser_virtualization(self) -> None:
+        snapshot = json.loads(json.dumps(self.snapshot))
+        template = snapshot["views"]["journey"]["events"][-1]
+        events = []
+        started = datetime(2026, 8, 1, 9, tzinfo=UTC)
+        for index in range(240):
+            event = json.loads(json.dumps(template))
+            commit = f"{index + 1:040x}"
+            occurred_at = (started + timedelta(minutes=index)).isoformat().replace(
+                "+00:00",
+                "Z",
+            )
+            event.update(
+                {
+                    "id": f"event:historical-commit-{index:03d}",
+                    "occurred_at": occurred_at,
+                    "subject": f"ri:example/repository:commit:{commit}",
+                }
+            )
+            event["subject_entity"].update(
+                {
+                    "id": event["subject"],
+                    "key": commit,
+                    "title": f"Historical commit {index:03d}",
+                    "canonical_url": f"https://github.com/example/repository/commit/{commit}",
+                }
+            )
+            event["provenance"] = [f"source:commit-{index:03d}"]
+            events.append(event)
+        snapshot["views"]["journey"] = {
+            "chapters": [
+                {
+                    "boundary": None,
+                    "end_at": events[-1]["occurred_at"],
+                    "event_ids": [event["id"] for event in events],
+                    "id": "chapter:after:unreleased",
+                    "start_at": events[0]["occurred_at"],
+                    "title": "Unreleased history",
+                }
+            ],
+            "events": events,
+        }
+        self.snapshot = snapshot
+        output = self.build("dist/intelligence")
+        rendered = (output / "journey/index.html").read_text(encoding="utf-8")
+        styles = (output / "site.css").read_text(encoding="utf-8")
+        self.assertEqual(rendered.count("data-journey-event data-journey-event-id"), 240)
+        self.assertIn("Historical commit 239", rendered)
+        self.assertIn('data-virtualization="content-visibility"', rendered)
+        self.assertIn("content-visibility: auto", styles)
+        self.assertIn('aria-posinset="240"', rendered)
+        self.assertIn('aria-setsize="240"', rendered)
+
+    def test_bundle_validation_rejects_a_broken_journey_context_link(self) -> None:
+        output = self.build("dist/intelligence")
+        journey = output / "journey/index.html"
+        rendered = journey.read_text(encoding="utf-8")
+        roadmap_anchor = site_builder.stable_fragment(
+            "quest",
+            "ri:example/repository:roadmap-step:EX-Q04",
+        )
+        journey.write_text(
+            rendered.replace(
+                f'href="../roadmap/#{roadmap_anchor}"',
+                'href="../roadmap/#quest-missing"',
+                1,
+            ),
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(
+            bundle_validator.BundleValidationError,
+            "unsupported fragment",
+        ):
+            bundle_validator.validate_bundle(
+                repository_root=self.repository,
+                output_root=output,
+                repository="example/repository",
+                repository_visibility="public",
+                source_commit=self.source_commit,
+                generator_version="1.2.0",
+                generator_source_ref=GENERATOR_COMMIT,
+                generator_source_commit=GENERATOR_COMMIT,
+                generator_immutable=True,
+            )
+
+    def test_journey_links_only_full_immutable_historical_commits(self) -> None:
+        output = self.build("dist/intelligence")
+        journey = output / "journey/index.html"
+        rendered = journey.read_text(encoding="utf-8")
+        historical = "2" * 40
+        self.assertIn(
+            f"https://github.com/example/repository/commit/{historical}",
+            rendered,
+        )
+        journey.write_text(
+            rendered.replace(
+                f"https://github.com/example/repository/commit/{historical}",
+                "https://github.com/example/repository/commit/2222222",
+            ),
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(
+            bundle_validator.BundleValidationError,
+            "outside the consumer contract",
+        ):
+            bundle_validator.validate_bundle(
+                repository_root=self.repository,
+                output_root=output,
+                repository="example/repository",
+                repository_visibility="public",
+                source_commit=self.source_commit,
+                generator_version="1.2.0",
+                generator_source_ref=GENERATOR_COMMIT,
+                generator_source_commit=GENERATOR_COMMIT,
+                generator_immutable=True,
+            )
+
+    def test_journey_contract_rejects_order_partition_and_boundary_drift(self) -> None:
+        unordered = json.loads(json.dumps(self.snapshot))
+        unordered["views"]["journey"]["events"][0], unordered["views"]["journey"][
+            "events"
+        ][1] = (
+            unordered["views"]["journey"]["events"][1],
+            unordered["views"]["journey"]["events"][0],
+        )
+        with self.assertRaisesRegex(site_builder.SiteInputError, "ordered"):
+            site_builder.validate_snapshot(
+                unordered,
+                "example/repository",
+                self.source_commit,
+            )
+        unresolved = json.loads(json.dumps(self.snapshot))
+        unresolved["views"]["journey"]["chapters"][0]["event_ids"][0] = (
+            "event:missing"
+        )
+        with self.assertRaisesRegex(site_builder.SiteInputError, "unresolved"):
+            site_builder.validate_snapshot(
+                unresolved,
+                "example/repository",
+                self.source_commit,
+            )
+        boundary = json.loads(json.dumps(self.snapshot))
+        boundary["views"]["journey"]["chapters"][0]["boundary"]["id"] = (
+            "ri:example/repository:release:other"
+        )
+        with self.assertRaisesRegex(site_builder.SiteInputError, "boundary event"):
+            site_builder.validate_snapshot(
+                boundary,
+                "example/repository",
+                self.source_commit,
+            )
+
+    def test_empty_journey_is_an_explicit_valid_state(self) -> None:
+        self.snapshot["views"]["journey"] = {"chapters": [], "events": []}
+        output = self.build("dist/intelligence")
+        rendered = (output / "journey/index.html").read_text(encoding="utf-8")
+        self.assertIn("No journey events projected", rendered)
+        self.assertIn("not evidence that the repository has no Git history", rendered)
+        self.assertNotIn("data-journey-event", rendered)
+
     def test_current_observatory_decision_shape_keeps_optional_facets_unknown(self) -> None:
         decision = json.loads(
             json.dumps(self.snapshot["views"]["decisions"]["decisions"][2])
@@ -580,6 +790,9 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
         decisions = (output / "decisions/index.html").read_text(encoding="utf-8")
         self.assertIn("Observatory decision history unavailable", decisions)
         self.assertIn("never reconstructs architectural intent", decisions)
+        journey = (output / "journey/index.html").read_text(encoding="utf-8")
+        self.assertIn("Observatory journey unavailable", journey)
+        self.assertIn("never reconstructs semantic history", journey)
 
     def test_snapshot_identity_and_commit_are_required(self) -> None:
         wrong = json.loads(json.dumps(self.snapshot))

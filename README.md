@@ -84,13 +84,17 @@ with stable step links, dependency chapters, declared progress, and expandable
 delivery evidence. `/decisions/` renders inherited and repository-local ADRs as
 an authority-aware historical ledger with durable lineage, implementation
 state, affected-quest links, faceted filtering, evidence expansion, and optional
-side-by-side comparison. The shell reserves stable routes for Journey,
+side-by-side comparison. `/journey/` renders Observatory lifecycle events as
+release-bounded delivery chapters across intent, work, code, proof, and delivery
+lanes. Events retain canonical sources, explicit quest/ADR context, visible
+unclassified status, date and evidence filters, chapter comparison, and an
+optional reduced-motion-safe replay. The shell reserves stable routes for
 Dependencies, Health, Releases, Work, Search, and Compare so focused follow-up
 work can fill them without changing navigation contracts.
 
 Supplying `observatory-snapshot` projects the commit-matched public-safe
 `egohygiene.observatory.repository-intelligence-read-model/v1` into `/now/`,
-`/roadmap/`, and `/decisions/`.
+`/roadmap/`, `/decisions/`, and `/journey/`.
 Omitting it remains valid and renders an explicit unavailable state; Relay does
 not infer active work from analytics. Private collection data remains in the
 configured work directory—`.cache/repository-intelligence/` by default—and
