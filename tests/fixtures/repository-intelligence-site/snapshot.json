@@ -284,15 +284,279 @@
     "decisions": {
       "decisions": [
         {
+          "date": "2026-07-15",
+          "decision_scope": "organization",
           "entity": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/policy/blob/1111111111111111111111111111111111111111/docs/decisions/ADR-001.md",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/policy:architecture-decision:ADR-001",
+            "key": "example/policy#ADR-001",
+            "kind": "architecture_decision",
+            "repository": "example/policy",
+            "state": "accepted",
+            "title": "Adopt the organization decision contract"
+          },
+          "evidence": [],
+          "implementation_status": "verified",
+          "informs": [
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md#ex-q01",
+              "confidence": "authoritative",
+              "freshness": "current",
+              "id": "ri:example/repository:roadmap-step:EX-Q01",
+              "key": "EX-Q01",
+              "kind": "roadmap_step",
+              "repository": "example/repository",
+              "state": "complete",
+              "title": "Establish the evidence contract"
+            }
+          ],
+          "superseded_by": [],
+          "supersedes": [],
+          "tracked_by": [],
+          "verified_by": []
+        },
+        {
+          "date": "2026-08-01",
+          "decision_scope": "repository",
+          "entity": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/docs/decisions/ADR-006.md",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:architecture-decision:ADR-006",
+            "key": "ADR-006",
+            "kind": "architecture_decision",
+            "repository": "example/repository",
+            "state": "superseded",
+            "title": "Use an order-dependent projection"
+          },
+          "evidence": [],
+          "implementation_status": "implemented",
+          "informs": [],
+          "superseded_by": [
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/docs/decisions/ADR-007.md",
+              "confidence": "authoritative",
+              "freshness": "current",
+              "id": "ri:example/repository:architecture-decision:ADR-007",
+              "key": "ADR-007",
+              "kind": "architecture_decision",
+              "repository": "example/repository",
+              "state": "accepted",
+              "title": "Adopt a deterministic projection"
+            }
+          ],
+          "supersedes": [],
+          "tracked_by": [],
+          "verified_by": []
+        },
+        {
+          "affected_components": [
+            "repository-intelligence renderer"
+          ],
+          "date": "2026-08-20",
+          "decision_scope": "repository",
+          "domains": [
+            "publication"
+          ],
+          "entity": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/docs/decisions/ADR-007.md",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:architecture-decision:ADR-007",
+            "key": "ADR-007",
+            "kind": "architecture_decision",
+            "repository": "example/repository",
+            "state": "accepted",
+            "title": "Adopt a deterministic projection"
+          },
+          "evidence": [
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/commit/1111111111111111111111111111111111111111",
+              "confidence": "authoritative",
+              "freshness": "not_applicable",
+              "id": "ri:example/repository:commit:1111111111111111111111111111111111111111",
+              "key": "1111111111111111111111111111111111111111",
+              "kind": "commit",
+              "repository": "example/repository",
+              "state": "recorded",
+              "title": "feat(intelligence): adopt deterministic projection"
+            },
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/releases/tag/v1.2.0",
+              "confidence": "authoritative",
+              "freshness": "current",
+              "id": "ri:example/repository:release:v1.2.0",
+              "key": "v1.2.0",
+              "kind": "release",
+              "repository": "example/repository",
+              "state": "published",
+              "title": "Repository Intelligence v1.2.0"
+            }
+          ],
+          "implementation_status": "verified",
+          "informs": [
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md#ex-q04",
+              "confidence": "authoritative",
+              "freshness": "current",
+              "id": "ri:example/repository:roadmap-step:EX-Q04",
+              "key": "EX-Q04",
+              "kind": "roadmap_step",
+              "repository": "example/repository",
+              "state": "ready",
+              "title": "Publish the visual roadmap"
+            }
+          ],
+          "owners": [
+            "example/repository"
+          ],
+          "superseded_by": [],
+          "supersedes": [
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/docs/decisions/ADR-006.md",
+              "confidence": "authoritative",
+              "freshness": "current",
+              "id": "ri:example/repository:architecture-decision:ADR-006",
+              "key": "ADR-006",
+              "kind": "architecture_decision",
+              "repository": "example/repository",
+              "state": "superseded",
+              "title": "Use an order-dependent projection"
+            }
+          ],
+          "tracked_by": [
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/issues/44",
+              "confidence": "authoritative",
+              "freshness": "current",
+              "id": "ri:example/repository:issue:44",
+              "key": "44",
+              "kind": "issue",
+              "repository": "example/repository",
+              "state": "closed",
+              "title": "Adopt a deterministic projection"
+            },
+            {
+              "assertion": "inferred",
+              "canonical_url": "https://github.com/example/repository/pull/45",
+              "confidence": "inferred",
+              "freshness": "current",
+              "id": "ri:example/repository:pull-request:45",
+              "key": "45",
+              "kind": "pull_request",
+              "repository": "example/repository",
+              "state": "merged",
+              "title": "Implement deterministic projection"
+            }
+          ],
+          "verified_by": [
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/actions/runs/99",
+              "confidence": "authoritative",
+              "freshness": "current",
+              "id": "ri:example/repository:check:decision-99",
+              "key": "decision-99",
+              "kind": "check",
+              "repository": "example/repository",
+              "state": "success",
+              "title": "Decision validation"
+            }
+          ]
+        },
+        {
+          "date": "2026-08-22",
+          "decision_scope": "repository",
+          "entity": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/docs/decisions/ADR-008.md",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:architecture-decision:ADR-008",
+            "key": "ADR-008",
+            "kind": "architecture_decision",
+            "repository": "example/repository",
+            "state": "rejected",
+            "title": "Make generated indexes canonical"
+          },
+          "evidence": [],
+          "implementation_status": "not_applicable",
+          "informs": [],
+          "superseded_by": [],
+          "supersedes": [],
+          "tracked_by": [],
+          "verified_by": []
+        },
+        {
+          "date": "2026-08-23",
+          "decision_scope": "repository",
+          "entity": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/docs/decisions/ADR-010.md",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:architecture-decision:ADR-010",
+            "key": "ADR-010",
+            "kind": "architecture_decision",
+            "repository": "example/repository",
+            "state": "deprecated",
+            "title": "Publish an experimental decision feed"
+          },
+          "evidence": [],
+          "implementation_status": "not_applicable",
+          "informs": [],
+          "superseded_by": [],
+          "supersedes": [],
+          "tracked_by": [],
+          "verified_by": []
+        },
+        {
+          "date": "2026-08-25",
+          "decision_scope": "repository",
+          "entity": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/docs/decisions/ADR-009.md",
+            "confidence": "authoritative",
+            "freshness": "current",
             "id": "ri:example/repository:architecture-decision:ADR-009",
             "key": "ADR-009",
-            "title": "Select the publication boundary",
             "kind": "architecture_decision",
+            "repository": "example/repository",
             "state": "proposed",
-            "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/docs/decisions/ADR-009.md"
+            "title": "Select the publication boundary"
           },
-          "implementation_status": "pending"
+          "evidence": [],
+          "implementation_status": "not_started",
+          "informs": [
+            {
+              "assertion": "authoritative",
+              "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md#ex-q04",
+              "confidence": "authoritative",
+              "freshness": "current",
+              "id": "ri:example/repository:roadmap-step:EX-Q04",
+              "key": "EX-Q04",
+              "kind": "roadmap_step",
+              "repository": "example/repository",
+              "state": "ready",
+              "title": "Publish the visual roadmap"
+            }
+          ],
+          "superseded_by": [],
+          "supersedes": [],
+          "tracked_by": [],
+          "verified_by": []
         }
       ]
     },

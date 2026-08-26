@@ -335,6 +335,182 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
         self.assertIn("aria-posinset", rendered)
         self.assertIn("aria-setsize", rendered)
 
+    def test_decisions_render_authority_lineage_facets_compare_and_evidence(self) -> None:
+        output = self.build("dist/intelligence")
+        rendered = (output / "decisions/index.html").read_text(encoding="utf-8")
+        old_id = "ri:example/repository:architecture-decision:ADR-006"
+        current_id = "ri:example/repository:architecture-decision:ADR-007"
+        old_anchor = site_builder.stable_fragment("decision", old_id)
+        current_anchor = site_builder.stable_fragment("decision", current_id)
+        roadmap_anchor = site_builder.stable_fragment(
+            "quest",
+            "ri:example/repository:roadmap-step:EX-Q04",
+        )
+        self.assertIn("The decision ledger", rendered)
+        self.assertIn("Inherited organization decisions", rendered)
+        self.assertIn("Repository-local decisions", rendered)
+        self.assertIn(f'id="{old_anchor}"', rendered)
+        self.assertIn(f'href="#{current_anchor}"', rendered)
+        self.assertIn(f'href="../roadmap/#{roadmap_anchor}"', rendered)
+        self.assertIn("Decision lifecycle", rendered)
+        self.assertIn("Implementation", rendered)
+        self.assertIn("Open canonical ADR", rendered)
+        self.assertIn("Represented revision", rendered)
+        self.assertIn("Context, alternatives, and consequences remain in the canonical ADR", rendered)
+        for status in ("Accepted", "Deprecated", "Proposed", "Rejected", "Superseded"):
+            self.assertIn(status, rendered)
+        for label in (
+            "Authority",
+            "Affected component",
+            "Date",
+            "Domain",
+            "Owner",
+            "Roadmap",
+        ):
+            self.assertIn(label, rendered)
+        self.assertIn("Place two decisions side by side", rendered)
+        self.assertIn("data-compare-left", rendered)
+        self.assertIn("data-compare-right", rendered)
+        self.assertIn('data-assertion="inferred"', rendered)
+        for label in ("Commit", "Issue", "Pull Request", "Release", "Check"):
+            self.assertIn(label, rendered)
+        self.assertNotIn("View intentionally not materialized yet", rendered)
+
+    def test_large_decision_history_remains_complete_and_navigable(self) -> None:
+        snapshot = json.loads(json.dumps(self.snapshot))
+        template = snapshot["views"]["decisions"]["decisions"][2]
+        statuses = ["proposed", "accepted", "rejected", "deprecated", "superseded"]
+        implementations = [
+            "not_started",
+            "in_progress",
+            "not_applicable",
+            "implemented",
+            "verified",
+        ]
+        decisions = []
+        for index in range(180):
+            decision = json.loads(json.dumps(template))
+            identifier = f"ri:example/repository:architecture-decision:ADR-{index + 100:03d}"
+            decision["entity"].update(
+                {
+                    "id": identifier,
+                    "key": f"ADR-{index + 100:03d}",
+                    "title": f"Historical decision {index:03d}",
+                    "state": statuses[index % len(statuses)],
+                    "canonical_url": (
+                        "https://github.com/example/repository/blob/"
+                        f"{self.source_commit}/docs/decisions/ADR-{index + 100:03d}.md"
+                    ),
+                }
+            )
+            decision["date"] = f"2026-{(index % 12) + 1:02d}-{(index % 28) + 1:02d}"
+            decision["implementation_status"] = implementations[
+                index % len(implementations)
+            ]
+            decision["evidence"] = []
+            decision["informs"] = []
+            decision["superseded_by"] = []
+            decision["supersedes"] = []
+            decision["tracked_by"] = []
+            decision["verified_by"] = []
+            decisions.append(decision)
+        snapshot["views"]["decisions"]["decisions"] = decisions
+        self.snapshot = snapshot
+        output = self.build("dist/intelligence")
+        rendered = (output / "decisions/index.html").read_text(encoding="utf-8")
+        script = (output / "site.js").read_text(encoding="utf-8")
+        self.assertEqual(rendered.count("data-decision-record"), 180)
+        self.assertEqual(rendered.count("data-decision-index href"), 180)
+        self.assertIn("Historical decision 179", rendered)
+        self.assertIn("IntersectionObserver", script)
+        self.assertIn("data-decision-index", script)
+        self.assertIn("ArrowDown", script)
+
+    def test_current_observatory_decision_shape_keeps_optional_facets_unknown(self) -> None:
+        decision = json.loads(
+            json.dumps(self.snapshot["views"]["decisions"]["decisions"][2])
+        )
+        for field in ("affected_components", "date", "domains", "owners"):
+            decision.pop(field, None)
+        self.snapshot["views"]["decisions"]["decisions"] = [decision]
+        output = self.build("dist/intelligence")
+        rendered = (output / "decisions/index.html").read_text(encoding="utf-8")
+        self.assertIn('data-filter-date="unknown"', rendered)
+        self.assertIn('data-filter-domain="unknown"', rendered)
+        self.assertIn('data-filter-component="unknown"', rendered)
+        self.assertIn("Not projected", rendered)
+        self.assertIn("stable key order otherwise", rendered)
+
+    def test_decision_contract_rejects_duplicate_status_and_shape_drift(self) -> None:
+        duplicate = json.loads(json.dumps(self.snapshot))
+        duplicate["views"]["decisions"]["decisions"][1]["entity"]["id"] = duplicate[
+            "views"
+        ]["decisions"]["decisions"][0]["entity"]["id"]
+        with self.assertRaisesRegex(site_builder.SiteInputError, "unique"):
+            site_builder.validate_snapshot(
+                duplicate,
+                "example/repository",
+                self.source_commit,
+            )
+        invalid_status = json.loads(json.dumps(self.snapshot))
+        invalid_status["views"]["decisions"]["decisions"][0]["entity"]["state"] = (
+            "complete"
+        )
+        with self.assertRaisesRegex(site_builder.SiteInputError, "unsupported status"):
+            site_builder.validate_snapshot(
+                invalid_status,
+                "example/repository",
+                self.source_commit,
+            )
+        invalid_relationship = json.loads(json.dumps(self.snapshot))
+        invalid_relationship["views"]["decisions"]["decisions"][0].pop("informs")
+        with self.assertRaisesRegex(site_builder.SiteInputError, "informs must be an array"):
+            site_builder.validate_snapshot(
+                invalid_relationship,
+                "example/repository",
+                self.source_commit,
+            )
+
+    def test_bundle_validation_rejects_a_broken_cross_view_decision_link(self) -> None:
+        output = self.build("dist/intelligence")
+        decisions = output / "decisions/index.html"
+        rendered = decisions.read_text(encoding="utf-8")
+        roadmap_anchor = site_builder.stable_fragment(
+            "quest",
+            "ri:example/repository:roadmap-step:EX-Q04",
+        )
+        decisions.write_text(
+            rendered.replace(
+                f'href="../roadmap/#{roadmap_anchor}"',
+                'href="../roadmap/#quest-missing"',
+                1,
+            ),
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(
+            bundle_validator.BundleValidationError,
+            "unsupported fragment",
+        ):
+            bundle_validator.validate_bundle(
+                repository_root=self.repository,
+                output_root=output,
+                repository="example/repository",
+                repository_visibility="public",
+                source_commit=self.source_commit,
+                generator_version="1.2.0",
+                generator_source_ref=GENERATOR_COMMIT,
+                generator_source_commit=GENERATOR_COMMIT,
+                generator_immutable=True,
+            )
+
+    def test_empty_decisions_are_an_explicit_valid_state(self) -> None:
+        self.snapshot["views"]["decisions"] = {"decisions": []}
+        output = self.build("dist/intelligence")
+        rendered = (output / "decisions/index.html").read_text(encoding="utf-8")
+        self.assertIn("No ADRs projected", rendered)
+        self.assertIn("not evidence that no decisions exist", rendered)
+        self.assertNotIn("data-decision-record", rendered)
+
     def test_roadmap_contract_rejects_duplicate_ids_and_unresolved_roots(self) -> None:
         duplicate = json.loads(json.dumps(self.snapshot))
         duplicate["views"]["roadmap"]["steps"][1]["entity"]["id"] = duplicate[
@@ -401,6 +577,9 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
         roadmap = (output / "roadmap/index.html").read_text(encoding="utf-8")
         self.assertIn("Observatory roadmap unavailable", roadmap)
         self.assertIn("never infers roadmap state", roadmap)
+        decisions = (output / "decisions/index.html").read_text(encoding="utf-8")
+        self.assertIn("Observatory decision history unavailable", decisions)
+        self.assertIn("never reconstructs architectural intent", decisions)
 
     def test_snapshot_identity_and_commit_are_required(self) -> None:
         wrong = json.loads(json.dumps(self.snapshot))
