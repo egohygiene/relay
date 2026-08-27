@@ -16,6 +16,9 @@ and deployment.
 | Scanner report normalization | `egohygiene/relay/actions/normalize-repository-report@v1` |
 | Guarded report snapshot publication | `egohygiene/relay/actions/publish-report-snapshot@v1` |
 | Opinionated intelligence artifact workflow | `egohygiene/relay/.github/workflows/repository-intelligence.yml@v1` |
+| Publication-site contract validation | `egohygiene/relay/actions/validate-publication-site@v1` |
+| Deployed publication byte verification | `egohygiene/relay/actions/verify-publication-pages@v1` |
+| Reviewed publication Pages lifecycle | `egohygiene/relay/.github/workflows/publication-pages.yml@v1` |
 
 These moving aliases advertise the release surface. Production consumers use a
 reviewed full commit SHA, as shown below.
@@ -65,6 +68,40 @@ https://repository.example/intelligence/dashboard/
 
 The action contract does not depend on a custom domain or a specific root-site
 stack.
+
+## Review and deploy product-owned publication sites
+
+Relay v1.3 adds a renderer-neutral Pages lifecycle around a complete static site
+artifact. The product repository still owns its source, native Make/Task build,
+theme, routes, and staged bytes. Beacon defines the optional
+`beacon.publication-hub/v1` catalog contract. Relay only downloads the caller's
+artifact, validates the catalog and complete `SHA256SUMS`, uploads the exact
+reviewed bytes, conditionally deploys them, and proves the public HTTPS bytes.
+
+```yaml
+jobs:
+  publication_pages:
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      pages: write
+    # Relay publication-pages v1.3.0; production callers pin a full commit SHA.
+    uses: egohygiene/relay/.github/workflows/publication-pages.yml@<full-commit-sha>
+    with:
+      artifact-name: "publication-site-${{ github.sha }}"
+      expected-base-url: "https://publication.example.org/"
+      expected-source-revision: "${{ github.sha }}"
+      required-routes: '["", "paper/", "magazine/", "downloads/"]'
+      deploy-enabled: true
+```
+
+The caller must build and upload the ordinary `publication-site-*` artifact in
+an earlier job. Deployment requests fail closed unless they originate from a
+push or manual run on the configured default branch. Pull requests use the same
+workflow with `deploy-enabled: false` and read-only job permissions. See the
+[Antidote](examples/workflows/publication-pages-antidote.md) and
+[Reflector](examples/workflows/publication-pages-reflector.md) caller patterns.
 
 For a standalone, reviewable artifact instead of a Pages composition, call the
 reusable workflow at the same immutable Relay commit:

@@ -1,0 +1,6 @@
+{
+  "base_url": "https://example.github.io/publication/",
+  "fallback_base_url": null,
+  "required_routes": ["", "paper/", "magazine/", "downloads/"],
+  "site_directory": "dist/repository-subpath"
+}

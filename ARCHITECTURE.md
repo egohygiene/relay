@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-08-25
+updated: 2026-08-27
 governed_by:
   - architecture-architecture
 depends_on:
@@ -66,10 +66,13 @@ The diagram is conceptual. [SYSTEM.md](SYSTEM.md) remains authoritative for resp
 actions/
 ├── repository-intelligence/      # read-only collector and static renderer
 ├── normalize-repository-report/  # producer contract adapter
-└── publish-report-snapshot/      # guarded default-branch writer
+├── publish-report-snapshot/      # guarded default-branch writer
+├── validate-publication-site/    # host-neutral local publication proof
+└── verify-publication-pages/     # bounded remote byte proof
 
 .github/workflows/
 ├── repository-intelligence.yml   # reusable artifact orchestration
+├── publication-pages.yml         # reviewed Pages lifecycle
 ├── validate.yml                  # pull-request and default-branch gate
 └── release.yml                   # reviewed manifest or manual SemVer publication
 
@@ -118,6 +121,38 @@ The tested Observatory and Holon boundaries are pinned in
 The snapshot publisher is isolated as a
 separate action because it requires `contents: write`; all other v1 action jobs
 operate with read-only repository permissions.
+
+## Publication deployment boundary
+
+Publication Pages preserves three owners instead of absorbing them into one
+workflow:
+
+1. The product repository owns source, native Make/Task commands, rendering,
+   style, routes, and the complete staged static tree.
+2. Beacon owns the renderer-neutral `beacon.publication-hub/v1` public catalog,
+   lifecycle vocabulary, and complete sorted checksum contract.
+3. Relay owns only CI review, authorization, deployment of exact reviewed bytes,
+   and bounded remote verification evidence.
+
+The reusable workflow never checks out caller source or builds content. Its
+read-only review job downloads the caller's ordinary artifact, validates it,
+and uploads the exact accepted bytes under a unique name. The write-scoped job
+can download only that reviewed artifact; it revalidates the tree digest before
+the GitHub Pages boundary and again compares every deployed public byte. This
+keeps Antidote and Reflector independently buildable when Beacon or Relay is
+unavailable.
+
+Canonical and fallback endpoints must be normalized standard-port HTTPS public
+DNS names. Redirects are manually bounded to the exact declared route on one of
+those endpoints, DNS answers must be globally routable, response sizes are
+bounded by reviewed local bytes, and evidence excludes bodies, headers, local
+filesystem roots, and unverified workflow identity. The Actions job timeout is
+the outer bound around platform DNS; application retries and reads have tighter
+caps.
+
+Relay v1.3.0 implementation references issue #38. Release publication and real
+Antidote/Reflector migrations remain separate evidence gates, so the issue is
+not closed by the implementation PR.
 
 ## Dependency rules
 

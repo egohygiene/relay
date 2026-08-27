@@ -9,6 +9,8 @@ documentation, implementation, contracts, and tests.
 | [`repository-intelligence`](repository-intelligence/)         | Build operational, roadmap, decision, and journey Repository Intelligence views | Workspace files only          |
 | [`normalize-repository-report`](normalize-repository-report/) | Normalize OSV, MegaLinter, and Scorecard producer summaries | Workspace files only          |
 | [`publish-report-snapshot`](publish-report-snapshot/)         | Guard and publish stable `.reports` snapshots               | Git commit and default-branch push |
+| [`validate-publication-site`](validate-publication-site/)     | Validate product-owned publication hub bytes and checksums  | Workspace evidence only       |
+| [`verify-publication-pages`](verify-publication-pages/)       | Prove deployed HTTPS publication bytes and routes           | Network reads and workspace evidence |
 
 ## Consumption
 
@@ -20,6 +22,8 @@ paths are:
 egohygiene/relay/actions/repository-intelligence
 egohygiene/relay/actions/normalize-repository-report
 egohygiene/relay/actions/publish-report-snapshot
+egohygiene/relay/actions/validate-publication-site
+egohygiene/relay/actions/verify-publication-pages
 ```
 
 GitHub Marketplace is a discovery surface, not the distribution mechanism for

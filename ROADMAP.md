@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-08-25
+updated: 2026-08-27
 governed_by:
   - architecture-roadmap
 depends_on:
@@ -163,6 +163,43 @@ issues: []
 **Current evidence:**
 
 - Current releases predate the proposed roadmap automation.
+
+### Publication Pages lifecycle track
+
+<!-- roadmap-step
+id: REL-PAGES-001
+status: active
+depends_on: [REL-Q01]
+issues: [38]
+-->
+#### REL-PAGES-001 — Ship the reviewed publication Pages lifecycle
+
+**State:** `active`
+**Depends on:** `REL-Q01`
+
+**Outcome:** Product repositories can keep their native Make/Task publication
+builds while one pinned Relay workflow reviews, conditionally deploys, and
+remotely proves the exact caller-built static bytes.
+
+**Exit criteria:**
+
+- [x] Local validation enforces the Beacon public catalog, lifecycle honesty,
+  route/resource linkage, complete checksums, path safety, and bounded input.
+- [x] Deployment uses a read-only review job and a separately authorized,
+  write-scoped Pages job that consumes only the exact reviewed artifact.
+- [x] Canonical and explicitly authorized fallback endpoints use bounded HTTPS
+  verification with deterministic, versioned evidence.
+- [ ] Relay v1.3.0 is published from the accepted implementation commit.
+- [ ] Antidote and Reflector pin that release and pass real default-branch
+  deployment plus rollback checks without losing native build independence.
+
+**Current evidence:**
+
+- Relay issue #38 owns the implementation and release/adoption acceptance.
+- The v1.3 implementation PR references rather than closes #38; the issue stays
+  open through immutable release publication and product migrations.
+- Antidote and Reflector static-permission caller patterns are documented under
+  `examples/workflows/`.
 
 ### Repository Intelligence experience track
 

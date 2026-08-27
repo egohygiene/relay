@@ -165,6 +165,23 @@ def validate_workflow_metadata(repository_root: Path, errors: list[str]) -> None
     if "uses: ./actions/repository-intelligence" in reusable:
         errors.append("reusable workflow must not resolve the action from the caller checkout")
 
+    publication = (workflow_root / "publication-pages.yml").read_text(encoding="utf-8")
+    if "workflow_call:" not in publication:
+        errors.append("publication-pages workflow is not callable")
+    for action in ("validate-publication-site", "verify-publication-pages"):
+        exact = f"uses: $/actions/{action}"
+        caller = f"uses: ./actions/{action}"
+        if exact not in publication:
+            errors.append(
+                f"publication-pages workflow must invoke {action} from its exact Relay revision"
+            )
+        if caller in publication:
+            errors.append(
+                f"publication-pages workflow must not resolve {action} from the caller checkout"
+            )
+    if "actions/checkout@" in publication:
+        errors.append("publication-pages workflow must never check out caller source")
+
     release = (workflow_root / "release.yml").read_text(encoding="utf-8")
     for required in (
         "workflow_dispatch:",

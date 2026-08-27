@@ -12,17 +12,18 @@ and failure semantics.
 | --- | --- | --- | --- | --- | --- |
 | `relay-validation` | Internal | `egohygiene/relay` | Validate packages, contracts, metadata, and the reusable smoke path | `contents: read` | 15 minutes |
 | `relay-release` | Internal | `egohygiene/relay` | Publish a verified immutable release and optional major alias | job-scoped `contents: write` | 20 minutes |
+| `publication-pages` | Reusable | `egohygiene/relay` | Review, conditionally deploy, and remotely prove caller-built publication bytes | review: read-only; deploy: job-scoped `pages: write` and `id-token: write` | 20 minutes |
 | `repository-intelligence` | Reusable | `egohygiene/relay` | Build, verify, and upload one bounded intelligence artifact | `contents: read` | 15 minutes |
 
 There are no staged workflow implementations in this repository at this
-snapshot. All three files under `.github/workflows/` are current and cataloged.
+snapshot. All four files under `.github/workflows/` are current and cataloged.
 A future staged candidate must first receive an owner, purpose, explicit
 contract, and `experimental` catalog state; an uncataloged workflow fails CI.
 
 ## Security contract
 
 - Workflow defaults grant only `contents: read`.
-- Write permission is job-scoped and bound to the release purpose.
+- Write permission is job-scoped and bound to release or Pages deployment.
 - `write-all` and `pull_request_target` are prohibited.
 - Every remote action or reusable workflow is pinned to a full 40-character
   commit SHA. The human-readable release remains in an adjacent comment.
@@ -42,19 +43,29 @@ Validation and artifact workflows fail closed: they publish no successful
 result when validation, provenance, output existence, or upload fails. A newer
 run on the same validation or intelligence ref cancels stale work.
 
+Publication Pages runs never cancel in progress. Every call performs a
+read-only review and stores the exact reviewed artifact. Deployment is a
+separate job authorized only for a push or manual run on the configured default
+branch. It revalidates that reviewed artifact before Pages receives it and fails
+closed on configuration, provider, HTTPS, route, or byte-proof disagreement.
+
 Release runs are serialized and never cancel in progress. A retry may resume a
 partial provider-side release only when the immutable tag still points to the
 same validated default-branch commit; contradictory state fails closed.
 
 ## Reusable caller contract
 
-`repository-intelligence` is the only reusable workflow in v1. Its inputs,
-defaults, output, permission ceiling, timeout, concurrency key, and failure
-semantics are recorded in the catalog and checked against its workflow source.
+`repository-intelligence` and `publication-pages` are the reusable workflows in
+v1. Their inputs, defaults, outputs, permission ceilings, timeouts, concurrency
+keys, and failure semantics are recorded in the catalog and checked against
+their workflow sources.
 
 Production callers pin an immutable Relay commit. See the
 [complete adoption example](examples/workflows/repository-intelligence.yml) and
-[example guidance](examples/workflows/README.md).
+[example guidance](examples/workflows/README.md). Publication consumers use
+separate static-permission review and deployment calls; the Antidote and
+Reflector patterns remain migration documentation until v1.3.0 is released and
+the product repositories pin it. Refs #38.
 
 ## Versioning
 

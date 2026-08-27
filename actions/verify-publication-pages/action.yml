@@ -1,0 +1,138 @@
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-action.json
+
+name: "Verify Publication Pages"
+description: >-
+  Verify deployed HTTPS routes and every checksummed file against an already
+  validated publication site, with bounded retries and deterministic evidence.
+
+inputs:
+  site-directory:
+    description: "Workspace-relative directory containing the reviewed static site."
+    required: true
+  expected-base-url:
+    description: "Canonical HTTPS base URL expected locally and remotely."
+    required: true
+  expected-source-revision:
+    description: "Full lowercase source commit expected locally and remotely."
+    required: true
+  required-routes:
+    description: "JSON array of routes that must exist locally and remotely."
+    required: false
+    default: "[]"
+  catalog-path:
+    description: "Site-relative Beacon publication catalog path."
+    required: false
+    default: "site.json"
+  checksum-path:
+    description: "Site-relative complete SHA-256 inventory path."
+    required: false
+    default: "SHA256SUMS"
+  fallback-base-url:
+    description: "Explicitly authorized fallback URL; when set it must match the catalog."
+    required: false
+    default: ""
+  verify-fallback:
+    description: "Verify all bytes at the explicitly authorized fallback target."
+    required: false
+    default: "false"
+  deployment-url:
+    description: "URL returned by deploy-pages; when set it must be canonical."
+    required: false
+    default: ""
+  configuration-only:
+    description: "Validate all predeploy inputs without making network requests."
+    required: false
+    default: "false"
+  attempts:
+    description: "Maximum attempts per remote resource, from 1 through 12."
+    required: false
+    default: "8"
+  retry-delay-seconds:
+    description: "Delay between attempts, from 0 through 30 seconds."
+    required: false
+    default: "5"
+  request-timeout-seconds:
+    description: "Per-request timeout, from 1 through 60 seconds."
+    required: false
+    default: "20"
+  max-elapsed-seconds:
+    description: "Total verification deadline, from 1 through 600 seconds."
+    required: false
+    default: "300"
+  workflow-ref:
+    description: "Exact called Relay workflow reference recorded in evidence."
+    required: true
+  workflow-sha:
+    description: "Exact called Relay workflow commit recorded in evidence."
+    required: true
+  evidence-output:
+    description: "Workspace-relative deployment evidence destination."
+    required: false
+    default: ".relay/publication-pages-evidence.json"
+
+outputs:
+  file-count:
+    description: "Number of files in the verified complete site."
+    value: "${{ steps.verify.outputs.file-count }}"
+  site-tree-sha256:
+    description: "SHA-256 digest of the verified complete checksum inventory."
+    value: "${{ steps.verify.outputs.site-tree-sha256 }}"
+  target-count:
+    description: "Number of verified canonical/fallback targets."
+    value: "${{ steps.verify.outputs.target-count }}"
+  total-bytes:
+    description: "Total bytes in the verified complete site."
+    value: "${{ steps.verify.outputs.total-bytes }}"
+
+branding:
+  icon: "globe"
+  color: "blue"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Verify deployed publication pages
+      id: verify
+      shell: bash
+      env:
+        INPUT_ATTEMPTS: "${{ inputs.attempts }}"
+        INPUT_CATALOG_PATH: "${{ inputs.catalog-path }}"
+        INPUT_CHECKSUM_PATH: "${{ inputs.checksum-path }}"
+        INPUT_CONFIGURATION_ONLY: "${{ inputs.configuration-only }}"
+        INPUT_DEPLOYMENT_URL: "${{ inputs.deployment-url }}"
+        INPUT_EVIDENCE_OUTPUT: "${{ inputs.evidence-output }}"
+        INPUT_EXPECTED_BASE_URL: "${{ inputs.expected-base-url }}"
+        INPUT_EXPECTED_SOURCE_REVISION: "${{ inputs.expected-source-revision }}"
+        INPUT_FALLBACK_BASE_URL: "${{ inputs.fallback-base-url }}"
+        INPUT_MAX_ELAPSED_SECONDS: "${{ inputs.max-elapsed-seconds }}"
+        INPUT_REQUEST_TIMEOUT_SECONDS: "${{ inputs.request-timeout-seconds }}"
+        INPUT_REQUIRED_ROUTES: "${{ inputs.required-routes }}"
+        INPUT_RETRY_DELAY_SECONDS: "${{ inputs.retry-delay-seconds }}"
+        INPUT_SITE_DIRECTORY: "${{ inputs.site-directory }}"
+        INPUT_VERIFY_FALLBACK: "${{ inputs.verify-fallback }}"
+        INPUT_WORKFLOW_REF: "${{ inputs.workflow-ref }}"
+        INPUT_WORKFLOW_SHA: "${{ inputs.workflow-sha }}"
+      run: |
+        set -euo pipefail
+        python3 "${GITHUB_ACTION_PATH}/scripts/verify_publication_pages.py" \
+          --workspace "${GITHUB_WORKSPACE}" \
+          --site-directory "${INPUT_SITE_DIRECTORY}" \
+          --expected-base-url "${INPUT_EXPECTED_BASE_URL}" \
+          --expected-source-revision "${INPUT_EXPECTED_SOURCE_REVISION}" \
+          --required-routes "${INPUT_REQUIRED_ROUTES}" \
+          --catalog-path "${INPUT_CATALOG_PATH}" \
+          --checksum-path "${INPUT_CHECKSUM_PATH}" \
+          --configuration-only "${INPUT_CONFIGURATION_ONLY}" \
+          --fallback-base-url "${INPUT_FALLBACK_BASE_URL}" \
+          --verify-fallback "${INPUT_VERIFY_FALLBACK}" \
+          --deployment-url "${INPUT_DEPLOYMENT_URL}" \
+          --attempts "${INPUT_ATTEMPTS}" \
+          --retry-delay-seconds "${INPUT_RETRY_DELAY_SECONDS}" \
+          --request-timeout-seconds "${INPUT_REQUEST_TIMEOUT_SECONDS}" \
+          --max-elapsed-seconds "${INPUT_MAX_ELAPSED_SECONDS}" \
+          --workflow-ref "${INPUT_WORKFLOW_REF}" \
+          --workflow-sha "${INPUT_WORKFLOW_SHA}" \
+          --evidence-output "${INPUT_EVIDENCE_OUTPUT}" \
+          --github-output "${GITHUB_OUTPUT}"

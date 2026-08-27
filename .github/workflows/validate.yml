@@ -133,6 +133,101 @@ jobs:
             puts "Parsed #{paths.length} YAML metadata documents"
           '
 
+  publication-site-fixture:
+    name: Build caller-owned publication fixture
+    needs: validate
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Checkout Relay fixture source
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Stage a complete static publication site
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYTHON'
+          import os
+          from pathlib import Path
+
+          from tests.test_publication_site_validation import build_site
+
+          _, site = build_site(
+              Path("."),
+              "repository-subpath",
+              revision=os.environ["GITHUB_SHA"],
+          )
+          print(f"Staged caller-owned publication fixture at {site}")
+          PYTHON
+
+      - name: Upload caller-owned static-site artifact
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: relay-publication-site-fixture
+          path: dist/repository-subpath
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 9
+
+  publication-pages-smoke:
+    name: Review caller-owned publication fixture
+    needs: publication-site-fixture
+    permissions:
+      actions: read
+      contents: read
+    uses: $/.github/workflows/publication-pages.yml
+    with:
+      artifact-name: relay-publication-site-fixture
+      expected-base-url: "https://example.github.io/publication/"
+      expected-source-revision: "${{ github.sha }}"
+      required-routes: '["", "paper/", "magazine/", "downloads/"]'
+      deploy-enabled: false
+      artifact-retention-days: 1
+
+  publication-pages-smoke-outputs:
+    name: Confirm review-only publication outputs
+    needs: publication-pages-smoke
+    permissions: {}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Validate review evidence outputs
+        shell: bash
+        env:
+          EVIDENCE_ARTIFACT: "${{ needs.publication-pages-smoke.outputs.evidence-artifact-name }}"
+          FILE_COUNT: "${{ needs.publication-pages-smoke.outputs.file-count }}"
+          REVIEW_ARTIFACT: "${{ needs.publication-pages-smoke.outputs.review-artifact-name }}"
+          SITE_TREE_SHA256: "${{ needs.publication-pages-smoke.outputs.site-tree-sha256 }}"
+          TOTAL_BYTES: "${{ needs.publication-pages-smoke.outputs.total-bytes }}"
+        run: |
+          set -euo pipefail
+          [[ "${EVIDENCE_ARTIFACT}" =~ ^publication-pages-validation- ]]
+          [[ "${REVIEW_ARTIFACT}" =~ ^publication-pages-review- ]]
+          [[ "${FILE_COUNT}" =~ ^[1-9][0-9]*$ ]]
+          [[ "${SITE_TREE_SHA256}" =~ ^[0-9a-f]{64}$ ]]
+          [[ "${TOTAL_BYTES}" =~ ^[1-9][0-9]*$ ]]
+
   intelligence-smoke:
     name: Exercise reusable workflow without producer reports
     needs: validate

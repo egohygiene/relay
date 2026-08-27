@@ -1,0 +1,95 @@
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-action.json
+
+name: "Validate Publication Site"
+description: >-
+  Validate a complete caller-built publication site, its Beacon catalog,
+  routes, and exact checksum inventory without rendering or deploying content.
+
+inputs:
+  site-directory:
+    description: "Workspace-relative directory containing the complete static site."
+    required: true
+  expected-base-url:
+    description: "Canonical HTTPS base URL expected in site.json."
+    required: true
+  expected-source-revision:
+    description: "Full lowercase source commit expected in site.json."
+    required: true
+  expected-fallback-base-url:
+    description: "Optional explicitly pinned fallback URL; empty accepts catalog metadata."
+    required: false
+    default: ""
+  required-routes:
+    description: "JSON array of site-relative routes that must be declared and present."
+    required: false
+    default: "[]"
+  catalog-path:
+    description: "Site-relative Beacon publication catalog path."
+    required: false
+    default: "site.json"
+  checksum-path:
+    description: "Site-relative complete SHA-256 inventory path."
+    required: false
+    default: "SHA256SUMS"
+  evidence-output:
+    description: "Workspace-relative destination for deterministic validation evidence."
+    required: false
+    default: ".relay/publication-site-validation.json"
+
+outputs:
+  canonical-base-url:
+    description: "Validated canonical HTTPS base URL."
+    value: "${{ steps.validate.outputs.canonical-base-url }}"
+  fallback-base-url:
+    description: "Validated technical fallback base URL, when declared."
+    value: "${{ steps.validate.outputs.fallback-base-url }}"
+  file-count:
+    description: "Number of files in the complete publication site."
+    value: "${{ steps.validate.outputs.file-count }}"
+  route-count:
+    description: "Number of declared publication routes."
+    value: "${{ steps.validate.outputs.route-count }}"
+  site-tree-sha256:
+    description: "SHA-256 digest of the exact complete checksum inventory."
+    value: "${{ steps.validate.outputs.site-tree-sha256 }}"
+  source-revision:
+    description: "Validated source revision."
+    value: "${{ steps.validate.outputs.source-revision }}"
+  total-bytes:
+    description: "Total bytes in the complete publication site."
+    value: "${{ steps.validate.outputs.total-bytes }}"
+
+branding:
+  icon: "check-circle"
+  color: "green"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Validate caller-built publication site
+      id: validate
+      shell: bash
+      env:
+        INPUT_CATALOG_PATH: "${{ inputs.catalog-path }}"
+        INPUT_CHECKSUM_PATH: "${{ inputs.checksum-path }}"
+        INPUT_EVIDENCE_OUTPUT: "${{ inputs.evidence-output }}"
+        INPUT_EXPECTED_BASE_URL: "${{ inputs.expected-base-url }}"
+        INPUT_EXPECTED_FALLBACK_BASE_URL: "${{ inputs.expected-fallback-base-url }}"
+        INPUT_EXPECTED_SOURCE_REVISION: "${{ inputs.expected-source-revision }}"
+        INPUT_REQUIRED_ROUTES: "${{ inputs.required-routes }}"
+        INPUT_SITE_DIRECTORY: "${{ inputs.site-directory }}"
+      run: |
+        set -euo pipefail
+        python3 "${GITHUB_ACTION_PATH}/scripts/validate_publication_site.py" \
+          --workspace "${GITHUB_WORKSPACE}" \
+          --site-directory "${INPUT_SITE_DIRECTORY}" \
+          --expected-base-url "${INPUT_EXPECTED_BASE_URL}" \
+          --expected-fallback-base-url "${INPUT_EXPECTED_FALLBACK_BASE_URL}" \
+          --expected-source-revision "${INPUT_EXPECTED_SOURCE_REVISION}" \
+          --required-routes "${INPUT_REQUIRED_ROUTES}" \
+          --catalog-path "${INPUT_CATALOG_PATH}" \
+          --checksum-path "${INPUT_CHECKSUM_PATH}" \
+          --evidence-output "${INPUT_EVIDENCE_OUTPUT}" \
+          --github-output "${GITHUB_OUTPUT}"

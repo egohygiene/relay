@@ -41,9 +41,56 @@
       "permissions": {"contents": "read"},
       "side_effects": ["workspace-write"],
       "consumer_ref": "egohygiene/relay/actions/repository-intelligence@v1"
+    },
+    {
+      "id": "validate-publication-site",
+      "path": "actions/validate-publication-site",
+      "name": "Validate Publication Site",
+      "summary": "Validate caller-built publication hub routes, lifecycle claims, files, and complete checksums without rendering or deploying.",
+      "status": "beta",
+      "runtime": [
+        "bash",
+        "python3"
+      ],
+      "permissions": {},
+      "side_effects": [
+        "workspace-write"
+      ],
+      "consumer_ref": "egohygiene/relay/actions/validate-publication-site@v1"
+    },
+    {
+      "id": "verify-publication-pages",
+      "path": "actions/verify-publication-pages",
+      "name": "Verify Publication Pages",
+      "summary": "Verify deployed HTTPS publication routes and every checksummed byte with bounded retries and deterministic evidence.",
+      "status": "beta",
+      "runtime": [
+        "bash",
+        "python3"
+      ],
+      "permissions": {},
+      "side_effects": [
+        "network-read",
+        "workspace-write"
+      ],
+      "consumer_ref": "egohygiene/relay/actions/verify-publication-pages@v1"
     }
   ],
   "workflows": [
+    {
+      "id": "publication-pages",
+      "path": ".github/workflows/publication-pages.yml",
+      "name": "Publication Pages Lifecycle",
+      "summary": "Review caller-built publication bytes, conditionally deploy the exact reviewed tree, and verify public HTTPS routes.",
+      "status": "beta",
+      "permissions": {
+        "actions": "read",
+        "contents": "read",
+        "id-token": "write",
+        "pages": "write"
+      },
+      "consumer_ref": "egohygiene/relay/.github/workflows/publication-pages.yml@v1"
+    },
     {
       "id": "repository-intelligence",
       "path": ".github/workflows/repository-intelligence.yml",

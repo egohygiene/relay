@@ -1,0 +1,363 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.io/beacon/contracts/publication-hub/v1",
+  "title": "Beacon public publication-hub catalog",
+  "description": "Deterministic public routes, slots, and byte-verified resources for deployment adapters.",
+  "type": "object",
+  "required": ["schema", "schema_version", "source", "site", "routes", "slots"],
+  "properties": {
+    "schema": { "const": "beacon.publication-hub/v1" },
+    "schema_version": { "const": "1.0.0" },
+    "source": {
+      "type": "object",
+      "required": ["catalog_sha256", "revision"],
+      "properties": {
+        "catalog_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "repository": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "revision": {
+          "anyOf": [
+            { "const": "WORKING_TREE" },
+            { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "site": { "$ref": "#/$defs/site" },
+    "routes": {
+      "type": "array",
+      "minItems": 5,
+      "items": { "$ref": "#/$defs/route" }
+    },
+    "slots": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/slot" }
+    },
+    "extensions": { "$ref": "#/$defs/extensions" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "httpsUrl": { "type": "string", "format": "uri", "pattern": "^https://" },
+    "nullableHttpsUrl": {
+      "anyOf": [{ "$ref": "#/$defs/httpsUrl" }, { "type": "null" }]
+    },
+    "relativeFile": {
+      "type": "string",
+      "minLength": 1,
+      "not": { "pattern": "^(?:/|.*(?:^|/)\\.\\.(?:/|$))" }
+    },
+    "extensions": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/identifier" }
+    },
+    "site": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "description",
+        "language",
+        "stage",
+        "publisher",
+        "theme",
+        "canonical_base_url",
+        "fallback_base_url",
+        "revision"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "title": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "language": { "type": "string", "minLength": 2 },
+        "stage": { "enum": ["draft", "published", "archived"] },
+        "publisher": { "type": "string", "minLength": 1 },
+        "theme": { "enum": ["neutral", "egohygiene"] },
+        "canonical_base_url": { "$ref": "#/$defs/httpsUrl" },
+        "fallback_base_url": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "repository": { "$ref": "#/$defs/httpsUrl" },
+        "revision": {
+          "anyOf": [
+            { "const": "WORKING_TREE" },
+            { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+          ]
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
+      },
+      "additionalProperties": false
+    },
+    "route": {
+      "type": "object",
+      "required": ["kind", "id", "path", "url", "fallback_url"],
+      "properties": {
+        "kind": { "$ref": "#/$defs/identifier" },
+        "id": { "type": "string", "minLength": 1 },
+        "path": { "type": "string" },
+        "file": { "$ref": "#/$defs/relativeFile" },
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "fallback_url": { "$ref": "#/$defs/nullableHttpsUrl" }
+      },
+      "additionalProperties": false
+    },
+    "reference": {
+      "type": "object",
+      "required": ["label", "url"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1 },
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "fallback_url": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "resource_id": { "$ref": "#/$defs/identifier" },
+        "media_type": { "type": "string", "pattern": "^[^/]+/[^/]+$" },
+        "path": { "$ref": "#/$defs/relativeFile" },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      },
+      "oneOf": [
+        {
+          "not": {
+            "anyOf": [
+              { "required": ["resource_id"] },
+              { "required": ["fallback_url"] },
+              { "required": ["path"] },
+              { "required": ["bytes"] },
+              { "required": ["sha256"] }
+            ]
+          }
+        },
+        {
+          "required": [
+            "resource_id",
+            "fallback_url",
+            "media_type",
+            "path",
+            "bytes",
+            "sha256"
+          ]
+        }
+      ],
+      "additionalProperties": false
+    },
+    "landing": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["mode"],
+          "properties": { "mode": { "const": "generated" } },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["mode", "resource_id"],
+          "properties": {
+            "mode": { "const": "resource" },
+            "resource_id": { "$ref": "#/$defs/identifier" }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "sourceRecord": {
+      "type": "object",
+      "required": ["repository", "revision"],
+      "properties": {
+        "repository": { "$ref": "#/$defs/httpsUrl" },
+        "revision": {
+          "anyOf": [
+            { "const": "WORKING_TREE" },
+            { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+          ]
+        },
+        "path": { "$ref": "#/$defs/relativeFile" }
+      },
+      "additionalProperties": false
+    },
+    "publicationIdentifier": {
+      "type": "object",
+      "required": ["scheme", "value"],
+      "properties": {
+        "scheme": { "$ref": "#/$defs/identifier" },
+        "value": { "type": "string", "minLength": 1 },
+        "url": { "$ref": "#/$defs/httpsUrl" }
+      },
+      "additionalProperties": false
+    },
+    "release": {
+      "type": "object",
+      "required": ["url"],
+      "properties": {
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "published_at": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" }
+      },
+      "additionalProperties": false
+    },
+    "accessibility": {
+      "type": "object",
+      "required": ["summary", "features"],
+      "properties": {
+        "summary": { "type": "string", "minLength": 1 },
+        "features": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "conformance": { "type": "string", "minLength": 1 },
+        "report": { "$ref": "#/$defs/reference" }
+      },
+      "additionalProperties": false
+    },
+    "alias": {
+      "type": "object",
+      "required": ["path", "url", "fallback_url"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^[^/]+$" },
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "fallback_url": { "$ref": "#/$defs/nullableHttpsUrl" }
+      },
+      "additionalProperties": false
+    },
+    "slot": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "title",
+        "summary",
+        "status",
+        "order",
+        "route",
+        "url",
+        "fallback_url",
+        "landing"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "kind": { "$ref": "#/$defs/identifier" },
+        "title": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 },
+        "status": {
+          "enum": ["planned", "draft", "available", "superseded", "withdrawn"]
+        },
+        "order": { "type": "integer" },
+        "route": { "type": "string", "pattern": "^[^/].*/$" },
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "fallback_url": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "landing": { "$ref": "#/$defs/landing" },
+        "version": { "type": "string", "minLength": 1 },
+        "source": { "$ref": "#/$defs/sourceRecord" },
+        "identifiers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/publicationIdentifier" },
+          "uniqueItems": true
+        },
+        "release": { "$ref": "#/$defs/release" },
+        "artifacts": { "type": "array", "items": { "$ref": "#/$defs/resource" } },
+        "manifests": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/manifestResource" }
+        },
+        "preview": { "$ref": "#/$defs/reference" },
+        "provenance": { "type": "array", "items": { "$ref": "#/$defs/reference" } },
+        "accessibility": { "$ref": "#/$defs/accessibility" },
+        "superseded_by": { "type": "string", "minLength": 1 },
+        "withdrawal_notice": { "type": "string", "minLength": 1 },
+        "extensions": { "$ref": "#/$defs/extensions" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "planned" } }, "required": ["status"] },
+          "then": {
+            "not": {
+              "anyOf": [
+                { "required": ["artifacts"] },
+                { "required": ["manifests"] },
+                { "required": ["version"] },
+                { "required": ["identifiers"] },
+                { "required": ["release"] },
+                { "required": ["preview"] },
+                { "required": ["provenance"] },
+                { "required": ["source"] }
+              ]
+            }
+          }
+        },
+        {
+          "if": { "properties": { "status": { "const": "available" } }, "required": ["status"] },
+          "then": {
+            "required": ["version", "source", "artifacts"],
+            "properties": { "artifacts": { "minItems": 1 } }
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "enum": ["draft", "withdrawn"] } },
+            "required": ["status"]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                { "required": ["artifacts"] },
+                { "required": ["manifests"] }
+              ]
+            }
+          }
+        },
+        {
+          "if": { "properties": { "status": { "const": "superseded" } }, "required": ["status"] },
+          "then": { "required": ["superseded_by"] }
+        },
+        {
+          "if": { "properties": { "status": { "const": "withdrawn" } }, "required": ["status"] },
+          "then": { "required": ["withdrawal_notice"] }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "resource": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "media_type",
+        "path",
+        "route",
+        "bytes",
+        "sha256",
+        "url",
+        "fallback_url",
+        "aliases"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "label": { "type": "string", "minLength": 1 },
+        "media_type": { "type": "string", "pattern": "^[^/]+/[^/]+$" },
+        "path": { "$ref": "#/$defs/relativeFile" },
+        "route": { "type": "string", "minLength": 1 },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "fallback_url": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "aliases": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/alias" },
+          "uniqueItems": true
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
+      },
+      "additionalProperties": false
+    },
+    "manifestResource": {
+      "allOf": [
+        { "$ref": "#/$defs/resource" },
+        {
+          "properties": {
+            "aliases": { "type": "array", "maxItems": 0 }
+          }
+        }
+      ]
+    }
+  }
+}
