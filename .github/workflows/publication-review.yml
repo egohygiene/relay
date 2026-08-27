@@ -1,0 +1,194 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Reusable publication review
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        description: Complete static-site artifact uploaded by a caller-owned build job.
+        required: true
+        type: string
+      expected-base-url:
+        description: Canonical HTTPS base URL recorded in the publication catalog.
+        required: true
+        type: string
+      expected-source-revision:
+        description: Full caller source commit recorded in the publication catalog.
+        required: true
+        type: string
+      required-routes:
+        description: JSON array of publication routes required in the reviewed site.
+        required: false
+        default: "[]"
+        type: string
+      catalog-path:
+        description: Site-relative Beacon publication catalog path.
+        required: false
+        default: "site.json"
+        type: string
+      checksum-path:
+        description: Site-relative complete SHA-256 inventory path.
+        required: false
+        default: "SHA256SUMS"
+        type: string
+      fallback-base-url:
+        description: Optional pinned fallback; when set it must match the catalog.
+        required: false
+        default: ""
+        type: string
+      artifact-retention-days:
+        description: Retention for reviewed bytes and validation evidence.
+        required: false
+        default: 30
+        type: number
+    outputs:
+      review-artifact-name:
+        description: Unique ordinary artifact containing the exact reviewed site bytes.
+        value: "${{ jobs.review.outputs.review-artifact-name }}"
+      evidence-artifact-name:
+        description: Local validation evidence artifact name.
+        value: "${{ jobs.review.outputs.evidence-artifact-name }}"
+      file-count:
+        description: Number of files in the reviewed complete publication site.
+        value: "${{ jobs.review.outputs.file-count }}"
+      site-tree-sha256:
+        description: Digest of the exact complete SHA256SUMS bytes.
+        value: "${{ jobs.review.outputs.site-tree-sha256 }}"
+      total-bytes:
+        description: Total bytes in the reviewed complete publication site.
+        value: "${{ jobs.review.outputs.total-bytes }}"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "relay-publication-review-${{ github.repository }}-${{ github.ref }}"
+  cancel-in-progress: false
+
+jobs:
+  authorize:
+    name: Authorize publication review request
+    permissions: {}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Validate review identity and bounds
+        shell: bash
+        env:
+          ARTIFACT_NAME: "${{ inputs.artifact-name }}"
+          EXPECTED_SOURCE_REVISION: "${{ inputs.expected-source-revision }}"
+          RETENTION_DAYS: "${{ inputs.artifact-retention-days }}"
+        run: |
+          set -euo pipefail
+
+          if [[ ! "${ARTIFACT_NAME}" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$ ]]; then
+            echo "::error::artifact-name is not a safe Actions artifact identifier"
+            exit 2
+          fi
+          if [[ "${ARTIFACT_NAME}" =~ ^publication-pages-(review|validation|deployment)- ]]; then
+            echo "::error::artifact-name uses a Relay-reserved artifact prefix"
+            exit 2
+          fi
+          if [[ ! "${EXPECTED_SOURCE_REVISION}" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::expected-source-revision must be a full lowercase Git SHA"
+            exit 2
+          fi
+          if [[ "${EXPECTED_SOURCE_REVISION}" != "${GITHUB_SHA}" ]]; then
+            echo "::error::expected-source-revision must equal the caller workflow SHA"
+            exit 2
+          fi
+          if [[ ! "${RETENTION_DAYS}" =~ ^[0-9]+$ ]] || \
+             (( RETENTION_DAYS < 1 || RETENTION_DAYS > 90 )); then
+            echo "::error::artifact-retention-days must be between 1 and 90"
+            exit 2
+          fi
+
+  review:
+    name: Validate and preserve reviewed publication bytes
+    needs: authorize
+    permissions:
+      actions: read
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      evidence-artifact-name: "${{ steps.names.outputs.evidence-artifact-name }}"
+      review-artifact-name: "${{ steps.names.outputs.review-artifact-name }}"
+      file-count: "${{ steps.validate.outputs.file-count }}"
+      site-tree-sha256: "${{ steps.validate.outputs.site-tree-sha256 }}"
+      total-bytes: "${{ steps.validate.outputs.total-bytes }}"
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Define bounded artifact names
+        id: names
+        shell: bash
+        env:
+          CALLER_ARTIFACT_NAME: "${{ inputs.artifact-name }}"
+        run: |
+          set -euo pipefail
+          artifact_key="$(printf '%s' "${CALLER_ARTIFACT_NAME}" | sha256sum | cut -c1-16)"
+          printf 'review-artifact-name=publication-pages-review-%s-%s-%s\n' \
+            "${GITHUB_SHA}" "${GITHUB_RUN_ATTEMPT}" "${artifact_key}" \
+            >> "${GITHUB_OUTPUT}"
+          printf 'evidence-artifact-name=publication-pages-validation-%s-%s-%s\n' \
+            "${GITHUB_SHA}" "${GITHUB_RUN_ATTEMPT}" "${artifact_key}" \
+            >> "${GITHUB_OUTPUT}"
+
+      - name: Download caller-built static site
+        # actions/download-artifact v8.0.1
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: "${{ inputs.artifact-name }}"
+          path: ".relay/publication-site"
+
+      - name: Validate downloaded publication site
+        id: validate
+        uses: $/actions/validate-publication-site
+        with:
+          site-directory: ".relay/publication-site"
+          expected-base-url: "${{ inputs.expected-base-url }}"
+          expected-fallback-base-url: "${{ inputs.fallback-base-url }}"
+          expected-source-revision: "${{ inputs.expected-source-revision }}"
+          required-routes: "${{ inputs.required-routes }}"
+          catalog-path: "${{ inputs.catalog-path }}"
+          checksum-path: "${{ inputs.checksum-path }}"
+          evidence-output: ".relay/publication-site-validation.json"
+
+      - name: Upload exact reviewed static site
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "${{ steps.names.outputs.review-artifact-name }}"
+          path: ".relay/publication-site"
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9
+
+      - name: Upload local validation evidence
+        if: "${{ always() }}"
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "${{ steps.names.outputs.evidence-artifact-name }}"
+          path: ".relay/publication-site-validation.json"
+          if-no-files-found: warn
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9

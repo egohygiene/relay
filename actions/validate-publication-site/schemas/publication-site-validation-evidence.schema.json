@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/publication-site-validation-evidence/v1/schema.json",
+  "title": "Relay publication-site validation evidence v1",
+  "oneOf": [
+    {"$ref": "#/$defs/success"},
+    {"$ref": "#/$defs/failure"}
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "success": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_base_url",
+        "catalog",
+        "catalog_schema",
+        "checksum_manifest",
+        "fallback_base_url",
+        "file_count",
+        "route_count",
+        "routes",
+        "schema",
+        "site_tree_sha256",
+        "source_revision",
+        "status",
+        "total_bytes"
+      ],
+      "properties": {
+        "canonical_base_url": {"type": "string", "format": "uri"},
+        "catalog": {"$ref": "#/$defs/resource"},
+        "catalog_schema": {"const": "beacon.publication-hub/v1"},
+        "checksum_manifest": {"$ref": "#/$defs/resource"},
+        "fallback_base_url": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "format": "uri"}
+          ]
+        },
+        "file_count": {"type": "integer", "minimum": 1},
+        "route_count": {"type": "integer", "minimum": 1},
+        "routes": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        },
+        "schema": {"const": "egohygiene.relay.publication-site-validation/v1"},
+        "site_tree_sha256": {"$ref": "#/$defs/sha256"},
+        "source_revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "status": {"const": "passed"},
+        "total_bytes": {"type": "integer", "minimum": 1}
+      }
+    },
+    "failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["error", "reason", "schema", "stage", "status"],
+      "properties": {
+        "error": {"const": "publication-site-validation-failed"},
+        "reason": {"const": "contract-rejected"},
+        "schema": {"const": "egohygiene.relay.publication-site-validation/v1"},
+        "stage": {"const": "local-validation"},
+        "status": {"const": "failed"}
+      }
+    },
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

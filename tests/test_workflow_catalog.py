@@ -55,6 +55,10 @@ class WorkflowCatalogTests(unittest.TestCase):
             },
             {
                 "egohygiene/relay/.github/workflows/"
+                "publication-pages.yml@v1",
+                "egohygiene/relay/.github/workflows/"
+                "publication-review.yml@v1",
+                "egohygiene/relay/.github/workflows/"
                 "repository-intelligence.yml@v1"
             },
         )

@@ -32,6 +32,8 @@ class ActionCatalogTests(unittest.TestCase):
                 "actions/normalize-repository-report",
                 "actions/publish-report-snapshot",
                 "actions/repository-intelligence",
+                "actions/validate-publication-site",
+                "actions/verify-publication-pages",
             },
         )
 
@@ -44,7 +46,11 @@ class ActionCatalogTests(unittest.TestCase):
         self.assertNotIn("uses: ./actions/repository-intelligence", workflow)
         self.assertEqual(
             validator.discovered_reusable_workflows(REPOSITORY_ROOT),
-            {".github/workflows/repository-intelligence.yml"},
+            {
+                ".github/workflows/publication-pages.yml",
+                ".github/workflows/publication-review.yml",
+                ".github/workflows/repository-intelligence.yml",
+            },
         )
 
     def test_dashboard_action_guards_artifact_path_scope(self) -> None:

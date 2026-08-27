@@ -1,0 +1,6 @@
+{
+  "base_url": "https://publication.example.test/",
+  "fallback_base_url": "https://example.github.io/publication/",
+  "required_routes": ["", "paper/", "magazine/", "downloads/"],
+  "site_directory": "dist/custom-domain"
+}

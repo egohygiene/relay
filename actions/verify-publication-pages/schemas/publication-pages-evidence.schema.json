@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/publication-pages-evidence/v1/schema.json",
+  "title": "Relay publication Pages evidence v1",
+  "oneOf": [
+    {"$ref": "#/$defs/deployment"},
+    {"$ref": "#/$defs/predeploy"},
+    {"$ref": "#/$defs/failure"}
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "revision": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "repository", "sha"],
+      "properties": {
+        "ref": {"type": "string", "minLength": 1},
+        "repository": {"const": "egohygiene/relay"},
+        "sha": {"$ref": "#/$defs/revision"}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "base_url",
+        "catalog_sha256",
+        "checksum_sha256",
+        "file_count",
+        "route_count",
+        "routes",
+        "status",
+        "target"
+      ],
+      "properties": {
+        "base_url": {"type": "string", "format": "uri"},
+        "catalog_sha256": {"$ref": "#/$defs/sha256"},
+        "checksum_sha256": {"$ref": "#/$defs/sha256"},
+        "file_count": {"type": "integer", "minimum": 1},
+        "route_count": {"type": "integer", "minimum": 1},
+        "routes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "sha256"],
+            "properties": {
+              "path": {"type": "string"},
+              "sha256": {"$ref": "#/$defs/sha256"}
+            }
+          }
+        },
+        "status": {"const": "passed"},
+        "target": {"enum": ["canonical", "fallback"]}
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file_count",
+        "result",
+        "schema",
+        "site_tree_sha256",
+        "source_revision",
+        "targets",
+        "total_bytes",
+        "workflow"
+      ],
+      "properties": {
+        "file_count": {"type": "integer", "minimum": 1},
+        "result": {"const": "passed"},
+        "schema": {"const": "egohygiene.relay.publication-pages-evidence/v1"},
+        "site_tree_sha256": {"$ref": "#/$defs/sha256"},
+        "source_revision": {"$ref": "#/$defs/revision"},
+        "targets": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": {"$ref": "#/$defs/target"}
+        },
+        "total_bytes": {"type": "integer", "minimum": 1},
+        "workflow": {"$ref": "#/$defs/workflow"}
+      }
+    },
+    "predeploy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_base_url",
+        "fallback_base_url",
+        "file_count",
+        "result",
+        "schema",
+        "site_tree_sha256",
+        "source_revision",
+        "stage",
+        "targets",
+        "total_bytes",
+        "workflow"
+      ],
+      "properties": {
+        "canonical_base_url": {"type": "string", "format": "uri"},
+        "fallback_base_url": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "format": "uri"}
+          ]
+        },
+        "file_count": {"type": "integer", "minimum": 1},
+        "result": {"const": "passed"},
+        "schema": {"const": "egohygiene.relay.publication-pages-evidence/v1"},
+        "site_tree_sha256": {"$ref": "#/$defs/sha256"},
+        "source_revision": {"$ref": "#/$defs/revision"},
+        "stage": {"const": "predeploy-configuration"},
+        "targets": {"const": []},
+        "total_bytes": {"type": "integer", "minimum": 1},
+        "workflow": {"$ref": "#/$defs/workflow"}
+      }
+    },
+    "failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["error", "reason", "result", "schema", "stage", "workflow"],
+      "properties": {
+        "error": {"const": "publication-pages-verification-failed"},
+        "reason": {
+          "enum": ["configuration-rejected", "remote-proof-failed"]
+        },
+        "result": {"const": "failed"},
+        "schema": {"const": "egohygiene.relay.publication-pages-evidence/v1"},
+        "stage": {
+          "enum": ["input-validation", "predeploy-configuration", "remote-verification"]
+        },
+        "workflow": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["identity", "repository"],
+          "properties": {
+            "identity": {"const": "unverified"},
+            "repository": {"const": "egohygiene/relay"}
+          }
+        }
+      }
+    }
+  }
+}

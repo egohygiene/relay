@@ -25,7 +25,7 @@
       "audience": "internal",
       "status": "stable",
       "triggers": ["pull_request", "push", "workflow_dispatch"],
-      "permissions": {"contents": "read"},
+      "permissions": {"actions": "read", "contents": "read"},
       "timeout_minutes": 15,
       "concurrency": {
         "group": "relay-validation-${{ github.workflow }}-${{ github.ref }}",
@@ -78,6 +78,272 @@
       ],
       "outputs": [],
       "consumer_ref": null
+    },
+    {
+      "id": "publication-review",
+      "path": ".github/workflows/publication-review.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Validate and preserve exact caller-built publication bytes under a statically read-only permission ceiling.",
+      "audience": "reusable",
+      "status": "beta",
+      "triggers": ["workflow_call"],
+      "permissions": {"actions": "read", "contents": "read"},
+      "timeout_minutes": 10,
+      "concurrency": {
+        "group": "relay-publication-review-${{ github.repository }}-${{ github.ref }}",
+        "cancel_in_progress": false
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Invalid identity, bounds, catalog, routes, bytes, or checksums fail review; sanitized validation evidence remains available where safe."
+      },
+      "inputs": [
+        {
+          "name": "artifact-name",
+          "type": "string",
+          "required": true,
+          "description": "Complete static-site artifact uploaded by the caller-owned build job."
+        },
+        {
+          "name": "expected-base-url",
+          "type": "string",
+          "required": true,
+          "description": "Canonical HTTPS base URL recorded in the public catalog."
+        },
+        {
+          "name": "expected-source-revision",
+          "type": "string",
+          "required": true,
+          "description": "Full caller source commit recorded in the public catalog."
+        },
+        {
+          "name": "required-routes",
+          "type": "string",
+          "required": false,
+          "default": "[]",
+          "description": "JSON array of required site-relative public routes."
+        },
+        {
+          "name": "catalog-path",
+          "type": "string",
+          "required": false,
+          "default": "site.json",
+          "description": "Site-relative Beacon publication catalog path."
+        },
+        {
+          "name": "checksum-path",
+          "type": "string",
+          "required": false,
+          "default": "SHA256SUMS",
+          "description": "Site-relative complete checksum inventory path."
+        },
+        {
+          "name": "fallback-base-url",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional technical fallback URL that must match the catalog when pinned."
+        },
+        {
+          "name": "artifact-retention-days",
+          "type": "number",
+          "required": false,
+          "default": 30,
+          "description": "Retention for reviewed bytes and local validation evidence."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "review-artifact-name",
+          "type": "string",
+          "required": true,
+          "description": "Unique ordinary artifact containing the exact reviewed site bytes."
+        },
+        {
+          "name": "evidence-artifact-name",
+          "type": "string",
+          "required": true,
+          "description": "Local validation evidence artifact name."
+        },
+        {
+          "name": "file-count",
+          "type": "string",
+          "required": true,
+          "description": "Number of files in the reviewed site."
+        },
+        {
+          "name": "site-tree-sha256",
+          "type": "string",
+          "required": true,
+          "description": "SHA-256 of the complete sorted SHA256SUMS bytes."
+        },
+        {
+          "name": "total-bytes",
+          "type": "string",
+          "required": true,
+          "description": "Total byte count of the reviewed site."
+        }
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/publication-review.yml@v1"
+    },
+    {
+      "id": "publication-pages",
+      "path": ".github/workflows/publication-pages.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Authorize a default-branch deployment, consume only the exact read-only reviewed site, and verify canonical and optional fallback HTTPS targets.",
+      "audience": "reusable",
+      "status": "beta",
+      "triggers": [
+        "workflow_call"
+      ],
+      "permissions": {
+        "actions": "read",
+        "contents": "read",
+        "id-token": "write",
+        "pages": "write"
+      },
+      "timeout_minutes": 20,
+      "concurrency": {
+        "group": "relay-publication-pages-${{ github.repository }}-${{ github.ref }}",
+        "cancel_in_progress": false
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Unauthorized deployment requests, invalid local contracts, reviewed-byte drift, Pages failures, or bounded remote-proof failures stop the lifecycle; review evidence remains available where safe."
+      },
+      "inputs": [
+        {
+          "name": "artifact-name",
+          "type": "string",
+          "required": true,
+          "description": "Complete static-site artifact uploaded by the caller-owned build job."
+        },
+        {
+          "name": "expected-base-url",
+          "type": "string",
+          "required": true,
+          "description": "Canonical HTTPS base URL recorded in the public catalog."
+        },
+        {
+          "name": "expected-source-revision",
+          "type": "string",
+          "required": true,
+          "description": "Full caller source commit recorded in the public catalog."
+        },
+        {
+          "name": "required-routes",
+          "type": "string",
+          "required": false,
+          "default": "[]",
+          "description": "JSON array of required site-relative public routes."
+        },
+        {
+          "name": "catalog-path",
+          "type": "string",
+          "required": false,
+          "default": "site.json",
+          "description": "Site-relative Beacon publication catalog path."
+        },
+        {
+          "name": "checksum-path",
+          "type": "string",
+          "required": false,
+          "default": "SHA256SUMS",
+          "description": "Site-relative complete checksum inventory path."
+        },
+        {
+          "name": "fallback-base-url",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional technical fallback URL that must match the catalog."
+        },
+        {
+          "name": "verify-fallback",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Verify every route and byte through the fallback URL."
+        },
+        {
+          "name": "artifact-retention-days",
+          "type": "number",
+          "required": false,
+          "default": 30,
+          "description": "Retention for review and deployment-evidence artifacts."
+        },
+        {
+          "name": "verification-attempts",
+          "type": "number",
+          "required": false,
+          "default": 8,
+          "description": "Maximum bounded attempts per remote resource."
+        },
+        {
+          "name": "verification-retry-delay-seconds",
+          "type": "number",
+          "required": false,
+          "default": 5,
+          "description": "Bounded delay between remote verification attempts."
+        },
+        {
+          "name": "verification-request-timeout-seconds",
+          "type": "number",
+          "required": false,
+          "default": 20,
+          "description": "Bounded application request timeout."
+        },
+        {
+          "name": "verification-max-elapsed-seconds",
+          "type": "number",
+          "required": false,
+          "default": 300,
+          "description": "Bounded application-level remote verification deadline."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "review-artifact-name",
+          "type": "string",
+          "required": true,
+          "description": "Unique ordinary artifact containing the exact reviewed site bytes."
+        },
+        {
+          "name": "evidence-artifact-name",
+          "type": "string",
+          "required": true,
+          "description": "Deployment verification evidence artifact name."
+        },
+        {
+          "name": "page-url",
+          "type": "string",
+          "required": true,
+          "description": "Pages deployment URL."
+        },
+        {
+          "name": "file-count",
+          "type": "string",
+          "required": true,
+          "description": "Number of files in the reviewed site."
+        },
+        {
+          "name": "site-tree-sha256",
+          "type": "string",
+          "required": true,
+          "description": "SHA-256 of the complete sorted SHA256SUMS bytes."
+        },
+        {
+          "name": "total-bytes",
+          "type": "string",
+          "required": true,
+          "description": "Total byte count of the reviewed site."
+        }
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/publication-pages.yml@v1"
     },
     {
       "id": "repository-intelligence",

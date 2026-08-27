@@ -1,0 +1,288 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Reusable publication Pages deployment
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        description: Complete static-site artifact uploaded by a caller-owned build job.
+        required: true
+        type: string
+      expected-base-url:
+        description: Canonical HTTPS base URL recorded in the publication catalog.
+        required: true
+        type: string
+      expected-source-revision:
+        description: Full caller source commit recorded in the publication catalog.
+        required: true
+        type: string
+      required-routes:
+        description: JSON array of publication routes required locally and remotely.
+        required: false
+        default: "[]"
+        type: string
+      catalog-path:
+        description: Site-relative Beacon publication catalog path.
+        required: false
+        default: "site.json"
+        type: string
+      checksum-path:
+        description: Site-relative complete SHA-256 inventory path.
+        required: false
+        default: "SHA256SUMS"
+        type: string
+      fallback-base-url:
+        description: Explicitly authorized fallback; when set it must match the catalog.
+        required: false
+        default: ""
+        type: string
+      verify-fallback:
+        description: Verify the explicitly authorized fallback URL and every byte.
+        required: false
+        default: false
+        type: boolean
+      artifact-retention-days:
+        description: Retention for review and deployment-evidence artifacts.
+        required: false
+        default: 30
+        type: number
+      verification-attempts:
+        description: Maximum remote attempts per resource, capped by Relay.
+        required: false
+        default: 8
+        type: number
+      verification-retry-delay-seconds:
+        description: Delay between remote verification attempts, capped by Relay.
+        required: false
+        default: 5
+        type: number
+      verification-request-timeout-seconds:
+        description: Per-request timeout in seconds, capped by Relay.
+        required: false
+        default: 20
+        type: number
+      verification-max-elapsed-seconds:
+        description: Application-level remote verification deadline, capped by Relay.
+        required: false
+        default: 300
+        type: number
+    outputs:
+      review-artifact-name:
+        description: Unique ordinary artifact containing the exact reviewed site bytes.
+        value: "${{ jobs.review.outputs.review-artifact-name }}"
+      evidence-artifact-name:
+        description: Deployment verification evidence artifact name.
+        value: "${{ jobs.deploy.outputs.evidence-artifact-name }}"
+      page-url:
+        description: GitHub Pages deployment URL.
+        value: "${{ jobs.deploy.outputs.page-url }}"
+      file-count:
+        description: Number of files in the reviewed complete publication site.
+        value: "${{ jobs.review.outputs.file-count }}"
+      site-tree-sha256:
+        description: Digest of the exact complete SHA256SUMS bytes.
+        value: "${{ jobs.deploy.outputs.site-tree-sha256 }}"
+      total-bytes:
+        description: Total bytes in the reviewed complete publication site.
+        value: "${{ jobs.review.outputs.total-bytes }}"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "relay-publication-pages-${{ github.repository }}-${{ github.ref }}"
+  cancel-in-progress: false
+
+jobs:
+  authorize:
+    name: Authorize publication deployment request
+    permissions: {}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Require the caller default branch
+        shell: bash
+        env:
+          DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_EVENT_NAME}" != "push" && \
+                "${GITHUB_EVENT_NAME}" != "workflow_dispatch" ]]; then
+            echo "::error::deployment is authorized only for push or workflow_dispatch"
+            exit 2
+          fi
+          if [[ "${GITHUB_REF_TYPE}" != "branch" || \
+                "${GITHUB_REF_NAME}" != "${DEFAULT_BRANCH}" ]]; then
+            echo "::error::deployment requires the caller repository default branch"
+            exit 2
+          fi
+
+  review:
+    name: Review exact publication bytes
+    needs: authorize
+    permissions:
+      actions: read
+      contents: read
+    uses: $/.github/workflows/publication-review.yml
+    with:
+      artifact-name: "${{ inputs.artifact-name }}"
+      expected-base-url: "${{ inputs.expected-base-url }}"
+      expected-source-revision: "${{ inputs.expected-source-revision }}"
+      required-routes: "${{ inputs.required-routes }}"
+      catalog-path: "${{ inputs.catalog-path }}"
+      checksum-path: "${{ inputs.checksum-path }}"
+      fallback-base-url: "${{ inputs.fallback-base-url }}"
+      artifact-retention-days: "${{ inputs.artifact-retention-days }}"
+
+  deploy:
+    name: Deploy and verify exact reviewed publication bytes
+    needs:
+      - authorize
+      - review
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      pages: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: "${{ steps.deployment.outputs.page_url }}"
+    outputs:
+      evidence-artifact-name: "${{ steps.names.outputs.evidence-artifact-name }}"
+      page-url: "${{ steps.deployment.outputs.page_url }}"
+      site-tree-sha256: "${{ steps.validate.outputs.site-tree-sha256 }}"
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Define deployment evidence name
+        id: names
+        shell: bash
+        env:
+          CALLER_ARTIFACT_NAME: "${{ inputs.artifact-name }}"
+        run: |
+          set -euo pipefail
+          artifact_key="$(printf '%s' "${CALLER_ARTIFACT_NAME}" | sha256sum | cut -c1-16)"
+          printf 'evidence-artifact-name=publication-pages-deployment-%s-%s-%s\n' \
+            "${GITHUB_SHA}" "${GITHUB_RUN_ATTEMPT}" "${artifact_key}" \
+            >> "${GITHUB_OUTPUT}"
+
+      - name: Download exact reviewed static site
+        # actions/download-artifact v8.0.1
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: "${{ needs.review.outputs.review-artifact-name }}"
+          path: ".relay/publication-site"
+
+      - name: Revalidate downloaded publication site
+        id: validate
+        uses: $/actions/validate-publication-site
+        with:
+          site-directory: ".relay/publication-site"
+          expected-base-url: "${{ inputs.expected-base-url }}"
+          expected-fallback-base-url: "${{ inputs.fallback-base-url }}"
+          expected-source-revision: "${{ inputs.expected-source-revision }}"
+          required-routes: "${{ inputs.required-routes }}"
+          catalog-path: "${{ inputs.catalog-path }}"
+          checksum-path: "${{ inputs.checksum-path }}"
+          evidence-output: ".relay/publication-site-validation.json"
+
+      - name: Confirm reviewed site-tree identity
+        shell: bash
+        env:
+          DEPLOY_TREE_SHA256: "${{ steps.validate.outputs.site-tree-sha256 }}"
+          REVIEW_TREE_SHA256: "${{ needs.review.outputs.site-tree-sha256 }}"
+        run: |
+          set -euo pipefail
+          if [[ ! "${REVIEW_TREE_SHA256}" =~ ^[0-9a-f]{64}$ || \
+                "${DEPLOY_TREE_SHA256}" != "${REVIEW_TREE_SHA256}" ]]; then
+            echo "::error::deployment bytes do not match the validated review artifact"
+            exit 2
+          fi
+
+      - name: Validate deployment and verification configuration
+        uses: $/actions/verify-publication-pages
+        with:
+          site-directory: ".relay/publication-site"
+          expected-base-url: "${{ inputs.expected-base-url }}"
+          expected-source-revision: "${{ inputs.expected-source-revision }}"
+          required-routes: "${{ inputs.required-routes }}"
+          catalog-path: "${{ inputs.catalog-path }}"
+          checksum-path: "${{ inputs.checksum-path }}"
+          fallback-base-url: "${{ inputs.fallback-base-url }}"
+          verify-fallback: "${{ inputs.verify-fallback }}"
+          configuration-only: "true"
+          attempts: "${{ inputs.verification-attempts }}"
+          retry-delay-seconds: "${{ inputs.verification-retry-delay-seconds }}"
+          request-timeout-seconds: "${{ inputs.verification-request-timeout-seconds }}"
+          max-elapsed-seconds: "${{ inputs.verification-max-elapsed-seconds }}"
+          workflow-ref: "${{ job.workflow_ref }}"
+          workflow-sha: "${{ job.workflow_sha }}"
+          evidence-output: ".relay/publication-pages-configuration.json"
+
+      - name: Configure GitHub Pages
+        # actions/configure-pages v6
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
+
+      - name: Upload deployable Pages artifact
+        # actions/upload-pages-artifact v5
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          path: ".relay/publication-site"
+
+      - name: Deploy GitHub Pages
+        id: deployment
+        # actions/deploy-pages v5
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128
+
+      - name: Verify deployed publication Pages
+        id: verify
+        uses: $/actions/verify-publication-pages
+        with:
+          site-directory: ".relay/publication-site"
+          expected-base-url: "${{ inputs.expected-base-url }}"
+          expected-source-revision: "${{ inputs.expected-source-revision }}"
+          required-routes: "${{ inputs.required-routes }}"
+          catalog-path: "${{ inputs.catalog-path }}"
+          checksum-path: "${{ inputs.checksum-path }}"
+          fallback-base-url: "${{ inputs.fallback-base-url }}"
+          verify-fallback: "${{ inputs.verify-fallback }}"
+          deployment-url: "${{ steps.deployment.outputs.page_url }}"
+          attempts: "${{ inputs.verification-attempts }}"
+          retry-delay-seconds: "${{ inputs.verification-retry-delay-seconds }}"
+          request-timeout-seconds: "${{ inputs.verification-request-timeout-seconds }}"
+          max-elapsed-seconds: "${{ inputs.verification-max-elapsed-seconds }}"
+          workflow-ref: "${{ job.workflow_ref }}"
+          workflow-sha: "${{ job.workflow_sha }}"
+          evidence-output: ".relay/publication-pages-evidence.json"
+
+      - name: Upload deployment verification evidence
+        if: "${{ always() }}"
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "${{ steps.names.outputs.evidence-artifact-name }}"
+          path: |
+            .relay/publication-site-validation.json
+            .relay/publication-pages-configuration.json
+            .relay/publication-pages-evidence.json
+          if-no-files-found: warn
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9
