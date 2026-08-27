@@ -80,10 +80,119 @@
       "consumer_ref": null
     },
     {
+      "id": "publication-review",
+      "path": ".github/workflows/publication-review.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Validate and preserve exact caller-built publication bytes under a statically read-only permission ceiling.",
+      "audience": "reusable",
+      "status": "beta",
+      "triggers": ["workflow_call"],
+      "permissions": {"actions": "read", "contents": "read"},
+      "timeout_minutes": 10,
+      "concurrency": {
+        "group": "relay-publication-review-${{ github.repository }}-${{ github.ref }}",
+        "cancel_in_progress": false
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Invalid identity, bounds, catalog, routes, bytes, or checksums fail review; sanitized validation evidence remains available where safe."
+      },
+      "inputs": [
+        {
+          "name": "artifact-name",
+          "type": "string",
+          "required": true,
+          "description": "Complete static-site artifact uploaded by the caller-owned build job."
+        },
+        {
+          "name": "expected-base-url",
+          "type": "string",
+          "required": true,
+          "description": "Canonical HTTPS base URL recorded in the public catalog."
+        },
+        {
+          "name": "expected-source-revision",
+          "type": "string",
+          "required": true,
+          "description": "Full caller source commit recorded in the public catalog."
+        },
+        {
+          "name": "required-routes",
+          "type": "string",
+          "required": false,
+          "default": "[]",
+          "description": "JSON array of required site-relative public routes."
+        },
+        {
+          "name": "catalog-path",
+          "type": "string",
+          "required": false,
+          "default": "site.json",
+          "description": "Site-relative Beacon publication catalog path."
+        },
+        {
+          "name": "checksum-path",
+          "type": "string",
+          "required": false,
+          "default": "SHA256SUMS",
+          "description": "Site-relative complete checksum inventory path."
+        },
+        {
+          "name": "fallback-base-url",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional technical fallback URL that must match the catalog when pinned."
+        },
+        {
+          "name": "artifact-retention-days",
+          "type": "number",
+          "required": false,
+          "default": 30,
+          "description": "Retention for reviewed bytes and local validation evidence."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "review-artifact-name",
+          "type": "string",
+          "required": true,
+          "description": "Unique ordinary artifact containing the exact reviewed site bytes."
+        },
+        {
+          "name": "evidence-artifact-name",
+          "type": "string",
+          "required": true,
+          "description": "Local validation evidence artifact name."
+        },
+        {
+          "name": "file-count",
+          "type": "string",
+          "required": true,
+          "description": "Number of files in the reviewed site."
+        },
+        {
+          "name": "site-tree-sha256",
+          "type": "string",
+          "required": true,
+          "description": "SHA-256 of the complete sorted SHA256SUMS bytes."
+        },
+        {
+          "name": "total-bytes",
+          "type": "string",
+          "required": true,
+          "description": "Total byte count of the reviewed site."
+        }
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/publication-review.yml@v1"
+    },
+    {
       "id": "publication-pages",
       "path": ".github/workflows/publication-pages.yml",
       "owner": "egohygiene/relay",
-      "purpose": "Review a caller-built publication site, conditionally deploy only its exact validated bytes, and verify canonical and optional fallback HTTPS targets.",
+      "purpose": "Authorize a default-branch deployment, consume only the exact read-only reviewed site, and verify canonical and optional fallback HTTPS targets.",
       "audience": "reusable",
       "status": "beta",
       "triggers": [
@@ -161,13 +270,6 @@
           "description": "Verify every route and byte through the fallback URL."
         },
         {
-          "name": "deploy-enabled",
-          "type": "boolean",
-          "required": false,
-          "default": false,
-          "description": "Explicitly request an authorized default-branch or manual deployment."
-        },
-        {
           "name": "artifact-retention-days",
           "type": "number",
           "required": false,
@@ -214,13 +316,13 @@
           "name": "evidence-artifact-name",
           "type": "string",
           "required": true,
-          "description": "Validation or deployment evidence artifact name."
+          "description": "Deployment verification evidence artifact name."
         },
         {
           "name": "page-url",
           "type": "string",
           "required": true,
-          "description": "Pages deployment URL when deployment is enabled."
+          "description": "Pages deployment URL."
         },
         {
           "name": "file-count",

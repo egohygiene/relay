@@ -52,15 +52,14 @@ jobs:
     permissions:
       actions: read
       contents: read
-    # egohygiene/relay publication-pages v1.3.0
-    uses: egohygiene/relay/.github/workflows/publication-pages.yml@<full-relay-v1.3-commit-sha>
+    # egohygiene/relay publication-review v1.3.0
+    uses: egohygiene/relay/.github/workflows/publication-review.yml@<full-relay-v1.3-commit-sha>
     with:
       artifact-name: "reflector-publication-site-${{ github.sha }}"
       expected-base-url: "https://reflector.egohygiene.io/"
       expected-source-revision: "${{ github.sha }}"
       fallback-base-url: "https://egohygiene.github.io/reflector/"
       required-routes: '["", "paper/", "magazine/", "downloads/"]'
-      deploy-enabled: false
 
   deploy_site:
     name: Deploy reviewed publication bytes
@@ -85,7 +84,6 @@ jobs:
       fallback-base-url: "https://egohygiene.github.io/reflector/"
       required-routes: '["", "paper/", "magazine/", "downloads/"]'
       verify-fallback: true
-      deploy-enabled: true
 ```
 
 The migration must preserve Reflector's published URLs, DOI and release

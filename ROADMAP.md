@@ -178,15 +178,15 @@ issues: [38]
 **Depends on:** `REL-Q01`
 
 **Outcome:** Product repositories can keep their native Make/Task publication
-builds while one pinned Relay workflow reviews, conditionally deploys, and
-remotely proves the exact caller-built static bytes.
+builds while pinned, statically separated Relay review and deployment workflows
+prove and publish the exact caller-built static bytes.
 
 **Exit criteria:**
 
 - [x] Local validation enforces the Beacon public catalog, lifecycle honesty,
   route/resource linkage, complete checksums, path safety, and bounded input.
-- [x] Deployment uses a read-only review job and a separately authorized,
-  write-scoped Pages job that consumes only the exact reviewed artifact.
+- [x] Read-only review and write-scoped Pages deployment are separate reusable
+  workflow surfaces; deployment consumes only the exact reviewed artifact.
 - [x] Canonical and explicitly authorized fallback endpoints use bounded HTTPS
   verification with deterministic, versioned evidence.
 - [ ] Relay v1.3.0 is published from the accepted implementation commit.

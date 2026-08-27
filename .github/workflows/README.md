@@ -87,24 +87,26 @@ discovery and controlled-update target, not an immutable consumer reference.
 See the [complete pinned caller](../../examples/workflows/repository-intelligence.yml)
 for an adoption-ready workflow.
 
-## Publication Pages lifecycle
+## Publication review and Pages deployment
 
-`publication-pages.yml` accepts an ordinary artifact containing a complete,
+`publication-review.yml` accepts an ordinary artifact containing a complete,
 caller-built static publication site. It never checks out the caller repository
-or invokes a renderer. Its read-only review job validates the
-`beacon.publication-hub/v1` catalog and complete checksum inventory, then
-uploads the exact reviewed bytes under a unique artifact name.
+or invokes a renderer. Under a static `actions: read` and `contents: read`
+ceiling, it validates the `beacon.publication-hub/v1` catalog and complete
+checksum inventory, then uploads the exact reviewed bytes under a unique
+artifact name.
 
-When `deploy-enabled` is false, the workflow stops after review. When it is true,
-the request must be a push or manual run on the caller's configured default
-branch. A separate job with job-scoped `pages: write` and `id-token: write`
-downloads only the reviewed artifact, revalidates its tree digest, validates all
-remote-proof inputs before Pages receives the bytes, deploys through the
-`github-pages` environment, and verifies every file and route over HTTPS.
+`publication-pages.yml` is a separate deployment-only surface. The request must
+be a push or manual run on the caller's configured default branch. It invokes
+the review workflow with read-only permissions, then a job with scoped
+`pages: write` and `id-token: write` downloads only that reviewed artifact,
+revalidates its tree digest, checks all remote-proof inputs before Pages receives
+the bytes, deploys through `github-pages`, and verifies every file and route.
 
-Publication deployments use non-cancelling concurrency so a newer run cannot
-interrupt a provider mutation. Pull-request review and default-branch deploy
-should be separate caller jobs with static permissions; see the
+Both workflows use non-cancelling concurrency so a nested review cannot collide
+with deployment and a newer run cannot interrupt a provider mutation.
+Pull-request review and default-branch deployment use separate caller jobs with
+static permissions; see the
 [Antidote](../../examples/workflows/publication-pages-antidote.md) and
 [Reflector](../../examples/workflows/publication-pages-reflector.md) examples.
 Production consumers pin the full v1.3.0 Relay commit. Refs #38.

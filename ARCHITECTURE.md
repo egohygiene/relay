@@ -72,7 +72,8 @@ actions/
 
 .github/workflows/
 ├── repository-intelligence.yml   # reusable artifact orchestration
-├── publication-pages.yml         # reviewed Pages lifecycle
+├── publication-review.yml        # statically read-only byte review
+├── publication-pages.yml         # authorized Pages deployment
 ├── validate.yml                  # pull-request and default-branch gate
 └── release.yml                   # reviewed manifest or manual SemVer publication
 
@@ -134,13 +135,14 @@ workflow:
 3. Relay owns only CI review, authorization, deployment of exact reviewed bytes,
    and bounded remote verification evidence.
 
-The reusable workflow never checks out caller source or builds content. Its
-read-only review job downloads the caller's ordinary artifact, validates it,
-and uploads the exact accepted bytes under a unique name. The write-scoped job
-can download only that reviewed artifact; it revalidates the tree digest before
-the GitHub Pages boundary and again compares every deployed public byte. This
-keeps Antidote and Reflector independently buildable when Beacon or Relay is
-unavailable.
+Neither reusable workflow checks out caller source or builds content.
+`publication-review.yml` has a static read-only ceiling: it downloads the
+caller's ordinary artifact, validates it, and uploads the exact accepted bytes
+under a unique name. `publication-pages.yml` is deployment-only; it invokes the
+read-only review surface, then its write-scoped job can download only that
+reviewed artifact. It revalidates the tree digest before the GitHub Pages
+boundary and again compares every deployed public byte. This keeps Antidote and
+Reflector independently buildable when Beacon or Relay is unavailable.
 
 Canonical and fallback endpoints must be normalized standard-port HTTPS public
 DNS names. Redirects are manually bounded to the exact declared route on one of

@@ -78,10 +78,22 @@
   ],
   "workflows": [
     {
+      "id": "publication-review",
+      "path": ".github/workflows/publication-review.yml",
+      "name": "Publication Site Review",
+      "summary": "Validate and preserve exact caller-built publication bytes under a statically read-only permission ceiling.",
+      "status": "beta",
+      "permissions": {
+        "actions": "read",
+        "contents": "read"
+      },
+      "consumer_ref": "egohygiene/relay/.github/workflows/publication-review.yml@v1"
+    },
+    {
       "id": "publication-pages",
       "path": ".github/workflows/publication-pages.yml",
-      "name": "Publication Pages Lifecycle",
-      "summary": "Review caller-built publication bytes, conditionally deploy the exact reviewed tree, and verify public HTTPS routes.",
+      "name": "Publication Pages Deployment",
+      "summary": "Authorize default-branch deployment, consume the exact read-only reviewed tree, and verify public HTTPS routes.",
       "status": "beta",
       "permissions": {
         "actions": "read",

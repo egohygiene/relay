@@ -165,9 +165,27 @@ def validate_workflow_metadata(repository_root: Path, errors: list[str]) -> None
     if "uses: ./actions/repository-intelligence" in reusable:
         errors.append("reusable workflow must not resolve the action from the caller checkout")
 
+    review = (workflow_root / "publication-review.yml").read_text(encoding="utf-8")
+    if "workflow_call:" not in review:
+        errors.append("publication-review workflow is not callable")
+    if "uses: $/actions/validate-publication-site" not in review:
+        errors.append(
+            "publication-review must validate through its exact Relay revision"
+        )
+    if "uses: ./actions/validate-publication-site" in review:
+        errors.append(
+            "publication-review must not resolve validation from the caller checkout"
+        )
+    if "pages: write" in review or "id-token: write" in review:
+        errors.append("publication-review must remain statically read-only")
+    if "actions/checkout@" in review:
+        errors.append("publication-review workflow must never check out caller source")
+
     publication = (workflow_root / "publication-pages.yml").read_text(encoding="utf-8")
     if "workflow_call:" not in publication:
         errors.append("publication-pages workflow is not callable")
+    if "uses: $/.github/workflows/publication-review.yml" not in publication:
+        errors.append("publication-pages must consume the read-only review workflow")
     for action in ("validate-publication-site", "verify-publication-pages"):
         exact = f"uses: $/actions/{action}"
         caller = f"uses: ./actions/{action}"

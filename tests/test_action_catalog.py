@@ -48,6 +48,7 @@ class ActionCatalogTests(unittest.TestCase):
             validator.discovered_reusable_workflows(REPOSITORY_ROOT),
             {
                 ".github/workflows/publication-pages.yml",
+                ".github/workflows/publication-review.yml",
                 ".github/workflows/repository-intelligence.yml",
             },
         )

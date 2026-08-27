@@ -19,9 +19,11 @@ the composite action in its existing build job instead.
 The publication examples deliberately use two statically permissioned caller
 jobs after one product-owned producer:
 
-- a pull-request review call grants only `actions: read` and `contents: read`;
-- a mutually exclusive default-branch deployment call additionally grants only
-  `pages: write` and `id-token: write`.
+- a pull-request call to `publication-review.yml` grants only `actions: read`
+  and `contents: read`;
+- a mutually exclusive default-branch call to deployment-only
+  `publication-pages.yml` additionally grants only `pages: write` and
+  `id-token: write`.
 
 Relay never checks out or builds the product. It downloads the ordinary static
 artifact uploaded by the producer, validates it, and makes the exact reviewed
