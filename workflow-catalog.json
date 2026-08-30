@@ -432,6 +432,63 @@
         }
       ],
       "consumer_ref": "egohygiene/relay/.github/workflows/repository-intelligence.yml@v1"
+    },
+    {
+      "id": "dependency-review",
+      "path": ".github/workflows/dependency-review.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Analyse dependency changes on every pull request and fail on high-severity or license-denied packages.",
+      "audience": "internal",
+      "status": "stable",
+      "triggers": [
+        "pull_request"
+      ],
+      "permissions": {
+        "contents": "read"
+      },
+      "timeout_minutes": 10,
+      "concurrency": {
+        "group": "dependency-review-${{ github.workflow }}-${{ github.ref }}",
+        "cancel_in_progress": true
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Any high-severity finding or denied license fails the workflow and blocks the pull request."
+      },
+      "inputs": [],
+      "outputs": [],
+      "consumer_ref": null
+    },
+    {
+      "id": "automerge-dependabot",
+      "path": ".github/workflows/automerge-dependabot.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Classify and auto-approve or merge allowlisted low-risk Dependabot updates after all required checks pass, separating read analysis from write authority.",
+      "audience": "internal",
+      "status": "stable",
+      "triggers": [
+        "pull_request"
+      ],
+      "permissions": {
+        "contents": "write",
+        "pull-requests": "write"
+      },
+      "timeout_minutes": 5,
+      "concurrency": {
+        "group": "automerge-dependabot-${{ github.workflow }}-${{ github.ref }}",
+        "cancel_in_progress": false
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Classification or merge failure fails the workflow; ineligible updates are silently skipped by the approve-and-merge job condition."
+      },
+      "inputs": [],
+      "outputs": [],
+      "consumer_ref": null
     }
   ]
 }

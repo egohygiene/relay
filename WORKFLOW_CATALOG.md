@@ -15,9 +15,10 @@ and failure semantics.
 | `publication-review` | Reusable | `egohygiene/relay` | Validate and preserve exact caller-built publication bytes | `actions: read`, `contents: read` | 10 minutes |
 | `publication-pages` | Reusable | `egohygiene/relay` | Deploy the exact read-only reviewed artifact and remotely prove it | job-scoped `pages: write` and `id-token: write` | 20 minutes |
 | `repository-intelligence` | Reusable | `egohygiene/relay` | Build, verify, and upload one bounded intelligence artifact | `contents: read` | 15 minutes |
+| `dependency-review` | Internal | `egohygiene/relay` | Analyse dependency changes on every pull request and fail on high-severity or denied-license packages | `contents: read` | 10 minutes |
+| `automerge-dependabot` | Internal | `egohygiene/relay` | Classify then auto-approve and merge allowlisted low-risk Dependabot updates after all required checks | job-scoped `contents: write` and `pull-requests: write` | 5 minutes |
 
-There are no staged workflow implementations in this repository at this
-snapshot. All five files under `.github/workflows/` are current and cataloged.
+All seven files under `.github/workflows/` are current and cataloged.
 A future staged candidate must first receive an owner, purpose, explicit
 contract, and `experimental` catalog state; an uncataloged workflow fails CI.
 
@@ -55,6 +56,28 @@ provider, HTTPS, route, or byte-proof disagreement.
 Release runs are serialized and never cancel in progress. A retry may resume a
 partial provider-side release only when the immutable tag still points to the
 same validated default-branch commit; contradictory state fails closed.
+
+Dependency review runs cancel stale analysis on the same ref. Any
+high-severity finding or denied-license package fails the workflow and blocks
+the pull request. A fresh run on the corrected PR resolves the failure; there
+is no partial-success state.
+
+Automerge classification and approval runs never cancel in progress to avoid
+orphaned approvals. The classify job skips non-Dependabot actors entirely. The
+approve-and-merge job is skipped when the update does not meet the allowlist
+policy. A failed merge attempt leaves the PR open for human review; no
+partially-applied state exists because auto-merge is a GitHub-side setting that
+only activates after all required checks pass.
+
+**Emergency disable**: remove the `automerge-dependabot` workflow file or set
+`if: false` on the `approve-and-merge` job to immediately stop automated
+merges without affecting dependency-review analysis. Disable
+`dependency-review` by removing that workflow file; existing open PRs will
+lose the blocking check until a fresh commit re-triggers the workflow.
+
+**Rollback**: revert the workflow file to a previous cataloged revision and
+push to the default branch. The prior behavior takes effect on the next
+pull-request event. No provider-side state accumulates.
 
 ## Reusable caller contract
 
