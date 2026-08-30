@@ -43,6 +43,17 @@
       "consumer_ref": "egohygiene/relay/actions/repository-intelligence@v1"
     },
     {
+      "id": "validate-release-bundle",
+      "path": "actions/validate-release-bundle",
+      "name": "Validate Release Bundle",
+      "summary": "Validate profile-bound release bundles, complete checksums, and deterministic immutable evidence without publishing.",
+      "status": "beta",
+      "runtime": ["bash", "python3"],
+      "permissions": {},
+      "side_effects": ["workspace-write"],
+      "consumer_ref": "egohygiene/relay/actions/validate-release-bundle@v1"
+    },
+    {
       "id": "validate-publication-site",
       "path": "actions/validate-publication-site",
       "name": "Validate Publication Site",
@@ -102,6 +113,18 @@
         "pages": "write"
       },
       "consumer_ref": "egohygiene/relay/.github/workflows/publication-pages.yml@v1"
+    },
+    {
+      "id": "release-artifact",
+      "path": ".github/workflows/release-artifact.yml",
+      "name": "Profile-bound Release Artifact",
+      "summary": "Validate one caller-built profile bundle and publish immutable GitHub Release evidence without taking registry or deployment authority.",
+      "status": "beta",
+      "permissions": {
+        "actions": "read",
+        "contents": "write"
+      },
+      "consumer_ref": "egohygiene/relay/.github/workflows/release-artifact.yml@v1"
     },
     {
       "id": "repository-intelligence",

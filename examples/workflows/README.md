@@ -32,7 +32,19 @@ bytes the deployment boundary. Use the repository-specific migration guides:
 - [Antidote publication Pages](publication-pages-antidote.md)
 - [Reflector publication Pages](publication-pages-reflector.md)
 
-The `<full-relay-v1.3-commit-sha>` marker must be replaced with the reviewed
-v1.3.0 release commit after publication. Keep the product's prior workflow as a
+## Profile-bound releases
+
+For packages, specifications, container evidence, binaries, static sites, and
+PDF/A documents, use the `release-artifact.yml` reusable workflow with the
+profile declared in [Relay’s release-profile contract](../../RELEASE_PROFILES.md).
+The caller builds and uploads the artifact first, grants `actions: read` and
+`contents: write` only to the publication job, and pins Relay to a reviewed
+full commit SHA. Relay validates the profile and exact `SHA256SUMS`, then
+publishes a GitHub Release archive, archive checksum, and deterministic release
+evidence. Registry publishing and deployment remain separate caller-owned
+steps with separately authorized credentials.
+
+The `<full-relay-v1.4-commit-sha>` marker must be replaced with the reviewed
+v1.4.0 release commit after publication. Keep the product's prior workflow as a
 rollback reference until its canonical and optional fallback endpoints pass the
 remote byte proof. Refs #38.

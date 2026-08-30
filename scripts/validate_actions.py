@@ -13,6 +13,7 @@ from typing import Any
 
 CATALOG_SCHEMA = "egohygiene.relay-action-catalog/v1"
 WORKFLOW_CATALOG_SCHEMA = "egohygiene.relay-workflow-catalog/v1"
+RELEASE_PROFILES_SCHEMA = "egohygiene.relay-release-profiles/v1"
 ACTION_ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 REMOTE_USES = re.compile(r"^\s*uses:\s*([^\s#]+)", re.MULTILINE)
 FULL_SHA = re.compile(r"^[0-9a-f]{40}$")
@@ -211,6 +212,116 @@ def validate_workflow_metadata(repository_root: Path, errors: list[str]) -> None
     ):
         if required not in release:
             errors.append(f"release workflow lacks required contract: {required}")
+
+    artifact_release = (workflow_root / "release-artifact.yml").read_text(
+        encoding="utf-8"
+    )
+    for required in (
+        "workflow_call:",
+        "uses: $/actions/validate-release-bundle",
+        "expected-source-revision",
+        "release-evidence.json",
+        "SHA256SUMS",
+        "gh release create",
+        "gh release upload",
+        "rollback-reference",
+    ):
+        if required not in artifact_release:
+            errors.append(
+                "release-artifact workflow lacks required profile-release contract: "
+                f"{required}"
+            )
+    if "pull_request_target:" in artifact_release:
+        errors.append("release-artifact workflow must not use pull_request_target")
+
+
+def validate_release_profiles(repository_root: Path, errors: list[str]) -> None:
+    """Validate the versioned profile catalog used by release-bundle checks."""
+
+    path = repository_root / "release-profiles.json"
+    try:
+        catalog = load_object(path)
+    except (OSError, json.JSONDecodeError, ValueError) as error:
+        errors.append(f"invalid release profile catalog: {error}")
+        return
+    if (
+        catalog.get("schema") != RELEASE_PROFILES_SCHEMA
+        or catalog.get("schema_version") != 1
+    ):
+        errors.append("release profile catalog uses an unsupported schema")
+    profiles = catalog.get("profiles")
+    if not isinstance(profiles, list) or not profiles:
+        errors.append("release profile catalog profiles must be a non-empty array")
+        return
+    identifiers: list[str] = []
+    required_keys = {
+        "id",
+        "repository_classes",
+        "delivery",
+        "required_paths",
+        "required_globs",
+        "required_any_globs",
+        "rollback",
+    }
+    required_evidence = {"provenance.json", "sbom.spdx.json", "signature.json"}
+    for index, profile in enumerate(profiles):
+        label = f"release-profiles.profiles[{index}]"
+        if not isinstance(profile, dict) or set(profile) != required_keys:
+            errors.append(f"{label} has an unsupported shape")
+            continue
+        identifier = profile.get("id")
+        if not isinstance(identifier, str) or not ACTION_ID.fullmatch(identifier):
+            errors.append(f"{label}.id is invalid: {identifier}")
+            continue
+        identifiers.append(identifier)
+        classes = profile.get("repository_classes")
+        if (
+            not isinstance(classes, list)
+            or not classes
+            or any(not isinstance(value, str) or not ACTION_ID.fullmatch(value) for value in classes)
+            or len(classes) != len(set(classes))
+        ):
+            errors.append(f"{label}.repository_classes must be a unique identifier array")
+        if profile.get("delivery") not in {"github-release", "github-release-evidence"}:
+            errors.append(f"{label}.delivery is invalid")
+        paths = profile.get("required_paths")
+        if (
+            not isinstance(paths, list)
+            or any(not isinstance(value, str) or not value for value in paths)
+            or len(paths) != len(set(paths))
+            or not required_evidence.issubset(set(paths))
+        ):
+            errors.append(
+                f"{label}.required_paths must include provenance, SBOM, and signature evidence"
+            )
+        for field in ("required_globs", "required_any_globs"):
+            value = profile.get(field)
+            if not isinstance(value, list):
+                errors.append(f"{label}.{field} must be an array")
+        rollback = profile.get("rollback")
+        if (
+            not isinstance(rollback, dict)
+            or set(rollback) != {"strategy", "instructions"}
+            or not isinstance(rollback.get("strategy"), str)
+            or not ACTION_ID.fullmatch(rollback["strategy"])
+            or not isinstance(rollback.get("instructions"), str)
+            or not rollback["instructions"].strip()
+        ):
+            errors.append(f"{label}.rollback is incomplete")
+    if identifiers != sorted(identifiers):
+        errors.append("release profile catalog entries must be sorted by id")
+    if len(identifiers) != len(set(identifiers)):
+        errors.append("release profile catalog has duplicate ids")
+    expected_profiles = {
+        "binary",
+        "container-image",
+        "github-action",
+        "npm-specification",
+        "pdfa-document",
+        "static-site",
+    }
+    if set(identifiers) != expected_profiles:
+        errors.append("release profile catalog does not cover the required repository classes")
 
 
 def validate_workflow_catalog(repository_root: Path, errors: list[str]) -> None:
@@ -423,6 +534,8 @@ def validate_catalog(repository_root: Path) -> list[str]:
             errors.append(f"release.json version is not exact SemVer: {version}")
         if not isinstance(release_manifest.get("update_major_alias"), bool):
             errors.append("release.json update_major_alias must be boolean")
+
+    validate_release_profiles(repository_root, errors)
 
     entries = catalog.get("actions")
     if not isinstance(entries, list):

@@ -80,6 +80,94 @@
       "consumer_ref": null
     },
     {
+      "id": "release-artifact",
+      "path": ".github/workflows/release-artifact.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Validate a caller-built profile release bundle, preserve deterministic evidence, and publish only immutable GitHub Release assets from the current default-branch commit.",
+      "audience": "reusable",
+      "status": "beta",
+      "triggers": ["workflow_call"],
+      "permissions": {"actions": "read", "contents": "write"},
+      "timeout_minutes": 15,
+      "concurrency": {
+        "group": "relay-release-artifact-${{ github.repository }}-${{ inputs.release-version }}",
+        "cancel_in_progress": false
+      },
+      "failure_semantics": {
+        "mode": "resume-verified-release",
+        "partial_success": false,
+        "retry": "matching-commit-only",
+        "description": "Validation, caller identity, default-branch drift, profile evidence, or contradictory immutable tag state fails closed. A rerun may reuse an existing release only when its immutable tag, archive checksum, and release evidence all match the represented commit."
+      },
+      "inputs": [
+        {
+          "name": "artifact-name",
+          "type": "string",
+          "required": true,
+          "description": "Complete caller-built release bundle uploaded by an earlier job."
+        },
+        {
+          "name": "expected-source-revision",
+          "type": "string",
+          "required": true,
+          "description": "Full caller commit SHA represented by the release bundle."
+        },
+        {
+          "name": "profile",
+          "type": "string",
+          "required": true,
+          "description": "Checked-in Relay release profile identifier."
+        },
+        {
+          "name": "release-version",
+          "type": "string",
+          "required": true,
+          "description": "Unused immutable vMAJOR.MINOR.PATCH GitHub Release tag."
+        },
+        {
+          "name": "update-major-alias",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Advance the matching moving major discovery alias after publication."
+        },
+        {
+          "name": "artifact-retention-days",
+          "type": "number",
+          "required": false,
+          "default": 30,
+          "description": "Retention for Relay validation evidence and the reviewed release payload."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "release-evidence-sha256",
+          "type": "string",
+          "required": true,
+          "description": "SHA-256 of deterministic Relay release evidence."
+        },
+        {
+          "name": "release-url",
+          "type": "string",
+          "required": true,
+          "description": "Immutable GitHub Release URL."
+        },
+        {
+          "name": "rollback-reference",
+          "type": "string",
+          "required": true,
+          "description": "Immutable release tag that retains the profile-specific rollback instructions."
+        },
+        {
+          "name": "sha256sums-sha256",
+          "type": "string",
+          "required": true,
+          "description": "SHA-256 of the complete caller-provided SHA256SUMS inventory."
+        }
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/release-artifact.yml@v1"
+    },
+    {
       "id": "publication-review",
       "path": ".github/workflows/publication-review.yml",
       "owner": "egohygiene/relay",

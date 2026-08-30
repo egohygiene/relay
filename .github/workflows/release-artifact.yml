@@ -1,0 +1,334 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Publish reviewed release artifact
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        description: Complete caller-built release bundle uploaded by an earlier job.
+        required: true
+        type: string
+      expected-source-revision:
+        description: Full caller commit SHA represented by the release bundle.
+        required: true
+        type: string
+      profile:
+        description: Checked-in Relay release profile identifier.
+        required: true
+        type: string
+      release-version:
+        description: Unused immutable vMAJOR.MINOR.PATCH GitHub Release tag.
+        required: true
+        type: string
+      update-major-alias:
+        description: Advance the matching moving major discovery alias after publication.
+        required: false
+        default: false
+        type: boolean
+      artifact-retention-days:
+        description: Retention for Relay validation evidence and the reviewed release payload.
+        required: false
+        default: 30
+        type: number
+    outputs:
+      release-evidence-sha256:
+        description: SHA-256 of deterministic Relay release evidence.
+        value: "${{ jobs.review.outputs.release-evidence-sha256 }}"
+      release-url:
+        description: Immutable GitHub Release URL.
+        value: "${{ jobs.publish.outputs.release-url }}"
+      rollback-reference:
+        description: Immutable release tag that retains the profile-specific rollback instructions.
+        value: "${{ jobs.publish.outputs.rollback-reference }}"
+      sha256sums-sha256:
+        description: SHA-256 of the complete caller-provided SHA256SUMS inventory.
+        value: "${{ jobs.review.outputs.sha256sums-sha256 }}"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "relay-release-artifact-${{ github.repository }}-${{ inputs.release-version }}"
+  cancel-in-progress: false
+
+jobs:
+  authorize:
+    name: Authorize immutable release request
+    permissions: {}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Require caller default-branch identity and bounded inputs
+        shell: bash
+        env:
+          ARTIFACT_NAME: "${{ inputs.artifact-name }}"
+          DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
+          EXPECTED_SOURCE_REVISION: "${{ inputs.expected-source-revision }}"
+          PROFILE: "${{ inputs.profile }}"
+          RELEASE_VERSION: "${{ inputs.release-version }}"
+          RETENTION_DAYS: "${{ inputs.artifact-retention-days }}"
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_EVENT_NAME}" != "push" && \
+                "${GITHUB_EVENT_NAME}" != "workflow_dispatch" ]]; then
+            echo "::error::release publication is authorized only for push or workflow_dispatch"
+            exit 2
+          fi
+          if [[ "${GITHUB_REF_TYPE}" != "branch" || \
+                "${GITHUB_REF_NAME}" != "${DEFAULT_BRANCH}" ]]; then
+            echo "::error::release publication requires the caller repository default branch"
+            exit 2
+          fi
+          if [[ ! "${ARTIFACT_NAME}" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$ ]]; then
+            echo "::error::artifact-name is not a safe Actions artifact identifier"
+            exit 2
+          fi
+          if [[ ! "${EXPECTED_SOURCE_REVISION}" =~ ^[0-9a-f]{40}$ || \
+                "${EXPECTED_SOURCE_REVISION}" != "${GITHUB_SHA}" ]]; then
+            echo "::error::expected-source-revision must equal the caller workflow SHA"
+            exit 2
+          fi
+          if [[ ! "${PROFILE}" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
+            echo "::error::profile is not a safe Relay release profile identifier"
+            exit 2
+          fi
+          if [[ ! "${RELEASE_VERSION}" =~ ^v([1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "::error::release-version must be an exact vMAJOR.MINOR.PATCH value"
+            exit 2
+          fi
+          if [[ ! "${RETENTION_DAYS}" =~ ^[0-9]+$ ]] || \
+             (( RETENTION_DAYS < 1 || RETENTION_DAYS > 90 )); then
+            echo "::error::artifact-retention-days must be between 1 and 90"
+            exit 2
+          fi
+
+  review:
+    name: Validate release artifact and preserve evidence
+    needs: authorize
+    permissions:
+      actions: read
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      payload-artifact-name: "${{ steps.names.outputs.payload-artifact-name }}"
+      release-evidence-sha256: "${{ steps.validate.outputs.release-evidence-sha256 }}"
+      sha256sums-sha256: "${{ steps.validate.outputs.sha256sums-sha256 }}"
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Define unique reviewed payload name
+        id: names
+        shell: bash
+        env:
+          CALLER_ARTIFACT_NAME: "${{ inputs.artifact-name }}"
+        run: |
+          set -euo pipefail
+          artifact_key="$(printf "%s" "${CALLER_ARTIFACT_NAME}" | sha256sum | cut -c1-16)"
+          printf "payload-artifact-name=release-payload-%s-%s-%s\n" \
+            "${GITHUB_SHA}" "${GITHUB_RUN_ATTEMPT}" "${artifact_key}" \
+            >> "${GITHUB_OUTPUT}"
+
+      - name: Download caller-built release bundle
+        # actions/download-artifact v8.0.1
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: "${{ inputs.artifact-name }}"
+          path: ".relay/release-bundle"
+
+      - name: Validate profile-bound release bundle
+        id: validate
+        uses: $/actions/validate-release-bundle
+        with:
+          bundle-directory: ".relay/release-bundle"
+          profile: "${{ inputs.profile }}"
+          release-version: "${{ inputs.release-version }}"
+          source-revision: "${{ inputs.expected-source-revision }}"
+          evidence-output: ".relay/release-evidence.json"
+
+      - name: Package exact reviewed release bytes
+        shell: bash
+        env:
+          PROFILE: "${{ inputs.profile }}"
+          RELEASE_VERSION: "${{ inputs.release-version }}"
+        run: |
+          set -euo pipefail
+          mkdir --parents ".relay/release-payload"
+          archive_name="${PROFILE}-${RELEASE_VERSION}.tar.gz"
+          archive=".relay/release-payload/${archive_name}"
+          tar \
+            --create \
+            --directory ".relay/release-bundle" \
+            --file - \
+            --format "posix" \
+            --group 0 \
+            --mtime "@0" \
+            --numeric-owner \
+            --owner 0 \
+            --sort "name" \
+          . | gzip --no-name > "${archive}"
+          cp ".relay/release-evidence.json" ".relay/release-payload/release-evidence.json"
+          (
+            cd ".relay/release-payload"
+            sha256sum "${archive_name}" > "release-asset.sha256"
+          )
+
+      - name: Upload reviewed release payload and evidence
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "${{ steps.names.outputs.payload-artifact-name }}"
+          path: ".relay/release-payload"
+          if-no-files-found: error
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9
+
+  publish:
+    name: Create or resume immutable GitHub Release
+    needs:
+      - authorize
+      - review
+    permissions:
+      actions: read
+      contents: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      release-url: "${{ steps.publish.outputs.release-url }}"
+      rollback-reference: "${{ steps.publish.outputs.rollback-reference }}"
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Check out exact caller revision
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+          ref: "${{ inputs.expected-source-revision }}"
+
+      - name: Download exact reviewed release payload
+        # actions/download-artifact v8.0.1
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: "${{ needs.review.outputs.payload-artifact-name }}"
+          path: ".relay/release-assets"
+
+      - name: Verify default-branch head and publish immutable evidence
+        id: publish
+        shell: bash
+        env:
+          DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
+          EXPECTED_SOURCE_REVISION: "${{ inputs.expected-source-revision }}"
+          GH_TOKEN: "${{ github.token }}"
+          PROFILE: "${{ inputs.profile }}"
+          RELEASE_VERSION: "${{ inputs.release-version }}"
+          UPDATE_MAJOR_ALIAS: "${{ inputs.update-major-alias }}"
+        run: |
+          set -euo pipefail
+          git fetch origin "${DEFAULT_BRANCH}"
+          default_commit="$(git rev-parse "origin/${DEFAULT_BRANCH}^{commit}")"
+          current_commit="$(git rev-parse "HEAD^{commit}")"
+          if [[ "${current_commit}" != "${EXPECTED_SOURCE_REVISION}" || \
+                "${current_commit}" != "${default_commit}" ]]; then
+            echo "::error::release must represent the current caller default-branch head"
+            exit 2
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/${RELEASE_VERSION}" >/dev/null 2>&1; then
+            git fetch --force origin "refs/tags/${RELEASE_VERSION}:refs/tags/${RELEASE_VERSION}"
+            existing_commit="$(git rev-parse "${RELEASE_VERSION}^{commit}")"
+            if [[ "${existing_commit}" != "${EXPECTED_SOURCE_REVISION}" ]]; then
+              echo "::error::immutable release tag already targets another commit"
+              exit 2
+            fi
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag --annotate "${RELEASE_VERSION}" --message "${PROFILE} ${RELEASE_VERSION}"
+            git push origin "refs/tags/${RELEASE_VERSION}"
+          fi
+          if ! gh release view "${RELEASE_VERSION}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh release create "${RELEASE_VERSION}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --title "${PROFILE} ${RELEASE_VERSION}" \
+              --notes "Profile-bound release evidence for ${PROFILE}. See release-evidence.json for checksums, provenance, SBOM, signature, and rollback records." \
+              --verify-tag
+          fi
+          mapfile -t assets < <(find ".relay/release-assets" -maxdepth 1 -type f -print | sort)
+          if (( ${#assets[@]} != 3 )); then
+            echo "::error::reviewed release payload must contain exactly three immutable assets"
+            exit 2
+          fi
+          mapfile -t existing_assets < <(
+            gh release view "${RELEASE_VERSION}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --json assets \
+              --jq ".assets[].name"
+          )
+          if (( ${#existing_assets[@]} == 0 )); then
+            gh release upload "${RELEASE_VERSION}" --repo "${GITHUB_REPOSITORY}" "${assets[@]}"
+          else
+            if (( ${#existing_assets[@]} != ${#assets[@]} )); then
+              echo "::error::existing release contains unexpected immutable assets"
+              exit 2
+            fi
+            for asset in "${assets[@]}"; do
+              if [[ ! " ${existing_assets[*]} " == *" $(basename "${asset}") "* ]]; then
+                echo "::error::existing release has incomplete or contradictory evidence assets"
+                exit 2
+              fi
+            done
+            mkdir --parents ".relay/existing-release-assets"
+            gh release download "${RELEASE_VERSION}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --dir ".relay/existing-release-assets" \
+              --pattern "${PROFILE}-${RELEASE_VERSION}.tar.gz" \
+              --pattern "release-asset.sha256" \
+              --pattern "release-evidence.json"
+            if ! (
+              cd ".relay/existing-release-assets"
+              sha256sum --check --strict "release-asset.sha256"
+            ); then
+              echo "::error::existing release archive does not match its immutable checksum"
+              exit 2
+            fi
+            if ! cmp --silent \
+              ".relay/release-assets/release-asset.sha256" \
+              ".relay/existing-release-assets/release-asset.sha256" || \
+              ! cmp --silent \
+              ".relay/release-assets/release-evidence.json" \
+              ".relay/existing-release-assets/release-evidence.json"; then
+              echo "::error::existing immutable release evidence differs from this request"
+              exit 2
+            fi
+          fi
+          release_url="$(gh release view "${RELEASE_VERSION}" --repo "${GITHUB_REPOSITORY}" --json url --jq ".url")"
+          printf "release-url=%s\n" "${release_url}" >> "${GITHUB_OUTPUT}"
+          printf "rollback-reference=%s\n" "${RELEASE_VERSION}" >> "${GITHUB_OUTPUT}"
+          if [[ "${UPDATE_MAJOR_ALIAS}" == "true" ]]; then
+            major_alias="${RELEASE_VERSION%%.*}"
+            git tag --force --annotate "${major_alias}" "${EXPECTED_SOURCE_REVISION}" \
+              --message "${major_alias} tracks ${RELEASE_VERSION}"
+            git push --force origin "refs/tags/${major_alias}"
+          fi

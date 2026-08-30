@@ -111,6 +111,7 @@ jobs:
               Path("action-catalog.json"),
               Path("workflow-catalog.json"),
               Path("release.json"),
+              Path("release-profiles.json"),
           ]
           paths.extend(sorted(
               path
