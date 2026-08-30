@@ -1,0 +1,119 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Automerge Dependabot updates
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "automerge-dependabot-${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: false
+
+jobs:
+  classify:
+    name: Classify Dependabot update
+    if: "${{ github.event.pull_request.user.login == 'dependabot[bot]' }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      eligible: "${{ steps.check.outputs.eligible }}"
+      update-type: "${{ steps.metadata.outputs.update-type }}"
+      package-ecosystem: "${{ steps.metadata.outputs.package-ecosystem }}"
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Fetch Dependabot metadata
+        id: metadata
+        # dependabot/fetch-metadata v3.1.0
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98
+        with:
+          github-token: "${{ github.token }}"
+
+      - name: Determine update eligibility
+        id: check
+        shell: bash
+        env:
+          UPDATE_TYPE: "${{ steps.metadata.outputs.update-type }}"
+          PACKAGE_ECOSYSTEM: "${{ steps.metadata.outputs.package-ecosystem }}"
+        run: |
+          set -euo pipefail
+          # Allowlist: patch updates for all ecosystems; minor updates for
+          # GitHub Actions, pip, and npm where the change surface is bounded.
+          eligible="false"
+          case "${UPDATE_TYPE}" in
+            version-update:semver-patch)
+              eligible="true"
+              ;;
+            version-update:semver-minor)
+              case "${PACKAGE_ECOSYSTEM}" in
+                github_actions|pip|npm)
+                  eligible="true"
+                  ;;
+              esac
+              ;;
+          esac
+          printf 'eligible=%s\n' "${eligible}" >> "${GITHUB_OUTPUT}"
+          printf 'update-type=%s package-ecosystem=%s eligible=%s\n' \
+            "${UPDATE_TYPE}" "${PACKAGE_ECOSYSTEM}" "${eligible}"
+
+  approve-and-merge:
+    name: Approve and merge allowlisted update
+    needs: classify
+    if: "${{ needs.classify.outputs.eligible == 'true' }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Approve pull request
+        shell: bash
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          PR_NUMBER: "${{ github.event.pull_request.number }}"
+          UPDATE_TYPE: "${{ needs.classify.outputs.update-type }}"
+          PACKAGE_ECOSYSTEM: "${{ needs.classify.outputs.package-ecosystem }}"
+        run: |
+          set -euo pipefail
+          gh pr review "${PR_NUMBER}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --approve \
+            --body "Auto-approved: Dependabot ${UPDATE_TYPE} update for ${PACKAGE_ECOSYSTEM} passes the allowlist policy."
+
+      - name: Enable auto-merge
+        shell: bash
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          PR_NUMBER: "${{ github.event.pull_request.number }}"
+        run: |
+          set -euo pipefail
+          gh pr merge "${PR_NUMBER}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --auto \
+            --squash
