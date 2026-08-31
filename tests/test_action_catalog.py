@@ -32,6 +32,7 @@ class ActionCatalogTests(unittest.TestCase):
                 "actions/normalize-repository-report",
                 "actions/publish-report-snapshot",
                 "actions/repository-intelligence",
+                "actions/validate-release-bundle",
                 "actions/validate-publication-site",
                 "actions/verify-publication-pages",
             },
@@ -49,6 +50,7 @@ class ActionCatalogTests(unittest.TestCase):
             {
                 ".github/workflows/publication-pages.yml",
                 ".github/workflows/publication-review.yml",
+                ".github/workflows/release-artifact.yml",
                 ".github/workflows/repository-intelligence.yml",
             },
         )

@@ -18,8 +18,10 @@ and deployment.
 | Opinionated intelligence artifact workflow | `egohygiene/relay/.github/workflows/repository-intelligence.yml@v1` |
 | Publication-site contract validation | `egohygiene/relay/actions/validate-publication-site@v1` |
 | Deployed publication byte verification | `egohygiene/relay/actions/verify-publication-pages@v1` |
+| Profile-bound release bundle validation | `egohygiene/relay/actions/validate-release-bundle@v1` |
 | Read-only publication review | `egohygiene/relay/.github/workflows/publication-review.yml@v1` |
 | Publication Pages deployment | `egohygiene/relay/.github/workflows/publication-pages.yml@v1` |
+| Immutable profile-bound release publication | `egohygiene/relay/.github/workflows/release-artifact.yml@v1` |
 
 These moving aliases advertise the release surface. Production consumers use a
 reviewed full commit SHA, as shown below.
@@ -89,7 +91,7 @@ jobs:
       contents: read
       id-token: write
       pages: write
-    # Relay publication-pages v1.3.0; production callers pin a full commit SHA.
+    # Relay publication-pages v1.4.0; production callers pin a full commit SHA.
     uses: egohygiene/relay/.github/workflows/publication-pages.yml@<full-commit-sha>
     with:
       artifact-name: "publication-site-${{ github.sha }}"
@@ -190,6 +192,12 @@ Subdirectory actions are directly consumable without Marketplace publication;
 a future Marketplace entry can improve discovery without changing distribution.
 The moving `v1` alias is for discovery and controlled refresh tooling, not for
 production consumer workflows.
+
+For consumer artifacts, use the profile-bound release workflow instead of
+copying a release YAML file. It validates complete checksums and the declared
+profile’s provenance, SBOM, signature, and rollback evidence before it creates
+or resumes an immutable GitHub Release. Registry publication and deployment
+remain caller-owned authorization steps. See [RELEASE_PROFILES.md](RELEASE_PROFILES.md).
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for structural boundaries and
 [ROADMAP.md](ROADMAP.md) for extraction and adoption sequencing.

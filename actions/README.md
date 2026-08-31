@@ -11,6 +11,7 @@ documentation, implementation, contracts, and tests.
 | [`publish-report-snapshot`](publish-report-snapshot/)         | Guard and publish stable `.reports` snapshots               | Git commit and default-branch push |
 | [`validate-publication-site`](validate-publication-site/)     | Validate product-owned publication hub bytes and checksums  | Workspace evidence only       |
 | [`verify-publication-pages`](verify-publication-pages/)       | Prove deployed HTTPS publication bytes and routes           | Network reads and workspace evidence |
+| [`validate-release-bundle`](validate-release-bundle/)         | Validate release profiles, checksums, and immutable evidence | Workspace evidence only              |
 
 ## Consumption
 

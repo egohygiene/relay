@@ -1,0 +1,65 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+
+name: Validate Release Bundle
+description: Validate a profile-bound release bundle, complete checksums, and immutable release evidence.
+
+inputs:
+  bundle-directory:
+    description: Directory containing the complete caller-built release bundle.
+    required: true
+  profile:
+    description: Release profile identifier from Relay's checked-in profile catalog.
+    required: true
+  release-version:
+    description: Immutable vMAJOR.MINOR.PATCH release version.
+    required: true
+  source-revision:
+    description: Full lowercase Git commit SHA represented by the bundle.
+    required: true
+  profiles-path:
+    description: Checked-in Relay profile catalog path.
+    required: false
+    default: "${{ github.action_path }}/../../release-profiles.json"
+  evidence-output:
+    description: File path for deterministic validated release evidence.
+    required: true
+
+outputs:
+  file-count:
+    description: Number of checked regular files in the release bundle.
+    value: "${{ steps.validate.outputs.file-count }}"
+  release-evidence-sha256:
+    description: SHA-256 of the deterministic release evidence JSON.
+    value: "${{ steps.validate.outputs.release-evidence-sha256 }}"
+  sha256sums-sha256:
+    description: SHA-256 of the complete sorted SHA256SUMS inventory.
+    value: "${{ steps.validate.outputs.sha256sums-sha256 }}"
+  total-bytes:
+    description: Total bytes represented by the checked bundle files.
+    value: "${{ steps.validate.outputs.total-bytes }}"
+
+runs:
+  using: composite
+  steps:
+    - name: Validate release bundle and write evidence
+      id: validate
+      shell: bash
+      env:
+        INPUT_BUNDLE_DIRECTORY: "${{ inputs.bundle-directory }}"
+        INPUT_EVIDENCE_OUTPUT: "${{ inputs.evidence-output }}"
+        INPUT_PROFILE: "${{ inputs.profile }}"
+        INPUT_PROFILES_PATH: "${{ inputs.profiles-path }}"
+        INPUT_RELEASE_VERSION: "${{ inputs.release-version }}"
+        INPUT_SOURCE_REVISION: "${{ inputs.source-revision }}"
+      run: |
+        set -euo pipefail
+        python3 "${GITHUB_ACTION_PATH}/scripts/validate_release_bundle.py" \
+          --bundle-directory "${INPUT_BUNDLE_DIRECTORY}" \
+          --profile "${INPUT_PROFILE}" \
+          --profiles-path "${INPUT_PROFILES_PATH}" \
+          --release-version "${INPUT_RELEASE_VERSION}" \
+          --source-revision "${INPUT_SOURCE_REVISION}" \
+          --evidence-output "${INPUT_EVIDENCE_OUTPUT}" \
+          --github-output "${GITHUB_OUTPUT}"

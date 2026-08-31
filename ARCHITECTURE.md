@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-08-27
+updated: 2026-08-30
 governed_by:
   - architecture-architecture
 depends_on:
@@ -68,17 +68,20 @@ actions/
 ├── normalize-repository-report/  # producer contract adapter
 ├── publish-report-snapshot/      # guarded default-branch writer
 ├── validate-publication-site/    # host-neutral local publication proof
+├── validate-release-bundle/      # profile and immutable evidence validation
 └── verify-publication-pages/     # bounded remote byte proof
 
 .github/workflows/
 ├── repository-intelligence.yml   # reusable artifact orchestration
 ├── publication-review.yml        # statically read-only byte review
 ├── publication-pages.yml         # authorized Pages deployment
+├── release-artifact.yml           # profile-bound immutable release evidence
 ├── validate.yml                  # pull-request and default-branch gate
 └── release.yml                   # reviewed manifest or manual SemVer publication
 
 action-catalog.json               # public composite-action surface
 workflow-catalog.json             # complete owner, authority, and failure inventory
+release-profiles.json             # versioned release artifact and rollback contract
 examples/workflows/               # immutable-pin caller examples
 ```
 

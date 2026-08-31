@@ -12,13 +12,14 @@ and failure semantics.
 | --- | --- | --- | --- | --- | --- |
 | `relay-validation` | Internal | `egohygiene/relay` | Validate packages, contracts, metadata, and the reusable smoke path | `actions: read`, `contents: read` | 15 minutes |
 | `relay-release` | Internal | `egohygiene/relay` | Publish a verified immutable release and optional major alias | job-scoped `contents: write` | 20 minutes |
+| `release-artifact` | Reusable | `egohygiene/relay` | Validate a profile-bound caller artifact and publish immutable release evidence | job-scoped `contents: write` | 15 minutes |
 | `publication-review` | Reusable | `egohygiene/relay` | Validate and preserve exact caller-built publication bytes | `actions: read`, `contents: read` | 10 minutes |
 | `publication-pages` | Reusable | `egohygiene/relay` | Deploy the exact read-only reviewed artifact and remotely prove it | job-scoped `pages: write` and `id-token: write` | 20 minutes |
 | `repository-intelligence` | Reusable | `egohygiene/relay` | Build, verify, and upload one bounded intelligence artifact | `contents: read` | 15 minutes |
 | `dependency-review` | Internal | `egohygiene/relay` | Analyse dependency changes on every pull request and fail on high-severity or denied-license packages | `contents: read` | 10 minutes |
 | `automerge-dependabot` | Internal | `egohygiene/relay` | Classify then auto-approve and merge allowlisted low-risk Dependabot updates after all required checks | job-scoped `contents: write` and `pull-requests: write` | 5 minutes |
 
-All seven files under `.github/workflows/` are current and cataloged.
+All eight files under `.github/workflows/` are current and cataloged.
 A future staged candidate must first receive an owner, purpose, explicit
 contract, and `experimental` catalog state; an uncataloged workflow fails CI.
 
@@ -81,7 +82,8 @@ pull-request event. No provider-side state accumulates.
 
 ## Reusable caller contract
 
-`repository-intelligence`, `publication-review`, and `publication-pages` are the
+`repository-intelligence`, `publication-review`, `publication-pages`, and
+`release-artifact` are the
 reusable workflows in v1. Their inputs, defaults, outputs, permission ceilings,
 timeouts, concurrency keys, and failure semantics are recorded in the catalog
 and checked against their workflow sources.
