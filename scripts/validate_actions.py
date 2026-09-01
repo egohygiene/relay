@@ -17,7 +17,9 @@ RELEASE_PROFILES_SCHEMA = "egohygiene.relay-release-profiles/v1"
 ACTION_ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 REMOTE_USES = re.compile(r"^\s*uses:\s*([^\s#]+)", re.MULTILINE)
 FULL_SHA = re.compile(r"^[0-9a-f]{40}$")
-SEMVER_TAG = re.compile(r"^v[1-9][0-9]*\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$")
+SEMVER_TAG = re.compile(
+    r"^v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$"
+)
 
 
 def load_object(path: Path) -> dict[str, Any]:
@@ -318,6 +320,7 @@ def validate_release_profiles(repository_root: Path, errors: list[str]) -> None:
         "github-action",
         "npm-specification",
         "pdfa-document",
+        "python-package",
         "static-site",
     }
     if set(identifiers) != expected_profiles:

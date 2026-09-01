@@ -13,11 +13,60 @@ Relay.
 | `binary` | CLI, desktop application, library | GitHub Release | binary archive, checksum, provenance, SBOM, signature |
 | `static-site` | GitHub Pages site, static site | GitHub Release evidence | `index.html`, site catalog, checksum, provenance, SBOM, signature |
 | `pdfa-document` | publication, research document | GitHub Release | PDF, PDF/A validation, checksum, provenance, SBOM, signature |
+| `python-package` | Python package, Python workspace component | GitHub Release evidence | package record, sdist, wheel(s), checksums, provenance, SBOM, signature |
 | `github-action` | action, workflow library | GitHub Release | action/workflow catalogs, packaged archive, checksum, provenance, SBOM, signature |
 
 All profiles require a root `SHA256SUMS` that covers every regular file in the
 bundle except itself, using sorted `<sha256><two spaces><path>` records. Relay
 copies neither raw source nor mutable registry state into the profile catalog.
+
+### Python package evidence
+
+The `python-package` profile requires a schema-governed
+`python-package.json` record alongside exactly one source distribution and one
+or more wheels. The record names one component, its distribution name, its
+exact semantic version, and one `pyproject-project` authority ending in
+`pyproject.toml`. Its requested version must equal the repository release tag.
+
+Every declared distribution path and digest must match both the bundle bytes
+and `SHA256SUMS`; undeclared wheels or source distributions fail closed. A
+workspace publishes independently versioned components as separate bundles,
+each with its own authority record, rather than asking Relay to infer a shared
+version.
+
+The registry state is intentionally limited to `external` or `unavailable`.
+Relay's pre-publication evidence cannot claim that PyPI accepted a package.
+PyPI publication, credentials, receipts, and yanking remain in a separately
+authorized repository-owned adapter.
+
+```json
+{
+  "$schema": "https://egohygiene.github.io/relay/contracts/python-package-release/v1/schema.json",
+  "schema": "egohygiene.relay-python-package-release/v1",
+  "component": {
+    "id": "example-package",
+    "distribution": "example-package",
+    "version": "1.4.0",
+    "version_authority": {
+      "kind": "pyproject-project",
+      "path": "packages/example/pyproject.toml"
+    }
+  },
+  "artifacts": {
+    "sdist": {
+      "path": "example_package-1.4.0.tar.gz",
+      "sha256": "<lowercase-sha256>"
+    },
+    "wheels": [
+      {
+        "path": "example_package-1.4.0-py3-none-any.whl",
+        "sha256": "<lowercase-sha256>"
+      }
+    ]
+  },
+  "registry": {"provider": "pypi", "state": "external"}
+}
+```
 
 ## Reusable publication workflow
 

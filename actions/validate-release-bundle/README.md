@@ -12,6 +12,12 @@ profile-specific missing files. On success it writes byte-stable
 version, represented commit, checked files, checksums, and profile rollback
 instructions.
 
+For the `python-package` profile, validation additionally binds the requested
+release version to one declared `pyproject.toml` authority, verifies the exact
+sdist and wheel digests in `python-package.json`, rejects undeclared package
+artifacts, and preserves an honest `external` or `unavailable` registry state.
+It does not contact or publish to PyPI.
+
 Use it directly in a caller-owned validation job, or through Relay's reusable
 release workflow. Production callers pin Relay to a reviewed full commit SHA.
 
