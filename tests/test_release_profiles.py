@@ -41,7 +41,15 @@ def write_checksums(directory: Path) -> None:
     (directory / "SHA256SUMS").write_text("\n".join(records) + "\n", encoding="utf-8")
 
 
-def profile_bundle(directory: Path, profile: str) -> None:
+def profile_bundle(
+    directory: Path,
+    profile: str,
+    *,
+    cargo_component_id: str = "example-crate",
+    cargo_package: str = "example-crate",
+    cargo_version: str = "1.4.0",
+    cargo_authority_path: str = "crates/example/Cargo.toml",
+) -> None:
     """Build the minimal evidence bundle accepted by one checked-in profile."""
 
     shared = {
@@ -53,8 +61,10 @@ def profile_bundle(directory: Path, profile: str) -> None:
         (directory / relative).write_text(content, encoding="utf-8")
     python_sdist = "example_package-1.4.0.tar.gz"
     python_wheel = "example_package-1.4.0-py3-none-any.whl"
+    cargo_archive = f"{cargo_package}-{cargo_version}.crate"
     profile_files = {
         "binary": {"tool.zip": "binary payload\n"},
+        "cargo-crate": {cargo_archive: "Cargo crate payload\n"},
         "container-image": {"image-digest.json": "{}\n"},
         "github-action": {
             "action-catalog.json": "{}\n",
@@ -71,6 +81,31 @@ def profile_bundle(directory: Path, profile: str) -> None:
     }
     for relative, content in profile_files[profile].items():
         (directory / relative).write_text(content, encoding="utf-8")
+    if profile == "cargo-crate":
+        metadata = {
+            "$schema": "https://egohygiene.github.io/relay/contracts/cargo-crate-release/v1/schema.json",
+            "schema": "egohygiene.relay-cargo-crate-release/v1",
+            "component": {
+                "id": cargo_component_id,
+                "package": cargo_package,
+                "version": cargo_version,
+                "version_authority": {
+                    "kind": "cargo-manifest",
+                    "path": cargo_authority_path,
+                },
+            },
+            "artifact": {
+                "path": cargo_archive,
+                "sha256": hashlib.sha256(
+                    (directory / cargo_archive).read_bytes()
+                ).hexdigest(),
+            },
+            "registry": {"provider": "crates-io", "state": "external"},
+        }
+        (directory / "cargo-crate.json").write_text(
+            json.dumps(metadata, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
     if profile == "python-package":
         metadata = {
             "$schema": "https://egohygiene.github.io/relay/contracts/python-package-release/v1/schema.json",
@@ -112,14 +147,19 @@ def profile_bundle(directory: Path, profile: str) -> None:
 class ReleaseProfileTests(unittest.TestCase):
     """Require every profile to preserve a strict, portable evidence boundary."""
 
-    def validate(self, directory: Path, profile: str) -> dict:
+    def validate(
+        self,
+        directory: Path,
+        profile: str,
+        release_version: str = "v1.4.0",
+    ) -> dict:
         """Validate one temporary bundle with the canonical profile catalog."""
 
         return release_bundle.validate_release_bundle(
             bundle_directory=directory,
             profiles_path=REPOSITORY_ROOT / "release-profiles.json",
             profile_id=profile,
-            release_version="v1.4.0",
+            release_version=release_version,
             source_revision=SOURCE_REVISION,
         )
 
@@ -139,9 +179,26 @@ class ReleaseProfileTests(unittest.TestCase):
             {"external", "unavailable"},
         )
 
+    def test_cargo_crate_schema_matches_the_runtime_contract(self) -> None:
+        schema = json.loads(
+            (REPOSITORY_ROOT / "schemas/cargo-crate-release.schema.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(schema["$id"], release_bundle.CARGO_CRATE_SCHEMA_URL)
+        self.assertEqual(
+            schema["properties"]["schema"]["const"],
+            release_bundle.CARGO_CRATE_SCHEMA,
+        )
+        self.assertEqual(
+            set(schema["properties"]["registry"]["properties"]["state"]["enum"]),
+            {"external", "unavailable"},
+        )
+
     def test_every_required_repository_class_has_a_valid_minimal_bundle(self) -> None:
         profiles = (
             "binary",
+            "cargo-crate",
             "container-image",
             "github-action",
             "npm-specification",
@@ -206,6 +263,137 @@ class ReleaseProfileTests(unittest.TestCase):
         self.assertEqual(evidence["package"]["registry_state"], "external")
         self.assertEqual(evidence["package"]["version"], "1.4.0")
         self.assertEqual(len(evidence["package"]["wheels"]), 1)
+
+    def test_cargo_crate_binds_component_version_and_artifact_hash(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            profile_bundle(directory, "cargo-crate")
+            evidence = self.validate(directory, "cargo-crate")
+        self.assertEqual(evidence["crate"]["component_id"], "example-crate")
+        self.assertEqual(evidence["crate"]["package"], "example-crate")
+        self.assertEqual(evidence["crate"]["registry_state"], "external")
+        self.assertEqual(evidence["crate"]["version"], "1.4.0")
+        self.assertEqual(evidence["crate"]["artifact"]["path"], "example-crate-1.4.0.crate")
+
+    def test_rust_workspace_components_keep_independent_version_authorities(self) -> None:
+        cases = (
+            ("workspace-core", "workspace_core", "0.3.0", "crates/core/Cargo.toml"),
+            ("workspace-cli", "workspace-cli", "1.4.0", "crates/cli/Cargo.toml"),
+        )
+        for component_id, package, version, authority_path in cases:
+            with self.subTest(component=component_id), tempfile.TemporaryDirectory() as temporary:
+                directory = Path(temporary)
+                profile_bundle(
+                    directory,
+                    "cargo-crate",
+                    cargo_component_id=component_id,
+                    cargo_package=package,
+                    cargo_version=version,
+                    cargo_authority_path=authority_path,
+                )
+                evidence = self.validate(directory, "cargo-crate", f"v{version}")
+                self.assertEqual(evidence["crate"]["component_id"], component_id)
+                self.assertEqual(evidence["crate"]["version"], version)
+                self.assertEqual(
+                    evidence["crate"]["version_authority"]["path"],
+                    authority_path,
+                )
+
+    def test_cargo_crate_filename_drift_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            profile_bundle(directory, "cargo-crate")
+            metadata_path = directory / "cargo-crate.json"
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            metadata["component"]["package"] = "another-crate"
+            metadata_path.write_text(
+                json.dumps(metadata, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            write_checksums(directory)
+            with self.assertRaisesRegex(release_bundle.ValidationError, "filename does not match"):
+                self.validate(directory, "cargo-crate")
+
+    def test_cargo_crate_version_drift_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            profile_bundle(directory, "cargo-crate")
+            metadata_path = directory / "cargo-crate.json"
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            metadata["component"]["version"] = "1.4.1"
+            metadata_path.write_text(
+                json.dumps(metadata, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            write_checksums(directory)
+            with self.assertRaisesRegex(release_bundle.ValidationError, "must equal release version"):
+                self.validate(directory, "cargo-crate")
+
+    def test_cargo_crate_undeclared_archive_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            profile_bundle(directory, "cargo-crate")
+            (directory / "untrusted-1.4.0.crate").write_text(
+                "untrusted crate\n",
+                encoding="utf-8",
+            )
+            write_checksums(directory)
+            with self.assertRaisesRegex(release_bundle.ValidationError, "only crate archive"):
+                self.validate(directory, "cargo-crate")
+
+    def test_cargo_crate_missing_archive_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            profile_bundle(directory, "cargo-crate")
+            (directory / "example-crate-1.4.0.crate").unlink()
+            write_checksums(directory)
+            with self.assertRaisesRegex(release_bundle.ValidationError, "requires a file matching"):
+                self.validate(directory, "cargo-crate")
+
+    def test_cargo_crate_declared_digest_drift_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            profile_bundle(directory, "cargo-crate")
+            metadata_path = directory / "cargo-crate.json"
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            metadata["artifact"]["sha256"] = "0" * 64
+            metadata_path.write_text(
+                json.dumps(metadata, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            write_checksums(directory)
+            with self.assertRaisesRegex(release_bundle.ValidationError, "digest mismatch"):
+                self.validate(directory, "cargo-crate")
+
+    def test_cargo_registry_cannot_claim_publication(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            profile_bundle(directory, "cargo-crate")
+            metadata_path = directory / "cargo-crate.json"
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            metadata["registry"]["state"] = "published"
+            metadata_path.write_text(
+                json.dumps(metadata, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            write_checksums(directory)
+            with self.assertRaisesRegex(release_bundle.ValidationError, "external or unavailable"):
+                self.validate(directory, "cargo-crate")
+
+    def test_cargo_version_authority_rejects_unsafe_paths(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            profile_bundle(directory, "cargo-crate")
+            metadata_path = directory / "cargo-crate.json"
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            metadata["component"]["version_authority"]["path"] = "../Cargo.toml"
+            metadata_path.write_text(
+                json.dumps(metadata, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            write_checksums(directory)
+            with self.assertRaisesRegex(release_bundle.ValidationError, "unsafe bundle path"):
+                self.validate(directory, "cargo-crate")
 
     def test_python_package_supports_reviewed_pre_one_versions(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/cargo-crate-release/v1/schema.json",
+  "title": "Relay Cargo crate release evidence v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schema", "component", "artifact", "registry"],
+  "properties": {
+    "$schema": {
+      "const": "https://egohygiene.github.io/relay/contracts/cargo-crate-release/v1/schema.json"
+    },
+    "schema": {"const": "egohygiene.relay-cargo-crate-release/v1"},
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "package", "version", "version_authority"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+        "package": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+        },
+        "version_authority": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "path"],
+          "properties": {
+            "kind": {"const": "cargo-manifest"},
+            "path": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*Cargo\\.toml$"
+            }
+          }
+        }
+      }
+    },
+    "artifact": {"$ref": "#/$defs/crate"},
+    "registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "state"],
+      "properties": {
+        "provider": {"enum": ["crates-io", "other"]},
+        "state": {"enum": ["external", "unavailable"]}
+      }
+    }
+  },
+  "$defs": {
+    "crate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*\\.crate$"
+        },
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}
