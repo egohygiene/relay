@@ -19,8 +19,15 @@ from typing import Any
 PROFILE_SCHEMA = "egohygiene.relay-release-profiles/v1"
 EVIDENCE_SCHEMA = "egohygiene.relay-release-evidence/v1"
 CHECKSUM_LINE = re.compile(r"^([0-9a-f]{64})  ([A-Za-z0-9][A-Za-z0-9._/-]*)$")
-SEMVER = re.compile(r"^v[1-9][0-9]*\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$")
+SEMVER = re.compile(r"^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$")
 SHA = re.compile(r"^[0-9a-f]{40}$")
+DIGEST = re.compile(r"^[0-9a-f]{64}$")
+IDENTIFIER = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+PYTHON_DISTRIBUTION = re.compile(r"^[A-Za-z0-9]+(?:[-_.][A-Za-z0-9]+)*$")
+PYTHON_PACKAGE_SCHEMA = "egohygiene.relay-python-package-release/v1"
+PYTHON_PACKAGE_SCHEMA_URL = (
+    "https://egohygiene.github.io/relay/contracts/python-package-release/v1/schema.json"
+)
 MAX_FILE_COUNT = 1_024
 MAX_TOTAL_BYTES = 512 * 1024 * 1024
 
@@ -193,6 +200,197 @@ def validate_profile_files(profile: dict[str, Any], files: dict[str, Path]) -> N
             )
 
 
+def require_exact_object(
+    value: Any,
+    *,
+    label: str,
+    keys: set[str],
+) -> dict[str, Any]:
+    """Return an object only when it has the exact contracted keys."""
+
+    if not isinstance(value, dict) or set(value) != keys:
+        raise ValidationError(f"{label} must contain exactly {sorted(keys)}")
+    return value
+
+
+def validate_python_artifact(
+    value: Any,
+    *,
+    label: str,
+    suffix: str,
+    files: dict[str, Path],
+    checksums: dict[str, str],
+) -> dict[str, str]:
+    """Validate one declared Python distribution against the checked bundle."""
+
+    artifact = require_exact_object(value, label=label, keys={"path", "sha256"})
+    relative = artifact.get("path")
+    digest = artifact.get("sha256")
+    if not isinstance(relative, str):
+        raise ValidationError(f"{label}.path must be a relative path")
+    relative = validate_relative_path(relative)
+    if not relative.endswith(suffix):
+        raise ValidationError(f"{label}.path must end with {suffix}")
+    if relative not in files:
+        raise ValidationError(f"{label}.path is absent from the release bundle: {relative}")
+    if not isinstance(digest, str) or DIGEST.fullmatch(digest) is None:
+        raise ValidationError(f"{label}.sha256 must be a lowercase SHA-256 digest")
+    if checksums.get(relative) != digest:
+        raise ValidationError(f"{label} digest mismatch for {relative}")
+    return {"path": relative, "sha256": digest}
+
+
+def canonical_python_distribution(value: str) -> str:
+    """Return the comparison form defined by Python distribution naming rules."""
+
+    return re.sub(r"[-_.]+", "-", value).lower()
+
+
+def validate_python_artifact_names(
+    *,
+    distribution: str,
+    version: str,
+    sdist: dict[str, str],
+    wheels: list[dict[str, str]],
+) -> None:
+    """Bind wheel and sdist filenames to the declared distribution and version."""
+
+    expected_distribution = canonical_python_distribution(distribution)
+    sdist_filename = PurePosixPath(sdist["path"]).name.removesuffix(".tar.gz")
+    if "-" not in sdist_filename:
+        raise ValidationError("Python sdist filename must contain its name and version")
+    sdist_name, sdist_version = sdist_filename.rsplit("-", 1)
+    if (
+        canonical_python_distribution(sdist_name) != expected_distribution
+        or sdist_version != version
+    ):
+        raise ValidationError("Python sdist filename does not match component name and version")
+    for wheel in wheels:
+        wheel_parts = PurePosixPath(wheel["path"]).name.removesuffix(".whl").split("-")
+        if (
+            len(wheel_parts) < 5
+            or canonical_python_distribution(wheel_parts[0]) != expected_distribution
+            or wheel_parts[1] != version
+        ):
+            raise ValidationError("Python wheel filename does not match component name and version")
+
+
+def validate_python_package(
+    *,
+    files: dict[str, Path],
+    checksums: dict[str, str],
+    release_version: str,
+) -> dict[str, Any]:
+    """Validate a Python component, its distributions, and external registry state."""
+
+    document = require_exact_object(
+        read_json_object(files["python-package.json"]),
+        label="python-package.json",
+        keys={"$schema", "schema", "component", "artifacts", "registry"},
+    )
+    if document["$schema"] != PYTHON_PACKAGE_SCHEMA_URL:
+        raise ValidationError("python-package.json references an unsupported JSON Schema")
+    if document["schema"] != PYTHON_PACKAGE_SCHEMA:
+        raise ValidationError("python-package.json has an unsupported semantic schema")
+
+    component = require_exact_object(
+        document["component"],
+        label="python-package.json.component",
+        keys={"id", "distribution", "version", "version_authority"},
+    )
+    component_id = component.get("id")
+    distribution = component.get("distribution")
+    version = component.get("version")
+    if not isinstance(component_id, str) or IDENTIFIER.fullmatch(component_id) is None:
+        raise ValidationError("python-package.json.component.id must be a kebab-case identifier")
+    if not isinstance(distribution, str) or PYTHON_DISTRIBUTION.fullmatch(distribution) is None:
+        raise ValidationError("python-package.json.component.distribution is invalid")
+    if version != release_version.removeprefix("v"):
+        raise ValidationError(
+            "python-package.json.component.version must equal release version "
+            f"{release_version.removeprefix('v')}"
+        )
+    authority = require_exact_object(
+        component["version_authority"],
+        label="python-package.json.component.version_authority",
+        keys={"kind", "path"},
+    )
+    if authority.get("kind") != "pyproject-project":
+        raise ValidationError("Python package version authority must be pyproject-project")
+    authority_path = authority.get("path")
+    if not isinstance(authority_path, str):
+        raise ValidationError("Python package version authority path must be relative")
+    authority_path = validate_relative_path(authority_path)
+    if not authority_path.endswith("pyproject.toml"):
+        raise ValidationError("Python package version authority must identify pyproject.toml")
+
+    artifacts = require_exact_object(
+        document["artifacts"],
+        label="python-package.json.artifacts",
+        keys={"sdist", "wheels"},
+    )
+    sdist = validate_python_artifact(
+        artifacts["sdist"],
+        label="python-package.json.artifacts.sdist",
+        suffix=".tar.gz",
+        files=files,
+        checksums=checksums,
+    )
+    wheels_value = artifacts["wheels"]
+    if not isinstance(wheels_value, list) or not wheels_value:
+        raise ValidationError("python-package.json.artifacts.wheels must be a non-empty array")
+    wheels = [
+        validate_python_artifact(
+            wheel,
+            label=f"python-package.json.artifacts.wheels[{index}]",
+            suffix=".whl",
+            files=files,
+            checksums=checksums,
+        )
+        for index, wheel in enumerate(wheels_value)
+    ]
+    validate_python_artifact_names(
+        distribution=distribution,
+        version=version,
+        sdist=sdist,
+        wheels=wheels,
+    )
+    declared_paths = [sdist["path"], *(wheel["path"] for wheel in wheels)]
+    if len(declared_paths) != len(set(declared_paths)):
+        raise ValidationError("python-package.json declares a distribution artifact more than once")
+    package_paths = sorted(
+        relative
+        for relative in files
+        if relative.endswith(".whl") or relative.endswith(".tar.gz")
+    )
+    if sorted(declared_paths) != package_paths:
+        raise ValidationError("python-package.json must declare every wheel and sdist exactly once")
+
+    registry = require_exact_object(
+        document["registry"],
+        label="python-package.json.registry",
+        keys={"provider", "state"},
+    )
+    if registry.get("provider") not in {"pypi", "other"}:
+        raise ValidationError("python-package.json.registry.provider must be pypi or other")
+    if registry.get("state") not in {"external", "unavailable"}:
+        raise ValidationError("Python package registry state must be external or unavailable")
+
+    return {
+        "component_id": component_id,
+        "distribution": distribution,
+        "registry_provider": registry["provider"],
+        "registry_state": registry["state"],
+        "sdist": sdist,
+        "version": version,
+        "version_authority": {
+            "kind": authority["kind"],
+            "path": authority_path,
+        },
+        "wheels": wheels,
+    }
+
+
 def render_evidence(
     *,
     profile: dict[str, Any],
@@ -249,13 +447,20 @@ def validate_release_bundle(
     files = safe_regular_files(bundle_directory)
     checksums = parse_checksums(files)
     validate_profile_files(profile, files)
-    return render_evidence(
+    evidence = render_evidence(
         profile=profile,
         release_version=release_version,
         source_revision=source_revision,
         files=files,
         checksums=checksums,
     )
+    if profile_id == "python-package":
+        evidence["package"] = validate_python_package(
+            files=files,
+            checksums=checksums,
+            release_version=release_version,
+        )
+    return evidence
 
 
 def write_json(path: Path, document: dict[str, Any]) -> str:

@@ -64,6 +64,18 @@
       }
     },
     {
+      "id": "python-package",
+      "repository_classes": ["python-package", "python-workspace"],
+      "delivery": "github-release-evidence",
+      "required_paths": ["provenance.json", "python-package.json", "sbom.spdx.json", "signature.json"],
+      "required_globs": ["*.tar.gz", "*.whl"],
+      "required_any_globs": [],
+      "rollback": {
+        "strategy": "yank-package-and-publish-replacement",
+        "instructions": "Never overwrite a published distribution. Yank or revoke the affected version through the repository-owned package index adapter, publish a corrective successor, and retain this immutable GitHub release evidence."
+      }
+    },
+    {
       "id": "static-site",
       "repository_classes": ["github-pages-site", "static-site"],
       "delivery": "github-release-evidence",

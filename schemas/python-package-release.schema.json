@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/python-package-release/v1/schema.json",
+  "title": "Relay Python package release evidence v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schema", "component", "artifacts", "registry"],
+  "properties": {
+    "$schema": {
+      "const": "https://egohygiene.github.io/relay/contracts/python-package-release/v1/schema.json"
+    },
+    "schema": {"const": "egohygiene.relay-python-package-release/v1"},
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "distribution", "version", "version_authority"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+        "distribution": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9]+(?:[-_.][A-Za-z0-9]+)*$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+        },
+        "version_authority": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "path"],
+          "properties": {
+            "kind": {"const": "pyproject-project"},
+            "path": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*pyproject\\.toml$"
+            }
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sdist", "wheels"],
+      "properties": {
+        "sdist": {"$ref": "#/$defs/sdist"},
+        "wheels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/wheel"}
+        }
+      }
+    },
+    "registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "state"],
+      "properties": {
+        "provider": {"enum": ["pypi", "other"]},
+        "state": {"enum": ["external", "unavailable"]}
+      }
+    }
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "sdist": {
+      "allOf": [
+        {"$ref": "#/$defs/artifact"},
+        {"properties": {"path": {"pattern": "\\.tar\\.gz$"}}}
+      ]
+    },
+    "wheel": {
+      "allOf": [
+        {"$ref": "#/$defs/artifact"},
+        {"properties": {"path": {"pattern": "\\.whl$"}}}
+      ]
+    }
+  }
+}
