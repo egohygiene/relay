@@ -1,0 +1,209 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Review semantic release preparation
+
+on:
+  workflow_call:
+    inputs:
+      release-version:
+        description: Reviewed exact vMAJOR.MINOR.PATCH candidate.
+        required: true
+        type: string
+      profile:
+        description: Relay artifact profile selected by the Aether declaration.
+        required: true
+        type: string
+      component-id:
+        description: Selected component; required for multi-component repositories.
+        required: false
+        default: ""
+        type: string
+      declaration-path:
+        description: Repository-relative Aether release declaration.
+        required: false
+        default: ".egohygiene/release.json"
+        type: string
+      mode:
+        description: Read-only plan or prepared-candidate verification.
+        required: false
+        default: "plan"
+        type: string
+      artifact-name:
+        description: Caller-built release bundle artifact; required by verify mode.
+        required: false
+        default: ""
+        type: string
+      expected-source-revision:
+        description: Full caller commit represented by the release plan.
+        required: true
+        type: string
+      artifact-retention-days:
+        description: Retention for deterministic success or failure evidence.
+        required: false
+        default: 30
+        type: number
+    outputs:
+      evidence-artifact-name:
+        description: Durable artifact containing success or bounded failure evidence.
+        value: "${{ jobs.review.outputs.evidence-artifact-name }}"
+      evidence-sha256:
+        description: SHA-256 of successful deterministic release-plan evidence.
+        value: "${{ jobs.review.outputs.evidence-sha256 }}"
+      releasable:
+        description: True only when every requested check passed.
+        value: "${{ jobs.review.outputs.releasable }}"
+      tag-state:
+        description: Available or resumable-identical immutable tag state.
+        value: "${{ jobs.review.outputs.tag-state }}"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "relay-release-prepare-${{ github.repository }}-${{ inputs.release-version }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: Validate read-only release preparation
+    permissions:
+      actions: read
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      evidence-artifact-name: "${{ steps.names.outputs.evidence-artifact-name }}"
+      evidence-sha256: "${{ steps.verify.outputs.evidence-sha256 }}"
+      releasable: "${{ steps.verify.outputs.releasable }}"
+      tag-state: "${{ steps.verify.outputs.tag-state }}"
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Check out exact caller revision
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          # The read-scoped token is retained for private-repository default-branch
+          # and immutable-tag queries; this workflow has no write permission.
+          persist-credentials: true
+          ref: "${{ inputs.expected-source-revision }}"
+
+      - name: Initialize bounded failure evidence
+        if: "${{ always() }}"
+        shell: bash
+        env:
+          DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
+          PROFILE: "${{ inputs.profile }}"
+          RELEASE_VERSION: "${{ inputs.release-version }}"
+          REQUESTED_MODE: "${{ inputs.mode }}"
+          SOURCE_REVISION: "${{ inputs.expected-source-revision }}"
+        run: |
+          set -euo pipefail
+          mkdir --parents ".relay"
+          python3 - <<'PYTHON'
+          import json
+          import os
+          from pathlib import Path
+
+          mode = os.environ["REQUESTED_MODE"]
+          evidence = {
+              "schema": "egohygiene.relay-release-plan-evidence/v1",
+              "status": "failed",
+              "mode": mode if mode in {"plan", "verify"} else "plan",
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "source_revision": os.environ["SOURCE_REVISION"],
+              "default_branch": os.environ.get("DEFAULT_BRANCH", ""),
+              "release_version": os.environ["RELEASE_VERSION"],
+              "component": None,
+              "profile": {"id": os.environ["PROFILE"]},
+              "changelog": None,
+              "tag_state": "unknown",
+              "bundle": None,
+              "rollback": None,
+              "errors": ["release preparation did not reach deterministic verification"],
+          }
+          Path(".relay/release-plan-evidence.json").write_text(
+              json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PYTHON
+
+      - name: Define durable evidence artifact
+        if: "${{ always() }}"
+        id: names
+        shell: bash
+        env:
+          RELEASE_VERSION: "${{ inputs.release-version }}"
+        run: |
+          set -euo pipefail
+          request_key="$(printf "%s" "${RELEASE_VERSION}" | sha256sum | cut -c1-16)"
+          printf "evidence-artifact-name=release-plan-%s-%s\n" \
+            "${GITHUB_SHA}" "${request_key}" >> "${GITHUB_OUTPUT}"
+
+      - name: Validate bounded preparation inputs
+        shell: bash
+        env:
+          ARTIFACT_NAME: "${{ inputs.artifact-name }}"
+          MODE: "${{ inputs.mode }}"
+          RETENTION_DAYS: "${{ inputs.artifact-retention-days }}"
+        run: |
+          set -euo pipefail
+          if [[ "${MODE}" != "plan" && "${MODE}" != "verify" ]]; then
+            echo "::error::mode must be plan or verify"
+            exit 2
+          fi
+          if [[ "${MODE}" == "verify" && -z "${ARTIFACT_NAME}" ]]; then
+            echo "::error::verify mode requires artifact-name"
+            exit 2
+          fi
+          if [[ -n "${ARTIFACT_NAME}" && ! "${ARTIFACT_NAME}" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$ ]]; then
+            echo "::error::artifact-name is unsafe"
+            exit 2
+          fi
+          if [[ ! "${RETENTION_DAYS}" =~ ^[0-9]+$ ]] || (( RETENTION_DAYS < 1 || RETENTION_DAYS > 90 )); then
+            echo "::error::artifact-retention-days must be between 1 and 90"
+            exit 2
+          fi
+
+      - name: Download caller-built release bundle
+        if: "${{ inputs.artifact-name != '' }}"
+        # actions/download-artifact v8.0.1
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: "${{ inputs.artifact-name }}"
+          path: ".relay/release-bundle"
+
+      - name: Verify release declaration and candidate
+        id: verify
+        uses: $/actions/verify-release-plan
+        with:
+          repository-id: "${{ github.repository }}"
+          declaration-path: "${{ inputs.declaration-path }}"
+          component-id: "${{ inputs.component-id }}"
+          release-version: "${{ inputs.release-version }}"
+          profile: "${{ inputs.profile }}"
+          source-revision: "${{ inputs.expected-source-revision }}"
+          default-branch: "${{ github.event.repository.default_branch }}"
+          mode: "${{ inputs.mode }}"
+          bundle-directory: "${{ inputs.artifact-name != '' && '.relay/release-bundle' || '' }}"
+          evidence-output: ".relay/release-plan-evidence.json"
+
+      - name: Preserve release-plan success or failure evidence
+        if: "${{ always() }}"
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "${{ steps.names.outputs.evidence-artifact-name }}"
+          path: ".relay/release-plan-evidence.json"
+          if-no-files-found: error
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9

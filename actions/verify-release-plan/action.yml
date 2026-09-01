@@ -1,0 +1,93 @@
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+
+name: Verify Release Plan
+description: >-
+  Verify an Aether release declaration, version authority, changelog, Git state,
+  immutable tag availability, and optional Relay profile bundle without publishing.
+
+inputs:
+  repository-id:
+    description: Caller repository identity in owner/name form.
+    required: true
+  declaration-path:
+    description: Repository-relative Aether release declaration.
+    required: false
+    default: ".egohygiene/release.json"
+  component-id:
+    description: Selected component; required when the declaration contains multiple components.
+    required: false
+    default: ""
+  release-version:
+    description: Reviewed exact vMAJOR.MINOR.PATCH candidate.
+    required: true
+  profile:
+    description: Relay artifact profile selected by the declaration.
+    required: true
+  source-revision:
+    description: Full lowercase Git commit represented by the plan.
+    required: true
+  default-branch:
+    description: Configured caller default branch; required by verify mode.
+    required: false
+    default: ""
+  mode:
+    description: Read-only plan for unpromoted changes or verify for a prepared release.
+    required: true
+  bundle-directory:
+    description: Complete profile bundle; required by verify mode.
+    required: false
+    default: ""
+  evidence-output:
+    description: Destination for deterministic success or failure evidence.
+    required: false
+    default: ".relay/release-plan-evidence.json"
+
+outputs:
+  evidence-sha256:
+    description: SHA-256 of successful deterministic release-plan evidence.
+    value: "${{ steps.verify.outputs.evidence-sha256 }}"
+  releasable:
+    description: True only when every requested check passed.
+    value: "${{ steps.verify.outputs.releasable }}"
+  tag-state:
+    description: Available or resumable-identical immutable tag state.
+    value: "${{ steps.verify.outputs.tag-state }}"
+
+runs:
+  using: composite
+  steps:
+    - name: Verify release plan without publishing
+      id: verify
+      shell: bash
+      env:
+        INPUT_BUNDLE_DIRECTORY: "${{ inputs.bundle-directory }}"
+        INPUT_COMPONENT_ID: "${{ inputs.component-id }}"
+        INPUT_DECLARATION_PATH: "${{ inputs.declaration-path }}"
+        INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
+        INPUT_EVIDENCE_OUTPUT: "${{ inputs.evidence-output }}"
+        INPUT_MODE: "${{ inputs.mode }}"
+        INPUT_PROFILE: "${{ inputs.profile }}"
+        INPUT_RELEASE_VERSION: "${{ inputs.release-version }}"
+        INPUT_REPOSITORY_ID: "${{ inputs.repository-id }}"
+        INPUT_SOURCE_REVISION: "${{ inputs.source-revision }}"
+      run: |
+        set -euo pipefail
+        arguments=(
+          --repository "."
+          --repository-id "${INPUT_REPOSITORY_ID}"
+          --declaration "${INPUT_DECLARATION_PATH}"
+          --component-id "${INPUT_COMPONENT_ID}"
+          --release-version "${INPUT_RELEASE_VERSION}"
+          --profile "${INPUT_PROFILE}"
+          --source-revision "${INPUT_SOURCE_REVISION}"
+          --default-branch "${INPUT_DEFAULT_BRANCH}"
+          --mode "${INPUT_MODE}"
+          --profiles-path "${GITHUB_ACTION_PATH}/../../release-profiles.json"
+          --evidence-output "${INPUT_EVIDENCE_OUTPUT}"
+          --github-output "${GITHUB_OUTPUT}"
+        )
+        if [[ -n "${INPUT_BUNDLE_DIRECTORY}" ]]; then
+          arguments+=(--bundle-directory "${INPUT_BUNDLE_DIRECTORY}")
+        fi
+        python3 "${GITHUB_ACTION_PATH}/scripts/verify_release_plan.py" "${arguments[@]}"

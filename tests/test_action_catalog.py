@@ -35,6 +35,7 @@ class ActionCatalogTests(unittest.TestCase):
                 "actions/validate-release-bundle",
                 "actions/validate-publication-site",
                 "actions/verify-publication-pages",
+                "actions/verify-release-plan",
             },
         )
 
@@ -51,7 +52,9 @@ class ActionCatalogTests(unittest.TestCase):
                 ".github/workflows/publication-pages.yml",
                 ".github/workflows/publication-review.yml",
                 ".github/workflows/release-artifact.yml",
+                ".github/workflows/release-prepare.yml",
                 ".github/workflows/repository-intelligence.yml",
+                ".github/workflows/semantic-release.yml",
             },
         )
 
@@ -109,8 +112,8 @@ class ActionCatalogTests(unittest.TestCase):
         self.assertIn('EXPECTED_WORKFLOW_REF: "${{ job.workflow_ref }}"', reusable)
         self.assertIn("workflow_dispatch:", release)
         self.assertIn("release.json", release)
-        self.assertIn("git tag --annotate", release)
-        self.assertIn("gh release create", release)
+        self.assertIn("uses: $/.github/workflows/semantic-release.yml", release)
+        self.assertNotIn("  push:", release)
 
     def test_extracted_v1_contract_ids_remain_compatible(self) -> None:
         expected_ids = {

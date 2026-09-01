@@ -69,15 +69,18 @@ actions/
 ├── publish-report-snapshot/      # guarded default-branch writer
 ├── validate-publication-site/    # host-neutral local publication proof
 ├── validate-release-bundle/      # profile and immutable evidence validation
-└── verify-publication-pages/     # bounded remote byte proof
+├── verify-publication-pages/     # bounded remote byte proof
+└── verify-release-plan/          # Aether intent and prepared-release proof
 
 .github/workflows/
 ├── repository-intelligence.yml   # reusable artifact orchestration
 ├── publication-review.yml        # statically read-only byte review
 ├── publication-pages.yml         # authorized Pages deployment
-├── release-artifact.yml           # profile-bound immutable release evidence
+├── release-artifact.yml          # profile-bound immutable release evidence
+├── release-prepare.yml           # statically read-only release review
+├── semantic-release.yml          # reviewed immutable publication handoff
 ├── validate.yml                  # pull-request and default-branch gate
-└── release.yml                   # reviewed manifest or manual SemVer publication
+└── release.yml                   # Relay manual-dispatch dogfood caller
 
 action-catalog.json               # public composite-action surface
 workflow-catalog.json             # complete owner, authority, and failure inventory
@@ -183,10 +186,10 @@ The architecture favors independently usable local and self-hosted operation. Op
 
 ## Evidence and uncertainty
 
-- **Observed:** Relay contains machine-readable action and workflow catalogs, three
-  independently consumable composite actions, a reusable artifact workflow,
-  immutable-pin adoption example, security validation gates, and a
-  `release.json`-driven release workflow with verified recovery. Empathy,
+- **Observed:** Relay contains machine-readable action and workflow catalogs,
+  seven independently consumable composite actions, six reusable workflows,
+  immutable-pin adoption examples, security validation gates, and an
+  Aether-declared manual semantic-release workflow with verified recovery. Empathy,
   Akashic, and Optiflow have existing Repository Intelligence integrations;
   their migrations remain planned pilots for the hardened package.
 - **Decided for this draft:** The repository owns the bounded concern described here and participates through versioned contracts.

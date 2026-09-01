@@ -12,6 +12,7 @@ documentation, implementation, contracts, and tests.
 | [`validate-publication-site`](validate-publication-site/)     | Validate product-owned publication hub bytes and checksums  | Workspace evidence only       |
 | [`verify-publication-pages`](verify-publication-pages/)       | Prove deployed HTTPS publication bytes and routes           | Network reads and workspace evidence |
 | [`validate-release-bundle`](validate-release-bundle/)         | Validate release profiles, checksums, and immutable evidence | Workspace evidence only              |
+| [`verify-release-plan`](verify-release-plan/)                 | Verify semantic-release intent and prepared profile evidence | Git reads and workspace evidence      |
 
 ## Consumption
 
@@ -25,6 +26,8 @@ egohygiene/relay/actions/normalize-repository-report
 egohygiene/relay/actions/publish-report-snapshot
 egohygiene/relay/actions/validate-publication-site
 egohygiene/relay/actions/verify-publication-pages
+egohygiene/relay/actions/validate-release-bundle
+egohygiene/relay/actions/verify-release-plan
 ```
 
 GitHub Marketplace is a discovery surface, not the distribution mechanism for
@@ -54,8 +57,8 @@ Moving aliases support discovery and controlled fleet refreshes. Production
 consumer workflows use reviewed full-SHA pins so an implementation update
 cannot enter a repository silently.
 
-The reviewed root `release.json` manifest or a manual dispatch triggers the
-release workflow. It validates the complete catalog and test suite, creates the
-immutable SemVer tag and GitHub Release, and then advances the selected major
-alias. It refuses non-default branches and any existing immutable tag that
-targets a different commit; matching partial releases can be resumed safely.
+The reviewed root `release.json`, Aether declaration, and `CHANGELOG.md` are
+verified by the read-only semantic-release gate. Explicit manual dispatch then
+builds a profile bundle and invokes the reusable immutable publication handoff.
+It refuses non-default branches and any existing immutable tag that targets a
+different commit; matching partial releases can be resumed safely.

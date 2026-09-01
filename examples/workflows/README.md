@@ -48,3 +48,8 @@ The `<full-relay-v1.4-commit-sha>` marker must be replaced with the reviewed
 v1.4.0 release commit after publication. Keep the product's prior workflow as a
 rollback reference until its canonical and optional fallback endpoints pass the
 remote byte proof. Refs #38.
+
+Semantic-release consumers use separate read-only preparation and explicit
+default-branch publication callers. See
+[`semantic-release-preparation.md`](semantic-release-preparation.md) and the
+complete lifecycle in [`../../SEMANTIC_RELEASE.md`](../../SEMANTIC_RELEASE.md).

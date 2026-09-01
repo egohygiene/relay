@@ -1,0 +1,68 @@
+---
+version: "3"
+
+vars:
+  RELEASE_VERSION:
+    sh: python3 -c "import json; print(json.load(open(\"release.json\", encoding=\"utf-8\"))[\"version\"])"
+
+tasks:
+  release:plan:
+    desc: Render a read-only plan for the next unpromoted Relay release
+    requires:
+      vars:
+        - RELEASE_VERSION
+    cmds:
+      - >-
+        python3 actions/verify-release-plan/scripts/verify_release_plan.py
+        --repository "."
+        --repository-id "egohygiene/relay"
+        --component-id "relay"
+        --release-version "{{.RELEASE_VERSION}}"
+        --profile "github-action"
+        --source-revision "$(git rev-parse HEAD^{commit})"
+        --default-branch "$(git remote show origin | sed -n 's/.*HEAD branch: //p')"
+        --mode "plan"
+        --profiles-path "release-profiles.json"
+        --relay-root "."
+        --evidence-output ".relay/release-plan-evidence.json"
+
+  release:prepare:
+    desc: Verify the read-only inputs for a reviewed Relay release PR
+    cmds:
+      - task: release:plan
+        vars:
+          RELEASE_VERSION: "{{.RELEASE_VERSION}}"
+
+  release:verify:
+    desc: Verify a promoted Relay release and its complete github-action bundle
+    requires:
+      vars:
+        - RELEASE_BUNDLE
+        - RELEASE_VERSION
+    cmds:
+      - >-
+        python3 actions/verify-release-plan/scripts/verify_release_plan.py
+        --repository "."
+        --repository-id "egohygiene/relay"
+        --component-id "relay"
+        --release-version "{{.RELEASE_VERSION}}"
+        --profile "github-action"
+        --source-revision "$(git rev-parse HEAD^{commit})"
+        --default-branch "$(git remote show origin | sed -n 's/.*HEAD branch: //p')"
+        --mode "verify"
+        --bundle-directory "{{.RELEASE_BUNDLE}}"
+        --profiles-path "release-profiles.json"
+        --relay-root "."
+        --evidence-output ".relay/release-plan-evidence.json"
+
+  release:publish:
+    desc: Dispatch the reviewed current-default-branch Relay release
+    requires:
+      vars:
+        - RELEASE_VERSION
+    cmds:
+      - >-
+        gh workflow run "release.yml"
+        --ref "$(git remote show origin | sed -n 's/.*HEAD branch: //p')"
+        --field "version={{.RELEASE_VERSION}}"
+        --field "update-major-alias=true"
