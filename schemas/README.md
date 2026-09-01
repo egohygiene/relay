@@ -7,6 +7,7 @@ the stable Relay namespace:
 https://egohygiene.github.io/relay/contracts/action-catalog/v1/schema.json
 https://egohygiene.github.io/relay/contracts/workflow-catalog/v1/schema.json
 https://egohygiene.github.io/relay/contracts/release-profiles/v1/schema.json
+https://egohygiene.github.io/relay/contracts/cargo-crate-release/v1/schema.json
 https://egohygiene.github.io/relay/contracts/python-package-release/v1/schema.json
 ```
 
@@ -16,6 +17,8 @@ internal validation and release automation, with owner, purpose, permissions,
 timeouts, concurrency, caller parameters, and failure semantics.
 
 `release-profiles.json` defines Relay's immutable artifact profiles.
+`cargo-crate-release/v1` defines the component, manifest authority, crate, and
+external-registry record required by the `cargo-crate` profile.
 `python-package-release/v1` defines the component, authority, distribution,
 and external-registry record required by the `python-package` profile.
 

@@ -11,6 +11,7 @@ Relay.
 | `npm-specification` | npm package, specification bundle | GitHub Release evidence | package metadata, `.tgz`, checksum, provenance, SBOM, signature |
 | `container-image` | container image, development environment | GitHub Release evidence | image digest, checksum, provenance, SBOM, signature |
 | `binary` | CLI, desktop application, library | GitHub Release | binary archive, checksum, provenance, SBOM, signature |
+| `cargo-crate` | Cargo crate, Rust workspace component | GitHub Release evidence | crate record, `.crate` archive, checksum, provenance, SBOM, signature |
 | `static-site` | GitHub Pages site, static site | GitHub Release evidence | `index.html`, site catalog, checksum, provenance, SBOM, signature |
 | `pdfa-document` | publication, research document | GitHub Release | PDF, PDF/A validation, checksum, provenance, SBOM, signature |
 | `python-package` | Python package, Python workspace component | GitHub Release evidence | package record, sdist, wheel(s), checksums, provenance, SBOM, signature |
@@ -19,6 +20,51 @@ Relay.
 All profiles require a root `SHA256SUMS` that covers every regular file in the
 bundle except itself, using sorted `<sha256><two spaces><path>` records. Relay
 copies neither raw source nor mutable registry state into the profile catalog.
+
+### Cargo crate evidence
+
+The `cargo-crate` profile requires a schema-governed `cargo-crate.json`
+record and exactly one `.crate` archive. The record names one component, its
+Cargo package, its exact semantic version, and one `cargo-manifest` authority
+ending in `Cargo.toml`. Its version must equal the requested repository release
+tag, and its archive must be named `<package>-<version>.crate`.
+The package field follows Cargo's registry-oriented ASCII name restrictions;
+the validator does not invent aliases or normalize a different package name.
+
+The declared archive path and digest must match both the bundle bytes and
+`SHA256SUMS`; undeclared crate archives fail closed. A Rust workspace publishes
+independently versioned components as separate bundles, each naming its own
+manifest authority. Relay never infers a shared workspace version.
+
+The registry state is intentionally limited to `external` or `unavailable`.
+Relay's pre-publication evidence cannot claim that crates.io accepted a crate.
+Registry publication, credentials, receipts, and yanking remain in a separately
+authorized repository-owned adapter.
+
+Compiled executables, platform archives, and installers remain under the
+`binary` profile. A repository that ships both a crate and native binaries
+validates two distinct bundles so neither evidence boundary weakens the other.
+
+```json
+{
+  "$schema": "https://egohygiene.github.io/relay/contracts/cargo-crate-release/v1/schema.json",
+  "schema": "egohygiene.relay-cargo-crate-release/v1",
+  "component": {
+    "id": "example-crate",
+    "package": "example-crate",
+    "version": "1.4.0",
+    "version_authority": {
+      "kind": "cargo-manifest",
+      "path": "crates/example/Cargo.toml"
+    }
+  },
+  "artifact": {
+    "path": "example-crate-1.4.0.crate",
+    "sha256": "<lowercase-sha256>"
+  },
+  "registry": {"provider": "crates-io", "state": "external"}
+}
+```
 
 ### Python package evidence
 

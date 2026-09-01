@@ -16,6 +16,18 @@
       }
     },
     {
+      "id": "cargo-crate",
+      "repository_classes": ["cargo-crate", "rust-workspace"],
+      "delivery": "github-release-evidence",
+      "required_paths": ["cargo-crate.json", "provenance.json", "sbom.spdx.json", "signature.json"],
+      "required_globs": ["*.crate"],
+      "required_any_globs": [],
+      "rollback": {
+        "strategy": "yank-crate-and-publish-replacement",
+        "instructions": "Never overwrite a published crate. Yank the affected version through the repository-owned Cargo registry adapter, publish a corrective successor, and retain this immutable GitHub release evidence."
+      }
+    },
+    {
       "id": "container-image",
       "repository_classes": ["container-image", "development-environment"],
       "delivery": "github-release-evidence",

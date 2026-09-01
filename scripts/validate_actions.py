@@ -316,6 +316,7 @@ def validate_release_profiles(repository_root: Path, errors: list[str]) -> None:
         errors.append("release profile catalog has duplicate ids")
     expected_profiles = {
         "binary",
+        "cargo-crate",
         "container-image",
         "github-action",
         "npm-specification",

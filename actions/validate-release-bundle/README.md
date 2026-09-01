@@ -12,6 +12,11 @@ profile-specific missing files. On success it writes byte-stable
 version, represented commit, checked files, checksums, and profile rollback
 instructions.
 
+For the `cargo-crate` profile, validation binds one declared Cargo package and
+`Cargo.toml` authority to the requested version, exact `.crate` filename and
+digest, and an `external` or `unavailable` registry state. Undeclared crate
+archives fail closed, and the action never contacts or publishes to crates.io.
+
 For the `python-package` profile, validation additionally binds the requested
 release version to one declared `pyproject.toml` authority, verifies the exact
 sdist and wheel digests in `python-package.json`, rejects undeclared package

@@ -23,6 +23,11 @@ SEMVER = re.compile(r"^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$")
 SHA = re.compile(r"^[0-9a-f]{40}$")
 DIGEST = re.compile(r"^[0-9a-f]{64}$")
 IDENTIFIER = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+CARGO_PACKAGE = re.compile(r"^[A-Za-z][A-Za-z0-9_-]{0,63}$")
+CARGO_CRATE_SCHEMA = "egohygiene.relay-cargo-crate-release/v1"
+CARGO_CRATE_SCHEMA_URL = (
+    "https://egohygiene.github.io/relay/contracts/cargo-crate-release/v1/schema.json"
+)
 PYTHON_DISTRIBUTION = re.compile(r"^[A-Za-z0-9]+(?:[-_.][A-Za-z0-9]+)*$")
 PYTHON_PACKAGE_SCHEMA = "egohygiene.relay-python-package-release/v1"
 PYTHON_PACKAGE_SCHEMA_URL = (
@@ -213,7 +218,7 @@ def require_exact_object(
     return value
 
 
-def validate_python_artifact(
+def validate_package_artifact(
     value: Any,
     *,
     label: str,
@@ -221,7 +226,7 @@ def validate_python_artifact(
     files: dict[str, Path],
     checksums: dict[str, str],
 ) -> dict[str, str]:
-    """Validate one declared Python distribution against the checked bundle."""
+    """Validate one declared package artifact against the checked bundle."""
 
     artifact = require_exact_object(value, label=label, keys={"path", "sha256"})
     relative = artifact.get("path")
@@ -244,6 +249,93 @@ def canonical_python_distribution(value: str) -> str:
     """Return the comparison form defined by Python distribution naming rules."""
 
     return re.sub(r"[-_.]+", "-", value).lower()
+
+
+def validate_cargo_crate(
+    *,
+    files: dict[str, Path],
+    checksums: dict[str, str],
+    release_version: str,
+) -> dict[str, Any]:
+    """Validate one Cargo package, crate archive, and external registry state."""
+
+    document = require_exact_object(
+        read_json_object(files["cargo-crate.json"]),
+        label="cargo-crate.json",
+        keys={"$schema", "schema", "component", "artifact", "registry"},
+    )
+    if document["$schema"] != CARGO_CRATE_SCHEMA_URL:
+        raise ValidationError("cargo-crate.json references an unsupported JSON Schema")
+    if document["schema"] != CARGO_CRATE_SCHEMA:
+        raise ValidationError("cargo-crate.json has an unsupported semantic schema")
+
+    component = require_exact_object(
+        document["component"],
+        label="cargo-crate.json.component",
+        keys={"id", "package", "version", "version_authority"},
+    )
+    component_id = component.get("id")
+    package = component.get("package")
+    version = component.get("version")
+    if not isinstance(component_id, str) or IDENTIFIER.fullmatch(component_id) is None:
+        raise ValidationError("cargo-crate.json.component.id must be a kebab-case identifier")
+    if not isinstance(package, str) or CARGO_PACKAGE.fullmatch(package) is None:
+        raise ValidationError("cargo-crate.json.component.package is invalid")
+    if version != release_version.removeprefix("v"):
+        raise ValidationError(
+            "cargo-crate.json.component.version must equal release version "
+            f"{release_version.removeprefix('v')}"
+        )
+    authority = require_exact_object(
+        component["version_authority"],
+        label="cargo-crate.json.component.version_authority",
+        keys={"kind", "path"},
+    )
+    if authority.get("kind") != "cargo-manifest":
+        raise ValidationError("Cargo crate version authority must be cargo-manifest")
+    authority_path = authority.get("path")
+    if not isinstance(authority_path, str):
+        raise ValidationError("Cargo crate version authority path must be relative")
+    authority_path = validate_relative_path(authority_path)
+    if not authority_path.endswith("Cargo.toml"):
+        raise ValidationError("Cargo crate version authority must identify Cargo.toml")
+
+    artifact = validate_package_artifact(
+        document["artifact"],
+        label="cargo-crate.json.artifact",
+        suffix=".crate",
+        files=files,
+        checksums=checksums,
+    )
+    expected_filename = f"{package}-{version}.crate"
+    if PurePosixPath(artifact["path"]).name != expected_filename:
+        raise ValidationError("Cargo crate filename does not match component package and version")
+    crate_paths = sorted(relative for relative in files if relative.endswith(".crate"))
+    if crate_paths != [artifact["path"]]:
+        raise ValidationError("cargo-crate.json must declare the only crate archive exactly once")
+
+    registry = require_exact_object(
+        document["registry"],
+        label="cargo-crate.json.registry",
+        keys={"provider", "state"},
+    )
+    if registry.get("provider") not in {"crates-io", "other"}:
+        raise ValidationError("cargo-crate.json.registry.provider must be crates-io or other")
+    if registry.get("state") not in {"external", "unavailable"}:
+        raise ValidationError("Cargo crate registry state must be external or unavailable")
+
+    return {
+        "artifact": artifact,
+        "component_id": component_id,
+        "package": package,
+        "registry_provider": registry["provider"],
+        "registry_state": registry["state"],
+        "version": version,
+        "version_authority": {
+            "kind": authority["kind"],
+            "path": authority_path,
+        },
+    }
 
 
 def validate_python_artifact_names(
@@ -329,7 +421,7 @@ def validate_python_package(
         label="python-package.json.artifacts",
         keys={"sdist", "wheels"},
     )
-    sdist = validate_python_artifact(
+    sdist = validate_package_artifact(
         artifacts["sdist"],
         label="python-package.json.artifacts.sdist",
         suffix=".tar.gz",
@@ -340,7 +432,7 @@ def validate_python_package(
     if not isinstance(wheels_value, list) or not wheels_value:
         raise ValidationError("python-package.json.artifacts.wheels must be a non-empty array")
     wheels = [
-        validate_python_artifact(
+        validate_package_artifact(
             wheel,
             label=f"python-package.json.artifacts.wheels[{index}]",
             suffix=".whl",
@@ -454,7 +546,13 @@ def validate_release_bundle(
         files=files,
         checksums=checksums,
     )
-    if profile_id == "python-package":
+    if profile_id == "cargo-crate":
+        evidence["crate"] = validate_cargo_crate(
+            files=files,
+            checksums=checksums,
+            release_version=release_version,
+        )
+    elif profile_id == "python-package":
         evidence["package"] = validate_python_package(
             files=files,
             checksums=checksums,
