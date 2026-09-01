@@ -6,20 +6,14 @@
 name: Release Relay actions
 
 on:
-  push:
-    branches:
-      - main
-      - master
-    paths:
-      - release.json
   workflow_dispatch:
     inputs:
       version:
-        description: "Unused immutable semantic version tag, for example v1.0.0."
+        description: "Reviewed version already promoted in CHANGELOG.md and release.json."
         required: true
         type: string
       update-major-alias:
-        description: "Advance the matching moving major alias after release creation."
+        description: "Advance the matching moving major discovery alias."
         required: true
         default: true
         type: boolean
@@ -28,17 +22,17 @@ permissions:
   contents: read
 
 concurrency:
-  group: relay-release
+  group: "relay-release-${{ inputs.version }}"
   cancel-in-progress: false
 
 jobs:
-  release:
-    name: Validate and publish every Relay action
+  bundle:
+    name: Build Relay's reviewed profile bundle
     if: "${{ github.ref_name == github.event.repository.default_branch }}"
     permissions:
-      contents: write
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
 
     steps:
       - name: Harden runner
@@ -47,162 +41,132 @@ jobs:
         with:
           egress-policy: audit
 
-      - name: Checkout exact default-branch commit
+      - name: Check out exact default-branch commit
         # actions/checkout v7.0.1
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
 
-      - name: Validate release request
-        id: release
+      - name: Require reviewed version authority agreement
         shell: bash
         env:
           DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
-          EVENT_NAME: "${{ github.event_name }}"
-          MANUAL_UPDATE_MAJOR_ALIAS: "${{ inputs.update-major-alias }}"
-          MANUAL_VERSION: "${{ inputs.version }}"
+          REQUESTED_VERSION: "${{ inputs.version }}"
         run: |
           set -euo pipefail
-          if [[ "${EVENT_NAME}" == "push" ]]; then
-            readarray -t release_values < <(
-              python3 -c 'import json, sys; from pathlib import Path; release = json.loads(Path("release.json").read_text(encoding="utf-8")); sys.exit("release.json uses an unsupported schema") if release.get("schema") != "egohygiene.relay-release/v1" else None; print(release.get("version", "")); print(str(release.get("update_major_alias", False)).lower())'
-            )
-            version="${release_values[0]:-}"
-            update_major_alias="${release_values[1]:-false}"
-          else
-            version="${MANUAL_VERSION}"
-            update_major_alias="${MANUAL_UPDATE_MAJOR_ALIAS}"
-          fi
           if [[ "${GITHUB_REF_NAME}" != "${DEFAULT_BRANCH}" ]]; then
-            printf 'Releases must run from default branch %s; received %s.\n' \
-              "${DEFAULT_BRANCH}" "${GITHUB_REF_NAME}" >&2
+            echo "::error::Relay releases must run from the configured default branch"
             exit 2
           fi
-          if [[ ! "${version}" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
-            printf 'version must be an exact vMAJOR.MINOR.PATCH value: %s\n' "${version}" >&2
+          declared_version="$(python3 -c 'import json; print(json.load(open("release.json", encoding="utf-8"))["version"])')"
+          if [[ "${REQUESTED_VERSION}" != "${declared_version}" ]]; then
+            echo "::error::manual version does not match release.json authority"
             exit 2
           fi
-          if [[ "${update_major_alias}" != "true" && "${update_major_alias}" != "false" ]]; then
-            printf 'update-major-alias must resolve to true or false: %s\n' \
-              "${update_major_alias}" >&2
-            exit 2
-          fi
-          git fetch origin "${DEFAULT_BRANCH}"
-          default_commit="$(git rev-parse "origin/${DEFAULT_BRANCH}^{commit}")"
-          current_commit="$(git rev-parse "HEAD^{commit}")"
-          if [[ "${current_commit}" != "${default_commit}" ]]; then
-            printf 'Release commit %s is not current default-branch head %s.\n' \
-              "${current_commit}" "${default_commit}" >&2
-            exit 2
-          fi
-          tag_exists="false"
-          if git ls-remote --exit-code --tags origin "refs/tags/${version}" >/dev/null 2>&1; then
-            git fetch --force origin "refs/tags/${version}:refs/tags/${version}"
-            existing_commit="$(git rev-parse "${version}^{commit}")"
-            if [[ "${existing_commit}" != "${current_commit}" ]]; then
-              printf 'Immutable release tag %s already targets another commit: %s\n' \
-                "${version}" "${existing_commit}" >&2
-              exit 2
-            fi
-            tag_exists="true"
-          fi
-          major_alias="${version%%.*}"
-          printf 'major-alias=%s\n' "${major_alias}" >> "${GITHUB_OUTPUT}"
-          printf 'commit=%s\n' "${current_commit}" >> "${GITHUB_OUTPUT}"
-          printf 'update-major-alias=%s\n' "${update_major_alias}" >> "${GITHUB_OUTPUT}"
-          printf 'version=%s\n' "${version}" >> "${GITHUB_OUTPUT}"
-          printf 'tag-exists=%s\n' "${tag_exists}" >> "${GITHUB_OUTPUT}"
 
-      - name: Validate action catalog and metadata
-        run: python3 scripts/validate_actions.py
-
-      - name: Run complete test suite
-        run: >-
-          python3 -m unittest discover
-          --start-directory tests
-          --pattern "test_*.py"
-          --verbose
-
-      - name: Compile Python sources
-        run: python3 -m compileall -q actions scripts tests
-
-      - name: Validate Bash syntax
+      - name: Validate Relay before packaging
         shell: bash
         run: |
           set -euo pipefail
-          while IFS= read -r script; do
-            bash -n "${script}"
-          done < <(find actions scripts -type f \( -name "*.sh" -o -name "repo-activity" \) -print | sort)
+          python3 scripts/validate_actions.py
+          python3 -m unittest discover \
+            --start-directory tests \
+            --pattern "test_*.py" \
+            --verbose
+          python3 -m compileall -q actions scripts tests
 
-      - name: Parse JSON contracts and fixtures
+      - name: Build deterministic github-action profile bundle
         shell: bash
+        env:
+          RELEASE_VERSION: "${{ inputs.version }}"
         run: |
           set -euo pipefail
+          bundle=".relay/release-bundle"
+          mkdir --parents "${bundle}"
+          cp "action-catalog.json" "${bundle}/action-catalog.json"
+          cp "workflow-catalog.json" "${bundle}/workflow-catalog.json"
+          tar \
+            --create \
+            --file - \
+            --format "posix" \
+            --group 0 \
+            --mtime "@0" \
+            --numeric-owner \
+            --owner 0 \
+            --sort "name" \
+            ".github/workflows" "actions" "schemas" \
+          | gzip --no-name > "${bundle}/relay-${RELEASE_VERSION}.tar.gz"
           python3 - <<'PYTHON'
           import json
+          import os
           from pathlib import Path
 
-          paths = [
-              Path("action-catalog.json"),
-              Path("workflow-catalog.json"),
-              Path("release.json"),
-              Path("release-profiles.json"),
-          ]
-          paths.extend(sorted(
-              path
-              for root in (Path("actions"), Path("schemas"), Path("tests/fixtures"))
-              for path in root.rglob("*.json")
-          ))
-          for path in paths:
-              json.loads(path.read_text(encoding="utf-8"))
-          print(f"Parsed {len(paths)} JSON documents")
+          bundle = Path(".relay/release-bundle")
+          documents = {
+              "provenance.json": {
+                  "schema": "egohygiene.relay-source-provenance/v1",
+                  "repository": os.environ["GITHUB_REPOSITORY"],
+                  "source_revision": os.environ["GITHUB_SHA"],
+                  "builder": "egohygiene/relay/.github/workflows/release.yml",
+              },
+              "sbom.spdx.json": {
+                  "spdxVersion": "SPDX-2.3",
+                  "dataLicense": "CC0-1.0",
+                  "SPDXID": "SPDXRef-DOCUMENT",
+                  "name": f"relay-{os.environ['RELEASE_VERSION']}",
+                  "documentNamespace": (
+                      "https://egohygiene.github.io/relay/sbom/"
+                      f"{os.environ['GITHUB_SHA']}"
+                  ),
+                  "creationInfo": {
+                      "created": "1970-01-01T00:00:00Z",
+                      "creators": ["Tool: egohygiene/relay"],
+                  },
+                  "packages": [],
+              },
+              "signature.json": {
+                  "schema": "egohygiene.relay-signature-status/v1",
+                  "state": "unavailable",
+                  "reason": "Relay records checksums and provenance; cryptographic release signing is not configured.",
+              },
+          }
+          for name, document in documents.items():
+              (bundle / name).write_text(
+                  json.dumps(document, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
+              )
           PYTHON
+          (
+            cd "${bundle}"
+            find . -maxdepth 1 -type f ! -name "SHA256SUMS" -print \
+              | sed 's#^./##' \
+              | sort \
+              | xargs sha256sum > "SHA256SUMS"
+          )
 
-      - name: Parse action and workflow YAML metadata
-        shell: bash
-        run: |
-          set -euo pipefail
-          ruby -e '
-            require "psych"
-            paths = Dir["actions/*/action.yml", ".github/workflows/*.{yml,yaml}"].sort
-            paths.each { |path| Psych.parse_file(path) }
-            puts "Parsed #{paths.length} YAML metadata documents"
-          '
+      - name: Upload caller-owned release bundle
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "relay-release-bundle-${{ github.sha }}"
+          path: ".relay/release-bundle"
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 9
 
-      - name: Create immutable tag and GitHub Release
-        shell: bash
-        env:
-          GH_TOKEN: "${{ github.token }}"
-          TAG_EXISTS: "${{ steps.release.outputs.tag-exists }}"
-          VERSION: "${{ steps.release.outputs.version }}"
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [[ "${TAG_EXISTS}" != "true" ]]; then
-            git tag --annotate "${VERSION}" --message "Relay ${VERSION}"
-            git push origin "refs/tags/${VERSION}"
-          fi
-          if gh release view "${VERSION}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
-            printf 'GitHub Release already exists for %s; retaining it.\n' "${VERSION}"
-          else
-            gh release create "${VERSION}" \
-              --repo "${GITHUB_REPOSITORY}" \
-              --title "Relay ${VERSION}" \
-              --generate-notes \
-              --verify-tag
-          fi
-
-      - name: Advance moving major alias
-        if: "${{ steps.release.outputs.update-major-alias == 'true' }}"
-        shell: bash
-        env:
-          MAJOR_ALIAS: "${{ steps.release.outputs.major-alias }}"
-          RELEASE_COMMIT: "${{ steps.release.outputs.commit }}"
-          VERSION: "${{ steps.release.outputs.version }}"
-        run: |
-          set -euo pipefail
-          git tag --force --annotate "${MAJOR_ALIAS}" "${RELEASE_COMMIT}" \
-            --message "Relay ${MAJOR_ALIAS} tracks ${VERSION}"
-          git push --force origin "refs/tags/${MAJOR_ALIAS}"
+  release:
+    name: Verify and publish Relay's immutable release
+    needs: bundle
+    permissions:
+      actions: read
+      contents: write
+    uses: $/.github/workflows/semantic-release.yml
+    with:
+      artifact-name: "relay-release-bundle-${{ github.sha }}"
+      release-version: "${{ inputs.version }}"
+      profile: "github-action"
+      component-id: "relay"
+      expected-source-revision: "${{ github.sha }}"
+      update-major-alias: "${{ inputs.update-major-alias }}"
+      artifact-retention-days: 30

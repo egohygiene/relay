@@ -87,6 +87,18 @@ discovery and controlled-update target, not an immutable consumer reference.
 See the [complete pinned caller](../../examples/workflows/repository-intelligence.yml)
 for an adoption-ready workflow.
 
+## Semantic release
+
+`release-prepare.yml` is the read-only entry point for Aether-declared release
+planning and verification. It preserves success or failure evidence and has no
+tag, release, registry, or deployment authority. `semantic-release.yml` is the
+separate default-branch publication handoff: it reuses preparation in `verify`
+mode, then passes the exact caller-built bundle to `release-artifact.yml`.
+
+Consumer repositories own the manual-dispatch wrapper, artifact construction,
+and every external registry or deployment adapter. Ordinary pull requests call
+only the preparation workflow; they cannot reach the write-capable handoff.
+
 ## Publication review and Pages deployment
 
 `publication-review.yml` accepts an ordinary artifact containing a complete,

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://egohygiene.io/schemas/aether/repository-release/v1.json",
+  "schema_version": "egohygiene.repository-release/v1",
+  "repository": {
+    "id": "egohygiene/relay",
+    "lifecycle": "active",
+    "release_profile": "contract"
+  },
+  "release": {
+    "state": "released",
+    "tag_prefix": "v",
+    "immutable_tags": true,
+    "major_alias": "enabled"
+  },
+  "changelog": {
+    "path": "CHANGELOG.md",
+    "format": "keep-a-changelog/1.1",
+    "unreleased_heading": "Unreleased"
+  },
+  "components": [
+    {
+      "id": "relay",
+      "kind": "catalog",
+      "version_authority": {
+        "kind": "catalog-record",
+        "path": "release.json",
+        "selector": "version"
+      }
+    }
+  ],
+  "delivery": {
+    "channels": [
+      {
+        "kind": "github-release",
+        "state": "configured",
+        "relay_profile": "github-action",
+        "notes": "Relay publishes immutable action/workflow evidence; consumers pin reviewed full commit SHAs."
+      }
+    ]
+  },
+  "evidence": {
+    "source": "required",
+    "change": "required",
+    "provenance": "required",
+    "sbom": "required",
+    "signature": "unavailable",
+    "rollback": {
+      "strategy": "revert-and-successor-tag",
+      "instructions": "Keep the immutable tag and assets. Move only the major discovery alias to the last verified commit, revert the fault, and publish a corrected successor release."
+    }
+  },
+  "automation": {
+    "taskfile_path": "Taskfile.yml",
+    "tasks": {
+      "plan": "release:plan",
+      "prepare": "release:prepare",
+      "verify": "release:verify",
+      "publish": "release:publish"
+    },
+    "github": {
+      "manual_dispatch_required": true,
+      "workflow_path": ".github/workflows/release.yml",
+      "state": "configured"
+    }
+  }
+}

@@ -45,14 +45,14 @@
       "id": "relay-release",
       "path": ".github/workflows/release.yml",
       "owner": "egohygiene/relay",
-      "purpose": "Validate and publish one immutable repository-wide Relay release, then optionally advance its major discovery alias.",
+      "purpose": "Build Relay's reviewed profile bundle and dogfood the reusable semantic-release handoff from explicit manual dispatch.",
       "audience": "internal",
       "status": "stable",
-      "triggers": ["push", "workflow_dispatch"],
-      "permissions": {"contents": "write"},
-      "timeout_minutes": 20,
+      "triggers": ["workflow_dispatch"],
+      "permissions": {"actions": "read", "contents": "write"},
+      "timeout_minutes": 15,
       "concurrency": {
-        "group": "relay-release",
+        "group": "relay-release-${{ inputs.version }}",
         "cancel_in_progress": false
       },
       "failure_semantics": {
@@ -166,6 +166,80 @@
         }
       ],
       "consumer_ref": "egohygiene/relay/.github/workflows/release-artifact.yml@v1"
+    },
+    {
+      "id": "release-prepare",
+      "path": ".github/workflows/release-prepare.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Plan or verify an Aether-declared release under read-only authority and retain deterministic success or failure evidence.",
+      "audience": "reusable",
+      "status": "beta",
+      "triggers": ["workflow_call"],
+      "permissions": {"actions": "read", "contents": "read"},
+      "timeout_minutes": 10,
+      "concurrency": {
+        "group": "relay-release-prepare-${{ github.repository }}-${{ inputs.release-version }}-${{ github.ref }}",
+        "cancel_in_progress": true
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Declaration, authority, changelog, source, tag, or profile disagreement fails closed while bounded failure evidence remains available."
+      },
+      "inputs": [
+        {"name": "release-version", "type": "string", "required": true, "description": "Reviewed exact vMAJOR.MINOR.PATCH candidate."},
+        {"name": "profile", "type": "string", "required": true, "description": "Relay artifact profile selected by the Aether declaration."},
+        {"name": "component-id", "type": "string", "required": false, "default": "", "description": "Selected component; required for multi-component repositories."},
+        {"name": "declaration-path", "type": "string", "required": false, "default": ".egohygiene/release.json", "description": "Repository-relative Aether release declaration."},
+        {"name": "mode", "type": "string", "required": false, "default": "plan", "description": "Read-only plan or prepared-candidate verification."},
+        {"name": "artifact-name", "type": "string", "required": false, "default": "", "description": "Caller-built release bundle artifact; required by verify mode."},
+        {"name": "expected-source-revision", "type": "string", "required": true, "description": "Full caller commit represented by the release plan."},
+        {"name": "artifact-retention-days", "type": "number", "required": false, "default": 30, "description": "Retention for deterministic success or failure evidence."}
+      ],
+      "outputs": [
+        {"name": "evidence-artifact-name", "type": "string", "required": true, "description": "Durable artifact containing success or bounded failure evidence."},
+        {"name": "evidence-sha256", "type": "string", "required": true, "description": "SHA-256 of successful deterministic release-plan evidence."},
+        {"name": "releasable", "type": "string", "required": true, "description": "True only when every requested check passed."},
+        {"name": "tag-state", "type": "string", "required": true, "description": "Available or resumable-identical immutable tag state."}
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/release-prepare.yml@v1"
+    },
+    {
+      "id": "semantic-release",
+      "path": ".github/workflows/semantic-release.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Verify a prepared default-branch candidate and hand its exact profile bundle to immutable GitHub Release publication.",
+      "audience": "reusable",
+      "status": "beta",
+      "triggers": ["workflow_call"],
+      "permissions": {"actions": "read", "contents": "write"},
+      "timeout_minutes": 5,
+      "concurrency": {
+        "group": "relay-semantic-release-${{ github.repository }}-${{ inputs.release-version }}",
+        "cancel_in_progress": false
+      },
+      "failure_semantics": {
+        "mode": "resume-verified-release",
+        "partial_success": false,
+        "retry": "matching-commit-only",
+        "description": "Preparation or publication disagreement fails closed and retains an outcome report; retries resume only identical immutable evidence."
+      },
+      "inputs": [
+        {"name": "artifact-name", "type": "string", "required": true, "description": "Complete caller-built release bundle from an earlier job."},
+        {"name": "release-version", "type": "string", "required": true, "description": "Reviewed exact vMAJOR.MINOR.PATCH candidate."},
+        {"name": "profile", "type": "string", "required": true, "description": "Relay artifact profile selected by the Aether declaration."},
+        {"name": "component-id", "type": "string", "required": false, "default": "", "description": "Selected component; required for multi-component repositories."},
+        {"name": "declaration-path", "type": "string", "required": false, "default": ".egohygiene/release.json", "description": "Repository-relative Aether release declaration."},
+        {"name": "expected-source-revision", "type": "string", "required": true, "description": "Full current default-branch commit represented by the release."},
+        {"name": "update-major-alias", "type": "boolean", "required": false, "default": false, "description": "Advance the matching moving major discovery alias after publication."},
+        {"name": "artifact-retention-days", "type": "number", "required": false, "default": 30, "description": "Retention for release evidence and publication outcome reports."}
+      ],
+      "outputs": [
+        {"name": "release-url", "type": "string", "required": true, "description": "Immutable GitHub Release URL."},
+        {"name": "rollback-reference", "type": "string", "required": true, "description": "Immutable release tag retaining rollback instructions."}
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/semantic-release.yml@v1"
     },
     {
       "id": "publication-review",

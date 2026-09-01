@@ -208,12 +208,14 @@ def validate_workflow_metadata(repository_root: Path, errors: list[str]) -> None
         "workflow_dispatch:",
         "release.json",
         "contents: write",
-        "vMAJOR.MINOR.PATCH",
-        "git tag --annotate",
-        "gh release create",
+        "uses: $/.github/workflows/semantic-release.yml",
+        'profile: "github-action"',
+        'component-id: "relay"',
     ):
         if required not in release:
             errors.append(f"release workflow lacks required contract: {required}")
+    if re.search(r"^\s*push:\s*$", release, re.MULTILINE):
+        errors.append("Relay dogfood release must require explicit manual dispatch")
 
     artifact_release = (workflow_root / "release-artifact.yml").read_text(
         encoding="utf-8"
@@ -235,6 +237,33 @@ def validate_workflow_metadata(repository_root: Path, errors: list[str]) -> None
             )
     if "pull_request_target:" in artifact_release:
         errors.append("release-artifact workflow must not use pull_request_target")
+
+    preparation = (workflow_root / "release-prepare.yml").read_text(encoding="utf-8")
+    for required in (
+        "workflow_call:",
+        "uses: $/actions/verify-release-plan",
+        "mode:",
+        "expected-source-revision",
+        "if: \"${{ always() }}\"",
+        "release-plan-evidence.json",
+    ):
+        if required not in preparation:
+            errors.append(f"release-prepare workflow lacks required contract: {required}")
+    if "contents: write" in preparation or "pull_request_target:" in preparation:
+        errors.append("release-prepare must remain read-only and avoid pull_request_target")
+
+    semantic = (workflow_root / "semantic-release.yml").read_text(encoding="utf-8")
+    for required in (
+        "workflow_call:",
+        "uses: $/.github/workflows/release-prepare.yml",
+        "uses: $/.github/workflows/release-artifact.yml",
+        "release-publication-outcome.json",
+        "if: \"${{ always() }}\"",
+    ):
+        if required not in semantic:
+            errors.append(f"semantic-release workflow lacks required contract: {required}")
+    if "pull_request_target:" in semantic:
+        errors.append("semantic-release workflow must not use pull_request_target")
 
 
 def validate_release_profiles(repository_root: Path, errors: list[str]) -> None:

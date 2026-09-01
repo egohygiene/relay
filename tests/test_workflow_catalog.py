@@ -61,7 +61,11 @@ class WorkflowCatalogTests(unittest.TestCase):
                 "egohygiene/relay/.github/workflows/"
                 "release-artifact.yml@v1",
                 "egohygiene/relay/.github/workflows/"
-                "repository-intelligence.yml@v1"
+                "release-prepare.yml@v1",
+                "egohygiene/relay/.github/workflows/"
+                "repository-intelligence.yml@v1",
+                "egohygiene/relay/.github/workflows/"
+                "semantic-release.yml@v1",
             },
         )
 
@@ -88,7 +92,8 @@ class WorkflowCatalogTests(unittest.TestCase):
         compatible_trigger = "  push:\n    branches:\n      - main\n      - master\n"
 
         self.assertIn(compatible_trigger, validation)
-        self.assertIn(compatible_trigger, release)
+        self.assertNotIn("  push:", release)
+        self.assertIn("  workflow_dispatch:", release)
         self.assertNotIn('default-branch: "main"', validation)
 
     def test_release_branch_compatibility_preserves_default_branch_gate(self) -> None:
@@ -104,7 +109,7 @@ class WorkflowCatalogTests(unittest.TestCase):
             'DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"',
             release,
         )
-        self.assertIn('git fetch origin "${DEFAULT_BRANCH}"', release)
+        self.assertIn("uses: $/.github/workflows/semantic-release.yml", release)
         self.assertNotIn('git fetch origin "main"', release)
         self.assertNotIn('git fetch origin "master"', release)
 

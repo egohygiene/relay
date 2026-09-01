@@ -19,9 +19,12 @@ and deployment.
 | Publication-site contract validation | `egohygiene/relay/actions/validate-publication-site@v1` |
 | Deployed publication byte verification | `egohygiene/relay/actions/verify-publication-pages@v1` |
 | Profile-bound release bundle validation | `egohygiene/relay/actions/validate-release-bundle@v1` |
+| Read-only semantic-release plan verification | `egohygiene/relay/actions/verify-release-plan@v1` |
 | Read-only publication review | `egohygiene/relay/.github/workflows/publication-review.yml@v1` |
 | Publication Pages deployment | `egohygiene/relay/.github/workflows/publication-pages.yml@v1` |
 | Immutable profile-bound release publication | `egohygiene/relay/.github/workflows/release-artifact.yml@v1` |
+| Read-only semantic-release preparation | `egohygiene/relay/.github/workflows/release-prepare.yml@v1` |
+| Reviewed semantic-release handoff | `egohygiene/relay/.github/workflows/semantic-release.yml@v1` |
 
 These moving aliases advertise the release surface. Production consumers use a
 reviewed full commit SHA, as shown below.
@@ -31,6 +34,8 @@ The complete action and workflow inventories live in
 [`workflow-catalog.json`](workflow-catalog.json). See
 [`actions/README.md`](actions/README.md) and
 [`WORKFLOW_CATALOG.md`](WORKFLOW_CATALOG.md) for their human contracts.
+The complete release lifecycle and repository-class boundaries are documented
+in [`SEMANTIC_RELEASE.md`](SEMANTIC_RELEASE.md).
 
 ## Compose Intelligence into an existing site
 
@@ -173,6 +178,26 @@ python3 -m compileall -q actions scripts tests
 CI additionally checks Bash syntax, JSON parsing, workflow/action metadata, and
 release invariants on every pull request and default-branch push.
 
+## Semantic-release preparation and publication
+
+The Aether `egohygiene.repository-release/v1` declaration remains the source of
+release intent. Relay validates that declaration, its selected component's sole
+version authority, Keep a Changelog promotion, Git/default-branch identity,
+immutable tag availability, and the selected artifact profile. Conventional
+Commit history may inform a human-reviewed bump, but Relay never rewrites a
+version or changelog.
+
+Use `release-prepare.yml` from pull requests or manual planning workflows. It
+has no write permission and always preserves deterministic success or bounded
+failure evidence. After the reviewed preparation merges, a repository-owned
+manual workflow on the current default branch builds the product's profile
+bundle and calls `semantic-release.yml`. That workflow verifies the exact
+candidate before handing the same artifact to `release-artifact.yml`.
+
+Registry packages, container pushes, Pages deployment, DOI minting, and other
+external delivery remain separate consumer-owned adapters. They may consume
+Relay evidence but are not implied by a GitHub Release.
+
 ## Versioning and publication
 
 Relay publishes all cataloged actions together:
@@ -181,11 +206,12 @@ Relay publishes all cataloged actions together:
 - moving major alias: `v1`;
 - recommended consumer reference: full commit SHA.
 
-The current [`release.json`](release.json) manifest requests `v1.2.0`; the
-existing `v1.0.0` and `v1.1.0` tags remain immutable. The `Release Relay actions` workflow
-also supports manual dispatch. In both cases it validates an unused exact
-`vMAJOR.MINOR.PATCH`, verifies the current default-branch commit, creates the
-immutable tag and GitHub Release, and then advances the matching major alias.
+The current [`release.json`](release.json) authority and
+[`CHANGELOG.md`](CHANGELOG.md) prepare `v1.5.0`; every prior exact tag remains
+immutable. The `Release Relay actions` workflow runs only through explicit
+manual dispatch on the configured default branch. It builds Relay's
+`github-action` profile bundle and dogfoods the reusable semantic-release
+verification and immutable publication path.
 If tag creation succeeds but release creation is interrupted, a rerun resumes
 only when that immutable tag still resolves to the same validated commit.
 Subdirectory actions are directly consumable without Marketplace publication;

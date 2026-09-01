@@ -1,0 +1,159 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Publish reviewed semantic release
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        description: Complete caller-built release bundle from an earlier job.
+        required: true
+        type: string
+      release-version:
+        description: Reviewed exact vMAJOR.MINOR.PATCH candidate.
+        required: true
+        type: string
+      profile:
+        description: Relay artifact profile selected by the Aether declaration.
+        required: true
+        type: string
+      component-id:
+        description: Selected component; required for multi-component repositories.
+        required: false
+        default: ""
+        type: string
+      declaration-path:
+        description: Repository-relative Aether release declaration.
+        required: false
+        default: ".egohygiene/release.json"
+        type: string
+      expected-source-revision:
+        description: Full current default-branch commit represented by the release.
+        required: true
+        type: string
+      update-major-alias:
+        description: Advance the matching moving major discovery alias after publication.
+        required: false
+        default: false
+        type: boolean
+      artifact-retention-days:
+        description: Retention for release evidence and publication outcome reports.
+        required: false
+        default: 30
+        type: number
+    outputs:
+      release-url:
+        description: Immutable GitHub Release URL.
+        value: "${{ jobs.publish.outputs.release-url }}"
+      rollback-reference:
+        description: Immutable release tag retaining rollback instructions.
+        value: "${{ jobs.publish.outputs.rollback-reference }}"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "relay-semantic-release-${{ github.repository }}-${{ inputs.release-version }}"
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify reviewed default-branch candidate
+    permissions:
+      actions: read
+      contents: read
+    uses: $/.github/workflows/release-prepare.yml
+    with:
+      artifact-name: "${{ inputs.artifact-name }}"
+      release-version: "${{ inputs.release-version }}"
+      profile: "${{ inputs.profile }}"
+      component-id: "${{ inputs.component-id }}"
+      declaration-path: "${{ inputs.declaration-path }}"
+      expected-source-revision: "${{ inputs.expected-source-revision }}"
+      mode: "verify"
+      artifact-retention-days: "${{ inputs.artifact-retention-days }}"
+
+  publish:
+    name: Publish exact reviewed immutable evidence
+    needs: verify
+    permissions:
+      actions: read
+      contents: write
+    uses: $/.github/workflows/release-artifact.yml
+    with:
+      artifact-name: "${{ inputs.artifact-name }}"
+      expected-source-revision: "${{ inputs.expected-source-revision }}"
+      profile: "${{ inputs.profile }}"
+      release-version: "${{ inputs.release-version }}"
+      update-major-alias: "${{ inputs.update-major-alias }}"
+      artifact-retention-days: "${{ inputs.artifact-retention-days }}"
+
+  outcome:
+    name: Preserve publication handoff outcome
+    if: "${{ always() }}"
+    needs:
+      - verify
+      - publish
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Write bounded publication outcome
+        shell: bash
+        env:
+          PREPARATION_RESULT: "${{ needs.verify.result }}"
+          PROFILE: "${{ inputs.profile }}"
+          PUBLICATION_RESULT: "${{ needs.publish.result }}"
+          RELEASE_VERSION: "${{ inputs.release-version }}"
+          SOURCE_REVISION: "${{ inputs.expected-source-revision }}"
+        run: |
+          set -euo pipefail
+          mkdir --parents ".relay"
+          python3 - <<'PYTHON'
+          import json
+          import os
+          from pathlib import Path
+
+          evidence = {
+              "schema": "egohygiene.relay-release-publication-outcome/v1",
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "release_version": os.environ["RELEASE_VERSION"],
+              "source_revision": os.environ["SOURCE_REVISION"],
+              "profile": os.environ["PROFILE"],
+              "preparation_result": os.environ["PREPARATION_RESULT"],
+              "publication_result": os.environ["PUBLICATION_RESULT"],
+              "immutable_release_created": os.environ["PUBLICATION_RESULT"] == "success",
+          }
+          Path(".relay/release-publication-outcome.json").write_text(
+              json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PYTHON
+
+      - name: Upload durable publication outcome
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "release-outcome-${{ github.run_id }}-${{ github.run_attempt }}"
+          path: ".relay/release-publication-outcome.json"
+          if-no-files-found: error
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9
+
+      - name: Fail when the immutable handoff did not complete
+        if: "${{ needs.verify.result != 'success' || needs.publish.result != 'success' }}"
+        shell: bash
+        run: |
+          echo "::error::semantic release handoff did not complete; durable outcome evidence was preserved"
+          exit 2

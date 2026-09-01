@@ -9,6 +9,8 @@ https://egohygiene.github.io/relay/contracts/workflow-catalog/v1/schema.json
 https://egohygiene.github.io/relay/contracts/release-profiles/v1/schema.json
 https://egohygiene.github.io/relay/contracts/cargo-crate-release/v1/schema.json
 https://egohygiene.github.io/relay/contracts/python-package-release/v1/schema.json
+https://egohygiene.github.io/relay/contracts/release-plan-evidence/v1/schema.json
+https://egohygiene.github.io/relay/contracts/release-publication-outcome/v1/schema.json
 ```
 
 `action-catalog.json` inventories public composite actions and reusable entry
@@ -21,6 +23,10 @@ timeouts, concurrency, caller parameters, and failure semantics.
 external-registry record required by the `cargo-crate` profile.
 `python-package-release/v1` defines the component, authority, distribution,
 and external-registry record required by the `python-package` profile.
+`release-plan-evidence/v1` records deterministic semantic-release preparation
+success or bounded failure without copying Aether's declaration schema.
+`release-publication-outcome/v1` retains the preparation and immutable
+publication job results even when the write handoff fails.
 
 The schemas packaged inside the Intelligence actions intentionally retain the
 public identities established while the implementation was incubated in

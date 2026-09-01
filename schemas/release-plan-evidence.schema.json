@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/release-plan-evidence/v1/schema.json",
+  "title": "Relay release-plan evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "mode",
+    "repository",
+    "source_revision",
+    "default_branch",
+    "release_version",
+    "component",
+    "profile",
+    "changelog",
+    "tag_state",
+    "bundle",
+    "rollback",
+    "errors"
+  ],
+  "properties": {
+    "schema": {"const": "egohygiene.relay-release-plan-evidence/v1"},
+    "status": {"enum": ["verified", "failed"]},
+    "mode": {"enum": ["plan", "verify"]},
+    "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "source_revision": {"type": "string"},
+    "default_branch": {"type": "string"},
+    "release_version": {"type": "string"},
+    "component": {"type": ["object", "null"]},
+    "profile": {"type": "object"},
+    "changelog": {"type": ["object", "null"]},
+    "tag_state": {"enum": ["available", "resumable-identical", "unknown"]},
+    "bundle": {"type": ["object", "null"]},
+    "rollback": {"type": ["object", "null"]},
+    "errors": {"type": "array", "items": {"type": "string"}}
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "status": {"const": "verified"},
+        "source_revision": {"pattern": "^[0-9a-f]{40}$"},
+        "release_version": {"pattern": "^v(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"},
+        "component": {"type": "object"},
+        "changelog": {"type": "object"},
+        "tag_state": {"enum": ["available", "resumable-identical"]},
+        "rollback": {"type": "object"},
+        "errors": {"maxItems": 0}
+      }
+    },
+    {
+      "properties": {
+        "status": {"const": "failed"},
+        "component": {"type": "null"},
+        "changelog": {"type": "null"},
+        "tag_state": {"const": "unknown"},
+        "bundle": {"type": "null"},
+        "rollback": {"type": "null"},
+        "errors": {"minItems": 1}
+      }
+    }
+  ]
+}

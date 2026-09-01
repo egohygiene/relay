@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/release-publication-outcome/v1/schema.json",
+  "title": "Relay release-publication outcome",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "repository",
+    "release_version",
+    "source_revision",
+    "profile",
+    "preparation_result",
+    "publication_result",
+    "immutable_release_created"
+  ],
+  "properties": {
+    "schema": {"const": "egohygiene.relay-release-publication-outcome/v1"},
+    "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "release_version": {"type": "string"},
+    "source_revision": {"type": "string"},
+    "profile": {"type": "string"},
+    "preparation_result": {"enum": ["success", "failure", "cancelled", "skipped"]},
+    "publication_result": {"enum": ["success", "failure", "cancelled", "skipped"]},
+    "immutable_release_created": {"type": "boolean"}
+  }
+}

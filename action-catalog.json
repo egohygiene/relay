@@ -54,6 +54,17 @@
       "consumer_ref": "egohygiene/relay/actions/validate-release-bundle@v1"
     },
     {
+      "id": "verify-release-plan",
+      "path": "actions/verify-release-plan",
+      "name": "Verify Release Plan",
+      "summary": "Verify Aether release intent, authoritative versions, changelog promotion, Git identity, immutable tag state, and optional profile evidence without publishing.",
+      "status": "beta",
+      "runtime": ["bash", "git", "python3"],
+      "permissions": {},
+      "side_effects": ["git-network-read", "workspace-write"],
+      "consumer_ref": "egohygiene/relay/actions/verify-release-plan@v1"
+    },
+    {
       "id": "validate-publication-site",
       "path": "actions/validate-publication-site",
       "name": "Validate Publication Site",
@@ -125,6 +136,30 @@
         "contents": "write"
       },
       "consumer_ref": "egohygiene/relay/.github/workflows/release-artifact.yml@v1"
+    },
+    {
+      "id": "release-prepare",
+      "path": ".github/workflows/release-prepare.yml",
+      "name": "Semantic Release Preparation",
+      "summary": "Plan or verify a reviewed release candidate under read-only authority and preserve deterministic success or failure evidence.",
+      "status": "beta",
+      "permissions": {
+        "actions": "read",
+        "contents": "read"
+      },
+      "consumer_ref": "egohygiene/relay/.github/workflows/release-prepare.yml@v1"
+    },
+    {
+      "id": "semantic-release",
+      "path": ".github/workflows/semantic-release.yml",
+      "name": "Reviewed Semantic Release",
+      "summary": "Verify a prepared default-branch candidate and hand its exact profile bundle to immutable GitHub Release publication.",
+      "status": "beta",
+      "permissions": {
+        "actions": "read",
+        "contents": "write"
+      },
+      "consumer_ref": "egohygiene/relay/.github/workflows/semantic-release.yml@v1"
     },
     {
       "id": "repository-intelligence",
