@@ -32,6 +32,7 @@ class ActionCatalogTests(unittest.TestCase):
                 "actions/normalize-repository-report",
                 "actions/publish-report-snapshot",
                 "actions/repository-intelligence",
+                "actions/repository-labels",
                 "actions/validate-release-bundle",
                 "actions/validate-publication-site",
                 "actions/verify-publication-pages",
@@ -51,6 +52,10 @@ class ActionCatalogTests(unittest.TestCase):
             {
                 ".github/workflows/publication-pages.yml",
                 ".github/workflows/publication-review.yml",
+                ".github/workflows/label-sync-apply.yml",
+                ".github/workflows/label-sync-plan.yml",
+                ".github/workflows/pull-request-label-apply.yml",
+                ".github/workflows/pull-request-label-plan.yml",
                 ".github/workflows/release-artifact.yml",
                 ".github/workflows/release-prepare.yml",
                 ".github/workflows/repository-intelligence.yml",
@@ -114,6 +119,23 @@ class ActionCatalogTests(unittest.TestCase):
         self.assertIn("release.json", release)
         self.assertIn("uses: $/.github/workflows/semantic-release.yml", release)
         self.assertNotIn("  push:", release)
+
+    def test_pull_request_label_handoff_recomputes_before_writing(self) -> None:
+        planner = (
+            REPOSITORY_ROOT / ".github/workflows/pull-request-label-plan.yml"
+        ).read_text(encoding="utf-8")
+        apply = (
+            REPOSITORY_ROOT / ".github/workflows/pull-request-label-apply.yml"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('ref: "${{ github.event.pull_request.base.sha }}"', planner)
+        self.assertNotIn("pull_request_target", planner + apply)
+        self.assertIn("actions/runs/${RUN_ID}/pull_requests", apply)
+        self.assertIn("Independently recompute the trusted plan", apply)
+        self.assertIn('ref: "${{ steps.provider.outputs.base-sha }}"', apply)
+        self.assertIn('CANDIDATE_SHA256: "${{ steps.candidate.outputs.plan-sha256 }}"', apply)
+        self.assertIn('TRUSTED_SHA256: "${{ steps.trusted.outputs.plan-sha256 }}"', apply)
+        self.assertIn('plan: ".relay/trusted-pull-request-label-plan.json"', apply)
 
     def test_extracted_v1_contract_ids_remain_compatible(self) -> None:
         expected_ids = {

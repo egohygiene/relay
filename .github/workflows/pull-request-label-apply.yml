@@ -1,0 +1,273 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Pull Request Label Apply
+
+on:
+  workflow_call:
+    inputs:
+      planner-workflow-name:
+        description: Exact trusted caller workflow name allowed to produce plans.
+        required: true
+        type: string
+      configuration-path:
+        description: Repository-relative Relay label configuration on the trusted PR base.
+        required: false
+        type: string
+        default: ".github/relay-labels.json"
+      artifact-retention-days:
+        description: Retention for apply evidence.
+        required: false
+        type: number
+        default: 30
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "relay-pr-label-apply-${{ github.repository }}-${{ github.event.workflow_run.id }}"
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    name: Validate trusted handoff and apply managed metadata
+    permissions:
+      actions: read
+      contents: read
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Authorize the triggering read-only workflow
+        shell: bash
+        env:
+          ACTUAL_EVENT: "${{ github.event.workflow_run.event }}"
+          ACTUAL_NAME: "${{ github.event.workflow_run.name }}"
+          CONCLUSION: "${{ github.event.workflow_run.conclusion }}"
+          EXPECTED_NAME: "${{ inputs.planner-workflow-name }}"
+          TRIGGER_REPOSITORY: "${{ github.event.workflow_run.repository.full_name }}"
+          TARGET_REPOSITORY: "${{ github.repository }}"
+        run: |
+          set -euo pipefail
+          [[ "${ACTUAL_EVENT}" == "pull_request" ]]
+          [[ "${CONCLUSION}" == "success" ]]
+          [[ "${ACTUAL_NAME}" == "${EXPECTED_NAME}" ]]
+          [[ "${TRIGGER_REPOSITORY}" == "${TARGET_REPOSITORY}" ]]
+
+      - name: Download the exact triggering run plan
+        # actions/download-artifact v7.0.1
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          pattern: "relay-pr-label-plan-*"
+          path: ".relay/handoff"
+          merge-multiple: true
+          github-token: "${{ github.token }}"
+          run-id: "${{ github.event.workflow_run.id }}"
+
+      - id: candidate
+        name: Require one unambiguous checksum-bound candidate
+        shell: bash
+        env:
+          EXPECTED_RUN_ID: "${{ github.event.workflow_run.id }}"
+          TARGET_REPOSITORY: "${{ github.repository }}"
+        run: |
+          set -euo pipefail
+          mapfile -t plans < <(
+            find ".relay/handoff" -type f \
+              -name "pull-request-label-plan.json" -print
+          )
+          if (( ${#plans[@]} != 1 )); then
+            printf 'expected exactly one pull-request label plan, found %s\n' "${#plans[@]}" >&2
+            exit 2
+          fi
+          cp "${plans[0]}" ".relay/candidate-pull-request-label-plan.json"
+          python3 - "${GITHUB_OUTPUT}" <<'PYTHON'
+          import hashlib
+          import json
+          import os
+          import sys
+          from pathlib import Path
+
+          plan = json.loads(
+              Path(".relay/candidate-pull-request-label-plan.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          checksum = plan.get("plan_sha256")
+          unsigned = dict(plan)
+          unsigned.pop("plan_sha256", None)
+          actual = hashlib.sha256(
+              json.dumps(
+                  unsigned,
+                  ensure_ascii=False,
+                  sort_keys=True,
+                  separators=(",", ":"),
+              ).encode("utf-8")
+          ).hexdigest()
+          number = plan.get("pull_request")
+          source = plan.get("source", {})
+          if (
+              plan.get("schema")
+              != "egohygiene.relay.pull-request-label-plan/v1"
+              or plan.get("repository") != os.environ["TARGET_REPOSITORY"]
+              or str(source.get("run_id")) != os.environ["EXPECTED_RUN_ID"]
+              or isinstance(number, bool)
+              or not isinstance(number, int)
+              or number < 1
+              or checksum != actual
+          ):
+              raise SystemExit("candidate plan identity or checksum is invalid")
+          with Path(sys.argv[1]).open("a", encoding="utf-8") as output:
+              output.write(f"pull-request-number={number}\n")
+              output.write(f"plan-sha256={checksum}\n")
+          PYTHON
+
+      - id: provider
+        name: Rebuild trusted provider inputs and bind run association
+        shell: bash
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          PR_NUMBER: "${{ steps.candidate.outputs.pull-request-number }}"
+          RUN_ID: "${{ github.event.workflow_run.id }}"
+          TARGET_REPOSITORY: "${{ github.repository }}"
+        run: |
+          set -euo pipefail
+          gh api --paginate --slurp \
+            "repos/${TARGET_REPOSITORY}/actions/runs/${RUN_ID}/pull_requests?per_page=100" \
+            > ".relay/run-pull-request-pages.json"
+          gh api "repos/${TARGET_REPOSITORY}/pulls/${PR_NUMBER}" \
+            > ".relay/live-pull-request.json"
+          gh api --paginate --slurp \
+            "repos/${TARGET_REPOSITORY}/pulls/${PR_NUMBER}/files?per_page=100" \
+            > ".relay/changed-file-pages.json"
+          gh api --paginate --slurp \
+            "repos/${TARGET_REPOSITORY}/labels?per_page=100" \
+            > ".relay/available-label-pages.json"
+          gh api --paginate --slurp \
+            "repos/${TARGET_REPOSITORY}/issues/${PR_NUMBER}/comments?per_page=100" \
+            > ".relay/comment-pages.json"
+          python3 - "${GITHUB_OUTPUT}" <<'PYTHON'
+          import json
+          import os
+          import sys
+          from pathlib import Path
+
+          def pages(name):
+              value = json.loads(Path(f".relay/{name}-pages.json").read_text())
+              return [item for page in value for item in page]
+
+          number = int(os.environ["PR_NUMBER"])
+          associated = pages("run-pull-request")
+          if [item.get("number") for item in associated].count(number) != 1:
+              raise SystemExit("candidate PR is not uniquely associated with the planner run")
+          pull = json.loads(Path(".relay/live-pull-request.json").read_text())
+          event = {
+              "action": "pull_request",
+              "number": number,
+              "repository": {"full_name": os.environ["TARGET_REPOSITORY"]},
+              "pull_request": pull,
+          }
+          Path(".relay/trusted-pull-request-event.json").write_text(
+              json.dumps(event, indent=2) + "\n", encoding="utf-8"
+          )
+          for source, destination in (
+              ("changed-file", "changed-files"),
+              ("available-label", "available-labels"),
+              ("comment", "comments"),
+          ):
+              Path(f".relay/trusted-{destination}.json").write_text(
+                  json.dumps(pages(source), indent=2) + "\n", encoding="utf-8"
+              )
+          base_sha = pull.get("base", {}).get("sha", "")
+          if len(base_sha) != 40 or any(
+              character not in "0123456789abcdef" for character in base_sha
+          ):
+              raise SystemExit("live pull request base SHA is invalid")
+          with Path(sys.argv[1]).open("a", encoding="utf-8") as output:
+              output.write(f"base-sha={base_sha}\n")
+          PYTHON
+
+      - name: Check out only the trusted pull-request base
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: "${{ github.repository }}"
+          ref: "${{ steps.provider.outputs.base-sha }}"
+          path: ".relay/consumer"
+          persist-credentials: false
+
+      - name: Check out immutable organization label contract
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: "egohygiene/.github"
+          ref: "b415c8029bf2fb5d474f367e7129791588ba3860"
+          path: ".relay/label-contract"
+          persist-credentials: false
+
+      - id: trusted
+        name: Independently recompute the trusted plan
+        uses: $/actions/repository-labels
+        with:
+          operation: "pr-plan"
+          repository: "${{ github.repository }}"
+          configuration: ".relay/consumer/${{ inputs.configuration-path }}"
+          event: ".relay/trusted-pull-request-event.json"
+          changed-files: ".relay/trusted-changed-files.json"
+          available-labels: ".relay/trusted-available-labels.json"
+          comments: ".relay/trusted-comments.json"
+          run-id: "${{ github.event.workflow_run.id }}"
+          output: ".relay/trusted-pull-request-label-plan.json"
+
+      - name: Require exact agreement with the untrusted candidate
+        shell: bash
+        env:
+          CANDIDATE_SHA256: "${{ steps.candidate.outputs.plan-sha256 }}"
+          TRUSTED_SHA256: "${{ steps.trusted.outputs.plan-sha256 }}"
+        run: |
+          set -euo pipefail
+          if [[ "${CANDIDATE_SHA256}" != "${TRUSTED_SHA256}" ]]; then
+            printf 'trusted plan differs from candidate: expected %s, got %s\n' \
+              "${CANDIDATE_SHA256}" "${TRUSTED_SHA256}" >&2
+            exit 2
+          fi
+
+      - id: apply
+        name: Apply only checksum-bound managed changes
+        uses: $/actions/repository-labels
+        env:
+          GH_TOKEN: "${{ github.token }}"
+        with:
+          operation: "pr-apply"
+          repository: "${{ github.repository }}"
+          plan: ".relay/trusted-pull-request-label-plan.json"
+          expected-run-id: "${{ github.event.workflow_run.id }}"
+          output: ".relay/pull-request-label-apply-evidence.json"
+
+      - name: Upload apply evidence
+        if: "${{ always() }}"
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "relay-pr-label-apply-${{ github.event.workflow_run.id }}"
+          path: ".relay/pull-request-label-apply-evidence.json"
+          if-no-files-found: error
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9
+
+      - name: Enforce maintainer-edit and label availability policy
+        if: "${{ steps.apply.outputs.blocking == 'true' }}"
+        shell: bash
+        run: |
+          printf 'pull-request metadata plan contains blocking violations\n' >&2
+          exit 1

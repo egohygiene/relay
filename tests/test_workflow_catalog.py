@@ -55,9 +55,17 @@ class WorkflowCatalogTests(unittest.TestCase):
             },
             {
                 "egohygiene/relay/.github/workflows/"
+                "label-sync-apply.yml@v1",
+                "egohygiene/relay/.github/workflows/"
+                "label-sync-plan.yml@v1",
+                "egohygiene/relay/.github/workflows/"
                 "publication-pages.yml@v1",
                 "egohygiene/relay/.github/workflows/"
                 "publication-review.yml@v1",
+                "egohygiene/relay/.github/workflows/"
+                "pull-request-label-apply.yml@v1",
+                "egohygiene/relay/.github/workflows/"
+                "pull-request-label-plan.yml@v1",
                 "egohygiene/relay/.github/workflows/"
                 "release-artifact.yml@v1",
                 "egohygiene/relay/.github/workflows/"

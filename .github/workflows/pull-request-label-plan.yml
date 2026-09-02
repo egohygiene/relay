@@ -1,0 +1,138 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Pull Request Label Plan
+
+on:
+  workflow_call:
+    inputs:
+      configuration-path:
+        description: Repository-relative Relay label configuration on the pull request base.
+        required: false
+        type: string
+        default: ".github/relay-labels.json"
+      artifact-retention-days:
+        description: Retention for the trusted read-only handoff plan.
+        required: false
+        type: number
+        default: 7
+    outputs:
+      artifact-name:
+        description: Artifact consumed by the trusted workflow_run apply stage.
+        value: "${{ jobs.plan.outputs.artifact-name }}"
+      blocking:
+        description: True when the plan identifies policy violations.
+        value: "${{ jobs.plan.outputs.blocking }}"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "relay-pr-label-plan-${{ github.repository }}-${{ github.event.pull_request.number }}"
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    name: Plan pull-request labels and contributor guidance
+    if: "${{ github.event_name == 'pull_request' }}"
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      artifact-name: "${{ steps.names.outputs.artifact-name }}"
+      blocking: "${{ steps.plan.outputs.blocking }}"
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Check out trusted pull-request base only
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: "${{ github.repository }}"
+          ref: "${{ github.event.pull_request.base.sha }}"
+          path: ".relay/consumer"
+          persist-credentials: false
+
+      - name: Check out immutable organization label contract
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: "egohygiene/.github"
+          ref: "b415c8029bf2fb5d474f367e7129791588ba3860"
+          path: ".relay/label-contract"
+          persist-credentials: false
+
+      - name: Collect provider metadata without executing contributor code
+        shell: bash
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          PR_NUMBER: "${{ github.event.pull_request.number }}"
+          TARGET_REPOSITORY: "${{ github.repository }}"
+        run: |
+          set -euo pipefail
+          cp "${GITHUB_EVENT_PATH}" ".relay/pull-request-event.json"
+          gh api --paginate --slurp \
+            "repos/${TARGET_REPOSITORY}/pulls/${PR_NUMBER}/files?per_page=100" \
+            > ".relay/changed-file-pages.json"
+          gh api --paginate --slurp \
+            "repos/${TARGET_REPOSITORY}/labels?per_page=100" \
+            > ".relay/available-label-pages.json"
+          gh api --paginate --slurp \
+            "repos/${TARGET_REPOSITORY}/issues/${PR_NUMBER}/comments?per_page=100" \
+            > ".relay/comment-pages.json"
+          python3 - <<'PYTHON'
+          import json
+          from pathlib import Path
+
+          for source, destination in (
+              ("changed-file-pages", "changed-files"),
+              ("available-label-pages", "available-labels"),
+              ("comment-pages", "comments"),
+          ):
+              pages = json.loads(Path(f".relay/{source}.json").read_text())
+              Path(f".relay/{destination}.json").write_text(
+                  json.dumps([item for page in pages for item in page], indent=2) + "\n",
+                  encoding="utf-8",
+              )
+          PYTHON
+
+      - id: plan
+        name: Build checksum-bound pull-request plan
+        uses: $/actions/repository-labels
+        with:
+          operation: "pr-plan"
+          repository: "${{ github.repository }}"
+          configuration: ".relay/consumer/${{ inputs.configuration-path }}"
+          run-id: "${{ github.run_id }}"
+          output: ".relay/pull-request-label-plan.json"
+
+      - id: names
+        name: Bind trusted artifact identity
+        shell: bash
+        env:
+          PLAN_SHA256: "${{ steps.plan.outputs.plan-sha256 }}"
+          PR_NUMBER: "${{ github.event.pull_request.number }}"
+        run: |
+          set -euo pipefail
+          printf 'artifact-name=relay-pr-label-plan-%s-%s\n' \
+            "${PR_NUMBER}" "${PLAN_SHA256}" >> "${GITHUB_OUTPUT}"
+
+      - name: Upload trusted pull-request plan
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "${{ steps.names.outputs.artifact-name }}"
+          path: ".relay/pull-request-label-plan.json"
+          if-no-files-found: error
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9

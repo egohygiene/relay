@@ -1,0 +1,13 @@
+{
+  "schema": "egohygiene.relay.organization-labels-lock/v1",
+  "repository": "egohygiene/.github",
+  "revision": "b415c8029bf2fb5d474f367e7129791588ba3860",
+  "catalog": {
+    "path": ".github/labels/catalog.v1.json",
+    "sha256": "7063a61608a66454310e5a7746b1514d1d11018da08427bfb49f4612326ff6ff"
+  },
+  "assignments": {
+    "path": ".github/labels/repositories.v1.json",
+    "sha256": "96743b7889d90cc99ea01d0720d50a4602d109d96cb2c6592e4a4ddac3d6325f"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "egohygiene.relay.repository-labels/v1",
+  "sync": {"retire_labels": []},
+  "pull_requests": {
+    "path_labels": {
+      "enabled": true,
+      "preset": "organization-v1",
+      "missing_label": "error",
+      "rules": [
+        {"label": "📄 documentation", "paths": ["**/*.md", "docs/**"]},
+        {"label": "📦 package", "paths": ["actions/**", "schemas/**"]},
+        {"label": "⚙️ infra", "paths": [".github/**", "Taskfile.yml"]}
+      ]
+    },
+    "size_labels": {
+      "enabled": true,
+      "thresholds": [
+        {"label": "size/xs", "max_changes": 9},
+        {"label": "size/s", "max_changes": 49},
+        {"label": "size/m", "max_changes": 249},
+        {"label": "size/l", "max_changes": 999},
+        {"label": "size/xl", "max_changes": null}
+      ]
+    },
+    "welcome": {
+      "enabled": true,
+      "message": "Thank you for making your first contribution to this repository! A maintainer will review it as soon as practical."
+    },
+    "maintainer_edits": {"required_for_forks": true, "behavior": "warn"}
+  }
+}

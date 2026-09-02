@@ -7,6 +7,7 @@ documentation, implementation, contracts, and tests.
 | Action                                                        | Capability                                                  | Side effects                  |
 | ------------------------------------------------------------- | ----------------------------------------------------------- | ----------------------------- |
 | [`repository-intelligence`](repository-intelligence/)         | Build operational, roadmap, decision, and journey Repository Intelligence views | Workspace files only          |
+| [`repository-labels`](repository-labels/)                     | Plan and apply canonical labels and pull-request metadata   | Optional repository metadata writes |
 | [`normalize-repository-report`](normalize-repository-report/) | Normalize OSV, MegaLinter, and Scorecard producer summaries | Workspace files only          |
 | [`publish-report-snapshot`](publish-report-snapshot/)         | Guard and publish stable `.reports` snapshots               | Git commit and default-branch push |
 | [`validate-publication-site`](validate-publication-site/)     | Validate product-owned publication hub bytes and checksums  | Workspace evidence only       |
@@ -22,6 +23,7 @@ paths are:
 
 ```text
 egohygiene/relay/actions/repository-intelligence
+egohygiene/relay/actions/repository-labels
 egohygiene/relay/actions/normalize-repository-report
 egohygiene/relay/actions/publish-report-snapshot
 egohygiene/relay/actions/validate-publication-site

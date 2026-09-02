@@ -1,0 +1,150 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Repository Label Sync Apply
+
+on:
+  workflow_call:
+    inputs:
+      expected-plan-sha256:
+        description: Exact checksum approved from the latest read-only plan.
+        required: true
+        type: string
+      configuration-path:
+        description: Repository-relative Relay label configuration used by the approved plan.
+        required: false
+        type: string
+        default: ".github/relay-labels.json"
+      allow-deletions:
+        description: Permit only explicit retire_labels deletions present in the approved plan.
+        required: false
+        type: boolean
+        default: false
+      artifact-retention-days:
+        description: Retention for apply evidence.
+        required: false
+        type: number
+        default: 30
+    outputs:
+      evidence-artifact-name:
+        description: Artifact containing apply evidence.
+        value: "${{ jobs.apply.outputs.evidence-artifact-name }}"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "relay-label-sync-apply-${{ github.repository }}"
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    name: Recompute and apply an approved label plan
+    if: "${{ github.ref_name == github.event.repository.default_branch }}"
+    permissions:
+      contents: read
+      issues: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      evidence-artifact-name: "${{ steps.names.outputs.evidence-artifact-name }}"
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Check out caller default-branch state
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: ".relay/consumer"
+          persist-credentials: false
+
+      - name: Check out immutable organization label contract
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: "egohygiene/.github"
+          ref: "b415c8029bf2fb5d474f367e7129791588ba3860"
+          path: ".relay/label-contract"
+          persist-credentials: false
+
+      - name: Read current repository labels
+        shell: bash
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          TARGET_REPOSITORY: "${{ github.repository }}"
+        run: |
+          set -euo pipefail
+          gh api --paginate --slurp \
+            "repos/${TARGET_REPOSITORY}/labels?per_page=100" \
+            > ".relay/observed-label-pages.json"
+          python3 - <<'PYTHON'
+          import json
+          from pathlib import Path
+
+          pages = json.loads(Path(".relay/observed-label-pages.json").read_text())
+          Path(".relay/observed-labels.json").write_text(
+              json.dumps([item for page in pages for item in page], indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PYTHON
+
+      - id: plan
+        name: Recompute synchronization plan from live state
+        uses: $/actions/repository-labels
+        with:
+          operation: "sync-plan"
+          repository: "${{ github.repository }}"
+          configuration: ".relay/consumer/${{ inputs.configuration-path }}"
+          output: ".relay/label-sync-plan.json"
+
+      - name: Verify exact human-approved plan checksum
+        shell: bash
+        env:
+          ACTUAL_PLAN_SHA256: "${{ steps.plan.outputs.plan-sha256 }}"
+          EXPECTED_PLAN_SHA256: "${{ inputs.expected-plan-sha256 }}"
+        run: |
+          set -euo pipefail
+          [[ "${EXPECTED_PLAN_SHA256}" =~ ^[0-9a-f]{64}$ ]]
+          if [[ "${ACTUAL_PLAN_SHA256}" != "${EXPECTED_PLAN_SHA256}" ]]; then
+            printf 'live plan changed: expected %s, got %s\n' \
+              "${EXPECTED_PLAN_SHA256}" "${ACTUAL_PLAN_SHA256}" >&2
+            exit 2
+          fi
+
+      - name: Apply only verified synchronization operations
+        uses: $/actions/repository-labels
+        env:
+          GH_TOKEN: "${{ github.token }}"
+        with:
+          operation: "sync-apply"
+          repository: "${{ github.repository }}"
+          plan: ".relay/label-sync-plan.json"
+          allow-deletions: "${{ inputs.allow-deletions }}"
+          output: ".relay/label-sync-apply-evidence.json"
+
+      - id: names
+        name: Bind evidence artifact identity
+        shell: bash
+        env:
+          PLAN_SHA256: "${{ steps.plan.outputs.plan-sha256 }}"
+        run: |
+          set -euo pipefail
+          printf 'evidence-artifact-name=relay-label-sync-apply-%s\n' \
+            "${PLAN_SHA256}" >> "${GITHUB_OUTPUT}"
+
+      - name: Upload apply evidence
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "${{ steps.names.outputs.evidence-artifact-name }}"
+          path: ".relay/label-sync-apply-evidence.json"
+          if-no-files-found: error
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9

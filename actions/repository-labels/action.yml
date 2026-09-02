@@ -1,0 +1,213 @@
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+
+name: "Repository Label Automation"
+description: >-
+  Plan or safely apply canonical label synchronization and pull-request metadata
+  without executing contributor code.
+
+inputs:
+  operation:
+    description: "sync-plan, sync-apply, pr-plan, or pr-apply."
+    required: true
+  repository:
+    description: "Target repository in owner/name form."
+    required: true
+  catalog:
+    description: "Checked-out canonical catalog path for planning operations."
+    required: false
+    default: ".relay/label-contract/.github/labels/catalog.v1.json"
+  assignments:
+    description: "Checked-out canonical repository assignments path."
+    required: false
+    default: ".relay/label-contract/.github/labels/repositories.v1.json"
+  configuration:
+    description: "Repository-owned pull-request behavior and explicit retirement path."
+    required: false
+    default: ".github/relay-labels.json"
+  observed-labels:
+    description: "GitHub repository label API JSON used by sync-plan."
+    required: false
+    default: ".relay/observed-labels.json"
+  event:
+    description: "Trusted pull_request event JSON used by pr-plan."
+    required: false
+    default: ".relay/pull-request-event.json"
+  changed-files:
+    description: "GitHub pull-request files API JSON used by pr-plan."
+    required: false
+    default: ".relay/changed-files.json"
+  available-labels:
+    description: "GitHub repository label API JSON used by pr-plan."
+    required: false
+    default: ".relay/available-labels.json"
+  comments:
+    description: "GitHub issue comments API JSON used for idempotent notices."
+    required: false
+    default: ".relay/comments.json"
+  run-id:
+    description: "Read-only planning workflow run identifier."
+    required: false
+    default: ""
+  plan:
+    description: "Checksum-bound plan path used by apply operations."
+    required: false
+    default: ".relay/label-plan.json"
+  expected-run-id:
+    description: "Trusted workflow_run identifier required by pr-apply."
+    required: false
+    default: ""
+  allow-deletions:
+    description: "Permit only the exact explicit deletions in a verified sync plan."
+    required: false
+    default: "false"
+  output:
+    description: "Repository-relative plan or evidence output path."
+    required: false
+    default: ".relay/label-result.json"
+
+outputs:
+  result:
+    description: "Repository-relative result path."
+    value: "${{ inputs.output }}"
+  plan-sha256:
+    description: "Deterministic plan checksum when the result is a plan."
+    value: "${{ steps.execute.outputs.plan-sha256 }}"
+  status:
+    description: "Ready, not-configured, or applied result state."
+    value: "${{ steps.execute.outputs.status }}"
+  blocking:
+    description: "True when a pull-request plan contains blocking violations."
+    value: "${{ steps.execute.outputs.blocking }}"
+
+branding:
+  icon: "tag"
+  color: "purple"
+
+runs:
+  using: "composite"
+  steps:
+    - id: execute
+      name: "🏷️ Resolve governed label automation"
+      shell: bash
+      env:
+        INPUT_ALLOW_DELETIONS: "${{ inputs.allow-deletions }}"
+        INPUT_ASSIGNMENTS: "${{ inputs.assignments }}"
+        INPUT_AVAILABLE_LABELS: "${{ inputs.available-labels }}"
+        INPUT_CATALOG: "${{ inputs.catalog }}"
+        INPUT_CHANGED_FILES: "${{ inputs.changed-files }}"
+        INPUT_COMMENTS: "${{ inputs.comments }}"
+        INPUT_CONFIGURATION: "${{ inputs.configuration }}"
+        INPUT_EVENT: "${{ inputs.event }}"
+        INPUT_EXPECTED_RUN_ID: "${{ inputs.expected-run-id }}"
+        INPUT_OBSERVED_LABELS: "${{ inputs.observed-labels }}"
+        INPUT_OPERATION: "${{ inputs.operation }}"
+        INPUT_OUTPUT: "${{ inputs.output }}"
+        INPUT_PLAN: "${{ inputs.plan }}"
+        INPUT_REPOSITORY: "${{ inputs.repository }}"
+        INPUT_RUN_ID: "${{ inputs.run-id }}"
+      run: |
+        set -euo pipefail
+
+        validate_path() {
+          local label="$1"
+          local value="$2"
+          if [[ -z "${value}" || "${value}" == /* || "/${value}/" == */../* ]]; then
+            printf '%s must be a safe repository-relative path: %s\n' "${label}" "${value}" >&2
+            return 2
+          fi
+        }
+
+        validate_path "output" "${INPUT_OUTPUT}"
+        arguments=(
+          "${INPUT_OPERATION}"
+          --repository "${INPUT_REPOSITORY}"
+          --output "${INPUT_OUTPUT}"
+        )
+        case "${INPUT_OPERATION}" in
+          sync-plan)
+            for entry in \
+              "catalog:${INPUT_CATALOG}" \
+              "assignments:${INPUT_ASSIGNMENTS}" \
+              "configuration:${INPUT_CONFIGURATION}" \
+              "observed-labels:${INPUT_OBSERVED_LABELS}"; do
+              validate_path "${entry%%:*}" "${entry#*:}"
+            done
+            arguments+=(
+              --lock "${GITHUB_ACTION_PATH}/contracts/organization-labels.lock.json"
+              --catalog "${INPUT_CATALOG}"
+              --assignments "${INPUT_ASSIGNMENTS}"
+              --config "${INPUT_CONFIGURATION}"
+              --observed-labels "${INPUT_OBSERVED_LABELS}"
+            )
+            ;;
+          pr-plan)
+            for entry in \
+              "catalog:${INPUT_CATALOG}" \
+              "assignments:${INPUT_ASSIGNMENTS}" \
+              "configuration:${INPUT_CONFIGURATION}" \
+              "event:${INPUT_EVENT}" \
+              "changed-files:${INPUT_CHANGED_FILES}" \
+              "available-labels:${INPUT_AVAILABLE_LABELS}" \
+              "comments:${INPUT_COMMENTS}"; do
+              validate_path "${entry%%:*}" "${entry#*:}"
+            done
+            if [[ ! "${INPUT_RUN_ID}" =~ ^[1-9][0-9]*$ ]]; then
+              printf 'run-id must be a positive integer\n' >&2
+              exit 2
+            fi
+            arguments+=(
+              --lock "${GITHUB_ACTION_PATH}/contracts/organization-labels.lock.json"
+              --catalog "${INPUT_CATALOG}"
+              --assignments "${INPUT_ASSIGNMENTS}"
+              --config "${INPUT_CONFIGURATION}"
+              --event "${INPUT_EVENT}"
+              --changed-files "${INPUT_CHANGED_FILES}"
+              --available-labels "${INPUT_AVAILABLE_LABELS}"
+              --comments "${INPUT_COMMENTS}"
+              --path-defaults "${GITHUB_ACTION_PATH}/contracts/path-labels.organization-v1.json"
+              --run-id "${INPUT_RUN_ID}"
+            )
+            ;;
+          sync-apply)
+            validate_path "plan" "${INPUT_PLAN}"
+            if [[ "${INPUT_ALLOW_DELETIONS}" != "true" \
+              && "${INPUT_ALLOW_DELETIONS}" != "false" ]]; then
+              printf 'allow-deletions must be true or false\n' >&2
+              exit 2
+            fi
+            arguments+=(--plan "${INPUT_PLAN}")
+            if [[ "${INPUT_ALLOW_DELETIONS}" == "true" ]]; then
+              arguments+=(--allow-deletions)
+            fi
+            ;;
+          pr-apply)
+            validate_path "plan" "${INPUT_PLAN}"
+            if [[ ! "${INPUT_EXPECTED_RUN_ID}" =~ ^[1-9][0-9]*$ ]]; then
+              printf 'expected-run-id must be a positive integer\n' >&2
+              exit 2
+            fi
+            arguments+=(
+              --plan "${INPUT_PLAN}"
+              --expected-run-id "${INPUT_EXPECTED_RUN_ID}"
+            )
+            ;;
+          *)
+            printf 'unsupported operation: %s\n' "${INPUT_OPERATION}" >&2
+            exit 2
+            ;;
+        esac
+
+        mkdir -p "$(dirname "${INPUT_OUTPUT}")"
+        python3 "${GITHUB_ACTION_PATH}/scripts/repository_labels.py" "${arguments[@]}"
+        python3 - "${INPUT_OUTPUT}" "${GITHUB_OUTPUT}" <<'PYTHON'
+        import json
+        import sys
+        from pathlib import Path
+
+        result = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+        with Path(sys.argv[2]).open("a", encoding="utf-8") as output:
+            output.write(f"plan-sha256={result.get('plan_sha256', '')}\n")
+            output.write(f"status={result.get('status', 'applied')}\n")
+            output.write(f"blocking={str(result.get('blocking', False)).lower()}\n")
+        PYTHON

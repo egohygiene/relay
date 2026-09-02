@@ -1,0 +1,118 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Repository Label Sync Plan
+
+on:
+  workflow_call:
+    inputs:
+      configuration-path:
+        description: Repository-relative Relay label configuration; absence is valid.
+        required: false
+        type: string
+        default: ".github/relay-labels.json"
+      artifact-retention-days:
+        description: Retention for the deterministic read-only plan.
+        required: false
+        type: number
+        default: 7
+    outputs:
+      artifact-name:
+        description: Artifact containing the checksum-bound synchronization plan.
+        value: "${{ jobs.plan.outputs.artifact-name }}"
+      plan-sha256:
+        description: Deterministic synchronization plan checksum.
+        value: "${{ jobs.plan.outputs.plan-sha256 }}"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "relay-label-sync-plan-${{ github.repository }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    name: Preview canonical repository label changes
+    permissions:
+      contents: read
+      issues: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      artifact-name: "${{ steps.names.outputs.artifact-name }}"
+      plan-sha256: "${{ steps.plan.outputs.plan-sha256 }}"
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Check out caller default-branch state
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: ".relay/consumer"
+          persist-credentials: false
+
+      - name: Check out immutable organization label contract
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: "egohygiene/.github"
+          ref: "b415c8029bf2fb5d474f367e7129791588ba3860"
+          path: ".relay/label-contract"
+          persist-credentials: false
+
+      - name: Read current repository labels
+        shell: bash
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          TARGET_REPOSITORY: "${{ github.repository }}"
+        run: |
+          set -euo pipefail
+          gh api --paginate --slurp \
+            "repos/${TARGET_REPOSITORY}/labels?per_page=100" \
+            > ".relay/observed-label-pages.json"
+          python3 - <<'PYTHON'
+          import json
+          from pathlib import Path
+
+          pages = json.loads(Path(".relay/observed-label-pages.json").read_text())
+          Path(".relay/observed-labels.json").write_text(
+              json.dumps([item for page in pages for item in page], indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PYTHON
+
+      - id: plan
+        name: Build checksum-bound synchronization plan
+        uses: $/actions/repository-labels
+        with:
+          operation: "sync-plan"
+          repository: "${{ github.repository }}"
+          configuration: ".relay/consumer/${{ inputs.configuration-path }}"
+          output: ".relay/label-sync-plan.json"
+
+      - id: names
+        name: Bind artifact identity
+        shell: bash
+        env:
+          PLAN_SHA256: "${{ steps.plan.outputs.plan-sha256 }}"
+        run: |
+          set -euo pipefail
+          printf 'artifact-name=relay-label-sync-plan-%s\n' "${PLAN_SHA256}" >> "${GITHUB_OUTPUT}"
+
+      - name: Upload read-only synchronization plan
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "${{ steps.names.outputs.artifact-name }}"
+          path: ".relay/label-sync-plan.json"
+          if-no-files-found: error
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9
