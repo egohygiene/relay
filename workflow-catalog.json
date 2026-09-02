@@ -242,6 +242,125 @@
       "consumer_ref": "egohygiene/relay/.github/workflows/semantic-release.yml@v1"
     },
     {
+      "id": "label-sync-plan",
+      "path": ".github/workflows/label-sync-plan.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Compare the locked organization label assignment with live repository labels and preserve a deterministic read-only plan.",
+      "audience": "reusable",
+      "status": "beta",
+      "triggers": ["workflow_call"],
+      "permissions": {"contents": "read", "issues": "read"},
+      "timeout_minutes": 10,
+      "concurrency": {
+        "group": "relay-label-sync-plan-${{ github.repository }}-${{ github.ref }}",
+        "cancel_in_progress": true
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Contract drift, invalid configuration, provider failure, or artifact failure prevents an approved plan from being reported."
+      },
+      "inputs": [
+        {"name": "configuration-path", "type": "string", "required": false, "default": ".github/relay-labels.json", "description": "Repository-relative Relay label configuration; absence is valid."},
+        {"name": "artifact-retention-days", "type": "number", "required": false, "default": 7, "description": "Retention for the deterministic read-only plan."}
+      ],
+      "outputs": [
+        {"name": "artifact-name", "type": "string", "required": true, "description": "Artifact containing the checksum-bound synchronization plan."},
+        {"name": "plan-sha256", "type": "string", "required": true, "description": "Deterministic synchronization plan checksum."}
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/label-sync-plan.yml@v1"
+    },
+    {
+      "id": "label-sync-apply",
+      "path": ".github/workflows/label-sync-apply.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Recompute and apply an exactly reviewed canonical label plan from the caller default branch.",
+      "audience": "reusable",
+      "status": "beta",
+      "triggers": ["workflow_call"],
+      "permissions": {"contents": "read", "issues": "write"},
+      "timeout_minutes": 10,
+      "concurrency": {
+        "group": "relay-label-sync-apply-${{ github.repository }}",
+        "cancel_in_progress": false
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Non-default-branch execution, changed plan bytes, contract drift, provider failure, or ungranted deletion authority prevents completion."
+      },
+      "inputs": [
+        {"name": "expected-plan-sha256", "type": "string", "required": true, "description": "Exact checksum approved from the latest read-only plan."},
+        {"name": "configuration-path", "type": "string", "required": false, "default": ".github/relay-labels.json", "description": "Repository-relative Relay label configuration used by the approved plan."},
+        {"name": "allow-deletions", "type": "boolean", "required": false, "default": false, "description": "Permit only explicit retire_labels deletions present in the approved plan."},
+        {"name": "artifact-retention-days", "type": "number", "required": false, "default": 30, "description": "Retention for apply evidence."}
+      ],
+      "outputs": [
+        {"name": "evidence-artifact-name", "type": "string", "required": true, "description": "Artifact containing apply evidence."}
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/label-sync-apply.yml@v1"
+    },
+    {
+      "id": "pull-request-label-plan",
+      "path": ".github/workflows/pull-request-label-plan.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Plan path and size labels, first-contributor welcome, and fork maintainer-edit policy without executing contributor code.",
+      "audience": "reusable",
+      "status": "beta",
+      "triggers": ["workflow_call"],
+      "permissions": {"contents": "read", "issues": "read", "pull-requests": "read"},
+      "timeout_minutes": 10,
+      "concurrency": {
+        "group": "relay-pr-label-plan-${{ github.repository }}-${{ github.event.pull_request.number }}",
+        "cancel_in_progress": true
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Untrusted event shape, contract drift, missing required labels, provider failure, or artifact failure prevents the trusted handoff."
+      },
+      "inputs": [
+        {"name": "configuration-path", "type": "string", "required": false, "default": ".github/relay-labels.json", "description": "Repository-relative Relay label configuration on the pull request base."},
+        {"name": "artifact-retention-days", "type": "number", "required": false, "default": 7, "description": "Retention for the trusted read-only handoff plan."}
+      ],
+      "outputs": [
+        {"name": "artifact-name", "type": "string", "required": true, "description": "Artifact consumed by the trusted workflow-run apply stage."},
+        {"name": "blocking", "type": "string", "required": true, "description": "True when the plan identifies policy violations."}
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/pull-request-label-plan.yml@v1"
+    },
+    {
+      "id": "pull-request-label-apply",
+      "path": ".github/workflows/pull-request-label-apply.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Validate a trusted planner artifact against the live pull request before applying only managed labels and comments.",
+      "audience": "reusable",
+      "status": "beta",
+      "triggers": ["workflow_call"],
+      "permissions": {"actions": "read", "contents": "read", "issues": "write", "pull-requests": "write"},
+      "timeout_minutes": 10,
+      "concurrency": {
+        "group": "relay-pr-label-apply-${{ github.repository }}-${{ github.event.workflow_run.id }}",
+        "cancel_in_progress": false
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Untrusted workflow identity, ambiguous artifacts, moved pull-request state, provider failure, or blocking maintainer policy fails the apply run."
+      },
+      "inputs": [
+        {"name": "planner-workflow-name", "type": "string", "required": true, "description": "Exact trusted caller workflow name allowed to produce plans."},
+        {"name": "configuration-path", "type": "string", "required": false, "default": ".github/relay-labels.json", "description": "Repository-relative Relay label configuration on the trusted pull-request base."},
+        {"name": "artifact-retention-days", "type": "number", "required": false, "default": 30, "description": "Retention for apply evidence."}
+      ],
+      "outputs": [],
+      "consumer_ref": "egohygiene/relay/.github/workflows/pull-request-label-apply.yml@v1"
+    },
+    {
       "id": "publication-review",
       "path": ".github/workflows/publication-review.yml",
       "owner": "egohygiene/relay",

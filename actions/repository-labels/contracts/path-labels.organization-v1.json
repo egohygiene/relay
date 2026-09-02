@@ -1,0 +1,22 @@
+{
+  "schema": "egohygiene.relay.path-label-profile/v1",
+  "profile": "organization-v1",
+  "rules": [
+    {
+      "label": "area:automation",
+      "paths": [".github/**", "Makefile", "Taskfile.yml"]
+    },
+    {
+      "label": "area:developer-experience",
+      "paths": [".devcontainer/**", ".editorconfig", ".pre-commit-config.yaml"]
+    },
+    {
+      "label": "area:security",
+      "paths": ["SECURITY.md", "security/**"]
+    },
+    {
+      "label": "type:documentation",
+      "paths": ["**/*.md", "docs/**"]
+    }
+  ]
+}

@@ -43,6 +43,20 @@
       "consumer_ref": "egohygiene/relay/actions/repository-intelligence@v1"
     },
     {
+      "id": "repository-labels",
+      "path": "actions/repository-labels",
+      "name": "Repository Labels",
+      "summary": "Plan and apply canonical repository labels, pull-request path and size labels, contributor welcomes, and maintainer-edit checks.",
+      "status": "beta",
+      "runtime": ["bash", "python3", "gh"],
+      "permissions": {
+        "issues": "write",
+        "pull-requests": "write"
+      },
+      "side_effects": ["repository-write", "workspace-write"],
+      "consumer_ref": "egohygiene/relay/actions/repository-labels@v1"
+    },
+    {
       "id": "validate-release-bundle",
       "path": "actions/validate-release-bundle",
       "name": "Validate Release Bundle",
@@ -99,6 +113,57 @@
     }
   ],
   "workflows": [
+    {
+      "id": "label-sync-plan",
+      "path": ".github/workflows/label-sync-plan.yml",
+      "name": "Repository Label Synchronization Plan",
+      "summary": "Compare canonical organization label assignments with live repository labels under read-only authority.",
+      "status": "beta",
+      "permissions": {
+        "contents": "read",
+        "issues": "read"
+      },
+      "consumer_ref": "egohygiene/relay/.github/workflows/label-sync-plan.yml@v1"
+    },
+    {
+      "id": "label-sync-apply",
+      "path": ".github/workflows/label-sync-apply.yml",
+      "name": "Repository Label Synchronization Apply",
+      "summary": "Recompute and apply an exactly reviewed canonical label plan from the caller default branch.",
+      "status": "beta",
+      "permissions": {
+        "contents": "read",
+        "issues": "write"
+      },
+      "consumer_ref": "egohygiene/relay/.github/workflows/label-sync-apply.yml@v1"
+    },
+    {
+      "id": "pull-request-label-plan",
+      "path": ".github/workflows/pull-request-label-plan.yml",
+      "name": "Pull Request Label Plan",
+      "summary": "Plan path labels, size labels, contributor welcomes, and maintainer-edit checks without executing pull-request code.",
+      "status": "beta",
+      "permissions": {
+        "contents": "read",
+        "issues": "read",
+        "pull-requests": "read"
+      },
+      "consumer_ref": "egohygiene/relay/.github/workflows/pull-request-label-plan.yml@v1"
+    },
+    {
+      "id": "pull-request-label-apply",
+      "path": ".github/workflows/pull-request-label-apply.yml",
+      "name": "Pull Request Label Apply",
+      "summary": "Validate a trusted planner artifact against live pull-request identity before applying labels and comments.",
+      "status": "beta",
+      "permissions": {
+        "actions": "read",
+        "contents": "read",
+        "issues": "write",
+        "pull-requests": "write"
+      },
+      "consumer_ref": "egohygiene/relay/.github/workflows/pull-request-label-apply.yml@v1"
+    },
     {
       "id": "publication-review",
       "path": ".github/workflows/publication-review.yml",

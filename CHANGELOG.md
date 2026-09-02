@@ -6,6 +6,14 @@ All notable changes to Relay are documented in this file. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Canonical organization label synchronization with reviewable, checksum-bound
+  plans and explicit deletion authority.
+- Shared and repository-overridable path labels, size labels, first-contributor
+  welcomes, and fork maintainer-edit checks through a read-only planner and
+  independently recomputed trusted apply handoff.
+
 ## [1.5.0] - 2026-09-01
 
 ### Added

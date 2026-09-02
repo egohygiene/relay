@@ -18,10 +18,14 @@ and failure semantics.
 | `publication-review` | Reusable | `egohygiene/relay` | Validate and preserve exact caller-built publication bytes | `actions: read`, `contents: read` | 10 minutes |
 | `publication-pages` | Reusable | `egohygiene/relay` | Deploy the exact read-only reviewed artifact and remotely prove it | job-scoped `pages: write` and `id-token: write` | 20 minutes |
 | `repository-intelligence` | Reusable | `egohygiene/relay` | Build, verify, and upload one bounded intelligence artifact | `contents: read` | 15 minutes |
+| `label-sync-plan` | Reusable | `egohygiene/relay` | Preview canonical label synchronization | `contents: read`, `issues: read` | 10 minutes |
+| `label-sync-apply` | Reusable | `egohygiene/relay` | Recompute and apply an approved label plan | job-scoped `issues: write` | 10 minutes |
+| `pull-request-label-plan` | Reusable | `egohygiene/relay` | Plan PR labels and contributor checks without executing PR code | `contents: read`, `issues: read`, `pull-requests: read` | 10 minutes |
+| `pull-request-label-apply` | Reusable | `egohygiene/relay` | Validate the trusted plan handoff and apply managed metadata | job-scoped `issues: write` and `pull-requests: write` | 10 minutes |
 | `dependency-review` | Internal | `egohygiene/relay` | Analyse dependency changes on every pull request and fail on high-severity or denied-license packages | `contents: read` | 10 minutes |
 | `automerge-dependabot` | Internal | `egohygiene/relay` | Classify then auto-approve and merge allowlisted low-risk Dependabot updates after all required checks | job-scoped `contents: write` and `pull-requests: write` | 5 minutes |
 
-All ten files under `.github/workflows/` are current and cataloged.
+All fourteen files under `.github/workflows/` are current and cataloged.
 A future staged candidate must first receive an owner, purpose, explicit
 contract, and `experimental` catalog state; an uncataloged workflow fails CI.
 
@@ -72,6 +76,20 @@ policy. A failed merge attempt leaves the PR open for human review; no
 partially-applied state exists because auto-merge is a GitHub-side setting that
 only activates after all required checks pass.
 
+Label synchronization separates review from mutation. The planning workflow
+reads the canonical `.github` contract and current repository labels; the apply
+workflow recomputes the same plan from live state and requires its exact reviewed
+checksum. Unmanaged labels are preserved, and deletion is impossible unless the
+configuration explicitly retires a label and the caller grants deletion authority.
+
+Pull-request metadata uses a two-workflow trust boundary. The `pull_request`
+planner checks out only the trusted base revision, reads provider metadata, and
+uploads a checksum-bound plan with no write permission. A caller-owned
+`workflow_run` wrapper invokes the apply workflow, which verifies the triggering
+workflow identity, event, run, repository, artifact count, and live head/base SHAs
+before writing. Neither stage uses `pull_request_target` or executes contributor
+code with a token.
+
 **Emergency disable**: remove the `automerge-dependabot` workflow file or set
 `if: false` on the `approve-and-merge` job to immediately stop automated
 merges without affecting dependency-review analysis. Disable
@@ -85,7 +103,8 @@ pull-request event. No provider-side state accumulates.
 ## Reusable caller contract
 
 `repository-intelligence`, `publication-review`, `publication-pages`,
-`release-artifact`, `release-prepare`, and `semantic-release` are the
+`release-artifact`, `release-prepare`, `semantic-release`, `label-sync-plan`,
+`label-sync-apply`, `pull-request-label-plan`, and `pull-request-label-apply` are the
 reusable workflows in v1. Their inputs, defaults, outputs, permission ceilings,
 timeouts, concurrency keys, and failure semantics are recorded in the catalog
 and checked against their workflow sources.

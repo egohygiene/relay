@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/repository-labels/v1/schema.json",
+  "title": "Relay repository label automation configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "sync", "pull_requests"],
+  "properties": {
+    "schema": {"const": "egohygiene.relay.repository-labels/v1"},
+    "sync": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["retire_labels"],
+      "properties": {
+        "retire_labels": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "pull_requests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path_labels", "size_labels", "welcome", "maintainer_edits"],
+      "properties": {
+        "path_labels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "preset", "missing_label", "rules"],
+          "properties": {
+            "enabled": {"type": "boolean"},
+            "preset": {"enum": ["none", "organization-v1"]},
+            "missing_label": {"enum": ["error", "warn"]},
+            "rules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["label", "paths"],
+                "properties": {
+                  "label": {"type": "string", "minLength": 1},
+                  "paths": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+                }
+              }
+            }
+          }
+        },
+        "size_labels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "thresholds"],
+          "properties": {
+            "enabled": {"type": "boolean"},
+            "thresholds": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["label", "max_changes"],
+                "properties": {
+                  "label": {"type": "string", "minLength": 1},
+                  "max_changes": {"type": ["integer", "null"], "minimum": 0}
+                }
+              }
+            }
+          }
+        },
+        "welcome": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "message"],
+          "properties": {"enabled": {"type": "boolean"}, "message": {"type": "string"}}
+        },
+        "maintainer_edits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["required_for_forks", "behavior"],
+          "properties": {
+            "required_for_forks": {"type": "boolean"},
+            "behavior": {"enum": ["error", "warn"]}
+          }
+        }
+      }
+    }
+  }
+}

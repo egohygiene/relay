@@ -13,6 +13,7 @@ and deployment.
 | Capability | Discovery alias |
 | ---------- | --------------- |
 | Repository Intelligence site | `egohygiene/relay/actions/repository-intelligence@v1` |
+| Canonical labels and pull-request metadata | `egohygiene/relay/actions/repository-labels@v1` |
 | Scanner report normalization | `egohygiene/relay/actions/normalize-repository-report@v1` |
 | Guarded report snapshot publication | `egohygiene/relay/actions/publish-report-snapshot@v1` |
 | Opinionated intelligence artifact workflow | `egohygiene/relay/.github/workflows/repository-intelligence.yml@v1` |
@@ -25,6 +26,10 @@ and deployment.
 | Immutable profile-bound release publication | `egohygiene/relay/.github/workflows/release-artifact.yml@v1` |
 | Read-only semantic-release preparation | `egohygiene/relay/.github/workflows/release-prepare.yml@v1` |
 | Reviewed semantic-release handoff | `egohygiene/relay/.github/workflows/semantic-release.yml@v1` |
+| Read-only canonical label plan | `egohygiene/relay/.github/workflows/label-sync-plan.yml@v1` |
+| Reviewed canonical label apply | `egohygiene/relay/.github/workflows/label-sync-apply.yml@v1` |
+| Read-only pull-request label plan | `egohygiene/relay/.github/workflows/pull-request-label-plan.yml@v1` |
+| Trusted pull-request label apply | `egohygiene/relay/.github/workflows/pull-request-label-apply.yml@v1` |
 
 These moving aliases advertise the release surface. Production consumers use a
 reviewed full commit SHA, as shown below.
