@@ -11,6 +11,9 @@ https://egohygiene.github.io/relay/contracts/cargo-crate-release/v1/schema.json
 https://egohygiene.github.io/relay/contracts/python-package-release/v1/schema.json
 https://egohygiene.github.io/relay/contracts/release-plan-evidence/v1/schema.json
 https://egohygiene.github.io/relay/contracts/release-publication-outcome/v1/schema.json
+https://egohygiene.github.io/relay/contracts/repository-continuity-preflight-profile/v1/schema.json
+https://egohygiene.github.io/relay/contracts/repository-continuity-preflight-request/v1/schema.json
+https://egohygiene.github.io/relay/contracts/repository-continuity-preflight-result/v1/schema.json
 ```
 
 `action-catalog.json` inventories public composite actions and reusable entry
@@ -27,6 +30,9 @@ and external-registry record required by the `python-package` profile.
 success or bounded failure without copying Aether's declaration schema.
 `release-publication-outcome/v1` retains the preparation and immutable
 publication job results even when the write handoff fails.
+The continuity-preflight profile pins Aether, Hygiene, EgoLint, and Holon
+inputs; its request and result schemas keep local and future CI evidence
+byte-compatible without copying or publishing consumer handoff prose.
 
 The schemas packaged inside the Intelligence actions intentionally retain the
 public identities established while the implementation was incubated in

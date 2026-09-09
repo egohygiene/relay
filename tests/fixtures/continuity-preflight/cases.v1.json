@@ -1,0 +1,251 @@
+{
+  "schema_version": "relay.repository-continuity-preflight-fixtures/v1",
+  "profile_sha256": "b7a55a65b88c44b05313a59a6edf4a3197771da3cbd178dc458216ef1fb566df",
+  "requests": {
+    "public-updated": {
+      "schema_version": "relay.repository-continuity-preflight-request/v1",
+      "profile": {
+        "version": "1.0.0-alpha.1",
+        "sha256": "b7a55a65b88c44b05313a59a6edf4a3197771da3cbd178dc458216ef1fb566df"
+      },
+      "repository": {
+        "id": "egohygiene/relay",
+        "visibility": "public",
+        "root": "."
+      },
+      "comparison": {
+        "base_revision": "65cc206565dd11b73190105d31d403ebe0ead633",
+        "head_revision": "working-tree",
+        "disposition": "updated",
+        "transition": "pull-request",
+        "evaluation_date": "2026-09-09"
+      },
+      "policy": {
+        "rollout_mode": "observe",
+        "exception_reference": null
+      },
+      "live_evidence": {
+        "status": "verified",
+        "references": [
+          "https://github.com/egohygiene/relay/issues/61"
+        ]
+      },
+      "parallel_heads": [],
+      "output": {
+        "format": "json",
+        "path": ".reports/relay/continuity-preflight.json"
+      }
+    },
+    "private-reviewed-no-change": {
+      "schema_version": "relay.repository-continuity-preflight-request/v1",
+      "profile": {
+        "version": "1.0.0-alpha.1",
+        "sha256": "b7a55a65b88c44b05313a59a6edf4a3197771da3cbd178dc458216ef1fb566df"
+      },
+      "repository": {
+        "id": "example/private-consumer",
+        "visibility": "private",
+        "root": "."
+      },
+      "comparison": {
+        "base_revision": "1111111111111111111111111111111111111111",
+        "head_revision": "2222222222222222222222222222222222222222",
+        "disposition": "reviewed-no-change",
+        "transition": "local-review",
+        "evaluation_date": "2026-09-09"
+      },
+      "policy": {
+        "rollout_mode": "observe",
+        "exception_reference": null
+      },
+      "live_evidence": {
+        "status": "unavailable",
+        "references": []
+      },
+      "parallel_heads": [],
+      "output": {
+        "format": "json",
+        "path": ".reports/relay/continuity-preflight.json"
+      }
+    },
+    "approved-exception": {
+      "schema_version": "relay.repository-continuity-preflight-request/v1",
+      "profile": {
+        "version": "1.0.0-alpha.1",
+        "sha256": "b7a55a65b88c44b05313a59a6edf4a3197771da3cbd178dc458216ef1fb566df"
+      },
+      "repository": {
+        "id": "example/archived-mirror",
+        "visibility": "public",
+        "root": "."
+      },
+      "comparison": {
+        "base_revision": "3333333333333333333333333333333333333333",
+        "head_revision": "4444444444444444444444444444444444444444",
+        "disposition": "exception",
+        "transition": "pull-request",
+        "evaluation_date": "2026-09-09"
+      },
+      "policy": {
+        "rollout_mode": "observe",
+        "exception_reference": "https://github.com/example/archived-mirror/issues/7"
+      },
+      "live_evidence": {
+        "status": "partial",
+        "references": [
+          "https://github.com/example/archived-mirror/issues/7"
+        ]
+      },
+      "parallel_heads": [],
+      "output": {
+        "format": "json",
+        "path": ".reports/relay/continuity-preflight.json"
+      }
+    }
+  },
+  "results": {
+    "valid-public": {
+      "schema_version": "relay.repository-continuity-preflight-result/v1",
+      "profile": {
+        "version": "1.0.0-alpha.1",
+        "sha256": "b7a55a65b88c44b05313a59a6edf4a3197771da3cbd178dc458216ef1fb566df"
+      },
+      "repository": {
+        "id": "egohygiene/relay",
+        "visibility": "public"
+      },
+      "rollout_mode": "observe",
+      "semantic_status": "valid",
+      "outcome": "passed",
+      "comparison": {
+        "requested_base": "65cc206565dd11b73190105d31d403ebe0ead633",
+        "requested_head": "working-tree",
+        "resolved_base": "65cc206565dd11b73190105d31d403ebe0ead633",
+        "resolved_head": "working-tree",
+        "topology": "working-tree"
+      },
+      "evidence_layers": {
+        "structural": "passed",
+        "freshness-declaration": "passed",
+        "local-git": "passed",
+        "external-live": "passed"
+      },
+      "findings": [],
+      "counts": {
+        "info": 0,
+        "warning": 0,
+        "error": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "corrective_actions": [],
+      "privacy": {
+        "classification": "public-repository",
+        "contains_handoff_content": false,
+        "redaction": "allowlisted-metadata-only"
+      }
+    },
+    "invalid-private-observe": {
+      "schema_version": "relay.repository-continuity-preflight-result/v1",
+      "profile": {
+        "version": "1.0.0-alpha.1",
+        "sha256": "b7a55a65b88c44b05313a59a6edf4a3197771da3cbd178dc458216ef1fb566df"
+      },
+      "repository": {
+        "id": "example/private-consumer",
+        "visibility": "private"
+      },
+      "rollout_mode": "observe",
+      "semantic_status": "incomplete",
+      "outcome": "warning",
+      "comparison": {
+        "requested_base": "1111111111111111111111111111111111111111",
+        "requested_head": "2222222222222222222222222222222222222222",
+        "resolved_base": "1111111111111111111111111111111111111111",
+        "resolved_head": "2222222222222222222222222222222222222222",
+        "topology": "linear"
+      },
+      "evidence_layers": {
+        "structural": "passed",
+        "freshness-declaration": "passed",
+        "local-git": "partial",
+        "external-live": "unavailable"
+      },
+      "findings": [
+        {
+          "id": "EGO-CONT-LIVE-001",
+          "severity": "warning",
+          "layer": "external-live",
+          "summary": "Live work-tracker state was unavailable.",
+          "remediation": "Verify mutable state with an authorized adapter before relying on the checkpoint."
+        }
+      ],
+      "counts": {
+        "info": 0,
+        "warning": 1,
+        "error": 0,
+        "critical": 0,
+        "total": 1
+      },
+      "corrective_actions": [
+        "Verify mutable state with an authorized adapter before relying on the checkpoint."
+      ],
+      "privacy": {
+        "classification": "private-repository",
+        "contains_handoff_content": false,
+        "redaction": "allowlisted-metadata-only"
+      }
+    },
+    "unavailable-validator": {
+      "schema_version": "relay.repository-continuity-preflight-result/v1",
+      "profile": {
+        "version": "1.0.0-alpha.1",
+        "sha256": "b7a55a65b88c44b05313a59a6edf4a3197771da3cbd178dc458216ef1fb566df"
+      },
+      "repository": {
+        "id": "example/public-consumer",
+        "visibility": "public"
+      },
+      "rollout_mode": "observe",
+      "semantic_status": "unavailable",
+      "outcome": "unavailable",
+      "comparison": {
+        "requested_base": "5555555555555555555555555555555555555555",
+        "requested_head": "working-tree",
+        "resolved_base": null,
+        "resolved_head": null,
+        "topology": "unavailable"
+      },
+      "evidence_layers": {
+        "structural": "unavailable",
+        "freshness-declaration": "unavailable",
+        "local-git": "unavailable",
+        "external-live": "not-applicable"
+      },
+      "findings": [
+        {
+          "id": "RELAY-CONT-AVAIL-001",
+          "severity": "error",
+          "layer": "local-git",
+          "summary": "The pinned validator was unavailable.",
+          "remediation": "Install or provide the exact digest-verified validator and rerun the preflight."
+        }
+      ],
+      "counts": {
+        "info": 0,
+        "warning": 0,
+        "error": 1,
+        "critical": 0,
+        "total": 1
+      },
+      "corrective_actions": [
+        "Install or provide the exact digest-verified validator and rerun the preflight."
+      ],
+      "privacy": {
+        "classification": "public-repository",
+        "contains_handoff_content": false,
+        "redaction": "allowlisted-metadata-only"
+      }
+    }
+  }
+}

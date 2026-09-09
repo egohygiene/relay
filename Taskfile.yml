@@ -6,6 +6,27 @@ vars:
     sh: python3 -c "import json; print(json.load(open(\"release.json\", encoding=\"utf-8\"))[\"version\"])"
 
 tasks:
+  continuity:contract:check:
+    desc: Validate the pinned continuity preflight profile and schemas offline
+    cmds:
+      - python3 scripts/validate_continuity_preflight_contract.py validate
+
+  continuity:sources:verify:
+    desc: Verify every pinned continuity artifact from explicit local checkouts
+    requires:
+      vars:
+        - AETHER_SOURCE
+        - HYGIENE_SOURCE
+        - EGOLINT_SOURCE
+        - HOLON_SOURCE
+    cmds:
+      - >-
+        python3 scripts/validate_continuity_preflight_contract.py verify-sources
+        --aether-source "{{.AETHER_SOURCE}}"
+        --hygiene-source "{{.HYGIENE_SOURCE}}"
+        --egolint-source "{{.EGOLINT_SOURCE}}"
+        --holon-source "{{.HOLON_SOURCE}}"
+
   release:plan:
     desc: Render a read-only plan for the next unpromoted Relay release
     requires:

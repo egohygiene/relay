@@ -3,12 +3,12 @@ schema: aether.architecture-document/v1
 id: relay-architecture
 title: Relay Architecture
 kind: architecture-document
-version: 0.1.0
+version: 0.2.0
 status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-08-30
+updated: 2026-09-09
 governed_by:
   - architecture-architecture
 depends_on:
@@ -85,6 +85,8 @@ actions/
 action-catalog.json               # public composite-action surface
 workflow-catalog.json             # complete owner, authority, and failure inventory
 release-profiles.json             # versioned release artifact and rollback contract
+catalog/repository-continuity-preflight.json
+                                  # pinned, release-gated continuity input profile
 examples/workflows/               # immutable-pin caller examples
 ```
 
@@ -128,6 +130,20 @@ The tested Observatory and Holon boundaries are pinned in
 The snapshot publisher is isolated as a
 separate action because it requires `contents: write`; all other v1 action jobs
 operate with read-only repository permissions.
+
+## Continuity preflight boundary
+
+Relay owns execution and evidence normalization around the continuity contract;
+it does not own checkpoint semantics, organization applicability, validation
+rules, materialization, observation, or fleet rollout. The proposed profile
+pins those sibling inputs and defines a closed request/result seam before any
+local or GitHub Actions adapter is added.
+
+The adapter boundary requires explicit base/head evidence and retains
+structural, declared-freshness, local-Git, and external-live states separately.
+Evidence contains bounded findings and remediation only, never the free-form
+checkpoint body. Unreleased inputs cap the profile at `observe`, and no
+continuity result grants repository or provider write authority.
 
 ## Publication deployment boundary
 

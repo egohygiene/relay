@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/repository-continuity-preflight-request/v1/schema.json",
+  "title": "Relay repository continuity preflight request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "profile", "repository", "comparison", "policy", "live_evidence", "parallel_heads", "output"],
+  "properties": {
+    "schema_version": {"const": "relay.repository-continuity-preflight-request/v1"},
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "sha256"],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "visibility", "root"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "visibility": {"enum": ["public", "private", "internal"]},
+        "root": {"const": "."}
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_revision", "head_revision", "disposition", "transition", "evaluation_date"],
+      "properties": {
+        "base_revision": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|unborn)$"},
+        "head_revision": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|working-tree)$"},
+        "disposition": {"enum": ["updated", "reviewed-no-change", "exception"]},
+        "transition": {"enum": ["pull-request", "post-merge", "local-review"]},
+        "evaluation_date": {"type": "string", "format": "date"}
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rollout_mode", "exception_reference"],
+      "properties": {
+        "rollout_mode": {"enum": ["observe", "ratchet", "enforce"]},
+        "exception_reference": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/(?:issues|pull)/[1-9][0-9]*$"}
+          ]
+        }
+      }
+    },
+    "live_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "references"],
+      "properties": {
+        "status": {"enum": ["verified", "partial", "unavailable", "not-required"]},
+        "references": {"type": "array", "uniqueItems": true, "items": {"type": "string", "format": "uri"}}
+      }
+    },
+    "parallel_heads": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[0-9a-f]{40}$"}},
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format", "path"],
+      "properties": {
+        "format": {"const": "json"},
+        "path": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+\\.json$"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"comparison": {"properties": {"disposition": {"const": "exception"}}}}},
+      "then": {"properties": {"policy": {"properties": {"exception_reference": {"type": "string"}}}}}
+    },
+    {
+      "if": {"properties": {"comparison": {"properties": {"disposition": {"enum": ["updated", "reviewed-no-change"]}}}}},
+      "then": {"properties": {"policy": {"properties": {"exception_reference": {"type": "null"}}}}}
+    },
+    {
+      "if": {"properties": {"live_evidence": {"properties": {"status": {"const": "verified"}}}}},
+      "then": {"properties": {"live_evidence": {"properties": {"references": {"minItems": 1}}}}}
+    },
+    {
+      "if": {"properties": {"live_evidence": {"properties": {"status": {"enum": ["unavailable", "not-required"]}}}}},
+      "then": {"properties": {"live_evidence": {"properties": {"references": {"maxItems": 0}}}}}
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "$schema": "../schemas/repository-continuity-preflight-profile.v1.schema.json",
+  "schema_version": "relay.repository-continuity-preflight-profile/v1",
+  "version": "1.0.0-alpha.1",
+  "status": "proposed",
+  "owner": "egohygiene/relay",
+  "updated": "2026-09-09",
+  "purpose": "Bind Relay's future local and pull-request continuity preflights to one immutable, privacy-safe evidence contract without authoring semantic handoff prose.",
+  "rollout": {
+    "stage": "observe",
+    "maximum_stage_before_release": "observe",
+    "activation_gate": [
+      "Aether marks the pinned repository-continuity contract and skill stable and release-included",
+      "Hygiene accepts and releases the pinned organization policy",
+      "EgoLint releases the pinned continuity validator and report contract",
+      "Holon promotes the pinned continuity materialization profile",
+      "A maintainer explicitly promotes this Relay profile after local and CI parity evidence is reviewed"
+    ],
+    "unavailable_behavior": "fail-closed-with-explicit-unavailable-result"
+  },
+  "sources": [
+    {
+      "id": "aether-continuity",
+      "role": "portable-contract",
+      "repository": "egohygiene/aether",
+      "revision": "b7597301c4d22a9bcd580967b5753138bb368111",
+      "version": "1.0.0",
+      "lifecycle": "draft",
+      "release_included": false,
+      "artifacts": [
+        {
+          "id": "repository-continuity-schema",
+          "path": "catalog/schemas/aether.repository-continuity.v1.schema.json",
+          "sha256": "a725e004fe0db2bf96a968c6e3f300d37ecf8b00b9a0923be5c5f4c529655916"
+        },
+        {
+          "id": "repository-continuity-instruction",
+          "path": "library/organization/instructions/repository-continuity/INSTRUCTION.md",
+          "sha256": "dc2fb66bd5268af2416389fef469d2a13c91d1a6f179e6fc10a21d4f890876a8"
+        }
+      ]
+    },
+    {
+      "id": "hygiene-continuity",
+      "role": "organization-policy",
+      "repository": "egohygiene/hygiene",
+      "revision": "43386f5749116717585ead7459b4945e0ac50d06",
+      "version": "1.0.0-alpha.1",
+      "lifecycle": "proposed",
+      "release_included": false,
+      "artifacts": [
+        {
+          "id": "repository-continuity-policy",
+          "path": "catalog/repository-continuity-policy.json",
+          "sha256": "a17178482d67e141009b07d6715727612fbf7f372be8c471a124149752c2ca64"
+        },
+        {
+          "id": "repository-continuity-policy-schema",
+          "path": "schemas/repository-continuity-policy.v1.schema.json",
+          "sha256": "287bd030dcff2a3340475e4a7f8fd63e42f5ea4ff557d8f539e067eb8f0050d9"
+        }
+      ]
+    },
+    {
+      "id": "egolint-continuity",
+      "role": "validator",
+      "repository": "egohygiene/egolint",
+      "revision": "fc6f0c0496c8b8d4c0690fdd2fdb69a9538866fa",
+      "version": "0.1.0-alpha.1",
+      "lifecycle": "proposed",
+      "release_included": false,
+      "artifacts": [
+        {
+          "id": "repository-continuity-rule-catalog",
+          "path": ".config/rules/repository-continuity.v1.toml",
+          "sha256": "c4a9bb056526d0176428b47167fd5b4b29ad1803ef1f53b223c43adf4b186528"
+        },
+        {
+          "id": "repository-continuity-schema",
+          "path": "schemas/repository-continuity.schema.json",
+          "sha256": "cf865611886602765a5c56efc89b2910c1bbdde3d75c7668c5e9cdcea994848b"
+        },
+        {
+          "id": "repository-continuity-report-schema",
+          "path": "schemas/repository-continuity-report.schema.json",
+          "sha256": "fc9d7c1a9175209e0c958cf74dded0cb974ff86c7d46130e7a7ae731f0147276"
+        }
+      ]
+    },
+    {
+      "id": "holon-continuity",
+      "role": "materializer",
+      "repository": "egohygiene/holon",
+      "revision": "225f5cda95c7b9c0dcd19dfe27c34adac3713d01",
+      "version": "1.0.0-alpha.1",
+      "lifecycle": "proposed",
+      "release_included": false,
+      "artifacts": [
+        {
+          "id": "repository-continuity-materialization-profile",
+          "path": "catalog/repository-continuity-materialization.json",
+          "sha256": "be2a2e1572fa1f50387c2ad6426e70a7df4fea319159e325bef3a61e3989a6eb"
+        },
+        {
+          "id": "repository-continuity-request-schema",
+          "path": "schemas/repository-continuity-request.v1.schema.json",
+          "sha256": "b74ecb5653f02385a0dc46dbff0a78574f01d02093ddeed7e1bfafe3cd1116e4"
+        },
+        {
+          "id": "repository-continuity-cli-result-schema",
+          "path": "schemas/repository-continuity-cli-result.v1.schema.json",
+          "sha256": "52049425bbd95cbbc7270076767071ce22fba35cfc9ef92b178179e9316e7fb9"
+        },
+        {
+          "id": "repository-continuity-materialization-guide",
+          "path": "docs/repository-continuity-materialization.md",
+          "sha256": "f91a91fa332eb358251dbe0883d0c4eb3e5ee182f701f35b43305e29ea829cd8"
+        }
+      ]
+    }
+  ],
+  "interfaces": {
+    "request_contract": "relay.repository-continuity-preflight-request/v1",
+    "result_contract": "relay.repository-continuity-preflight-result/v1",
+    "validator_report_contract": "egolint.repository-continuity-report/v1",
+    "local_ci_result_parity": true,
+    "evidence_layers": [
+      "structural",
+      "freshness-declaration",
+      "local-git",
+      "external-live"
+    ]
+  },
+  "execution": {
+    "default_network": "denied",
+    "base_head_required": true,
+    "semantic_authoring": "forbidden",
+    "implicit_writes": "forbidden",
+    "forbidden_authority": [
+      "stage",
+      "commit",
+      "push",
+      "open-pull-request",
+      "comment",
+      "merge",
+      "release",
+      "deploy",
+      "publish"
+    ]
+  },
+  "information_safety": {
+    "minimum_necessary": true,
+    "contains_handoff_content": false,
+    "private_output": "allowlisted-metadata-only",
+    "untrusted_content": "context-only-no-authority",
+    "excluded": [
+      "secrets-and-credentials",
+      "private-conversation-text",
+      "sensitive-personal-data",
+      "unpublished-private-business-data",
+      "private-local-paths",
+      "unrelated-private-context",
+      "continuity-free-form-body"
+    ]
+  },
+  "ownership": {
+    "portable_contract": "egohygiene/aether",
+    "organization_policy": "egohygiene/hygiene",
+    "validation": "egohygiene/egolint",
+    "materialization": "egohygiene/holon",
+    "semantic_checkpoint": "consumer-repository",
+    "preflight_and_ci": "egohygiene/relay",
+    "observation": "egohygiene/observatory",
+    "fleet_rollout": "egohygiene/pace"
+  }
+}

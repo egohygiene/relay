@@ -3,12 +3,12 @@ schema: aether.architecture-document/v1
 id: relay-roadmap
 title: Relay Roadmap
 kind: architecture-document
-version: 0.1.0
+version: 0.2.0
 status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-08-27
+updated: 2026-09-09
 governed_by:
   - architecture-roadmap
 depends_on:
@@ -328,6 +328,36 @@ organization dashboard form one consistent evidence-navigation system.
 
 - [ ] Every supporting view preserves the shared shell and evidence vocabulary.
 - [ ] Consumer publication refreshes deterministically through one pinned workflow.
+
+### Repository continuity preflight track
+
+<!-- roadmap-step
+id: REL-CONT-001
+status: active
+depends_on: [REL-Q01]
+issues: [60, 61, 62, 63]
+-->
+#### REL-CONT-001 — Publish continuity preflight and CI evidence
+
+**State:** `active`
+**Depends on:** `REL-Q01`
+
+**Outcome:** Consumers run one immutable, privacy-safe continuity contract
+locally before pull-request presentation and through a read-only CI backstop.
+
+**Exit criteria:**
+
+- [ ] The pinned contract and shared request/result schemas are reviewed.
+- [ ] The local adapter performs no implicit Git, provider, or semantic writes.
+- [ ] The reusable pull-request workflow is least-privilege and fork-safe.
+- [ ] Local and CI evidence is byte-compatible and released immutably.
+
+**Current evidence:**
+
+- Parent issue #60 is decomposed into contract #61, local adapter #62, and
+  reusable workflow/dogfood #63.
+- All upstream inputs are immutable reviewed commits but remain unreleased;
+  promotion is capped at `observe`.
 
 ### Roadmap-to-issue handoff
 
