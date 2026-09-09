@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/repository-continuity-preflight-result/v1/schema.json",
+  "title": "Relay repository continuity preflight result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "profile", "repository", "rollout_mode", "semantic_status", "outcome", "comparison", "evidence_layers", "findings", "counts", "corrective_actions", "privacy"],
+  "properties": {
+    "schema_version": {"const": "relay.repository-continuity-preflight-result/v1"},
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "sha256"],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "visibility"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "visibility": {"enum": ["public", "private", "internal"]}
+      }
+    },
+    "rollout_mode": {"enum": ["observe", "ratchet", "enforce"]},
+    "semantic_status": {"enum": ["valid", "invalid", "incomplete", "exempt", "not-applicable", "unsupported", "unavailable"]},
+    "outcome": {"enum": ["passed", "warning", "failed", "unavailable"]},
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requested_base", "requested_head", "resolved_base", "resolved_head", "topology"],
+      "properties": {
+        "requested_base": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|unborn)$"},
+        "requested_head": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|working-tree)$"},
+        "resolved_base": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^[0-9a-f]{40}$"}, {"const": "unborn"}]},
+        "resolved_head": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^[0-9a-f]{40}$"}, {"const": "working-tree"}]},
+        "topology": {"enum": ["linear", "merge-commit", "diverged", "unborn", "working-tree", "unavailable"]}
+      }
+    },
+    "evidence_layers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["structural", "freshness-declaration", "local-git", "external-live"],
+      "properties": {
+        "structural": {"$ref": "#/$defs/layer"},
+        "freshness-declaration": {"$ref": "#/$defs/layer"},
+        "local-git": {"$ref": "#/$defs/layer"},
+        "external-live": {"$ref": "#/$defs/layer"}
+      }
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "severity", "layer", "summary", "remediation"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Z][A-Z0-9-]+-[0-9]{3}$"},
+          "severity": {"enum": ["info", "warning", "error", "critical"]},
+          "layer": {"enum": ["structural", "freshness-declaration", "local-git", "external-live"]},
+          "summary": {"type": "string", "minLength": 1, "maxLength": 512},
+          "remediation": {"type": "string", "minLength": 1, "maxLength": 1024}
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["info", "warning", "error", "critical", "total"],
+      "properties": {
+        "info": {"type": "integer", "minimum": 0},
+        "warning": {"type": "integer", "minimum": 0},
+        "error": {"type": "integer", "minimum": 0},
+        "critical": {"type": "integer", "minimum": 0},
+        "total": {"type": "integer", "minimum": 0, "maximum": 256}
+      }
+    },
+    "corrective_actions": {"type": "array", "maxItems": 32, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 1024}},
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "contains_handoff_content", "redaction"],
+      "properties": {
+        "classification": {"enum": ["public-repository", "private-repository", "internal-repository"]},
+        "contains_handoff_content": {"const": false},
+        "redaction": {"const": "allowlisted-metadata-only"}
+      }
+    }
+  },
+  "$defs": {
+    "layer": {"enum": ["passed", "failed", "partial", "unavailable", "not-applicable"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"semantic_status": {"const": "valid"}}},
+      "then": {"properties": {"outcome": {"const": "passed"}}}
+    },
+    {
+      "if": {"properties": {"semantic_status": {"enum": ["unsupported", "unavailable"]}}},
+      "then": {"properties": {"outcome": {"const": "unavailable"}}}
+    },
+    {
+      "if": {"properties": {"rollout_mode": {"const": "observe"}, "semantic_status": {"enum": ["invalid", "incomplete"]}}, "required": ["rollout_mode", "semantic_status"]},
+      "then": {"properties": {"outcome": {"const": "warning"}}}
+    },
+    {
+      "if": {"properties": {"repository": {"properties": {"visibility": {"const": "private"}}}}},
+      "then": {"properties": {"privacy": {"properties": {"classification": {"const": "private-repository"}}}}}
+    }
+  ]
+}

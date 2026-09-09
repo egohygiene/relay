@@ -42,6 +42,9 @@ jobs:
       - name: Validate action catalog and metadata
         run: python3 scripts/validate_actions.py
 
+      - name: Validate continuity preflight contracts
+        run: python3 scripts/validate_continuity_preflight_contract.py validate
+
       - name: Run unit and integration tests
         run: >-
           python3 -m unittest discover

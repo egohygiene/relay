@@ -3,12 +3,12 @@ schema: aether.architecture-document/v1
 id: relay-decisions
 title: Relay Decisions
 kind: architecture-document
-version: 0.1.0
+version: 0.2.0
 status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-08-25
+updated: 2026-09-09
 governed_by:
   - architecture-decisions
 depends_on:
@@ -44,6 +44,7 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - ADR-005: Release the action catalog as one repository unit
 - ADR-006: Catalog workflow authority and failure semantics
 - ADR-007: Compose Repository Intelligence from bounded sibling contracts
+- ADR-008: Separate continuity orchestration from semantic authority
 
 ## ADR-001: Package reusable behavior outside templates
 
@@ -107,6 +108,15 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - **Decision:** Observatory owns the versioned public-safe read model, Holon owns framework-neutral visual primitives, and Relay owns the static route shell, action/workflow execution, bundle validation, and publication artifact. Relay accepts only a repository- and commit-matched snapshot, renders missing evidence explicitly, keeps browser resume state local-only, and retains one consumer-owned deployment boundary.
 - **Consequences:** `/now/` can answer operational questions without scraping providers or manufacturing readiness. Sibling changes require pinned contract evidence and compatibility tests. The routed shell may reserve future pages before their focused projections exist, but those pages must state that limitation honestly.
 - **Reconsider when:** A versioned shared site runtime can preserve the same offline determinism, privacy boundary, and consumer-owned publication with less duplicated composition code.
+
+## ADR-008: Separate continuity orchestration from semantic authority
+
+- **Status:** Accepted for the proposed continuity preflight contract
+- **Date:** 2026-09-09
+- **Context:** Agents need one local pre-PR check and one CI backstop, but Relay cannot safely infer repository state, duplicate upstream policy, or centralize private handoff prose.
+- **Decision:** Pin Aether, Hygiene, EgoLint, and Holon contracts immutably; require explicit base/head and live-evidence inputs; expose one privacy-safe result across local and CI execution; prohibit semantic authoring and repository/provider writes. Keep unreleased inputs at `observe`.
+- **Consequences:** Consumers receive consistent evidence and exact corrective actions while retaining semantic ownership. Release promotion requires coordinated sibling releases and reviewed repinning. CI can detect but cannot repair a stale checkpoint.
+- **Reconsider when:** A released owner contract supplies an equivalent portable orchestration envelope without transferring semantic or write authority to Relay.
 
 ## Open decisions
 

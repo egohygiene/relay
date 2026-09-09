@@ -230,5 +230,23 @@ profile’s provenance, SBOM, signature, and rollback evidence before it creates
 or resumes an immutable GitHub Release. Registry publication and deployment
 remain caller-owned authorization steps. See [RELEASE_PROFILES.md](RELEASE_PROFILES.md).
 
+## Repository continuity preflight
+
+Relay's proposed continuity-preflight profile binds future local and reusable
+CI adapters to one request/result contract. It pins the reviewed Aether,
+Hygiene, EgoLint, and Holon inputs by immutable revision and SHA-256 digest,
+keeps unreleased inputs capped at `observe`, and excludes semantic checkpoint
+prose from evidence. See
+[`docs/repository-continuity-preflight.md`](docs/repository-continuity-preflight.md).
+
+Validate the contract offline:
+
+```bash
+python3 scripts/validate_continuity_preflight_contract.py validate
+```
+
+This contract-only surface does not yet execute EgoLint or expose the reusable
+workflow. Those adapters are tracked by Relay issues #62 and #63.
+
 See [ARCHITECTURE.md](ARCHITECTURE.md) for structural boundaries and
 [ROADMAP.md](ROADMAP.md) for extraction and adoption sequencing.
