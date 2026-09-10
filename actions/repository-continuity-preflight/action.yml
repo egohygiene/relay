@@ -1,0 +1,39 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+
+name: Repository Continuity Preflight
+description: Run the pinned EgoLint continuity validator without modifying the consumer checkout.
+inputs:
+  request:
+    description: Repository-relative Relay continuity preflight request JSON.
+    required: true
+  egolint-source:
+    description: Path to the exact pinned EgoLint source checkout.
+    required: true
+  continuity-policy:
+    description: Repository-relative EgoLint continuity policy TOML.
+    required: true
+outputs:
+  result:
+    description: Repository-relative path to the normalized Relay result.
+    value: ${{ steps.preflight.outputs.result }}
+  outcome:
+    description: Relay enforcement outcome.
+    value: ${{ steps.preflight.outputs.outcome }}
+runs:
+  using: composite
+  steps:
+    - id: preflight
+      shell: bash
+      env:
+        RELAY_REQUEST: ${{ inputs.request }}
+        RELAY_EGOLINT_SOURCE: ${{ inputs.egolint-source }}
+        RELAY_CONTINUITY_POLICY: ${{ inputs.continuity-policy }}
+      run: >-
+        python3 "${{ github.action_path }}/scripts/run_repository_continuity_preflight.py"
+        --repository-root "."
+        --request "${RELAY_REQUEST}"
+        --egolint-source "${RELAY_EGOLINT_SOURCE}"
+        --continuity-policy "${RELAY_CONTINUITY_POLICY}"
+

@@ -6,6 +6,7 @@ documentation, implementation, contracts, and tests.
 
 | Action                                                        | Capability                                                  | Side effects                  |
 | ------------------------------------------------------------- | ----------------------------------------------------------- | ----------------------------- |
+| [`repository-continuity-preflight`](repository-continuity-preflight/) | Run pinned offline continuity validation and normalize evidence | Workspace evidence only |
 | [`repository-intelligence`](repository-intelligence/)         | Build operational, roadmap, decision, and journey Repository Intelligence views | Workspace files only          |
 | [`repository-labels`](repository-labels/)                     | Plan and apply canonical labels and pull-request metadata   | Optional repository metadata writes |
 | [`normalize-repository-report`](normalize-repository-report/) | Normalize OSV, MegaLinter, and Scorecard producer summaries | Workspace files only          |

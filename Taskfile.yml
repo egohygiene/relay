@@ -27,6 +27,18 @@ tasks:
         --egolint-source "{{.EGOLINT_SOURCE}}"
         --holon-source "{{.HOLON_SOURCE}}"
 
+  continuity:preflight:
+    desc: Run the read-only local continuity preflight from explicit inputs
+    requires:
+      vars: [REQUEST, EGOLINT_SOURCE, CONTINUITY_POLICY]
+    cmds:
+      - >-
+        python3 actions/repository-continuity-preflight/scripts/run_repository_continuity_preflight.py
+        --repository-root "."
+        --request "{{.REQUEST}}"
+        --egolint-source "{{.EGOLINT_SOURCE}}"
+        --continuity-policy "{{.CONTINUITY_POLICY}}"
+
   release:plan:
     desc: Render a read-only plan for the next unpromoted Relay release
     requires:

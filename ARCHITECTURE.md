@@ -136,8 +136,9 @@ operate with read-only repository permissions.
 Relay owns execution and evidence normalization around the continuity contract;
 it does not own checkpoint semantics, organization applicability, validation
 rules, materialization, observation, or fleet rollout. The proposed profile
-pins those sibling inputs and defines a closed request/result seam before any
-local or GitHub Actions adapter is added.
+pins those sibling inputs and defines a closed request/result seam. The local
+adapter runs the source-pinned validator offline inside an ephemeral checkout
+copy; reusable workflow orchestration remains separate work.
 
 The adapter boundary requires explicit base/head evidence and retains
 structural, declared-freshness, local-Git, and external-live states separately.
