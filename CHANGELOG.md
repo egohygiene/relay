@@ -6,6 +6,9 @@ All notable changes to Relay are documented in this file. The format follows
 
 ## [Unreleased]
 
+- Reusable read-only repository continuity pull-request preflight with pinned
+  EgoLint acquisition, bounded annotations and artifacts, and Relay dogfood.
+
 ### Added
 
 - Canonical organization label synchronization with reviewable, checksum-bound

@@ -4,6 +4,10 @@ These examples are complete caller-owned workflows, not templates that hide
 authority. They demonstrate the minimum permissions and immutable dependency
 pin expected in a production repository.
 
+[`continuity-preflight.md`](continuity-preflight.md) shows the read-only PR
+backstop. The repository updates its semantic handoff before presenting the PR;
+CI verifies explicit base/head evidence and never writes or repairs prose.
+
 [`repository-intelligence.yml`](repository-intelligence.yml) uses the published
 Relay v1.1.0 commit. A reviewed dependency update replaces both the full commit
 SHA and its adjacent release comment. The moving `v1` alias is useful for

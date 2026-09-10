@@ -53,6 +53,7 @@ class ActionCatalogTests(unittest.TestCase):
             {
                 ".github/workflows/publication-pages.yml",
                 ".github/workflows/publication-review.yml",
+                ".github/workflows/continuity-preflight.yml",
                 ".github/workflows/label-sync-apply.yml",
                 ".github/workflows/label-sync-plan.yml",
                 ".github/workflows/pull-request-label-apply.yml",

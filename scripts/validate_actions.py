@@ -479,7 +479,12 @@ def validate_workflow_catalog(repository_root: Path, errors: list[str]) -> None:
                 if not isinstance(trigger, str) or f"  {trigger}:" not in source:
                     errors.append(f"catalog trigger is absent from {workflow_path}: {trigger}")
         timeout = entry.get("timeout_minutes")
-        if not isinstance(timeout, int) or f"timeout-minutes: {timeout}" not in source:
+        if timeout is None:
+            if not re.search(r"^\s{4}uses:\s+\S+\.github/workflows/", source, re.MULTILINE):
+                errors.append(
+                    f"null catalog timeout is only valid for a reusable-workflow caller: {workflow_path}"
+                )
+        elif not isinstance(timeout, int) or f"timeout-minutes: {timeout}" not in source:
             errors.append(f"catalog timeout does not match {workflow_path}: {timeout}")
         concurrency = entry.get("concurrency")
         if not isinstance(concurrency, dict):

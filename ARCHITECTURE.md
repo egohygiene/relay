@@ -140,6 +140,11 @@ pins those sibling inputs and defines a closed request/result seam. The local
 adapter runs the source-pinned validator offline inside an ephemeral checkout
 copy; reusable workflow orchestration remains separate work.
 
+The reusable workflow checks out the exact pull-request candidate without
+persisted credentials, acquires EgoLint at the profile's immutable source SHA,
+and resolves checksum-locked dependencies before switching execution offline.
+It uploads only the bounded normalized result and never runs consumer code.
+
 The adapter boundary requires explicit base/head evidence and retains
 structural, declared-freshness, local-Git, and external-live states separately.
 Evidence contains bounded findings and remediation only, never the free-form
