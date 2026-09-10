@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-10T13:57:38Z"
+  updated_at: "2026-09-10T14:01:46Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -61,15 +61,15 @@ state:
   candidate:
     branch: codex/relay-63-continuity-pr-workflow
     revision: null
-    pull_request: null
+    pull_request: https://github.com/egohygiene/relay/pull/66
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: "2026-09-10T13:54:10Z"
+    observed_at: "2026-09-10T14:01:46Z"
     default_branch_revision: 861887a2d2223b80e9e6076c3ae7f88dc132d8b9
     issue_state: open
-    pull_request_state: not-applicable
-    notes: GitHub confirmed PR 65 merged at the represented main revision and issue 63 is open; no issue 63 pull request existed before implementation.
+    pull_request_state: open
+    notes: GitHub confirmed PR 65 merged at the represented main revision, issue 63 remains open, and PR 66 is the unmerged candidate with one implementation commit at aef89cac040080c12b66336a8fef2d5dec2e1144 before this handoff-only update.
   parallel_changes: []
 review:
   status: partial
@@ -136,8 +136,9 @@ are bounded, and Relay dogfoods the workflow without semantic authoring.
 
 The verified base is Relay `main` at
 `861887a2d2223b80e9e6076c3ae7f88dc132d8b9`. The candidate branch is
-`codex/relay-63-continuity-pr-workflow`; issue #63 is open, no candidate
-pull request exists yet, and this claim must be rechecked before handoff.
+`codex/relay-63-continuity-pr-workflow`; issue #63 and candidate PR #66 are
+open, the pull request is unmerged, and these claims must be rechecked before
+handoff.
 
 ## Completed and material changes
 
@@ -145,6 +146,8 @@ pull request exists yet, and this claim must be rechecked before handoff.
 - The candidate adds the reusable workflow, Relay pull-request dogfood caller,
   pinned contract projections, a consumer example, bounded evidence behavior,
   catalogs, documentation, and workflow tests.
+- PR #66 presents the candidate without merging it and records issue #63 plus
+  parent #60 acceptance-to-evidence traceability.
 - The contract keeps Aether, Hygiene, EgoLint, Holon, Observatory, Pace, and
   consumer ownership distinct.
 
