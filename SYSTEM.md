@@ -35,7 +35,7 @@ This document identifies Relay's logical systems and responsibilities. It answer
 | Composite-action library | Active | Publishes three independently consumable, repository-versioned composite actions. |
 | Reusable-workflow library | Active | Publishes bounded orchestration with explicit caller inputs, outputs, authority, and failure states. |
 | Contract metadata | Active | Owns versioned action, workflow, release, artifact, and provenance schemas and catalogs. |
-| Continuity preflight contract | Proposed | Pins upstream continuity owners and defines one privacy-safe request/result boundary for future local and pull-request adapters. |
+| Continuity preflight contract and local adapter | Proposed | Pins upstream continuity owners and runs one offline, privacy-safe local request/result boundary without modifying the inspected checkout. |
 | Security and permission tests | Active | Rejects uncataloged workflows, mutable dependencies, broad authority, unsafe triggers, and unbounded runner jobs. |
 | Release and versioning | Active | Publishes verified immutable repository releases and a controlled moving major alias. |
 | Consumer examples | Active | Demonstrates complete caller-owned workflows with least privilege and immutable Relay pins. |

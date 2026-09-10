@@ -43,6 +43,17 @@
       "consumer_ref": "egohygiene/relay/actions/repository-intelligence@v1"
     },
     {
+      "id": "repository-continuity-preflight",
+      "path": "actions/repository-continuity-preflight",
+      "name": "Repository Continuity Preflight",
+      "summary": "Run the pinned offline EgoLint continuity capability and emit privacy-safe normalized evidence.",
+      "status": "experimental",
+      "runtime": ["cargo", "python3"],
+      "permissions": {},
+      "side_effects": ["workspace-write"],
+      "consumer_ref": "egohygiene/relay/actions/repository-continuity-preflight@v1"
+    },
+    {
       "id": "repository-labels",
       "path": "actions/repository-labels",
       "name": "Repository Labels",

@@ -347,8 +347,8 @@ locally before pull-request presentation and through a read-only CI backstop.
 
 **Exit criteria:**
 
-- [ ] The pinned contract and shared request/result schemas are reviewed.
-- [ ] The local adapter performs no implicit Git, provider, or semantic writes.
+- [x] The pinned contract and shared request/result schemas are reviewed.
+- [ ] The local adapter performs no implicit Git, provider, or semantic writes. Candidate implementation: #62.
 - [ ] The reusable pull-request workflow is least-privilege and fork-safe.
 - [ ] Local and CI evidence is byte-compatible and released immutably.
 

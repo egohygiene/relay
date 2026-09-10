@@ -31,6 +31,7 @@ class ActionCatalogTests(unittest.TestCase):
             {
                 "actions/normalize-repository-report",
                 "actions/publish-report-snapshot",
+                "actions/repository-continuity-preflight",
                 "actions/repository-intelligence",
                 "actions/repository-labels",
                 "actions/validate-release-bundle",

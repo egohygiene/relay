@@ -232,6 +232,11 @@ remain caller-owned authorization steps. See [RELEASE_PROFILES.md](RELEASE_PROFI
 
 ## Repository continuity preflight
 
+Local consumers may invoke
+`egohygiene/relay/actions/repository-continuity-preflight@v1` from an immutable
+commit pin, or use `task continuity:preflight` with explicit request, policy,
+and pinned EgoLint source paths.
+
 Relay's proposed continuity-preflight profile binds future local and reusable
 CI adapters to one request/result contract. It pins the reviewed Aether,
 Hygiene, EgoLint, and Holon inputs by immutable revision and SHA-256 digest,
@@ -245,8 +250,9 @@ Validate the contract offline:
 python3 scripts/validate_continuity_preflight_contract.py validate
 ```
 
-This contract-only surface does not yet execute EgoLint or expose the reusable
-workflow. Those adapters are tracked by Relay issues #62 and #63.
+The local adapter executes the pinned EgoLint source entirely offline and
+normalizes its report without modifying the inspected checkout. The reusable
+pull-request workflow remains tracked by Relay issue #63.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for structural boundaries and
 [ROADMAP.md](ROADMAP.md) for extraction and adoption sequencing.

@@ -3,9 +3,9 @@
 Relay issue [#60](https://github.com/egohygiene/relay/issues/60) defines two
 execution points around one evidence boundary: a local pre-pull-request check
 and a read-only GitHub Actions backstop. This document describes the contract
-slice introduced by issue
-[#61](https://github.com/egohygiene/relay/issues/61); executable adapters remain
-in #62 and #63.
+contract introduced by issue
+[#61](https://github.com/egohygiene/relay/issues/61). Issue #62 adds the local
+adapter; the reusable pull-request workflow remains in #63.
 
 ## Ownership
 

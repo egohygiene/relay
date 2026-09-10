@@ -37,7 +37,7 @@
         "requested_head": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|working-tree)$"},
         "resolved_base": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^[0-9a-f]{40}$"}, {"const": "unborn"}]},
         "resolved_head": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^[0-9a-f]{40}$"}, {"const": "working-tree"}]},
-        "topology": {"enum": ["linear", "merge-commit", "diverged", "unborn", "working-tree", "unavailable"]}
+        "topology": {"enum": ["linear", "merge-commit", "diverged", "same-revision", "unborn", "working-tree", "unavailable"]}
       }
     },
     "evidence_layers": {

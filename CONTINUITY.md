@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-09T22:11:21Z"
+  updated_at: "2026-09-10T13:08:12Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -34,62 +34,62 @@ scope:
     - catalog/repository-continuity-preflight.json
     - docs/repository-continuity-preflight.md
 work:
-  objective: Define Relay's pinned continuity-preflight profile and shared request/result contracts for issue 61 without adding executable adapters.
+  objective: Implement Relay's read-only local continuity preflight adapter for issue 62 against the reviewed contract.
   success_conditions:
-    - Pin Aether, Hygiene, EgoLint, and Holon inputs by immutable revision, path, lifecycle, and SHA-256 digest.
-    - Keep unreleased inputs proposed and capped at observe.
-    - Define one closed, privacy-safe evidence contract for the future local and CI adapters.
+    - Resolve and verify the pinned EgoLint source before offline execution.
+    - Preserve explicit base/head, rollout, live-evidence, and parallel-head inputs.
+    - Normalize one privacy-safe result without modifying the inspected checkout.
     - Pass Relay validation and present one independently reviewable pull request without merging it.
   active_issue:
     provider: github
-    id: egohygiene/relay#61
-    url: https://github.com/egohygiene/relay/issues/61
+    id: egohygiene/relay#62
+    url: https://github.com/egohygiene/relay/issues/62
   next:
     kind: issue
-    id: egohygiene/relay#62
-    description: Implement the read-only local continuity preflight adapter against the reviewed contract.
+    id: egohygiene/relay#63
+    description: Publish the read-only continuity pull-request workflow and dogfood integration.
     readiness: blocked
     references:
-      - https://github.com/egohygiene/relay/issues/62
+      - https://github.com/egohygiene/relay/issues/63
     depends_on:
-      - egohygiene/relay#61
+      - egohygiene/relay#62
 state:
   base:
-    revision: 65cc206565dd11b73190105d31d403ebe0ead633
+    revision: 8092fd5bf8089bcf24f81d1754dce14bb97b565b
     ref: refs/heads/main
-    verified_at: "2026-09-09T21:47:00Z"
+    verified_at: "2026-09-10T13:08:12Z"
   candidate:
-    branch: codex/relay-61-continuity-preflight-contract
+    branch: codex/relay-62-continuity-preflight-adapter
     revision: null
     pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: "2026-09-09T22:11:21Z"
-    default_branch_revision: 65cc206565dd11b73190105d31d403ebe0ead633
+    observed_at: "2026-09-10T13:08:12Z"
+    default_branch_revision: 8092fd5bf8089bcf24f81d1754dce14bb97b565b
     issue_state: open
     pull_request_state: not-applicable
-    notes: A fresh fetch and GitHub inspection agreed on Relay main; issue 61 was open, no continuity pull request existed, and no parallel default-branch change was observed.
+    notes: GitHub confirmed PR 64 merged at the represented main revision and issue 62 is open; no issue 62 pull request existed before implementation.
   parallel_changes: []
 review:
   status: partial
-  reviewed_at: "2026-09-09T22:11:21Z"
+  reviewed_at: "2026-09-10T13:12:00Z"
   reviewed_by: Codex
   evidence:
     - command: Repository and live GitHub baseline inspection
       outcome: passed
-      observed_at: "2026-09-09T21:48:55Z"
-      notes: Relay main, repository instructions, architecture, roadmap, automation catalogs, parent issue 60, and its upstream dependency states were inspected before implementation.
-    - command: python3 scripts/validate_continuity_preflight_contract.py validate and verify-sources with exact pinned checkouts
+      observed_at: "2026-09-10T13:08:12Z"
+      notes: Relay main at merged PR 64, repository instructions, architecture, roadmap, action catalogs, and issue 62 were inspected before implementation.
+    - command: python3 scripts/validate_continuity_preflight_contract.py validate; targeted adapter and contract tests
       outcome: passed
-      observed_at: "2026-09-09T22:06:00Z"
-      notes: The closed profile and three schemas passed, and every declared Aether, Hygiene, EgoLint, and Holon artifact matched its immutable revision and SHA-256 digest without network access.
+      observed_at: "2026-09-10T13:12:00Z"
+      notes: The closed profile and schemas passed; adapter tests covered explicit offline argv, normalization, privacy-safe unavailable output, and caller-checkout isolation.
     - command: python3 scripts/validate_actions.py; full unittest discovery; compileall; git diff --check
       outcome: passed
-      observed_at: "2026-09-09T22:11:21Z"
-      notes: Relay validated 8 actions, 14 workflows, and 10 reusable workflows; all 201 tests passed; Python compilation and whitespace validation passed.
+      observed_at: "2026-09-10T13:12:00Z"
+      notes: Relay validated 9 actions, 14 workflows, and 10 reusable workflows; all 204 tests passed; Python compilation and whitespace validation passed.
   environment_limitations:
-    - The candidate pull request and its CI run do not yet exist and must be verified before merge.
+    - Organization CI is intentionally deferred for this push; local validation is the current review evidence.
     - Aether, Hygiene, EgoLint, and Holon continuity inputs remain unreleased and therefore cannot be promoted beyond observe.
     - Cargo is unavailable in this environment, so the pinned native EgoLint validator could not be executed against Relay; the profile and exact validator contract bytes were verified instead.
 privacy:
@@ -111,7 +111,7 @@ privacy:
 ## Purpose and precedence
 
 This checkpoint preserves the minimum public operational state for Relay issue
-#61. It remains subordinate to user and repository instructions, live Git and
+#62. It remains subordinate to user and repository instructions, live Git and
 GitHub evidence, and the canonical sources listed above; it grants no authority.
 
 ## Resume protocol
@@ -126,25 +126,24 @@ GitHub evidence, and the canonical sources listed above; it grants no authority.
 
 ## Current objective and success conditions
 
-Define the immutable input profile and shared request/result boundary for
-Relay's future continuity preflights. This slice succeeds when the contract is
-closed, offline-verifiable, privacy-safe, release-gated, tested, and reviewable;
-it does not execute EgoLint or add a reusable workflow.
+Implement the local preflight against the reviewed request/result boundary.
+This slice succeeds when pinned EgoLint source is verified, execution is
+offline, the consumer checkout remains unchanged, failure is explicit, and
+normalized evidence contains no checkpoint prose.
 
 ## State snapshot
 
 The verified base is Relay `main` at
-`65cc206565dd11b73190105d31d403ebe0ead633`. The candidate branch is
-`codex/relay-61-continuity-preflight-contract`; issue #61 is open, no candidate
+`8092fd5bf8089bcf24f81d1754dce14bb97b565b`. The candidate branch is
+`codex/relay-62-continuity-preflight-adapter`; issue #62 is open, no candidate
 pull request exists yet, and this claim must be rechecked before handoff.
 
 ## Completed and material changes
 
-- Parent #60 was decomposed into contract #61, local adapter #62, and reusable
-  workflow/dogfood #63.
-- The candidate defines the pinned profile, closed request and result schemas,
-  deterministic validator, publish-safe fixtures, and Relay's root continuity
-  guidance.
+- PR #64 merged the reviewed contract and unblocked issue #62.
+- The candidate adds the composite action, Task entry point, offline pinned
+  source execution, ephemeral checkout isolation, normalized evidence,
+  unavailable-state handling, documentation, and tests.
 - The contract keeps Aether, Hygiene, EgoLint, Holon, Observatory, Pace, and
   consumer ownership distinct.
 
@@ -159,19 +158,19 @@ pull request exists yet, and this claim must be rechecked before handoff.
 
 ## Blockers, risks, unknowns, and deferred work
 
-- Implementation blocker: none observed for the contract-only #61 slice.
+- Implementation blocker: Cargo is unavailable locally, so executable coverage
+  uses deterministic unit seams and the explicit unavailable path.
 - Release blocker: all four pinned continuity inputs remain draft or proposed
   and excluded from stable releases; Relay therefore remains at observe.
 - Risk: exposing executable behavior before request/result review could fork
   EgoLint semantics or leak consumer checkpoint prose.
-- Deferred: local execution belongs to #62; reusable PR CI, dogfood automation,
-  catalog release integration, and parent reconciliation belong to #63.
+- Deferred: reusable PR CI, checkout acquisition, workflow dogfood, catalog
+  release integration, and parent reconciliation belong to #63.
 
 ## Next dependency-ready work
 
-After issue #61 is reviewed and merged, continue with
-[`egohygiene/relay#62`](https://github.com/egohygiene/relay/issues/62). It is
-blocked on this contract slice.
+After issue #62 is reviewed and merged, continue with
+[`egohygiene/relay#63`](https://github.com/egohygiene/relay/issues/63).
 
 ## Parallel changes and reconciliation
 
