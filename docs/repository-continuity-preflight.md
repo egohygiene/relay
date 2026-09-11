@@ -95,6 +95,28 @@ commenting, merging, releasing, deploying, publishing, and semantic authoring.
 Future adapters may write only their caller-selected evidence file. CI is a
 post-PR backstop and cannot repair a stale handoff.
 
+## Pull-request workflow
+
+The reusable `continuity-preflight.yml` workflow is a CI backstop after local
+semantic review. It checks out the candidate without persisted credentials,
+acquires EgoLint at the profile's full source SHA, resolves only Cargo.lock
+checksum-bound dependencies, and then runs the shared adapter offline. It uses
+`pull_request`, never `pull_request_target`, and has only `contents: read`.
+Callers set `exception-reference` only with the `exception` disposition; the
+reference is preserved as reviewed declaration metadata and never grants write
+authority. GitHub does not accept `timeout-minutes` on a job that directly
+calls a reusable workflow, so the thin caller inherits the called workflow's
+15-minute job timeout.
+
+Evidence contains at most 256 findings, emits at most 20 annotations, and is
+retained for 1–90 caller-selected days. Concurrency cancels stale read-only
+runs; retry begins fresh. Missing history, unsupported versions, unavailable
+validation, cancellation, and upload failure never become a pass. Private and
+internal repository results remain restricted to allowlisted metadata. The
+workflow cannot author, comment, commit, push, merge, release, deploy, or
+publish semantic content. See the
+[`continuity-preflight` example](../examples/workflows/continuity-preflight.md).
+
 ## Release and promotion
 
 The profile stays at `observe` until every pinned upstream input is stable and

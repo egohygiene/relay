@@ -237,6 +237,11 @@ Local consumers may invoke
 commit pin, or use `task continuity:preflight` with explicit request, policy,
 and pinned EgoLint source paths.
 
+Pull-request consumers call
+`egohygiene/relay/.github/workflows/continuity-preflight.yml@v1` from a reviewed
+full commit SHA. The workflow is a read-only backstop after the repository's
+semantic handoff has already been reviewed locally.
+
 Relay's proposed continuity-preflight profile binds future local and reusable
 CI adapters to one request/result contract. It pins the reviewed Aether,
 Hygiene, EgoLint, and Holon inputs by immutable revision and SHA-256 digest,

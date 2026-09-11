@@ -72,8 +72,8 @@ def snapshot_repository(source: Path, destination: Path, output: Path) -> None:
     def ignore(directory: str, names: list[str]) -> set[str]:
         current = Path(directory).resolve()
         ignored: set[str] = set()
-        if current == source.resolve() and ".reports" in names:
-            ignored.add(".reports")
+        if current == source.resolve():
+            ignored.update(name for name in (".relay", ".reports") if name in names)
         candidate = current / output_relative.name
         if candidate == output and output_relative.name in names:
             ignored.add(output_relative.name)
@@ -237,7 +237,13 @@ def run(namespace: argparse.Namespace) -> tuple[dict[str, Any], Path]:
             relative_policy = policy_path.relative_to(root).as_posix()
             completed = subprocess.run(
                 build_command(namespace.egolint_source, snapshot, relative_policy, request),
-                cwd=snapshot, env={**os.environ, "CARGO_NET_OFFLINE": "true", "GIT_OPTIONAL_LOCKS": "0"},
+                cwd=snapshot,
+                env={
+                    **os.environ,
+                    "CARGO_NET_OFFLINE": "true",
+                    "CARGO_TARGET_DIR": str(Path(temporary) / "cargo-target"),
+                    "GIT_OPTIONAL_LOCKS": "0",
+                },
                 capture_output=True, check=False,
             )
             raw_path = snapshot / RAW_REPORT

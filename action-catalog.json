@@ -125,6 +125,15 @@
   ],
   "workflows": [
     {
+      "id": "continuity-preflight",
+      "path": ".github/workflows/continuity-preflight.yml",
+      "name": "Repository Continuity Preflight",
+      "summary": "Run the local continuity adapter in a least-privilege reusable pull-request workflow.",
+      "status": "experimental",
+      "permissions": {"contents": "read"},
+      "consumer_ref": "egohygiene/relay/.github/workflows/continuity-preflight.yml@v1"
+    },
+    {
       "id": "label-sync-plan",
       "path": ".github/workflows/label-sync-plan.yml",
       "name": "Repository Label Synchronization Plan",

@@ -1,0 +1,189 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Reusable repository continuity preflight
+
+on:
+  workflow_call:
+    inputs:
+      repository-id:
+        description: Exact owner/name identity of the caller repository.
+        required: true
+        type: string
+      visibility:
+        description: Public, private, or internal caller visibility.
+        required: true
+        type: string
+      base-revision:
+        description: Full locally available base SHA or unborn.
+        required: true
+        type: string
+      head-revision:
+        description: Full candidate SHA or working-tree.
+        required: false
+        default: "working-tree"
+        type: string
+      disposition:
+        description: Updated, reviewed-no-change, or exception.
+        required: true
+        type: string
+      exception-reference:
+        description: Stable reviewed exception URL; required for exception disposition.
+        required: false
+        default: ""
+        type: string
+      transition:
+        description: Pull-request, post-merge, or local-review transition.
+        required: false
+        default: "pull-request"
+        type: string
+      rollout-mode:
+        description: Observe, ratchet, or enforce policy mode.
+        required: false
+        default: "observe"
+        type: string
+      evaluation-date:
+        description: Explicit YYYY-MM-DD date or event timestamp.
+        required: true
+        type: string
+      continuity-policy:
+        description: Repository-relative EgoLint continuity policy.
+        required: false
+        default: ".config/continuity/repository-continuity.toml"
+        type: string
+      live-evidence-status:
+        description: Verified, partial, unavailable, or not-required.
+        required: false
+        default: "unavailable"
+        type: string
+      live-evidence-references:
+        description: JSON array of stable issue or pull-request URLs.
+        required: false
+        default: "[]"
+        type: string
+      parallel-heads:
+        description: JSON array of full locally available candidate SHAs.
+        required: false
+        default: "[]"
+        type: string
+      artifact-retention-days:
+        description: Retention for bounded continuity evidence.
+        required: false
+        default: 14
+        type: number
+    outputs:
+      outcome:
+        description: Passed, warning, failed, or unavailable.
+        value: "${{ jobs.preflight.outputs.outcome }}"
+      evidence-artifact-name:
+        description: Bounded result artifact name.
+        value: "${{ jobs.preflight.outputs.evidence-artifact-name }}"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "relay-continuity-preflight-${{ github.repository }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      outcome: "${{ steps.run.outputs.outcome }}"
+      evidence-artifact-name: "${{ steps.names.outputs.name }}"
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+      - name: Check out exact caller candidate with complete history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: "${{ github.event.pull_request.head.sha || github.sha }}"
+      - name: Check out exact pinned EgoLint source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: egohygiene/egolint
+          ref: fc6f0c0496c8b8d4c0690fdd2fdb69a9538866fa
+          path: .relay/egolint-source
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Acquire checksum-locked EgoLint dependencies
+        shell: bash
+        run: cargo fetch --locked --manifest-path ".relay/egolint-source/Cargo.toml"
+      - name: Create closed preflight request
+        shell: bash
+        env:
+          BASE: "${{ inputs.base-revision }}"
+          DISPOSITION: "${{ inputs.disposition }}"
+          EVALUATION_DATE: "${{ inputs.evaluation-date }}"
+          EXCEPTION_REFERENCE: "${{ inputs.exception-reference }}"
+          HEAD: "${{ inputs.head-revision }}"
+          LIVE_REFERENCES: "${{ inputs.live-evidence-references }}"
+          LIVE_STATUS: "${{ inputs.live-evidence-status }}"
+          MODE: "${{ inputs.rollout-mode }}"
+          PARALLEL_HEADS: "${{ inputs.parallel-heads }}"
+          REPOSITORY_ID: "${{ inputs.repository-id }}"
+          TRANSITION: "${{ inputs.transition }}"
+          VISIBILITY: "${{ inputs.visibility }}"
+        run: |
+          set -euo pipefail
+          mkdir --parents ".relay"
+          python3 - <<'PYTHON'
+          import json
+          import os
+          from pathlib import Path
+          request = {
+              "schema_version": "relay.repository-continuity-preflight-request/v1",
+              "profile": {"version": "1.0.0-alpha.1", "sha256": "b7a55a65b88c44b05313a59a6edf4a3197771da3cbd178dc458216ef1fb566df"},
+              "repository": {"id": os.environ["REPOSITORY_ID"], "visibility": os.environ["VISIBILITY"], "root": "."},
+              "comparison": {"base_revision": os.environ["BASE"], "head_revision": os.environ["HEAD"], "disposition": os.environ["DISPOSITION"], "transition": os.environ["TRANSITION"], "evaluation_date": os.environ["EVALUATION_DATE"][:10]},
+              "policy": {"rollout_mode": os.environ["MODE"], "exception_reference": os.environ["EXCEPTION_REFERENCE"] or None},
+              "live_evidence": {"status": os.environ["LIVE_STATUS"], "references": json.loads(os.environ["LIVE_REFERENCES"])},
+              "parallel_heads": json.loads(os.environ["PARALLEL_HEADS"]),
+              "output": {"format": "json", "path": ".reports/relay/continuity-preflight.json"},
+          }
+          Path(".relay/continuity-preflight-request.json").write_text(json.dumps(request, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          PYTHON
+      - name: Define bounded artifact name
+        id: names
+        shell: bash
+        run: printf 'name=continuity-preflight-%s-%s\n' "${GITHUB_SHA}" "${GITHUB_RUN_ATTEMPT}" >> "${GITHUB_OUTPUT}"
+      - name: Run shared local adapter
+        id: run
+        uses: $/actions/repository-continuity-preflight
+        with:
+          request: ".relay/continuity-preflight-request.json"
+          egolint-source: ".relay/egolint-source"
+          continuity-policy: "${{ inputs.continuity-policy }}"
+      - name: Emit bounded annotations
+        if: "${{ always() }}"
+        shell: bash
+        run: |
+          python3 - <<'PYTHON'
+          import json
+          from pathlib import Path
+          path = Path(".reports/relay/continuity-preflight.json")
+          if path.is_file():
+              result = json.loads(path.read_text(encoding="utf-8"))
+              level = "error" if result["outcome"] in {"failed", "unavailable"} else "warning"
+              for finding in result["findings"][:20]:
+                  print(f"::{level} title={finding['id']}::{finding['summary']} {finding['remediation']}")
+          PYTHON
+      - name: Upload bounded continuity evidence
+        if: "${{ always() }}"
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "${{ steps.names.outputs.name }}"
+          path: ".reports/relay/continuity-preflight.json"
+          if-no-files-found: error
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9

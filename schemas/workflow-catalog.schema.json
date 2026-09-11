@@ -129,7 +129,12 @@
           "uniqueItems": true
         },
         "permissions": {"$ref": "#/$defs/permissions"},
-        "timeout_minutes": {"type": "integer", "minimum": 1, "maximum": 60},
+        "timeout_minutes": {
+          "oneOf": [
+            {"type": "integer", "minimum": 1, "maximum": 60},
+            {"type": "null"}
+          ]
+        },
         "concurrency": {"$ref": "#/$defs/concurrency"},
         "failure_semantics": {"$ref": "#/$defs/failure_semantics"},
         "inputs": {

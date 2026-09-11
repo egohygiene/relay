@@ -10,6 +10,14 @@ out complete caller history, invokes the action from the exact called Relay
 revision through GitHub's `$/` syntax, builds the routed site, and uploads it as
 an ordinary workflow artifact.
 
+The continuity preflight checks out the exact caller candidate without
+credentials, acquires the pinned EgoLint source and checksum-locked Cargo
+dependencies, then runs the shared adapter offline. It emits at most twenty
+privacy-safe annotations and one retention-governed result artifact. Cancelled
+or retried runs have no repository effects; missing history, unsupported
+contracts, and unavailable validation remain explicit, while private output
+stays allowlisted.
+
 ## Default branch compatibility
 
 `main` remains the preferred default branch for new Ego Hygiene repositories,

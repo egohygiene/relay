@@ -18,6 +18,56 @@
   },
   "workflows": [
     {
+      "id": "continuity-preflight",
+      "path": ".github/workflows/continuity-preflight.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Validate explicit repository continuity base/head evidence through the pinned EgoLint source and preserve one bounded privacy-safe artifact.",
+      "audience": "reusable",
+      "status": "experimental",
+      "triggers": ["workflow_call"],
+      "permissions": {"contents": "read"},
+      "timeout_minutes": 15,
+      "concurrency": {"group": "relay-continuity-preflight-${{ github.repository }}-${{ github.ref }}", "cancel_in_progress": true},
+      "failure_semantics": {"mode": "fail-closed", "partial_success": false, "retry": "fresh-run", "description": "Invalid inputs, unavailable pinned source, missing history, incompatible evidence, or upload failure fails the workflow without mutating repository state."},
+      "inputs": [
+        {"name": "repository-id", "type": "string", "required": true, "description": "Exact owner/name identity."},
+        {"name": "visibility", "type": "string", "required": true, "description": "Repository visibility."},
+        {"name": "base-revision", "type": "string", "required": true, "description": "Full base SHA or unborn."},
+        {"name": "head-revision", "type": "string", "required": false, "default": "working-tree", "description": "Full head SHA or working-tree."},
+        {"name": "disposition", "type": "string", "required": true, "description": "Continuity update disposition."},
+        {"name": "exception-reference", "type": "string", "required": false, "default": "", "description": "Stable reviewed exception URL; required with exception disposition."},
+        {"name": "transition", "type": "string", "required": false, "default": "pull-request", "description": "Evaluated transition."},
+        {"name": "rollout-mode", "type": "string", "required": false, "default": "observe", "description": "Observe, ratchet, or enforce."},
+        {"name": "evaluation-date", "type": "string", "required": true, "description": "Explicit evaluation date or event timestamp."},
+        {"name": "continuity-policy", "type": "string", "required": false, "default": ".config/continuity/repository-continuity.toml", "description": "Repository-relative policy path."},
+        {"name": "live-evidence-status", "type": "string", "required": false, "default": "unavailable", "description": "External live evidence state."},
+        {"name": "live-evidence-references", "type": "string", "required": false, "default": "[]", "description": "JSON stable-reference array."},
+        {"name": "parallel-heads", "type": "string", "required": false, "default": "[]", "description": "JSON parallel-head array."},
+        {"name": "artifact-retention-days", "type": "number", "required": false, "default": 14, "description": "Evidence retention in days."}
+      ],
+      "outputs": [
+        {"name": "outcome", "type": "string", "required": true, "description": "Normalized enforcement outcome."},
+        {"name": "evidence-artifact-name", "type": "string", "required": true, "description": "Bounded evidence artifact name."}
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/continuity-preflight.yml@v1"
+    },
+    {
+      "id": "continuity-preflight-dogfood",
+      "path": ".github/workflows/continuity-preflight-dogfood.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Exercise the reusable continuity preflight against Relay pull requests under a read-only permission ceiling.",
+      "audience": "internal",
+      "status": "experimental",
+      "triggers": ["pull_request"],
+      "permissions": {"contents": "read"},
+      "timeout_minutes": null,
+      "concurrency": {"group": "relay-continuity-dogfood-${{ github.ref }}", "cancel_in_progress": true},
+      "failure_semantics": {"mode": "fail-closed", "partial_success": false, "retry": "fresh-run", "description": "The caller fails when reusable continuity validation or bounded evidence preservation fails."},
+      "inputs": [],
+      "outputs": [],
+      "consumer_ref": null
+    },
+    {
       "id": "relay-validation",
       "path": ".github/workflows/validate.yml",
       "owner": "egohygiene/relay",
