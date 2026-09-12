@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-12T14:32:01Z"
+  updated_at: "2026-09-12T14:37:58Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -49,11 +49,12 @@ work:
     url: https://github.com/egohygiene/relay/issues/71
   next:
     kind: pull-request
-    id: null
-    description: Present the validated Relay issue 71 candidate for review.
-    readiness: ready
+    id: egohygiene/relay#72
+    description: Review and merge the validated Relay issue 71 candidate.
+    readiness: ready-for-review
     references:
       - https://github.com/egohygiene/relay/issues/71
+      - https://github.com/egohygiene/relay/pull/72
     depends_on: []
 state:
   base:
@@ -62,20 +63,20 @@ state:
     verified_at: "2026-09-12T14:25:37Z"
   candidate:
     branch: fix/71-release-name
-    revision: 2d736525ad01730a01ec7e94eb41ea440295af4f
-    pull_request: null
-    handoff_state: local-validated
+    revision: null
+    pull_request: https://github.com/egohygiene/relay/pull/72
+    handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: "2026-09-12T14:25:37Z"
+    observed_at: "2026-09-12T14:37:58Z"
     default_branch_revision: 1eada5142f7fc7da7862f335589e3b8f5884ffaf
     issue_state: open
-    pull_request_state: absent
-    notes: Relay v1.5.0 and OptiFlow v0.1.0 are published; OptiFlow's immutable first release retains the legacy binary-derived outer asset name, and Relay v1.6.0 remains untagged.
+    pull_request_state: open
+    notes: Pull request 72 carries the validated contract tree; Relay v1.5.0 and OptiFlow v0.1.0 are published, OptiFlow's immutable first release retains the legacy binary-derived outer asset name, and Relay v1.6.0 remains untagged.
   parallel_changes: []
 review:
   status: complete
-  reviewed_at: "2026-09-12T14:32:01Z"
+  reviewed_at: "2026-09-12T14:37:58Z"
   reviewed_by: Codex
   evidence:
     - command: Repository instructions, architecture sources, issue and pull-request state, releases, and consumer evidence inspection
@@ -94,6 +95,10 @@ review:
       outcome: passed
       observed_at: "2026-09-12T14:31:58Z"
       notes: The exact candidate commit produced verified unpromoted release-plan evidence with the v1.6.0 tag available.
+    - command: Compare local candidate tree with GitHub pull request 72 head tree
+      outcome: passed
+      observed_at: "2026-09-12T14:37:58Z"
+      notes: Both resolved to tree 4d3d0de1d86e88ecc9d4940e67230b3e925ea0f7 before this checkpoint-only handoff update.
   environment_limitations:
     - The task runner is unavailable locally; documented underlying commands were invoked directly.
     - GitHub Actions evidence is pending the candidate pull request.
@@ -129,9 +134,9 @@ GitHub evidence, and the canonical sources listed above; it grants no authority.
 
 Issue #71 separates product-facing release identity from Relay's generic
 artifact-class profile. The verified base is released Relay v1.5.0 at
-`1eada5142f7fc7da7862f335589e3b8f5884ffaf`. The local candidate at
-`2d736525ad01730a01ec7e94eb41ea440295af4f` adds an optional `release-name`,
-falls back to the profile for compatibility, and prepares unpromoted v1.6.0.
+`1eada5142f7fc7da7862f335589e3b8f5884ffaf`. Pull request #72 adds an optional
+`release-name`, falls back to the profile for compatibility, and prepares
+unpromoted v1.6.0.
 
 ## Material changes and evidence
 
@@ -142,7 +147,7 @@ falls back to the profile for compatibility, and prepares unpromoted v1.6.0.
 - Existing callers that omit the input retain their previous profile-derived
   archive, title, notes, and resume behavior.
 - ADR-009, catalog metadata, examples, version authority, and release docs agree.
-- Focused checks, all 213 tests, catalog and continuity validation, YAML parsing,
+- Focused checks, all 214 tests, catalog and continuity validation, YAML parsing,
   Python compilation, whitespace checks, and v1.6.0 plan verification passed.
 
 ## Blockers, risks, and deferred work
@@ -156,7 +161,7 @@ falls back to the profile for compatibility, and prepares unpromoted v1.6.0.
 
 ## Next dependency-ready work
 
-Open and review the issue #71 candidate. After merge, promote and publish Relay
+Review and merge pull request #72. After merge, promote and publish Relay
 v1.6.0, verify its `relay-v1.6.0.tar.gz` asset and v1 alias, then repin OptiFlow
 and add `release-name: "optiflow"` before its next release.
 
