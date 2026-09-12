@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-12T12:47:29Z"
+  updated_at: "2026-09-12T12:51:27Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -63,20 +63,20 @@ state:
     verified_at: "2026-09-12T12:47:29Z"
   candidate:
     branch: fix/relay-v0-release
-    revision: a36e2cfee6c0b03a43a29d23426cf487e5e830c0
-    pull_request: null
+    revision: null
+    pull_request: https://github.com/egohygiene/relay/pull/68
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: "2026-09-12T12:47:29Z"
+    observed_at: "2026-09-12T12:51:27Z"
     default_branch_revision: 30bc3cc34b5fea07163ecaf4eaf1a5e68fe03db5
     issue_state: open
-    pull_request_state: not-applicable
-    notes: GitHub confirmed PR 66 merged at the represented main revision, Relay issue 67 is open, v1.5.0 is not tagged, and no competing pull request was found before implementation.
+    pull_request_state: open
+    notes: GitHub confirmed PR 66 merged at the represented main revision, Relay issue 67 and PR 68 are open, v1.5.0 is not tagged, and PR 68 is mergeable with its GitHub checks running.
   parallel_changes: []
 review:
   status: partial
-  reviewed_at: "2026-09-12T12:47:29Z"
+  reviewed_at: "2026-09-12T12:51:27Z"
   reviewed_by: Codex
   evidence:
     - command: Repository, release history, and live GitHub baseline inspection
@@ -139,8 +139,9 @@ full-SHA repin and v0.1.0 rerun.
 
 The verified base is Relay `main` at
 `30bc3cc34b5fea07163ecaf4eaf1a5e68fe03db5`. The candidate branch is
-`fix/relay-v0-release`; issue #67 is open, no candidate pull request exists yet,
-and these mutable claims must be rechecked before handoff.
+`fix/relay-v0-release`; issue #67 and candidate PR #68 are open, the pull request
+is mergeable with checks running, and these mutable claims must be rechecked
+before publication.
 
 ## Completed and material changes
 
@@ -152,6 +153,8 @@ and these mutable claims must be rechecked before handoff.
   rejected leading-zero versions.
 - The v1.5.0 changelog now covers the label and continuity features merged after
   its original preparation, plus the pre-one publication compatibility change.
+- PR #68 presents the two-commit candidate and is mergeable; GitHub validation
+  remains in progress at this handoff update.
 
 ## Validation and review evidence
 
