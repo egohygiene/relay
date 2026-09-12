@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-12T13:49:21Z"
+  updated_at: "2026-09-12T13:52:05Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -64,19 +64,19 @@ state:
   candidate:
     branch: fix/relay-self-release
     revision: null
-    pull_request: null
+    pull_request: https://github.com/egohygiene/relay/pull/70
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: "2026-09-12T13:49:21Z"
+    observed_at: "2026-09-12T13:52:05Z"
     default_branch_revision: 9982088b932750e1480c8e8c717e62580557606a
     issue_state: open
-    pull_request_state: not-applicable
-    notes: GitHub confirmed PR 68 merged and issue 67 closed at the represented main revision; issue 69 is open, no competing pull request exists, release run 34697344773 failed before publication, and v1.5.0 remains untagged.
+    pull_request_state: open
+    notes: GitHub confirmed PR 68 merged and issue 67 closed at the represented main revision; issue 69 and PR 70 are open, release run 34697344773 failed before publication, and v1.5.0 remains untagged.
   parallel_changes: []
 review:
   status: partial
-  reviewed_at: "2026-09-12T13:49:21Z"
+  reviewed_at: "2026-09-12T13:52:05Z"
   reviewed_by: Codex
   evidence:
     - command: Repository, release history, and live GitHub baseline inspection
@@ -137,8 +137,8 @@ publication precedes OptiFlow's full-SHA repin and v0.1.0 rerun.
 
 The verified base is Relay `main` at
 `9982088b932750e1480c8e8c717e62580557606a`. The candidate branch is
-`fix/relay-self-release`; issue #69 is open, no candidate pull request exists,
-and these mutable claims must be rechecked before handoff.
+`fix/relay-self-release`; issue #69 and candidate PR #70 are open, and these
+mutable claims must be rechecked before publication.
 
 ## Completed and material changes
 
@@ -149,6 +149,8 @@ and these mutable claims must be rechecked before handoff.
   `github.action_path` to empty, yielding `/../../release-profiles.json`.
 - The candidate makes the metadata default context-independent, resolves an
   omitted path from runtime `GITHUB_ACTION_PATH`, and preserves explicit paths.
+- PR #70 presents the two-commit candidate; GitHub validation is pending at this
+  handoff update.
 
 ## Validation and review evidence
 
