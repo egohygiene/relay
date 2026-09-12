@@ -20,6 +20,11 @@ on:
         description: Relay artifact profile selected by the Aether declaration.
         required: true
         type: string
+      release-name:
+        description: Optional safe product name for the outer archive and GitHub Release.
+        required: false
+        default: ""
+        type: string
       component-id:
         description: Selected component; required for multi-component repositories.
         required: false
@@ -87,6 +92,7 @@ jobs:
       artifact-name: "${{ inputs.artifact-name }}"
       expected-source-revision: "${{ inputs.expected-source-revision }}"
       profile: "${{ inputs.profile }}"
+      release-name: "${{ inputs.release-name }}"
       release-version: "${{ inputs.release-version }}"
       update-major-alias: "${{ inputs.update-major-alias }}"
       artifact-retention-days: "${{ inputs.artifact-retention-days }}"

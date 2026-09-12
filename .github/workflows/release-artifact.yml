@@ -20,6 +20,11 @@ on:
         description: Checked-in Relay release profile identifier.
         required: true
         type: string
+      release-name:
+        description: Optional safe product name for the outer archive and GitHub Release.
+        required: false
+        default: ""
+        type: string
       release-version:
         description: Unused immutable vMAJOR.MINOR.PATCH GitHub Release tag.
         required: true
@@ -76,6 +81,7 @@ jobs:
           DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
           EXPECTED_SOURCE_REVISION: "${{ inputs.expected-source-revision }}"
           PROFILE: "${{ inputs.profile }}"
+          RELEASE_NAME: "${{ inputs.release-name }}"
           RELEASE_VERSION: "${{ inputs.release-version }}"
           RETENTION_DAYS: "${{ inputs.artifact-retention-days }}"
         run: |
@@ -101,6 +107,11 @@ jobs:
           fi
           if [[ ! "${PROFILE}" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
             echo "::error::profile is not a safe Relay release profile identifier"
+            exit 2
+          fi
+          if [[ -n "${RELEASE_NAME}" && \
+                ! "${RELEASE_NAME}" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
+            echo "::error::release-name is not a safe product identifier"
             exit 2
           fi
           if [[ ! "${RELEASE_VERSION}" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
@@ -166,11 +177,13 @@ jobs:
         shell: bash
         env:
           PROFILE: "${{ inputs.profile }}"
+          RELEASE_NAME: "${{ inputs.release-name }}"
           RELEASE_VERSION: "${{ inputs.release-version }}"
         run: |
           set -euo pipefail
           mkdir --parents ".relay/release-payload"
-          archive_name="${PROFILE}-${RELEASE_VERSION}.tar.gz"
+          release_name="${RELEASE_NAME:-${PROFILE}}"
+          archive_name="${release_name}-${RELEASE_VERSION}.tar.gz"
           archive=".relay/release-payload/${archive_name}"
           tar \
             --create \
@@ -243,10 +256,18 @@ jobs:
           EXPECTED_SOURCE_REVISION: "${{ inputs.expected-source-revision }}"
           GH_TOKEN: "${{ github.token }}"
           PROFILE: "${{ inputs.profile }}"
+          RELEASE_NAME: "${{ inputs.release-name }}"
           RELEASE_VERSION: "${{ inputs.release-version }}"
           UPDATE_MAJOR_ALIAS: "${{ inputs.update-major-alias }}"
         run: |
           set -euo pipefail
+          release_name="${RELEASE_NAME:-${PROFILE}}"
+          release_title="${release_name} ${RELEASE_VERSION}"
+          if [[ -n "${RELEASE_NAME}" ]]; then
+            release_notes="Profile-bound release evidence for ${release_name} using Relay's ${PROFILE} profile. See release-evidence.json for checksums, provenance, SBOM, signature, and rollback records."
+          else
+            release_notes="Profile-bound release evidence for ${PROFILE}. See release-evidence.json for checksums, provenance, SBOM, signature, and rollback records."
+          fi
           git fetch origin "${DEFAULT_BRANCH}"
           default_commit="$(git rev-parse "origin/${DEFAULT_BRANCH}^{commit}")"
           current_commit="$(git rev-parse "HEAD^{commit}")"
@@ -262,18 +283,29 @@ jobs:
               echo "::error::immutable release tag already targets another commit"
               exit 2
             fi
+            existing_tag_subject="$(git for-each-ref --format='%(contents:subject)' "refs/tags/${RELEASE_VERSION}")"
+            if [[ "${existing_tag_subject}" != "${release_title}" ]]; then
+              echo "::error::immutable release tag already uses another product name"
+              exit 2
+            fi
           else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git tag --annotate "${RELEASE_VERSION}" --message "${PROFILE} ${RELEASE_VERSION}"
+            git tag --annotate "${RELEASE_VERSION}" --message "${release_title}"
             git push origin "refs/tags/${RELEASE_VERSION}"
           fi
           if ! gh release view "${RELEASE_VERSION}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
             gh release create "${RELEASE_VERSION}" \
               --repo "${GITHUB_REPOSITORY}" \
-              --title "${PROFILE} ${RELEASE_VERSION}" \
-              --notes "Profile-bound release evidence for ${PROFILE}. See release-evidence.json for checksums, provenance, SBOM, signature, and rollback records." \
+              --title "${release_title}" \
+              --notes "${release_notes}" \
               --verify-tag
+          else
+            existing_release_title="$(gh release view "${RELEASE_VERSION}" --repo "${GITHUB_REPOSITORY}" --json name --jq ".name")"
+            if [[ "${existing_release_title}" != "${release_title}" ]]; then
+              echo "::error::existing immutable release uses another product name"
+              exit 2
+            fi
           fi
           mapfile -t assets < <(find ".relay/release-assets" -maxdepth 1 -type f -print | sort)
           if (( ${#assets[@]} != 3 )); then
@@ -303,7 +335,7 @@ jobs:
             gh release download "${RELEASE_VERSION}" \
               --repo "${GITHUB_REPOSITORY}" \
               --dir ".relay/existing-release-assets" \
-              --pattern "${PROFILE}-${RELEASE_VERSION}.tar.gz" \
+              --pattern "${release_name}-${RELEASE_VERSION}.tar.gz" \
               --pattern "release-asset.sha256" \
               --pattern "release-evidence.json"
             if ! (
