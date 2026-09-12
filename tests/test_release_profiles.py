@@ -147,6 +147,23 @@ def profile_bundle(
 class ReleaseProfileTests(unittest.TestCase):
     """Require every profile to preserve a strict, portable evidence boundary."""
 
+    def test_action_resolves_the_omitted_catalog_path_at_runtime(self) -> None:
+        manifest = (
+            REPOSITORY_ROOT / "actions/validate-release-bundle/action.yml"
+        ).read_text(encoding="utf-8")
+
+        self.assertNotIn(
+            'default: "${{ github.action_path }}/../../release-profiles.json"',
+            manifest,
+        )
+        self.assertIn('profiles_path="${INPUT_PROFILES_PATH}"', manifest)
+        self.assertIn('if [[ -z "${profiles_path}" ]]; then', manifest)
+        self.assertIn(
+            'profiles_path="${GITHUB_ACTION_PATH}/../../release-profiles.json"',
+            manifest,
+        )
+        self.assertIn('--profiles-path "${profiles_path}"', manifest)
+
     def validate(
         self,
         directory: Path,
