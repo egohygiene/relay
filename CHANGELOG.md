@@ -6,18 +6,7 @@ All notable changes to Relay are documented in this file. The format follows
 
 ## [Unreleased]
 
-- Reusable read-only repository continuity pull-request preflight with pinned
-  EgoLint acquisition, bounded annotations and artifacts, and Relay dogfood.
-
-### Added
-
-- Canonical organization label synchronization with reviewable, checksum-bound
-  plans and explicit deletion authority.
-- Shared and repository-overridable path labels, size labels, first-contributor
-  welcomes, and fork maintainer-edit checks through a read-only planner and
-  independently recomputed trusted apply handoff.
-
-## [1.5.0] - 2026-09-01
+## [1.5.0] - 2026-09-12
 
 ### Added
 
@@ -25,11 +14,20 @@ All notable changes to Relay are documented in this file. The format follows
 - Durable success and failure evidence for release preparation and publication handoffs.
 - Aether release-declaration, changelog, Taskfile, and version-authority dogfooding.
 - Python-package and Cargo-crate release evidence profiles.
+- Canonical organization label synchronization with reviewable, checksum-bound
+  plans and explicit deletion authority.
+- Shared and repository-overridable path labels, size labels, first-contributor
+  welcomes, and fork maintainer-edit checks through a read-only planner and
+  independently recomputed trusted apply handoff.
+- Reusable read-only repository continuity pull-request preflight with pinned
+  EgoLint acquisition, bounded annotations and artifacts, and Relay dogfood.
 
 ### Changed
 
 - Relay publication now requires an explicit manual default-branch dispatch and
   delegates immutable release creation through the profile-bound release surface.
+- Profile-bound publication accepts exact SemVer `v0.x.y` candidates while
+  continuing to reject numeric identifiers with leading zeroes.
 
 ## [1.4.0] - 2026-08-31
 
