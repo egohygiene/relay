@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-12T12:51:27Z"
+  updated_at: "2026-09-12T13:52:05Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -36,16 +36,16 @@ scope:
     - .github/workflows/release.yml
     - .github/workflows/release-artifact.yml
 work:
-  objective: Publish Relay v1.5.0 with exact pre-one SemVer authorization and unblock OptiFlow v0.1.0.
+  objective: Fix Relay's composite-action catalog resolution, publish v1.5.0, and unblock OptiFlow v0.1.0.
   success_conditions:
-    - Prove the reusable publication guard accepts v0.1.0 and rejects malformed or leading-zero versions.
-    - Keep the v1.5.0 declaration, changelog, and shipped catalog aligned.
+    - Resolve an omitted profile catalog from GITHUB_ACTION_PATH at composite runtime.
+    - Preserve explicit caller-supplied profile catalog paths as authoritative.
     - Publish immutable v1.5.0 evidence from the reviewed default-branch commit and advance v1 only after verification.
     - Pin OptiFlow to the exact released Relay commit and complete its v0.1.0 release.
   active_issue:
     provider: github
-    id: egohygiene/relay#67
-    url: https://github.com/egohygiene/relay/issues/67
+    id: egohygiene/relay#69
+    url: https://github.com/egohygiene/relay/issues/69
   next:
     kind: issue
     id: egohygiene/optiflow#27
@@ -55,45 +55,44 @@ work:
       - https://github.com/egohygiene/optiflow/issues/27
       - https://github.com/egohygiene/optiflow/actions/runs/34694169732
     depends_on:
-      - egohygiene/relay#67
+      - egohygiene/relay#69
 state:
   base:
-    revision: 30bc3cc34b5fea07163ecaf4eaf1a5e68fe03db5
+    revision: 9982088b932750e1480c8e8c717e62580557606a
     ref: refs/heads/main
-    verified_at: "2026-09-12T12:47:29Z"
+    verified_at: "2026-09-12T13:49:21Z"
   candidate:
-    branch: fix/relay-v0-release
+    branch: fix/relay-self-release
     revision: null
-    pull_request: https://github.com/egohygiene/relay/pull/68
+    pull_request: https://github.com/egohygiene/relay/pull/70
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: "2026-09-12T12:51:27Z"
-    default_branch_revision: 30bc3cc34b5fea07163ecaf4eaf1a5e68fe03db5
+    observed_at: "2026-09-12T13:52:05Z"
+    default_branch_revision: 9982088b932750e1480c8e8c717e62580557606a
     issue_state: open
     pull_request_state: open
-    notes: GitHub confirmed PR 66 merged at the represented main revision, Relay issue 67 and PR 68 are open, v1.5.0 is not tagged, and PR 68 is mergeable with its GitHub checks running.
+    notes: GitHub confirmed PR 68 merged and issue 67 closed at the represented main revision; issue 69 and PR 70 are open, release run 34697344773 failed before publication, and v1.5.0 remains untagged.
   parallel_changes: []
 review:
   status: partial
-  reviewed_at: "2026-09-12T12:51:27Z"
+  reviewed_at: "2026-09-12T13:52:05Z"
   reviewed_by: Codex
   evidence:
     - command: Repository, release history, and live GitHub baseline inspection
       outcome: passed
       observed_at: "2026-09-12T12:45:49Z"
-      notes: Relay main, all repository instructions and canonical architecture sources, the v1.4.0-to-main release diff, merged PR 66, and new issue 67 were inspected before implementation.
-    - command: python3 -m unittest tests.test_release_artifact_workflow tests.test_semantic_release_workflows -v; python3 scripts/validate_actions.py; compileall; git diff --check
+      notes: Relay main, all repository instructions and canonical architecture sources, merged PR 68, failed release run 34697344773, and new issue 69 were inspected before implementation.
+    - command: focused release-profile, artifact-workflow, and semantic-release tests; python3 scripts/validate_actions.py; continuity contract validation
       outcome: passed
-      observed_at: "2026-09-12T12:46:25Z"
-      notes: Eight focused release tests passed, nine actions and sixteen workflows matched the catalogs, Python compilation passed, and the diff had no whitespace errors.
-    - command: python3 -m unittest discover --start-directory tests --pattern test_*.py --verbose; workflow YAML parse
+      observed_at: "2026-09-12T13:49:00Z"
+      notes: All 33 focused release tests passed, nine actions and sixteen workflows matched the catalogs, and the continuity profile remained valid.
+    - command: full unittest discovery; workflow and action YAML parse; compileall; git diff --check
       outcome: passed
-      observed_at: "2026-09-12T12:46:50Z"
-      notes: All 211 Relay tests passed and every GitHub workflow parsed successfully.
+      observed_at: "2026-09-12T13:49:21Z"
+      notes: All 212 Relay tests passed; every workflow and action manifest parsed; Python compilation and whitespace validation passed.
   environment_limitations:
     - The task runner is unavailable locally; the documented wrapper could not be invoked.
-    - Full release verification requires the exact candidate to be the current remote default-branch head and is intentionally deferred until review and merge.
     - GitHub Actions evidence is pending the candidate pull request.
 privacy:
   classification: public-repository
@@ -114,7 +113,7 @@ privacy:
 ## Purpose and precedence
 
 This checkpoint preserves the minimum public operational state for Relay issue
-#67. It remains subordinate to user and repository instructions, live Git and
+#69. It remains subordinate to user and repository instructions, live Git and
 GitHub evidence, and the canonical sources listed above; it grants no authority.
 
 ## Resume protocol
@@ -129,58 +128,55 @@ GitHub evidence, and the canonical sources listed above; it grants no authority.
 
 ## Current objective and success conditions
 
-Publish the already-prepared Relay v1.5.0 catalog so consumers can authorize
-exact pre-one SemVer releases. This slice succeeds when the workflow-level test
-binds directly to the shipped guard, the release notes cover every included
-change, local and CI checks pass, and immutable publication precedes OptiFlow's
-full-SHA repin and v0.1.0 rerun.
+Fix the runtime path resolution exposed by Relay's first v1.5.0 dispatch. This
+slice succeeds when omitted paths resolve from `GITHUB_ACTION_PATH`, explicit
+caller overrides remain authoritative, local and CI checks pass, and immutable
+publication precedes OptiFlow's full-SHA repin and v0.1.0 rerun.
 
 ## State snapshot
 
 The verified base is Relay `main` at
-`30bc3cc34b5fea07163ecaf4eaf1a5e68fe03db5`. The candidate branch is
-`fix/relay-v0-release`; issue #67 and candidate PR #68 are open, the pull request
-is mergeable with checks running, and these mutable claims must be rechecked
-before publication.
+`9982088b932750e1480c8e8c717e62580557606a`. The candidate branch is
+`fix/relay-self-release`; issue #69 and candidate PR #70 are open, and these
+mutable claims must be rechecked before publication.
 
 ## Completed and material changes
 
-- OptiFlow run 34694169732 proved every consumer-owned build, smoke, SBOM,
-  provenance, Sigstore, and bundle step before Relay v1.4.0 rejected v0.1.0.
-- Relay main already contains the corrected exact-SemVer guard from the prepared
-  v1.5.0 catalog.
-- The candidate adds a workflow-level regression test for accepted pre-one and
-  rejected leading-zero versions.
-- The v1.5.0 changelog now covers the label and continuity features merged after
-  its original preparation, plus the pre-one publication compatibility change.
-- PR #68 presents the two-commit candidate and is mergeable; GitHub validation
-  remains in progress at this handoff update.
+- PR #68 merged the v0 authorization regression proof and complete v1.5.0 notes.
+- Release run 34697344773 passed default-branch authorization, Relay validation,
+  deterministic bundle creation, and read-only release-plan verification.
+- The run then failed before tag creation because an input default expanded
+  `github.action_path` to empty, yielding `/../../release-profiles.json`.
+- The candidate makes the metadata default context-independent, resolves an
+  omitted path from runtime `GITHUB_ACTION_PATH`, and preserves explicit paths.
+- PR #70 presents the two-commit candidate; GitHub validation is pending at this
+  handoff update.
 
 ## Validation and review evidence
 
 - Baseline repository, release history, and live GitHub inspection passed before
   implementation.
-- Eight focused release tests, all 211 Relay tests, action/workflow catalog
-  validation, workflow YAML parsing, Python compilation, and whitespace checks
-  passed locally.
-- The `task` executable is absent locally. Its release-plan wrapper was inspected;
-  full verify mode correctly remains gated on the reviewed candidate becoming
-  the remote default-branch head.
+- All 33 focused release tests, all 212 Relay tests, action/workflow catalog and
+  continuity validation, workflow/action YAML parsing, Python compilation, and
+  whitespace checks passed locally.
+- The `task` executable remains absent locally; exact underlying validators were
+  invoked directly where possible.
 
 ## Blockers, risks, unknowns, and deferred work
 
-- Release blocker: v1.5.0 cannot be published until this candidate is reviewed,
-  merged, and independently verified on the exact resulting main commit.
+- Release blocker: v1.5.0 cannot be published until issue #69's candidate is
+  reviewed, merged, and independently verified on the exact resulting main commit.
 - Consumer blocker: OptiFlow must not pin mutable Relay main or the moving v1
   alias; it waits for the immutable released Relay commit.
-- Risk: publishing the earlier v1.5.0 preparation without reconciling later main
-  changes would make the changelog incomplete; this candidate closes that gap.
+- Risk: resolving the catalog anywhere except the checked-out action revision
+  could validate against mutable or consumer-owned policy; runtime action path
+  keeps the catalog bound to the exact Relay revision.
 - Deferred: OptiFlow v0.1.0 publication and Relay issue closure follow the Relay
   release and immutable consumer repin.
 
 ## Next dependency-ready work
 
-Open and review the Relay #67 candidate. After merge, dispatch v1.5.0 from the
+Open and review the Relay #69 candidate. After merge, dispatch v1.5.0 from the
 exact default-branch head, verify its tag, assets, evidence, and v1 alias, then
 repin OptiFlow and rerun issue #27's v0.1.0 release.
 

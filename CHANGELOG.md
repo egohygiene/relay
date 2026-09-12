@@ -29,6 +29,11 @@ All notable changes to Relay are documented in this file. The format follows
 - Profile-bound publication accepts exact SemVer `v0.x.y` candidates while
   continuing to reject numeric identifiers with leading zeroes.
 
+### Fixed
+
+- The release-bundle action resolves its bundled profile catalog at composite
+  runtime when callers omit the optional path override.
+
 ## [1.4.0] - 2026-08-31
 
 ### Added
