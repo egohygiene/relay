@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
+import re
 import unittest
 
 
@@ -39,6 +40,24 @@ class ReleaseArtifactWorkflowTests(unittest.TestCase):
         self.assertIn("release must represent the current caller default-branch head", self.workflow)
         self.assertIn("immutable release tag already targets another commit", self.workflow)
         self.assertNotIn("pull_request_target:", self.workflow)
+
+    def test_authorization_accepts_v0_without_accepting_leading_zeroes(self) -> None:
+        guard = next(
+            line
+            for line in self.workflow.splitlines()
+            if '"${RELEASE_VERSION}" =~ ' in line
+        )
+        match = re.search(r"=~ (.+) \]\]; then$", guard)
+        self.assertIsNotNone(match)
+        pattern = re.compile(match.group(1))
+
+        for version in ("v0.1.0", "v0.0.1", "v1.5.0", "v12.34.56"):
+            with self.subTest(version=version):
+                self.assertIsNotNone(pattern.fullmatch(version))
+
+        for version in ("v00.1.0", "v01.0.0", "v0.01.0", "v0.1.00", "1.0.0"):
+            with self.subTest(version=version):
+                self.assertIsNone(pattern.fullmatch(version))
 
     def test_publishes_exactly_the_reviewed_release_evidence_assets(self) -> None:
         self.assertIn("release-evidence.json", self.workflow)
