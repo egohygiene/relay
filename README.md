@@ -212,11 +212,12 @@ Relay publishes all cataloged actions together:
 - recommended consumer reference: full commit SHA.
 
 The current [`release.json`](release.json) authority and
-[`CHANGELOG.md`](CHANGELOG.md) prepare `v1.5.0`; every prior exact tag remains
+[`CHANGELOG.md`](CHANGELOG.md) prepare `v1.6.0`; every prior exact tag remains
 immutable. The `Release Relay actions` workflow runs only through explicit
 manual dispatch on the configured default branch. It builds Relay's
 `github-action` profile bundle and dogfoods the reusable semantic-release
-verification and immutable publication path.
+verification and immutable publication path while naming the product-facing
+archive and Release `relay`.
 If tag creation succeeds but release creation is interrupted, a rerun resumes
 only when that immutable tag still resolves to the same validated commit.
 Subdirectory actions are directly consumable without Marketplace publication;
@@ -227,7 +228,9 @@ production consumer workflows.
 For consumer artifacts, use the profile-bound release workflow instead of
 copying a release YAML file. It validates complete checksums and the declared
 profile’s provenance, SBOM, signature, and rollback evidence before it creates
-or resumes an immutable GitHub Release. Registry publication and deployment
+or resumes an immutable GitHub Release. Callers may provide a separate bounded
+`release-name` so generic validation profiles such as `binary` do not leak into
+product-facing asset names. Registry publication and deployment
 remain caller-owned authorization steps. See [RELEASE_PROFILES.md](RELEASE_PROFILES.md).
 
 ## Repository continuity preflight

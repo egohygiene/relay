@@ -169,6 +169,13 @@
           "description": "Checked-in Relay release profile identifier."
         },
         {
+          "name": "release-name",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional safe product name for the outer archive and GitHub Release; defaults to the profile."
+        },
+        {
           "name": "release-version",
           "type": "string",
           "required": true,
@@ -279,6 +286,7 @@
         {"name": "artifact-name", "type": "string", "required": true, "description": "Complete caller-built release bundle from an earlier job."},
         {"name": "release-version", "type": "string", "required": true, "description": "Reviewed exact vMAJOR.MINOR.PATCH candidate."},
         {"name": "profile", "type": "string", "required": true, "description": "Relay artifact profile selected by the Aether declaration."},
+        {"name": "release-name", "type": "string", "required": false, "default": "", "description": "Optional safe product name for the outer archive and GitHub Release; defaults to the profile."},
         {"name": "component-id", "type": "string", "required": false, "default": "", "description": "Selected component; required for multi-component repositories."},
         {"name": "declaration-path", "type": "string", "required": false, "default": ".egohygiene/release.json", "description": "Repository-relative Aether release declaration."},
         {"name": "expected-source-revision", "type": "string", "required": true, "description": "Full current default-branch commit represented by the release."},

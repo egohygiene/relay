@@ -166,6 +166,7 @@ jobs:
       artifact-name: "relay-release-bundle-${{ github.sha }}"
       release-version: "${{ inputs.version }}"
       profile: "github-action"
+      release-name: "relay"
       component-id: "relay"
       expected-source-revision: "${{ github.sha }}"
       update-major-alias: "${{ inputs.update-major-alias }}"

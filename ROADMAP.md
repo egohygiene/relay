@@ -47,7 +47,7 @@ updated: 2026-08-25
 
 **Mode:** `central`  
 **Route:** `/roadmap/relay/`  
-**Current publication evidence:** Versioned GitHub releases and reusable workflow distribution; v1.0 through v1.4 observed.
+**Current publication evidence:** Versioned GitHub releases and reusable workflow distribution; v1.0 through v1.5 observed.
 
 Publish the public-safe projection through egohygiene.io at /roadmap/relay/. This repository owns intent and acceptance evidence; it does not add a second site deployment.
 
@@ -420,9 +420,9 @@ consumer evidence is tracked in Phase 5.
 
 ## Phase 4: Publish immutable releases
 
-**Status:** `v1.0.0` through `v1.4.0` are published immutably. The current
+**Status:** `v1.0.0` through `v1.5.0` are published immutably. The current
 release declaration, changelog, and version authority prepare the additive
-`v1.5.0` semantic-release workflow release for explicit manual dispatch.
+`v1.6.0` product-facing release-name contract for explicit manual dispatch.
 
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 

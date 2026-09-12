@@ -45,6 +45,7 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - ADR-006: Catalog workflow authority and failure semantics
 - ADR-007: Compose Repository Intelligence from bounded sibling contracts
 - ADR-008: Separate continuity orchestration from semantic authority
+- ADR-009: Separate product release identity from artifact validation profile
 
 ## ADR-001: Package reusable behavior outside templates
 
@@ -117,6 +118,15 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - **Decision:** Pin Aether, Hygiene, EgoLint, and Holon contracts immutably; require explicit base/head and live-evidence inputs; expose one privacy-safe result across local and CI execution; prohibit semantic authoring and repository/provider writes. Keep unreleased inputs at `observe`.
 - **Consequences:** Consumers receive consistent evidence and exact corrective actions while retaining semantic ownership. Release promotion requires coordinated sibling releases and reviewed repinning. CI can detect but cannot repair a stale checkpoint.
 - **Reconsider when:** A released owner contract supplies an equivalent portable orchestration envelope without transferring semantic or write authority to Relay.
+
+## ADR-009: Separate product release identity from artifact validation profile
+
+- **Status:** Accepted for Relay v1 publication
+- **Date:** 2026-09-12
+- **Context:** Relay's profile identifiers name artifact classes and their validation and rollback contracts. Reusing a generic profile such as `binary` as the outer archive and GitHub Release name exposes an internal policy category as if it were the consumer product identity.
+- **Decision:** Keep the profile authoritative for evidence validation and accept a separately bounded optional product-facing release name. Use that name consistently for the outer archive, annotated-tag message, Release title, notes, and identical-release resume lookup; retain the profile as the default for compatibility.
+- **Consequences:** Consumers can publish recognizable product assets without creating product-specific validation profiles. Both identifiers remain explicit, safe, and independently reviewable, and an existing immutable release cannot be resumed under a contradictory name.
+- **Reconsider when:** A versioned repository release declaration supplies an equivalent product-identity field that Relay can consume without inferring or owning consumer semantics.
 
 ## Open decisions
 

@@ -1,6 +1,6 @@
 {
     "$schema": "./schemas/release.schema.json",
     "schema": "egohygiene.relay-release/v1",
-    "version": "v1.5.0",
+    "version": "v1.6.0",
     "update_major_alias": true
 }

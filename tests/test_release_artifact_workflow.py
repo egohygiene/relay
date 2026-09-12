@@ -8,6 +8,8 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 import re
+import subprocess
+import textwrap
 import unittest
 
 
@@ -18,6 +20,17 @@ assert SPEC is not None
 assert SPEC.loader is not None
 validator = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(validator)
+
+
+def workflow_step_script(workflow: str, step_name: str) -> str:
+    _, separator, remainder = workflow.partition(f"      - name: {step_name}\n")
+    if not separator:
+        raise AssertionError(f"release workflow has no {step_name} step")
+    step, _, _ = remainder.partition("\n      - name: ")
+    _, separator, script = step.partition("        run: |\n")
+    if not separator:
+        raise AssertionError(f"release workflow step {step_name} has no run block")
+    return textwrap.dedent(script)
 
 
 class ReleaseArtifactWorkflowTests(unittest.TestCase):
@@ -58,6 +71,70 @@ class ReleaseArtifactWorkflowTests(unittest.TestCase):
         for version in ("v00.1.0", "v01.0.0", "v0.01.0", "v0.1.00", "1.0.0"):
             with self.subTest(version=version):
                 self.assertIsNone(pattern.fullmatch(version))
+
+    def test_release_name_is_a_bounded_product_identity(self) -> None:
+        guard = next(
+            line
+            for line in self.workflow.splitlines()
+            if '"${RELEASE_NAME}" =~ ' in line
+        )
+        match = re.search(r"=~ (.+) \]\]; then$", guard)
+        self.assertIsNotNone(match)
+        pattern = re.compile(match.group(1))
+
+        for release_name in ("optiflow", "relay", "ego-hygiene-cli"):
+            with self.subTest(release_name=release_name):
+                self.assertIsNotNone(pattern.fullmatch(release_name))
+
+        for release_name in ("OptiFlow", "optiflow/cli", "-optiflow", "optiflow-"):
+            with self.subTest(release_name=release_name):
+                self.assertIsNone(pattern.fullmatch(release_name))
+
+        self.assertGreaterEqual(
+            self.workflow.count('release_name="${RELEASE_NAME:-${PROFILE}}"'),
+            2,
+        )
+        self.assertIn(
+            'archive_name="${release_name}-${RELEASE_VERSION}.tar.gz"',
+            self.workflow,
+        )
+        self.assertIn(
+            'release_title="${release_name} ${RELEASE_VERSION}"',
+            self.workflow,
+        )
+        self.assertIn('--title "${release_title}"', self.workflow)
+        self.assertIn(
+            '--pattern "${release_name}-${RELEASE_VERSION}.tar.gz"',
+            self.workflow,
+        )
+        self.assertIn(
+            "immutable release tag already uses another product name",
+            self.workflow,
+        )
+        self.assertIn(
+            "existing immutable release uses another product name",
+            self.workflow,
+        )
+        self.assertIn(
+            'release_notes="Profile-bound release evidence for ${PROFILE}.',
+            self.workflow,
+        )
+
+    def test_release_name_shell_paths_parse(self) -> None:
+        for step_name in (
+            "Require caller default-branch identity and bounded inputs",
+            "Package exact reviewed release bytes",
+            "Verify default-branch head and publish immutable evidence",
+        ):
+            with self.subTest(step=step_name):
+                completed = subprocess.run(
+                    ["bash", "--noprofile", "--norc", "-n"],
+                    input=workflow_step_script(self.workflow, step_name),
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                )
+                self.assertEqual(completed.returncode, 0, completed.stderr)
 
     def test_publishes_exactly_the_reviewed_release_evidence_assets(self) -> None:
         self.assertIn("release-evidence.json", self.workflow)

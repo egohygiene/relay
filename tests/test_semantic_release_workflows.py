@@ -45,6 +45,7 @@ class SemanticReleaseWorkflowTests(unittest.TestCase):
             "uses: $/.github/workflows/release-artifact.yml", self.publication
         )
         self.assertIn('mode: "verify"', self.publication)
+        self.assertIn('release-name: "${{ inputs.release-name }}"', self.publication)
         self.assertIn("release-publication-outcome.json", self.publication)
         self.assertIn('if: "${{ always() }}"', self.publication)
         self.assertNotIn("pull_request_target:", self.publication)
@@ -64,6 +65,7 @@ class SemanticReleaseWorkflowTests(unittest.TestCase):
         self.assertIn("  workflow_dispatch:", workflow)
         self.assertNotIn("  push:", workflow)
         self.assertIn("uses: $/.github/workflows/semantic-release.yml", workflow)
+        self.assertIn('release-name: "relay"', workflow)
         self.assertEqual(
             declaration["schema_version"], "egohygiene.repository-release/v1"
         )

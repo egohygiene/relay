@@ -6,6 +6,15 @@ All notable changes to Relay are documented in this file. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- A bounded `release-name` input that keeps product-facing archive, tag, and
+  GitHub Release names separate from Relay's artifact-class validation profile.
+
+### Changed
+
+- Relay dogfood releases now use `relay` as their explicit product-facing name.
+
 ## [1.5.0] - 2026-09-12
 
 ### Added

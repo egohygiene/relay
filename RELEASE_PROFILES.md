@@ -141,9 +141,16 @@ jobs:
       artifact-name: "aether-v1.4.0"
       expected-source-revision: "${{ github.sha }}"
       profile: "npm-specification"
+      release-name: "aether"
       release-version: "v1.4.0"
       update-major-alias: false
 ```
+
+`profile` selects Relay's validation and rollback contract. The optional
+`release-name` is a separate lowercase kebab-case product identity used for the
+outer archive, annotated-tag message, Release title, and notes. It defaults to
+the profile for compatibility; product repositories should set it explicitly
+when the profile is a generic artifact class such as `binary`.
 
 The reusable workflow only accepts push or manual-dispatch calls from the
 caller’s default branch. It creates an annotated immutable tag only after the
