@@ -7,8 +7,8 @@ name: "🧠 Repository Intelligence"
 description: >-
   Build a deterministic, visibility-aware Repository Intelligence site with a
   shared shell, operational Now view, scrollable roadmap quest line, ADR
-  decision ledger, semantic Git journey, analytics dashboard, and searchable
-  source tree. The action writes static files but never deploys them.
+  decision ledger, semantic Git journey, dependency impact, analytics dashboard,
+  and searchable source tree. The action writes static files but never deploys them.
 
 inputs:
   output-directory:
@@ -31,7 +31,7 @@ inputs:
     description: >-
       Optional repository-relative path to a public-safe Observatory Repository
       Intelligence read model for the represented commit. When omitted, the
-      operational, roadmap, decision, and journey views render explicit
+      operational, roadmap, decision, journey, and dependency views render explicit
       unavailable states instead of inferring repository truth.
     required: false
     default: ""
@@ -117,6 +117,9 @@ outputs:
   journey:
     description: "Repository-relative path to the semantic Git journey view."
     value: "${{ inputs.output-directory }}/journey/index.html"
+  dependencies:
+    description: "Repository-relative path to the directed dependency-impact view."
+    value: "${{ inputs.output-directory }}/dependencies/index.html"
   dashboard:
     description: "Repository-relative path to the compatibility analytics dashboard."
     value: "${{ inputs.output-directory }}/dashboard/index.html"
@@ -492,6 +495,14 @@ runs:
           --source-commit "${RESOLVED_SOURCE_COMMIT}" \
           --stylesheet-source "${GITHUB_ACTION_PATH}/assets/site.css" \
           --script-source "${GITHUB_ACTION_PATH}/assets/site.js" \
+          "${snapshot_arguments[@]}"
+        python3 "${GITHUB_ACTION_PATH}/scripts/render_repository_intelligence_dependencies.py" \
+          --repository-root "${GITHUB_WORKSPACE}" \
+          --output-root "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}" \
+          --summary "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/summary.json" \
+          --provenance "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/provenance.json" \
+          --repository "${RESOLVED_REPOSITORY}" \
+          --source-commit "${RESOLVED_SOURCE_COMMIT}" \
           "${snapshot_arguments[@]}"
 
     - name: "🛡️ Validate generated intelligence bundle"

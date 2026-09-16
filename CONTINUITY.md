@@ -7,17 +7,17 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-12T14:37:58Z"
+  updated_at: "2026-09-16T01:29:57Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Preserve the minimum verified state needed to release Relay's product-facing release-name contract safely.
+  purpose: Preserve the minimum verified state needed to review Relay's first REL-RI-006 supporting-view checkpoint safely.
   includes:
-    - The active issue, represented Git state, contract validation, v1.6.0 release gate, and OptiFlow consumer dependency.
+    - Repository Intelligence dependency-route issue and pull request, represented Git state, accepted Observatory contract boundary, completed validation evidence, and next supporting-view dependency.
   excludes:
-    - Conversation transcripts and duplicated architecture, roadmap, or changelog history.
+    - Conversation transcripts, duplicated architecture history, unrelated release work, and organization-level domain semantics not yet accepted upstream.
   precedence:
     - user-and-runtime-instructions
     - scoped-repository-instructions
@@ -26,82 +26,80 @@ scope:
     - continuity-checkpoint
   canonical_sources:
     - AGENTS.md
-    - README.md
     - ARCHITECTURE.md
     - SYSTEM.md
     - DECISIONS.md
     - ROADMAP.md
-    - CHANGELOG.md
-    - release.json
-    - .github/workflows/release.yml
-    - .github/workflows/semantic-release.yml
-    - .github/workflows/release-artifact.yml
+    - actions/repository-intelligence/action.yml
+    - actions/repository-intelligence/scripts/generate_repository_intelligence_site.py
+    - actions/repository-intelligence/scripts/validate_repository_intelligence_bundle.py
 work:
-  objective: Separate consumer product release names from Relay artifact-class validation profiles.
+  objective: Materialize Repository Intelligence /dependencies/ from Observatory's accepted normalized dependency query without creating Relay-local dependency semantics.
   success_conditions:
-    - Accept an optional bounded product-facing release name while retaining the profile as validation authority.
-    - Preserve profile-derived naming when the new input is omitted.
-    - Use the resolved name consistently for archives, tags, releases, notes, and resume checks.
-    - Publish the additive contract as v1.6.0 before OptiFlow adopts release-name optiflow.
+    - Render directed depends-on and blocks relationships with endpoint identity, assertion/confidence, freshness, provenance, and cross-repository boundaries intact.
+    - Keep missing, empty, stale, inferred, unknown, and not-applicable states explicit without an opaque aggregate score.
+    - Preserve useful static HTML while reusing the shared shell and URL-backed enhancement layer.
+    - Validate populated, empty, unavailable, malformed, deterministic, and accessibility-oriented fixtures.
+    - Keep the reusable action and public bundle validation path authoritative.
   active_issue:
     provider: github
-    id: egohygiene/relay#71
-    url: https://github.com/egohygiene/relay/issues/71
+    id: egohygiene/relay#77
+    url: https://github.com/egohygiene/relay/issues/77
   next:
     kind: pull-request
-    id: egohygiene/relay#72
-    description: Review and merge the validated Relay issue 71 candidate.
+    id: egohygiene/relay#78
+    description: Review and merge the validated bounded /dependencies/ implementation if acceptable.
     readiness: ready-for-review
     references:
-      - https://github.com/egohygiene/relay/issues/71
-      - https://github.com/egohygiene/relay/pull/72
+      - https://github.com/egohygiene/relay/issues/77
+      - https://github.com/egohygiene/relay/pull/78
+      - https://github.com/egohygiene/observatory/issues/7
     depends_on: []
 state:
   base:
-    revision: 1eada5142f7fc7da7862f335589e3b8f5884ffaf
+    revision: e9ea9e33129f7842e5686f14a71aa05c59be1720
     ref: refs/heads/main
-    verified_at: "2026-09-12T14:25:37Z"
+    verified_at: "2026-09-16T01:25:34Z"
   candidate:
-    branch: fix/71-release-name
-    revision: null
-    pull_request: https://github.com/egohygiene/relay/pull/72
+    branch: feat/77-repository-intelligence-dependencies
+    revision: 4ebc21690f2d359f9eef7962af6682ee088d89e3
+    pull_request: https://github.com/egohygiene/relay/pull/78
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: "2026-09-12T14:37:58Z"
-    default_branch_revision: 1eada5142f7fc7da7862f335589e3b8f5884ffaf
+    observed_at: "2026-09-16T01:29:57Z"
+    default_branch_revision: e9ea9e33129f7842e5686f14a71aa05c59be1720
     issue_state: open
     pull_request_state: open
-    notes: Pull request 72 carries the validated contract tree; Relay v1.5.0 and OptiFlow v0.1.0 are published, OptiFlow's immutable first release retains the legacy binary-derived outer asset name, and Relay v1.6.0 remains untagged.
+    notes: Relay issues 28, 30, 31, and 32 are complete; Observatory issue 7 supplies the accepted Dependencies query; hygiene/audit/sanity and organization-roadmap contracts remain open upstream, making /dependencies/ the smallest dependency-ready supporting-view checkpoint.
   parallel_changes: []
 review:
   status: complete
-  reviewed_at: "2026-09-12T14:37:58Z"
-  reviewed_by: Codex
+  reviewed_at: "2026-09-16T01:29:57Z"
+  reviewed_by: ChatGPT
   evidence:
-    - command: Repository instructions, architecture sources, issue and pull-request state, releases, and consumer evidence inspection
+    - command: Live tracker, parent issue, child issue, open pull-request, default-branch, repository instruction, architecture, roadmap, and continuity inspection
       outcome: passed
-      observed_at: "2026-09-12T14:25:37Z"
-      notes: Relay main and v1.5.0, issue 71, no competing release pull request, and OptiFlow's v0.1.0 naming evidence were verified before implementation.
-    - command: Focused release-artifact, semantic-release, workflow-catalog, and release-profile tests; action catalog validation; continuity contract validation; YAML parse; compileall; git diff check
+      observed_at: "2026-09-16T01:25:34Z"
+      notes: No competing Relay or Organization Intelligence implementation pull request was open; later audit, hygiene, sanity, and organization-roadmap views remain gated by open Observatory contracts.
+    - command: Observatory Repository Intelligence contract and canonical expected-fixture inspection
       outcome: passed
-      observed_at: "2026-09-12T14:30:02Z"
-      notes: Custom and fallback naming, unsafe-name rejection, shell syntax, catalog alignment, and immutable resume checks passed.
-    - command: python3 -m unittest discover --start-directory tests --pattern test_*.py --verbose
+      observed_at: "2026-09-16T01:25:34Z"
+      notes: views.dependencies is limited to external repository names plus directed depends-on/blocks relationships carrying assertion, confidence, freshness, provenance, and compact endpoint references.
+    - command: GitHub Actions Validate Relay actions run 35044239093 on implementation revision 4ebc21690f2d359f9eef7962af6682ee088d89e3
       outcome: passed
-      observed_at: "2026-09-12T14:30:45Z"
-      notes: All 213 Relay tests passed.
-    - command: verify_release_plan.py --mode plan for v1.6.0
+      observed_at: "2026-09-16T01:29:57Z"
+      notes: Action/catalog metadata, continuity contracts, full unit and integration tests, Python compilation, Bash and inline-shell syntax, JSON/YAML parsing, caller-owned publication fixture, reusable Repository Intelligence generation, provenance verification, and publication review all passed.
+    - command: GitHub Actions Relay continuity preflight run 35044239143
       outcome: passed
-      observed_at: "2026-09-12T14:31:58Z"
-      notes: The exact candidate commit produced verified unpromoted release-plan evidence with the v1.6.0 tag available.
-    - command: Compare local candidate tree with GitHub pull request 72 head tree
+      observed_at: "2026-09-16T01:29:23Z"
+      notes: The exact candidate ran the shared adapter, bounded annotations, and evidence upload successfully.
+    - command: GitHub Actions Dependency review run 35044238927
       outcome: passed
-      observed_at: "2026-09-12T14:37:58Z"
-      notes: Both resolved to tree 4d3d0de1d86e88ecc9d4940e67230b3e925ea0f7 before this checkpoint-only handoff update.
+      observed_at: "2026-09-16T01:29:57Z"
+      notes: Dependency review completed successfully on the validated implementation head.
   environment_limitations:
-    - The task runner is unavailable locally; documented underlying commands were invoked directly.
-    - GitHub Actions evidence is pending the candidate pull request.
+    - Direct GitHub network access from the local shell is unavailable; repository reads, writes, and validation status use the connected GitHub integration.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -120,56 +118,76 @@ privacy:
 
 ## Purpose and precedence
 
-This checkpoint preserves the minimum public operational state for Relay issue
-#71. It remains subordinate to user and repository instructions, live Git and
-GitHub evidence, and the canonical sources listed above; it grants no authority.
+This checkpoint preserves the minimum public operational state for Repository
+Intelligence issue #77 and pull request #78. It remains subordinate to user and
+repository instructions, live Git and GitHub evidence, and the canonical sources
+listed above; it grants no authority.
 
 ## Resume protocol
 
-1. Read `AGENTS.md`, inspect the checkout, and load the named canonical sources.
-2. Verify issue, pull-request, branch, tag, release, and default-branch claims live.
-3. Continue only the named dependency-ready work and keep publication explicit.
+1. Read `AGENTS.md`, inspect the newest `main`, and re-fetch issue #77 and PR #78.
+2. Reconfirm Observatory issue #7 remains the accepted dependency-query owner.
+3. Inspect all PR checks and review feedback before changing or merging anything.
+4. Continue only the next dependency-ready visual slice after this PR merges.
 
 ## Current objective and state
 
-Issue #71 separates product-facing release identity from Relay's generic
-artifact-class profile. The verified base is released Relay v1.5.0 at
-`1eada5142f7fc7da7862f335589e3b8f5884ffaf`. Pull request #72 adds an optional
-`release-name`, falls back to the profile for compatibility, and prepares
-unpromoted v1.6.0.
+Issue #77 implements the first bounded `REL-RI-006` checkpoint: `/dependencies/`.
+Relay consumes `snapshot.views.dependencies` and renders only Observatory's
+normalized directed relationships. Missing dependency evidence stays explicit;
+Relay does not reconstruct dependency truth from Roadmap, GitHub, package, or
+other route-local data.
+
+Pull request #78 is open from `feat/77-repository-intelligence-dependencies`.
+The validated implementation revision is
+`4ebc21690f2d359f9eef7962af6682ee088d89e3`; this continuity update follows it
+as handoff-only documentation. The verified base is
+`e9ea9e33129f7842e5686f14a71aa05c59be1720`.
 
 ## Material changes and evidence
 
-- `release-artifact.yml` validates a lowercase kebab-case release name and uses
-  it for the outer archive, tag subject, Release title, notes, and resume lookup.
-- `semantic-release.yml` and Relay dogfood propagate explicit product identity;
-  Relay's own next archive is named `relay-v1.6.0.tar.gz`.
-- Existing callers that omit the input retain their previous profile-derived
-  archive, title, notes, and resume behavior.
-- ADR-009, catalog metadata, examples, version authority, and release docs agree.
-- Focused checks, all 214 tests, catalog and continuity validation, YAML parsing,
-  Python compilation, whitespace checks, and v1.6.0 plan verification passed.
+- A bounded dependency renderer reuses the existing Repository Intelligence
+  shell and writes only `dependencies/index.html` after the shared site composer.
+- The view surfaces directed relationship counts, dependency/blocking edges,
+  external-repository context, explicit assertion/freshness/confidence, endpoint
+  state/kind, and expandable canonical provenance.
+- Shared search, state, kind, and URL-backed extra filters remain optional browser
+  enhancement; relationship content is present in static HTML without JavaScript.
+- Cross-repository repository-root identity remains visible without weakening the
+  existing public-bundle URL allowlist; authorized provenance routes stay linked.
+- The reusable action now exposes the dependency route as an explicit output.
+- Deterministic fixtures cover authoritative/current, inferred/unknown,
+  stale/blocking, and cross-repository relationships plus empty/unavailable cases.
+- `REL-RI-005` is reconciled to complete and `REL-RI-006` is now active with
+  issue #77 and PR #78 as current evidence.
+- Relay's required validation, reusable-workflow smoke, continuity preflight,
+  dependency review, and publication-review chain passed on the implementation.
 
 ## Blockers, risks, and deferred work
 
-- Relay v1.6.0 must not be published until the candidate is reviewed, merged,
-  and promoted through the repository's release gate on the exact new main.
-- OptiFlow cannot pass `release-name: optiflow` while pinned to Relay v1.5.0;
-  it must wait for the immutable v1.6.0 commit and then repin.
-- OptiFlow v0.1.0 is immutable historical evidence. Correct product naming begins
-  with its next version instead of deleting or replacing the published assets.
+- No implementation blocker remains for this bounded checkpoint; merge remains a
+  human review decision.
+- `/health/` must not absorb Hygiene conformance semantics while Observatory #5
+  remains open; `/audits/`, `/hygiene/`, and `/sanity/` remain gated by their
+  normalized upstream evidence models.
+- Organization `/roadmap/` and `/sanity/` remain gated by Observatory #22 and #21;
+  this Relay slice does not create replacement organization semantics.
+- External repository-root links remain non-clickable under Relay's existing
+  publication allowlist; canonical evidence links remain available where allowed.
 
 ## Next dependency-ready work
 
-Review and merge pull request #72. After merge, promote and publish Relay
-v1.6.0, verify its `relay-v1.6.0.tar.gz` asset and v1 alias, then repin OptiFlow
-and add `release-name: "optiflow"` before its next release.
+After PR #78 merges, re-fetch Relay #29/#33 and the open Observatory contracts.
+Prefer a bounded `/work/` child of #29 next: Observatory #7 already owns the
+normalized Work query, and the view can orient active issues, pull requests, and
+roadmap queues while deep-linking to GitHub rather than rebuilding execution.
 
 ## Parallel changes and reconciliation
 
-No competing open release pull request was observed. Recheck remote heads and
-pull requests before review, then reconcile semantically if another branch
-changes the same public workflows or checkpoint.
+No competing open Relay or `.github` Intelligence implementation pull request was
+observed before branch creation. Recheck live PRs and `main` before review or
+merge, then reconcile semantically if another branch changes Repository
+Intelligence action metadata, routing, roadmap state, or this checkpoint.
 
 ## Privacy and compaction
 

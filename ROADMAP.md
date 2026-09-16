@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-09-09
+updated: 2026-09-15
 governed_by:
   - architecture-roadmap
 depends_on:
@@ -33,7 +33,7 @@ repository: egohygiene/relay
 visibility: public
 publication: central
 route: /roadmap/relay/
-updated: 2026-08-25
+updated: 2026-09-15
 -->
 ## 2026-08-25 execution snapshot
 
@@ -289,13 +289,13 @@ supersession as a navigable historical chain.
 
 <!-- roadmap-step
 id: REL-RI-005
-status: active
+status: complete
 depends_on: [REL-RI-003, REL-RI-004]
 issues: [32]
 -->
 #### REL-RI-005 — Unify commits and delivery evidence as a journey
 
-**State:** `active`
+**State:** `complete`
 **Depends on:** `REL-RI-003`, `REL-RI-004`
 
 **Outcome:** `/journey/` relates commits to quests, decisions, issues, checks,
@@ -308,17 +308,17 @@ releases, and deployments across meaningful epochs.
 - [x] Release chapters partition every event in deterministic chronological order.
 - [x] Explicit quest and ADR context is linked while orphaned work stays unclassified.
 - [x] Optional replay respects reduced-motion preferences and never changes evidence.
-- [ ] The implementation is reviewed and merged as the current Relay contract.
+- [x] The implementation is reviewed and merged as the current Relay contract.
 
 <!-- roadmap-step
 id: REL-RI-006
-status: planned
+status: active
 depends_on: [REL-RI-005]
-issues: [29, 33]
+issues: [29, 33, 77]
 -->
 #### REL-RI-006 — Complete supporting views and the intelligence dashboard
 
-**State:** `planned`
+**State:** `active`
 **Depends on:** `REL-RI-005`
 
 **Outcome:** Dependencies, Health, Releases, Work, Search, Compare, and the
@@ -328,6 +328,13 @@ organization dashboard form one consistent evidence-navigation system.
 
 - [ ] Every supporting view preserves the shared shell and evidence vocabulary.
 - [ ] Consumer publication refreshes deterministically through one pinned workflow.
+
+**Current evidence:**
+
+- Issue #77 and PR #78 implement the first bounded REL-RI-006 slice by rendering
+  `/dependencies/` from Observatory's accepted normalized dependency query.
+- Health, Releases, Work, Search, Compare, and final deterministic publication
+  remain tracked by issues #29 and #33 or their bounded child issues.
 
 ### Repository continuity preflight track
 

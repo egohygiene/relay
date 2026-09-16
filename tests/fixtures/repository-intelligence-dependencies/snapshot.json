@@ -1,0 +1,196 @@
+{
+  "coverage": {
+    "status": "current"
+  },
+  "graph": {
+    "sources": [
+      {
+        "assertion": "authoritative",
+        "freshness": "current",
+        "id": "source:roadmap",
+        "kind": "roadmap",
+        "observed_at": "2026-08-25T18:00:00Z",
+        "repository": "example/repository",
+        "revision": "1111111111111111111111111111111111111111",
+        "url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md",
+        "visibility": "public"
+      },
+      {
+        "assertion": "authoritative",
+        "freshness": "current",
+        "id": "source:hygiene",
+        "kind": "roadmap",
+        "observed_at": "2026-08-25T18:00:00Z",
+        "repository": "egohygiene/hygiene",
+        "revision": "2222222222222222222222222222222222222222",
+        "url": "https://github.com/egohygiene/hygiene/blob/2222222222222222222222222222222222222222/ROADMAP.md",
+        "visibility": "public"
+      },
+      {
+        "assertion": "authoritative",
+        "freshness": "stale",
+        "id": "source:issue-44",
+        "kind": "github_issue",
+        "observed_at": "2026-08-24T18:00:00Z",
+        "repository": "example/repository",
+        "revision": null,
+        "url": "https://github.com/example/repository/issues/44",
+        "visibility": "public"
+      }
+    ]
+  },
+  "observed_at": "2026-08-25T18:00:00Z",
+  "repository": {
+    "id": "ri:example/repository:repository:example/repository",
+    "key": "example/repository",
+    "state": "active",
+    "title": "Repository"
+  },
+  "represented_commit": "1111111111111111111111111111111111111111",
+  "schema": "egohygiene.observatory.repository-intelligence-read-model/v1",
+  "snapshot_id": "example/repository@1111111111111111111111111111111111111111",
+  "views": {
+    "decisions": {
+      "decisions": []
+    },
+    "dependencies": {
+      "external_repositories": [
+        "egohygiene/hygiene"
+      ],
+      "relationships": [
+        {
+          "assertion": "authoritative",
+          "confidence": "authoritative",
+          "freshness": "current",
+          "id": "relationship:active-depends-foundation",
+          "provenance": [
+            "source:roadmap"
+          ],
+          "source": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md#active-step",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:roadmap-step:ACTIVE",
+            "key": "ACTIVE",
+            "kind": "roadmap_step",
+            "repository": "example/repository",
+            "state": "active",
+            "title": "Build the dependency view",
+            "visibility": "public"
+          },
+          "target": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md#foundation",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:roadmap-step:FOUNDATION",
+            "key": "FOUNDATION",
+            "kind": "roadmap_step",
+            "repository": "example/repository",
+            "state": "complete",
+            "title": "Establish the graph contract",
+            "visibility": "public"
+          },
+          "type": "depends-on"
+        },
+        {
+          "assertion": "inferred",
+          "confidence": "inferred",
+          "freshness": "unknown",
+          "id": "relationship:repository-depends-hygiene",
+          "provenance": [
+            "source:roadmap",
+            "source:hygiene"
+          ],
+          "source": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:repository:example/repository",
+            "key": "example/repository",
+            "kind": "repository",
+            "repository": "example/repository",
+            "state": "active",
+            "title": "Repository",
+            "visibility": "public"
+          },
+          "target": {
+            "assertion": "inferred",
+            "canonical_url": "https://github.com/egohygiene/hygiene",
+            "confidence": "inferred",
+            "freshness": "unknown",
+            "id": "ri:egohygiene/hygiene:repository:egohygiene/hygiene",
+            "key": "egohygiene/hygiene",
+            "kind": "repository",
+            "repository": "egohygiene/hygiene",
+            "state": "active",
+            "title": "Hygiene",
+            "visibility": "public"
+          },
+          "type": "depends-on"
+        },
+        {
+          "assertion": "authoritative",
+          "confidence": "authoritative",
+          "freshness": "stale",
+          "id": "relationship:issue-blocks-active",
+          "provenance": [
+            "source:issue-44",
+            "source:roadmap"
+          ],
+          "source": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/issues/44",
+            "confidence": "authoritative",
+            "freshness": "stale",
+            "id": "ri:example/repository:issue:44",
+            "key": "44",
+            "kind": "issue",
+            "repository": "example/repository",
+            "state": "open",
+            "title": "Await normalized evidence",
+            "visibility": "public"
+          },
+          "target": {
+            "assertion": "authoritative",
+            "canonical_url": "https://github.com/example/repository/blob/1111111111111111111111111111111111111111/ROADMAP.md#active-step",
+            "confidence": "authoritative",
+            "freshness": "current",
+            "id": "ri:example/repository:roadmap-step:ACTIVE",
+            "key": "ACTIVE",
+            "kind": "roadmap_step",
+            "repository": "example/repository",
+            "state": "active",
+            "title": "Build the dependency view",
+            "visibility": "public"
+          },
+          "type": "blocks"
+        }
+      ]
+    },
+    "health": {
+      "checks": []
+    },
+    "journey": {
+      "chapters": [],
+      "events": []
+    },
+    "now": {
+      "blockers": [],
+      "current_focus": [],
+      "next_ready": [],
+      "recent_events": []
+    },
+    "roadmap": {
+      "roots": [],
+      "steps": []
+    },
+    "work": {
+      "open_issues": [],
+      "open_pull_requests": [],
+      "roadmap_queues": {}
+    }
+  }
+}
