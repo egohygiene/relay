@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-16T13:01:00Z"
+  updated_at: "2026-09-16T13:03:05Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -15,10 +15,10 @@ document:
 scope:
   purpose: Preserve the minimum verified state needed to review the second bounded REL-RI-006 supporting-view checkpoint.
   includes:
-    - Repository Intelligence Work-route issue and candidate branch.
+    - Repository Intelligence Work-route issue, pull request, and exact candidate state.
     - Accepted Observatory Work query boundary and rendering constraints.
     - Prior merged Dependencies checkpoint and next supporting-view dependencies.
-    - Roadmap impact, ADR impact, validation status, and next dependency-ready action.
+    - Roadmap impact, ADR impact, completed validation evidence, and next dependency-ready action.
   excludes:
     - Conversation transcripts, duplicated architecture history, unrelated release work, and organization-level semantics not accepted upstream.
   precedence:
@@ -50,11 +50,12 @@ work:
     url: https://github.com/egohygiene/relay/issues/79
   next:
     kind: pull-request
-    id: pending
-    description: Review the bounded /work/ implementation after required validation passes.
-    readiness: implementation-ready-for-ci
+    id: egohygiene/relay#80
+    description: Review and merge the validated bounded /work/ implementation if acceptable.
+    readiness: ready-for-review-after-final-head-ci
     references:
       - https://github.com/egohygiene/relay/issues/79
+      - https://github.com/egohygiene/relay/pull/80
       - https://github.com/egohygiene/relay/issues/29
       - https://github.com/egohygiene/observatory/issues/7
     depends_on: []
@@ -65,12 +66,13 @@ state:
     verified_at: "2026-09-16T12:54:07Z"
   candidate:
     branch: feat/79-repository-intelligence-work
-    revision: 97348a096ee68e96162e03a68ab124295ed33835
-    pull_request: null
-    handoff_state: implementation-ready-for-ci
+    implementation_revision: 97348a096ee68e96162e03a68ab124295ed33835
+    validated_handoff_revision: 0cc6b25d2ff05924dd9b4be0f735d21728642c5f
+    pull_request: https://github.com/egohygiene/relay/pull/80
+    handoff_state: ready-for-review-after-final-head-ci
   live:
     status: verified
-    observed_at: "2026-09-16T13:01:00Z"
+    observed_at: "2026-09-16T13:03:05Z"
     default_branch_revision: 2480bd307f067b7d54f7661340a0b8b41fc1c750
     dependencies_checkpoint:
       issue: egohygiene/relay#77
@@ -78,11 +80,12 @@ state:
       state: merged
     work_checkpoint:
       issue: egohygiene/relay#79
+      pull_request: egohygiene/relay#80
       state: open
     notes: Observatory #7 already owns open issues, open pull requests, and active/ready/waiting/blocked/unknown roadmap queues. Health remains partially gated by Observatory #5, while Organization Roadmap remains gated by Hygiene #60 and Observatory #22.
 review:
-  status: in-progress
-  reviewed_at: "2026-09-16T13:01:00Z"
+  status: complete-for-validated-handoff-revision
+  reviewed_at: "2026-09-16T13:03:05Z"
   reviewed_by: ChatGPT
   evidence:
     - command: Verify Relay main, AGENTS.md, ARCHITECTURE.md, SYSTEM.md, DECISIONS.md, ROADMAP.md, CONTINUITY.md, parent #29, and merged #78.
@@ -92,11 +95,17 @@ review:
       outcome: passed
       notes: Work is a deterministic query over open issue/PR entity refs plus five roadmap readiness queues; Relay does not own those readiness semantics.
     - command: Add bounded Work renderer and focused tests while preserving the existing dependency route renderer.
-      outcome: authored
-      notes: The existing supporting-view action invocation now renders Dependencies and Work from the same accepted snapshot.
-    - command: Repository-required GitHub Actions validation.
-      outcome: pending
-      notes: Full validation begins after the pull request is opened.
+      outcome: passed
+      notes: The existing supporting-view action invocation renders Dependencies and Work from the same accepted snapshot.
+    - command: GitHub Actions Validate Relay actions run 35099289370, run 55, on 0cc6b25d2ff05924dd9b4be0f735d21728642c5f.
+      outcome: passed
+      notes: Full unit/integration tests, action/catalog validation, continuity contract validation, Python compilation, Bash and inline-shell syntax, JSON/YAML parsing, caller-owned publication fixture, reusable Repository Intelligence generation/provenance, and publication review/preservation jobs all completed successfully.
+    - command: GitHub Actions Relay continuity preflight run 35099289164, run 10.
+      outcome: passed
+      notes: Shared continuity adapter and bounded evidence path passed on the candidate.
+    - command: GitHub Actions Dependency review run 35099288545, run 17.
+      outcome: passed
+      notes: Dependency review passed; the Dependabot-only automerge workflow skipped as expected.
   environment_limitations:
     - Direct GitHub network access from the local shell is unavailable; repository reads, writes, and validation status use the connected GitHub integration.
 roadmap_impact:
@@ -126,8 +135,13 @@ or mutate GitHub execution state.
 
 Branch: `feat/79-repository-intelligence-work`
 
-Current implementation revision:
+Implementation revision:
 `97348a096ee68e96162e03a68ab124295ed33835`
+
+Validated handoff revision before this evidence-only continuity update:
+`0cc6b25d2ff05924dd9b4be0f735d21728642c5f`
+
+Pull request: https://github.com/egohygiene/relay/pull/80
 
 The implementation:
 
@@ -142,6 +156,18 @@ The implementation:
 - adds focused deterministic, static-first, filter, malformed-input, and
   accessibility-oriented tests.
 
+## Validation evidence
+
+On `0cc6b25d2ff05924dd9b4be0f735d21728642c5f`:
+
+- `Validate Relay actions` run 35099289370 / #55 passed its full chain.
+- `Relay continuity preflight` run 35099289164 / #10 passed.
+- `Dependency review` run 35099288545 / #17 passed.
+- Dependabot automerge skipped as expected for a non-Dependabot pull request.
+
+Because this checkpoint update changes only continuity evidence, verify the same
+required workflows on the new final PR head before merge.
+
 ## Roadmap and decision reconciliation
 
 `REL-RI-006` is already active and explicitly includes Work, so this bounded
@@ -153,7 +179,7 @@ normalized truth; Relay owns static route composition and validated artifacts.
 
 ## Blockers and deferred work
 
-- The candidate still requires Relay's complete pull-request validation.
+- No implementation blocker remains for `/work/`; only review/final-head CI remains.
 - `/health/` must not absorb unfinished fleet-conformance semantics from
   Observatory #5.
 - `/audits/`, `/hygiene/`, and `/sanity/` remain gated by their normalized owner
@@ -162,14 +188,14 @@ normalized truth; Relay owns static route composition and validated artifacts.
 
 ## Next dependency-ready work
 
-After #79 merges, re-fetch Relay #29/#33 and the upstream models. Prefer
+After #80 merges, re-fetch Relay #29/#33 and the upstream models. Prefer
 `/releases/` or `/search/` if their accepted Observatory queries remain sufficient
 for a truthful bounded implementation; use `/health/` only for the already
 accepted check/freshness slice unless fleet-conformance semantics have landed.
 
 ## Resume protocol
 
-1. Verify newest Relay `main`, issue #79, and its pull request/checks.
+1. Verify newest Relay `main`, issue #79, PR #80, and exact-head checks.
 2. Re-read parent #29 and `REL-RI-006` before selecting another view.
 3. Do not duplicate a route with an open implementation PR.
 4. Keep one bounded supporting-view checkpoint per PR.
