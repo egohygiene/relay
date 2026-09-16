@@ -35,6 +35,13 @@ inputs:
       unavailable states instead of inferring repository truth.
     required: false
     default: ""
+  observatory-comparison:
+    description: >-
+      Optional repository-relative path to a public-safe Observatory Repository
+      Intelligence comparison whose after boundary matches observatory-snapshot
+      and the represented commit. Requires observatory-snapshot when supplied.
+    required: false
+    default: ""
   repository:
     description: >-
       Repository in owner/name form for local contexts. It cannot override the
@@ -160,6 +167,7 @@ runs:
         INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
         INPUT_MAX_DEPTH: "${{ inputs.max-depth }}"
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
+        INPUT_OBSERVATORY_COMPARISON: "${{ inputs.observatory-comparison }}"
         INPUT_OBSERVATORY_SNAPSHOT: "${{ inputs.observatory-snapshot }}"
         INPUT_REPORTS_DIRECTORY: "${{ inputs.reports-directory }}"
         INPUT_REPOSITORY: "${{ inputs.repository }}"
@@ -195,6 +203,22 @@ runs:
           if [[ "${INPUT_OBSERVATORY_SNAPSHOT}/" == "${INPUT_OUTPUT_DIRECTORY}/"* \
             || "${INPUT_OUTPUT_DIRECTORY}/" == "${INPUT_OBSERVATORY_SNAPSHOT}/"* ]]; then
             printf 'observatory-snapshot and output-directory must not overlap\n' >&2
+            exit 2
+          fi
+        fi
+        if [[ -n "${INPUT_OBSERVATORY_COMPARISON}" ]]; then
+          validate_relative_path "observatory-comparison" "${INPUT_OBSERVATORY_COMPARISON}"
+          if [[ -z "${INPUT_OBSERVATORY_SNAPSHOT}" ]]; then
+            printf 'observatory-comparison requires observatory-snapshot\n' >&2
+            exit 2
+          fi
+          if [[ "${INPUT_OBSERVATORY_COMPARISON}" == "${INPUT_OBSERVATORY_SNAPSHOT}" ]]; then
+            printf 'observatory-comparison and observatory-snapshot must be different files\n' >&2
+            exit 2
+          fi
+          if [[ "${INPUT_OBSERVATORY_COMPARISON}/" == "${INPUT_OUTPUT_DIRECTORY}/"* \
+            || "${INPUT_OUTPUT_DIRECTORY}/" == "${INPUT_OBSERVATORY_COMPARISON}/"* ]]; then
+            printf 'observatory-comparison and output-directory must not overlap\n' >&2
             exit 2
           fi
         fi
@@ -440,6 +464,7 @@ runs:
     - name: "✨ Render static intelligence site"
       shell: bash
       env:
+        INPUT_OBSERVATORY_COMPARISON: "${{ inputs.observatory-comparison }}"
         INPUT_OBSERVATORY_SNAPSHOT: "${{ inputs.observatory-snapshot }}"
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
         INPUT_REPORTS_DIRECTORY: "${{ inputs.reports-directory }}"
@@ -504,6 +529,21 @@ runs:
           --repository "${RESOLVED_REPOSITORY}" \
           --source-commit "${RESOLVED_SOURCE_COMMIT}" \
           "${snapshot_arguments[@]}"
+        comparison_arguments=()
+        if [[ -n "${INPUT_OBSERVATORY_COMPARISON}" ]]; then
+          comparison_arguments+=(
+            --comparison "${GITHUB_WORKSPACE}/${INPUT_OBSERVATORY_COMPARISON}"
+          )
+        fi
+        python3 "${GITHUB_ACTION_PATH}/scripts/render_repository_intelligence_compare.py" \
+          --repository-root "${GITHUB_WORKSPACE}" \
+          --output-root "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}" \
+          --summary "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/summary.json" \
+          --provenance "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/provenance.json" \
+          --repository "${RESOLVED_REPOSITORY}" \
+          --source-commit "${RESOLVED_SOURCE_COMMIT}" \
+          "${snapshot_arguments[@]}" \
+          "${comparison_arguments[@]}"
 
     - name: "🛡️ Validate generated intelligence bundle"
       shell: bash
