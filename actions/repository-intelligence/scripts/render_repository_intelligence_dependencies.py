@@ -89,7 +89,9 @@ def validate_endpoint(value: Any, label: str) -> dict[str, Any]:
     if not REPOSITORY_PATTERN.fullmatch(endpoint["repository"]):
         raise DependencyViewError(f"{label}.repository must use owner/name form")
     if not site.safe_href(endpoint["canonical_url"]):
-        raise DependencyViewError(f"{label}.canonical_url must be a credential-free HTTPS URL")
+        raise DependencyViewError(
+            f"{label}.canonical_url must be a credential-free HTTPS URL"
+        )
     title = endpoint.get("title")
     if title is not None and (not isinstance(title, str) or not title):
         raise DependencyViewError(f"{label}.title must be null or a non-empty string")
@@ -116,7 +118,9 @@ def validate_dependencies_view(value: Any) -> dict[str, Any]:
             "snapshot views.dependencies.external_repositories must be unique"
         )
     if not isinstance(relationships, list):
-        raise DependencyViewError("snapshot views.dependencies.relationships must be an array")
+        raise DependencyViewError(
+            "snapshot views.dependencies.relationships must be an array"
+        )
 
     identifiers: set[str] = set()
     for index, candidate in enumerate(relationships):
@@ -165,10 +169,14 @@ def validate_dependencies_view(value: Any) -> dict[str, Any]:
         if (
             not isinstance(provenance, list)
             or not provenance
-            or any(not isinstance(identifier, str) or not identifier for identifier in provenance)
+            or any(
+                not isinstance(identifier, str) or not identifier
+                for identifier in provenance
+            )
         ):
             raise DependencyViewError(
-                f"snapshot views.dependencies.relationships[{index}].provenance must contain source IDs"
+                f"snapshot views.dependencies.relationships[{index}].provenance "
+                "must contain source IDs"
             )
         validate_endpoint(
             relationship.get("source"),
@@ -221,13 +229,11 @@ def render_endpoint(endpoint: dict[str, Any], *, label: str, repository: str) ->
     state = site.state_label(endpoint.get("state"))
     repository_name = str(endpoint.get("repository"))
     attributes = site.source_repository_attribute(endpoint)
-    # Relay's bundle validator deliberately allows reviewed cross-repository evidence
-    # routes but not arbitrary repository-root navigation. Preserve that canonical URL
-    # as visible evidence rather than weakening the existing publication boundary.
     repository_root = f"https://github.com/{repository_name}"
     link_allowed = bool(href) and not (
         repository_name != repository and href.rstrip("/") == repository_root
     )
+    canonical_note = ""
     if link_allowed:
         identity = (
             f'<a class="ri-link-chip"{attributes} href="{site.escaped(href)}">'
@@ -239,9 +245,14 @@ def render_endpoint(endpoint: dict[str, Any], *, label: str, repository: str) ->
             f'<span class="ri-link-chip"{attributes}><strong>{site.escaped(text)}</strong>'
             f'<small>{site.escaped(kind)} · {site.escaped(state)}</small></span>'
         )
+        if href:
+            canonical_note = (
+                '<small>Canonical identity: '
+                f'<code>{site.escaped(href)}</code></small>'
+            )
     return (
         f'<div><strong>{site.escaped(label)}</strong>{identity}'
-        f'<small>{site.escaped(repository_name)}</small></div>'
+        f'<small>{site.escaped(repository_name)}</small>{canonical_note}</div>'
     )
 
 
@@ -254,23 +265,24 @@ def render_provenance(
     for identifier in relationship["provenance"]:
         source = sources.get(identifier, {})
         href = site.safe_href(source.get("url"))
-        repository = source.get("repository")
         repository_attribute = site.source_repository_attribute(source)
         if href:
             records.append(
-                f'<li><a class="ri-link-chip"{repository_attribute} href="{site.escaped(href)}">'
-                f'{site.escaped(identifier)} <span aria-hidden="true">↗</span></a></li>'
+                f'<li><a class="ri-link-chip"{repository_attribute} '
+                f'href="{site.escaped(href)}">{site.escaped(identifier)} '
+                '<span aria-hidden="true">↗</span></a></li>'
             )
         else:
             records.append(f'<li><code>{site.escaped(identifier)}</code></li>')
+    source_label = "source" if len(records) == 1 else "sources"
     return (
         '<details class="ri-evidence"><summary><span><strong>Canonical evidence</strong>'
-        f'<small>{len(records)} provenance {"source" if len(records) == 1 else "sources"}</small>'
+        f'<small>{len(records)} provenance {source_label}</small>'
         '</span><span aria-hidden="true">+</span></summary>'
         '<div class="ri-evidence__summary"><span>Relationship evidence is normalized by '
         'Observatory; linked sources remain canonical.</span></div>'
-        f'<div class="ri-evidence-viewport"><ol class="ri-evidence-list">{"".join(records)}</ol></div>'
-        '</details>'
+        '<div class="ri-evidence-viewport"><ol class="ri-evidence-list">'
+        f'{"".join(records)}</ol></div></details>'
     )
 
 
@@ -289,8 +301,14 @@ def render_relationship(
     freshness = str(relationship["freshness"])
     confidence = str(relationship["confidence"])
     scope = relationship_scope(relationship)
-    source_states = {site.normalize_state(source.get("state")), site.normalize_state(target.get("state"))}
-    source_kinds = {site.normalize_state(source.get("kind")), site.normalize_state(target.get("kind"))}
+    endpoint_states = {
+        site.normalize_state(source.get("state")),
+        site.normalize_state(target.get("state")),
+    }
+    endpoint_kinds = {
+        site.normalize_state(source.get("kind")),
+        site.normalize_state(target.get("kind")),
+    }
     search = " ".join(
         str(value or "")
         for value in (
@@ -314,12 +332,11 @@ def render_relationship(
         )
     ).lower()
     readable_type = "depends on" if relationship_type == "depends-on" else "blocks"
-    direction_label = f"{endpoint_label(source)} {readable_type} {endpoint_label(target)}"
-    fragment = site.stable_fragment("dependency", relationship.get("id"))
-    source_repository_attributes = (
-        site.source_repository_attribute(source) + site.source_repository_attribute(target)
+    direction_label = (
+        f"{endpoint_label(source)} {readable_type} {endpoint_label(target)}"
     )
-    return f'''<li class="ri-evidence-record" id="{site.escaped(fragment)}" data-filter-item data-states="{site.escaped(" ".join(sorted(source_states)))}" data-kinds="{site.escaped(" ".join(sorted(source_kinds)))}" data-filter-relationship="{site.escaped(relationship_type)}" data-filter-assertion="{site.escaped(assertion)}" data-filter-freshness="{site.escaped(freshness)}" data-filter-scope="{site.escaped(scope)}" data-search="{site.escaped(search)}"{source_repository_attributes}>
+    fragment = site.stable_fragment("dependency", relationship.get("id"))
+    return f'''<li class="ri-evidence-record" id="{site.escaped(fragment)}" data-filter-item data-states="{site.escaped(" ".join(sorted(endpoint_states)))}" data-kinds="{site.escaped(" ".join(sorted(endpoint_kinds)))}" data-filter-relationship="{site.escaped(relationship_type)}" data-filter-assertion="{site.escaped(assertion)}" data-filter-freshness="{site.escaped(freshness)}" data-filter-scope="{site.escaped(scope)}" data-search="{site.escaped(search)}">
       <div class="ri-evidence-record__top"><span class="ri-evidence-kind">{site.escaped(site.state_label(relationship_type))}</span><span>{site.status_pill(assertion, f"Assertion: {site.state_label(assertion)}")} {site.status_pill(freshness, f"Freshness: {site.state_label(freshness)}")}</span></div>
       <strong>{site.escaped(direction_label)}</strong>
       <p>Directed relationship · Confidence: {site.escaped(site.state_label(confidence))} · Scope: {site.escaped(site.state_label(scope))}</p>
@@ -341,7 +358,8 @@ def render_filter_controls(relationships: list[dict[str, Any]]) -> str:
 
     def options(values: list[str]) -> str:
         return "".join(
-            f'<option value="{site.escaped(value)}">{site.escaped(site.state_label(value))}</option>'
+            f'<option value="{site.escaped(value)}">'
+            f'{site.escaped(site.state_label(value))}</option>'
             for value in values
         )
 
@@ -368,15 +386,21 @@ def dependencies_body(snapshot: dict[str, Any] | None, *, repository: str) -> st
         return f'''<section class="ri-section ri-section--lead" aria-labelledby="dependencies-heading"><div class="ri-section-heading"><div><span class="ri-eyebrow">Dependency impact</span><h2 id="dependencies-heading">What depends on what?</h2></div><p>This snapshot predates or omits the normalized Dependencies query.</p></div>{site.empty_state("Dependencies view not projected", "The represented snapshot is available, but it does not contain views.dependencies. Relay will not infer dependency truth from other views.", "partial")}</section>'''
 
     dependencies = validate_dependencies_view(views.get("dependencies"))
-    relationships = [site.require_object(value) for value in dependencies["relationships"]]
+    relationships = [
+        site.require_object(value) for value in dependencies["relationships"]
+    ]
     external_repositories = list(dependencies["external_repositories"])
     if not relationships:
         return f'''<section class="ri-section ri-section--lead" aria-labelledby="dependencies-heading"><div class="ri-section-heading"><div><span class="ri-eyebrow">Dependency impact</span><h2 id="dependencies-heading">What depends on what?</h2></div><p>The normalized Dependencies query is present and contains no directed relationships.</p></div>{site.empty_state("No dependency relationships projected", "This means this Observatory query is empty for the represented snapshot; it does not prove the wider ecosystem has no dependencies.", "not_applicable")}</section>'''
 
-    depends_on = sum(1 for value in relationships if value["type"] == "depends-on")
+    depends_on = sum(
+        1 for value in relationships if value["type"] == "depends-on"
+    )
     blocks = sum(1 for value in relationships if value["type"] == "blocks")
     inferred_or_unknown = sum(
-        1 for value in relationships if value["assertion"] in {"inferred", "unknown"}
+        1
+        for value in relationships
+        if value["assertion"] in {"inferred", "unknown"}
     )
     evidence = source_index(snapshot)
     external = (
@@ -393,10 +417,11 @@ def dependencies_body(snapshot: dict[str, Any] | None, *, repository: str) -> st
         render_relationship(value, repository=repository, sources=evidence)
         for value in relationships
     )
+    relationship_verb = "is" if inferred_or_unknown == 1 else "are"
     return f'''<section class="ri-section ri-section--lead" aria-labelledby="dependencies-heading">
       <div class="ri-section-heading"><div><span class="ri-eyebrow">Dependency impact</span><h2 id="dependencies-heading">What depends on what?</h2></div><p>Follow directed dependency and blocking evidence without turning inferred relationships into authoritative truth.</p></div>
       <div class="ri-roadmap-metrics" aria-label="Dependency relationship summary"><article><strong>{len(relationships)}</strong><span>directed relationships</span></article><article><strong>{depends_on}</strong><span>depends-on edges</span></article><article><strong>{blocks}</strong><span>blocking edges</span></article><article><strong>{len(external_repositories)}</strong><span>external repositories</span></article></div>
-      <details class="ri-progress-rules"><summary>How to read this view</summary><p>Direction, assertion, freshness, and provenance come from the normalized Observatory query. Relay derives only presentation grouping such as repository-local versus cross-repository scope. {inferred_or_unknown} relationship {"is" if inferred_or_unknown == 1 else "are"} inferred or unknown and therefore remain labelled rather than promoted.</p></details>
+      <details class="ri-progress-rules"><summary>How to read this view</summary><p>Direction, assertion, freshness, and provenance come from the normalized Observatory query. Relay derives only presentation grouping such as repository-local versus cross-repository scope. {inferred_or_unknown} relationship {relationship_verb} inferred or unknown and therefore remain labelled rather than promoted.</p></details>
       <div class="ri-relationship-grid">{external}</div>
       {render_filter_controls(relationships)}
     </section>
@@ -413,10 +438,14 @@ def render_page(
     """Compose Dependencies through Relay's canonical shared shell."""
 
     observed_at = str(
-        snapshot.get("observed_at") if snapshot else summary.get("generated_at") or ""
+        snapshot.get("observed_at")
+        if snapshot
+        else summary.get("generated_at") or ""
     )
     freshness = site.normalize_state(
-        site.require_object(snapshot.get("coverage")).get("status") if snapshot else "unknown"
+        site.require_object(snapshot.get("coverage")).get("status")
+        if snapshot
+        else "unknown"
     )
     return site.shell_document(
         route="dependencies",
@@ -452,7 +481,12 @@ def main() -> int:
         site.validate_repository_path(repository_root, path, label)
     summary = site.load_object(summary_path, "dashboard summary")
     provenance = site.load_object(provenance_path, "bundle provenance")
-    site.validate_site_contracts(summary, provenance, args.repository, args.source_commit)
+    site.validate_site_contracts(
+        summary,
+        provenance,
+        args.repository,
+        args.source_commit,
+    )
     snapshot = None
     if snapshot_path is not None:
         if not snapshot_path.is_file():
