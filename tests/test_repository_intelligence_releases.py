@@ -147,7 +147,11 @@ class RepositoryIntelligenceReleasesTests(unittest.TestCase):
 
     def test_latest_highlight_does_not_reorder_normalized_records(self) -> None:
         rendered = releases.releases_body(self.populated())
-        self.assertLess(rendered.index("Example v1.1.0"), rendered.index("Example v1.2.0"))
+        release_history = rendered[rendered.index('<ol class="ri-record-list"'):]
+        self.assertLess(
+            release_history.index("Example v1.1.0"),
+            release_history.index("Example v1.2.0"),
+        )
         self.assertIn("Latest projected release:</strong> Example v1.2.0", rendered)
         self.assertIn("normalized record order is preserved", rendered)
 
@@ -158,7 +162,10 @@ class RepositoryIntelligenceReleasesTests(unittest.TestCase):
         rendered = releases.releases_body(snapshot)
         self.assertIn("Published", rendered)
         self.assertIn("Failure", rendered)
-        self.assertIn("Release publication is not treated as deployment success", rendered)
+        self.assertIn(
+            "Release publication, included work, and deployment evidence stay separate",
+            rendered,
+        )
 
     def test_stale_and_unknown_evidence_remain_visible(self) -> None:
         snapshot = self.populated()
