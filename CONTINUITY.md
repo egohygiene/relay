@@ -7,20 +7,20 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-16T14:14:00Z"
+  updated_at: "2026-09-16T14:27:56Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Preserve the minimum verified state needed to review the fourth bounded REL-RI-006 supporting-view checkpoint.
+  purpose: Preserve the minimum verified state needed to review the fifth bounded REL-RI-006 supporting-view checkpoint.
   includes:
-    - Repository Intelligence Search-route issue, pull request, and exact candidate state.
-    - Accepted Observatory Search query boundary and rendering constraints.
-    - Merged Dependencies, Work, and Releases checkpoints.
-    - Roadmap impact, ADR impact, validation evidence, upstream gates, and next dependency-ready action.
+    - Repository Intelligence Compare issue, pull request, exact implementation revision, and action input boundary.
+    - Accepted Observatory two-snapshot comparison semantics and rendering constraints.
+    - Merged Dependencies, Work, Releases, and Search checkpoints.
+    - Roadmap impact, ADR impact, validation evidence, upstream gates, and next-work guidance.
   excludes:
-    - Conversation transcripts, duplicated architecture history, source-code/full-text search, fuzzy or semantic ranking, live provider search, and organization-level semantics not accepted upstream.
+    - Conversation transcripts, duplicated architecture history, raw Git/source diffs, causal analysis, audit-finding comparison, and organization semantics not accepted upstream.
   precedence:
     - user-and-runtime-instructions
     - scoped-repository-instructions
@@ -34,95 +34,85 @@ scope:
     - DECISIONS.md
     - ROADMAP.md
     - actions/repository-intelligence/action.yml
-    - actions/repository-intelligence/assets/site.js
     - actions/repository-intelligence/scripts/generate_repository_intelligence_site.py
-    - actions/repository-intelligence/scripts/render_repository_intelligence_dependencies.py
-    - actions/repository-intelligence/scripts/render_repository_intelligence_search.py
+    - actions/repository-intelligence/scripts/render_repository_intelligence_compare.py
+    - https://github.com/egohygiene/observatory/blob/main/docs/repository-intelligence-read-model.md
+    - https://github.com/egohygiene/observatory/blob/main/schemas/repository-intelligence-compare.v1.schema.json
 work:
-  objective: Materialize Repository Intelligence /search/ from Observatory's accepted normalized Search query without creating Relay-local indexing, ranking, or provider-search semantics.
+  objective: Materialize Repository Intelligence /compare/ from Observatory's accepted comparison artifact without creating Relay-local diff, causal, quality, or resolution semantics.
   success_conditions:
-    - Render every normalized Search record with kind, key, state, repository, assertion, freshness, and canonical source.
-    - Use Observatory-supplied search_text directly for browser matching.
-    - Preserve normalized record order and shared URL-backed text/state/kind filtering.
-    - Keep unavailable Search evidence, empty Search evidence, and a zero-match browser filter distinct.
+    - Bind Before and After boundaries to one repository and the rendered current commit.
+    - Keep entity, relationship, and event additions, removals, and field changes distinct.
+    - Expose exact Observatory-provided changed field paths and per-view digest differences.
+    - Link current entity evidence only when stable IDs resolve against the matching after snapshot.
+    - Keep missing comparison evidence distinct from a valid zero-change comparison.
     - Keep Repository Intelligence generation and public bundle validation green.
   active_issue:
     provider: github
-    id: egohygiene/relay#83
-    url: https://github.com/egohygiene/relay/issues/83
+    id: egohygiene/relay#86
+    url: https://github.com/egohygiene/relay/issues/86
   next:
     kind: pull-request
-    id: egohygiene/relay#85
-    description: Review and merge the validated bounded /search/ implementation if acceptable.
+    id: egohygiene/relay#87
+    description: Review and merge the validated bounded /compare/ implementation if acceptable.
     readiness: ready-for-review-after-final-head-ci
     references:
-      - https://github.com/egohygiene/relay/issues/83
-      - https://github.com/egohygiene/relay/pull/85
+      - https://github.com/egohygiene/relay/issues/86
+      - https://github.com/egohygiene/relay/pull/87
       - https://github.com/egohygiene/relay/issues/29
       - https://github.com/egohygiene/observatory/issues/7
     depends_on: []
 state:
   base:
-    revision: e30ddd79204cbf6da919acdda20b33b1514dce73
+    revision: 86ec7af2a01124d1d38872dc80f878e48a4f8568
     ref: refs/heads/main
-    verified_at: "2026-09-16T14:00:00Z"
+    verified_at: "2026-09-16T14:14:51Z"
   candidate:
-    branch: feat/83-repository-intelligence-search
-    implementation_revision: 36a9d7b30e494f3677a2e829122d35e20bc33f37
-    pull_request: https://github.com/egohygiene/relay/pull/85
+    branch: feat/86-repository-intelligence-compare
+    implementation_revision: 470e3c8cbeac4fcea435f4740534e375ed137616
+    pull_request: https://github.com/egohygiene/relay/pull/87
     handoff_state: ready-for-review-after-final-head-ci
   live:
     status: verified
-    observed_at: "2026-09-16T14:14:00Z"
-    default_branch_revision: e30ddd79204cbf6da919acdda20b33b1514dce73
-    dependencies_checkpoint:
-      issue: egohygiene/relay#77
-      pull_request: egohygiene/relay#78
-      state: merged
-    work_checkpoint:
-      issue: egohygiene/relay#79
-      pull_request: egohygiene/relay#80
-      state: merged
-    releases_checkpoint:
-      issue: egohygiene/relay#81
-      pull_request: egohygiene/relay#82
-      state: merged
-    search_checkpoint:
-      issue: egohygiene/relay#83
-      pull_request: egohygiene/relay#85
-      state: open
-    notes: Observatory #7 owns Search and Compare queries. Search records expose normalized search_text from title, key, kind, state, and repository, but do not identify which individual field matched. Health remains only partially represented by the core graph while broader fleet Hygiene/conformance belongs to Observatory #5. Organization Roadmap remains gated by Hygiene #60 and Observatory #22. Accidental issue #84 was immediately closed not_planned and owns no work.
+    observed_at: "2026-09-16T14:27:56Z"
+    default_branch_revision: 86ec7af2a01124d1d38872dc80f878e48a4f8568
+    dependencies_checkpoint: {issue: egohygiene/relay#77, pull_request: egohygiene/relay#78, state: merged}
+    work_checkpoint: {issue: egohygiene/relay#79, pull_request: egohygiene/relay#80, state: merged}
+    releases_checkpoint: {issue: egohygiene/relay#81, pull_request: egohygiene/relay#82, state: merged}
+    search_checkpoint: {issue: egohygiene/relay#83, pull_request: egohygiene/relay#85, state: merged}
+    compare_checkpoint: {issue: egohygiene/relay#86, pull_request: egohygiene/relay#87, state: open}
+    notes: Observatory #7 owns the accepted compare artifact and explicitly defines it as structural change without causality. Broader Health/Hygiene conformance remains owned by Observatory #5. Organization Roadmap remains gated by Hygiene #60 and Observatory #22 unless live state changes.
 review:
   status: complete-for-implementation-revision
-  reviewed_at: "2026-09-16T14:14:00Z"
+  reviewed_at: "2026-09-16T14:27:56Z"
   reviewed_by: ChatGPT
   evidence:
-    - command: Verify Relay main, merged #82, parent #29, open PRs, repository instructions, and accepted Observatory Search implementation.
+    - command: Verify Relay main, merged Search PR #85, parent #29, open compare work, repository instructions, and Observatory compare contract.
       outcome: passed
-      notes: No competing /search/ child issue or PR existed; live main was e30ddd79204cbf6da919acdda20b33b1514dce73.
-    - command: Inspect Observatory _search_view and entity-reference contract.
+      notes: No competing Compare child or PR existed; live main was 86ec7af2a01124d1d38872dc80f878e48a4f8568.
+    - command: Inspect Observatory compare schema, read-model documentation, compare_snapshots implementation, and CLI boundary.
       outcome: passed
-      notes: Search emits compact entity references plus search_text normalized only from publishable title, key, kind, state, and repository fields.
-    - command: Add bounded Search renderer, compose it through the existing supporting-view entry point, and add focused tests.
+      notes: Compare reports Before/After boundaries, added/removed/field-changed graph IDs, and per-view digests without causal claims.
+    - command: Add bounded Compare renderer, explicit observatory-comparison action input, strict binding to the matching after snapshot, and focused tests.
       outcome: passed
-      notes: Dependencies, Work, Releases, and Search render from the same repository- and commit-matched snapshot. Tests prove Relay consumes supplied search_text rather than rebuilding it.
-    - command: GitHub Actions Validate Relay actions run 35106533975, run 62, on 36a9d7b30e494f3677a2e829122d35e20bc33f37.
+      notes: Existing one-snapshot Dependencies/Work/Releases/Search composition remains unchanged; Compare is a separate two-snapshot adapter.
+    - command: GitHub Actions Validate Relay actions run 35108717028, run 65, on 470e3c8cbeac4fcea435f4740534e375ed137616.
       outcome: passed
       notes: Full unit/integration tests, action/catalog and continuity-contract validation, Python compilation, Bash and inline-shell syntax, JSON/YAML parsing, caller-owned publication fixture, reusable Repository Intelligence generation/provenance, publication review, and reviewed-byte preservation all passed.
-    - command: GitHub Actions Relay continuity preflight run 35106534011, run 15.
+    - command: GitHub Actions Relay continuity preflight run 35108717120, run 17.
       outcome: passed
       notes: Shared continuity adapter and bounded evidence path passed on the implementation candidate.
-    - command: GitHub Actions Dependency review run 35106533379, run 22.
+    - command: GitHub Actions Dependency review run 35108716771, run 24.
       outcome: passed
-      notes: Dependency review passed; Dependabot automerge run 35106533360 / #22 skipped as expected.
+      notes: Dependency review passed; Dependabot automerge run 35108716757 / #24 skipped as expected.
   environment_limitations:
     - Direct GitHub network access from the local shell is unavailable; repository reads, writes, and validation status use the connected GitHub integration.
 roadmap_impact:
   disposition: no-state-transition
-  rationale: REL-RI-006 is already active and explicitly owns Search. Issue #83 is a bounded implementation child; accepting it adds normalized discovery but does not complete Health, Compare, deterministic publication, or organization aggregation.
+  rationale: REL-RI-006 remains active. Compare completes another bounded supporting view, but broader Health semantics, deterministic publication completion, and organization aggregation remain outside this candidate.
 adr_impact:
   disposition: none
-  rationale: The change implements ADR-007's existing Observatory-normalization and Relay-presentation boundary without changing authority or dependency direction.
+  rationale: The change implements ADR-007 and Observatory's accepted compare contract without changing authority or dependency direction.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -133,79 +123,76 @@ privacy:
 
 ## Current checkpoint
 
-Issue #83 implements the fourth bounded `REL-RI-006` supporting view: `/search/`.
-Observatory supplies stable entity records plus a normalized `search_text` built
-only from already-publishable title, key, kind, state, and repository fields.
-
-Relay filters that supplied string; it does not build a second index, inspect
-canonical URL contents, rank by activity, or query GitHub/providers at runtime.
+Issue #86 implements the fifth bounded `REL-RI-006` supporting view: `/compare/`.
+Observatory owns the two-snapshot comparison and reports structural change only:
+Before/After boundaries, added/removed IDs, changed field paths, and per-view
+digests. Relay presents that artifact without explaining why the change happened.
 
 ## Candidate implementation
 
-Branch: `feat/83-repository-intelligence-search`
+Branch: `feat/86-repository-intelligence-compare`
 
 Implementation revision:
-`36a9d7b30e494f3677a2e829122d35e20bc33f37`
+`470e3c8cbeac4fcea435f4740534e375ed137616`
 
-Pull request: https://github.com/egohygiene/relay/pull/85
+Pull request: https://github.com/egohygiene/relay/pull/87
 
 The implementation:
 
-- keeps the existing supporting-view action invocation stable;
-- renders `/dependencies/`, `/work/`, `/releases/`, then `/search/` from one accepted snapshot;
-- uses Observatory's exact supplied `search_text` as each record's browser-search value;
-- preserves Observatory record order instead of relevance/activity ranking;
-- reuses shared URL-backed text, state, and kind filters and adds an evidence-freshness facet;
-- deep-links every result to its canonical source and exposes kind, key, repository, state, assertion, and freshness;
-- distinguishes missing Search evidence, an explicitly empty projection, and a browser query with zero visible matches;
-- fails closed for duplicate IDs, missing search text, malformed records, and unsafe canonical URLs;
-- keeps every projected record in static HTML and adds escaping, deterministic, mixed-kind, stale/unknown, empty/unavailable, and filtering-hook tests.
-
-The current Observatory contract does not identify the individual field that
-matched a query, so Relay explicitly documents the searchable field set rather
-than inventing matched-field metadata.
+- adds optional `observatory-comparison` while requiring the matching `observatory-snapshot` when comparison evidence is supplied;
+- binds comparison repository, `after.represented_commit`, and `after.snapshot_id` to the current rendered repository/snapshot;
+- leaves the existing one-snapshot supporting-view composer unchanged;
+- renders Compare through a separate adapter because Observatory Compare is a separate artifact, not `views.compare`;
+- keeps entity, relationship, and event added/removed/changed categories distinct;
+- shows exact changed field paths and per-view before/after SHA-256 digests;
+- links only current entity IDs that resolve safely through the matching after Search projection;
+- never treats additions as improvements, removals as resolutions/regressions, or structural deltas as causal evidence;
+- distinguishes unavailable comparison evidence from a valid comparison with no normalized structural differences;
+- fails closed on shape drift, duplicate/overlapping IDs, malformed field paths/digests, mismatched boundaries, and contradictory changed flags.
 
 ## Validation evidence
 
-On implementation revision `36a9d7b30e494f3677a2e829122d35e20bc33f37`:
+On implementation revision `470e3c8cbeac4fcea435f4740534e375ed137616`:
 
-- `Validate Relay actions` run 35106533975 / #62 passed its complete chain.
-- `Relay continuity preflight` run 35106534011 / #15 passed.
-- `Dependency review` run 35106533379 / #22 passed.
-- Dependabot automerge run 35106533360 / #22 skipped as expected.
+- `Validate Relay actions` run 35108717028 / #65 passed its complete chain.
+- `Relay continuity preflight` run 35108717120 / #17 passed.
+- `Dependency review` run 35108716771 / #24 passed.
+- Dependabot automerge run 35108716757 / #24 skipped as expected.
 
-This continuity-only checkpoint creates a new final PR head. Verify the same
-required workflows on that exact head before merge.
+This continuity-only update creates a new final PR head. Verify the same required
+workflows on that exact head before merge.
 
 ## Roadmap and decision reconciliation
 
-`REL-RI-006` remains active. Dependencies (#77/#78), Work (#79/#80), and Releases
-(#81/#82) are merged; Search (#83/#85) is the current candidate. No roadmap state
-transition is appropriate because Health, Compare, deterministic publication,
-and organization aggregation remain broader work.
+`REL-RI-006` remains active. Dependencies (#77/#78), Work (#79/#80), Releases
+(#81/#82), and Search (#83/#85) are merged; Compare (#86/#87) is the current
+candidate. No roadmap state transition is appropriate yet.
 
-No new ADR is required. This implementation follows ADR-007: Observatory owns
-normalized truth; Relay owns static route composition and validated artifacts.
+No new ADR is required. The implementation follows ADR-007: Observatory owns
+normalized comparison truth; Relay owns static presentation and validated artifacts.
 
 ## Blockers and deferred work
 
-- No implementation blocker remains for `/search/`; only final-head CI and review remain.
-- Search is normalized entity discovery, not source-code/full-text, fuzzy/vector, or live provider search.
-- `/health/` must not absorb unfinished fleet-conformance semantics from Observatory #5.
-- `/audits/`, `/hygiene/`, and `/sanity/` remain gated by their normalized owner contracts.
-- Organization `/roadmap/` remains gated by Hygiene #60 and Observatory #22.
+- No implementation blocker remains for `/compare/`; only final-head CI and review remain.
+- Compare is normalized structural comparison, not raw Git diffing or root-cause analysis.
+- Audit-specific comparison remains owned by Relay #74 / Observatory #20.
+- Broader `/health/` must not absorb unfinished fleet-conformance semantics from Observatory #5.
+- `/audits/`, `/hygiene/`, and `/sanity/` remain gated by their normalized owner contracts unless live state changes.
+- Organization `/roadmap/` remains gated by Hygiene #60 and Observatory #22 unless those dependencies have landed.
 
 ## Next dependency-ready work
 
-After #85 merges, prefer a bounded `/compare/` checkpoint if live state remains
-unchanged. Observatory #7 already owns the deterministic two-snapshot compare
-contract, so Relay can visualize additions, removals, field changes, relationship
-changes, event changes, and per-view content digests without claiming causality.
+After #87 merges, re-fetch Relay #29/#33 and the visual-control-plane upstream
+contracts. Compare completes the accepted #7 supporting-view set except the
+broader Health surface. Prefer the smallest truthful remaining dashboard slice:
+a bounded core `/health/` check/freshness view if its ownership boundary is
+still clear, deterministic publication completion if #33 is the remaining gate,
+or organization `/roadmap/` immediately if Hygiene #60 and Observatory #22 have landed.
 
 ## Resume protocol
 
-1. Verify newest Relay `main`, issue #83, PR #85, and exact-head checks.
-2. Re-read parent #29 and `REL-RI-006` before selecting another view.
-3. Do not duplicate a route with an open implementation PR.
-4. Keep one bounded supporting-view checkpoint per PR.
-5. Reconcile this continuity checkpoint before every handoff.
+1. Verify newest Relay `main`, issue #86, PR #87, and exact-head checks.
+2. Re-read parent #29, #33, and `REL-RI-006` before selecting another view.
+3. Re-fetch Hygiene #60, Observatory #22/#5, and `.github#30` before choosing organization or Health work.
+4. Do not duplicate a route with an open implementation PR.
+5. Keep one bounded visual checkpoint per PR and reconcile continuity before handoff.
