@@ -24,3 +24,6 @@ jobs:
     uses: egohygiene/relay/.github/workflows/repository-intelligence.yml@46cf1d66a7e66ca5a35d2c99cbaed5ccfb67573f
     with:
       artifact-retention-days: 30
+      # Optional commit-matched Observatory evidence may be supplied as a pair:
+      # observatory-snapshot: ".cache/observatory/repository.json"
+      # observatory-comparison: ".cache/observatory/comparison.json"
