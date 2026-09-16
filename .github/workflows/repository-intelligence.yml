@@ -28,6 +28,11 @@ on:
         required: false
         default: ""
         type: string
+      observatory-comparison:
+        description: Optional public-safe Observatory comparison whose after boundary matches the snapshot and represented commit.
+        required: false
+        default: ""
+        type: string
       default-branch:
         description: Optional caller default-branch override.
         required: false
@@ -71,6 +76,11 @@ on:
         type: string
       observatory-snapshot:
         description: Optional public-safe Observatory read model for the represented commit.
+        required: false
+        default: ""
+        type: string
+      observatory-comparison:
+        description: Optional public-safe Observatory comparison whose after boundary matches the snapshot and represented commit.
         required: false
         default: ""
         type: string
@@ -131,6 +141,7 @@ jobs:
           work-directory: "${{ inputs.work-directory }}"
           reports-directory: "${{ inputs.reports-directory }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
+          observatory-comparison: "${{ inputs.observatory-comparison }}"
           repository: "${{ github.repository }}"
           default-branch: "${{ inputs.default-branch }}"
           source-commit: "${{ github.sha }}"
