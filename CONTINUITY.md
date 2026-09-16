@@ -7,17 +7,20 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-16T01:29:57Z"
+  updated_at: "2026-09-16T13:01:00Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Preserve the minimum verified state needed to review Relay's first REL-RI-006 supporting-view checkpoint safely.
+  purpose: Preserve the minimum verified state needed to review the second bounded REL-RI-006 supporting-view checkpoint.
   includes:
-    - Repository Intelligence dependency-route issue and pull request, represented Git state, accepted Observatory contract boundary, completed validation evidence, and next supporting-view dependency.
+    - Repository Intelligence Work-route issue and candidate branch.
+    - Accepted Observatory Work query boundary and rendering constraints.
+    - Prior merged Dependencies checkpoint and next supporting-view dependencies.
+    - Roadmap impact, ADR impact, validation status, and next dependency-ready action.
   excludes:
-    - Conversation transcripts, duplicated architecture history, unrelated release work, and organization-level domain semantics not yet accepted upstream.
+    - Conversation transcripts, duplicated architecture history, unrelated release work, and organization-level semantics not accepted upstream.
   precedence:
     - user-and-runtime-instructions
     - scoped-repository-instructions
@@ -34,163 +37,140 @@ scope:
     - actions/repository-intelligence/scripts/generate_repository_intelligence_site.py
     - actions/repository-intelligence/scripts/validate_repository_intelligence_bundle.py
 work:
-  objective: Materialize Repository Intelligence /dependencies/ from Observatory's accepted normalized dependency query without creating Relay-local dependency semantics.
+  objective: Materialize Repository Intelligence /work/ from Observatory's accepted normalized Work query without recreating GitHub execution or Relay-local readiness semantics.
   success_conditions:
-    - Render directed depends-on and blocks relationships with endpoint identity, assertion/confidence, freshness, provenance, and cross-repository boundaries intact.
-    - Keep missing, empty, stale, inferred, unknown, and not-applicable states explicit without an opaque aggregate score.
-    - Preserve useful static HTML while reusing the shared shell and URL-backed enhancement layer.
-    - Validate populated, empty, unavailable, malformed, deterministic, and accessibility-oriented fixtures.
-    - Keep the reusable action and public bundle validation path authoritative.
+    - Render open issues and pull requests as direct GitHub execution links.
+    - Keep active, ready, waiting, blocked, and unknown roadmap queues distinct.
+    - Keep unavailable and empty Work evidence distinct and explicit.
+    - Preserve useful static HTML while reusing the shared shell, state vocabulary, filters, and roadmap deep links.
+    - Keep Repository Intelligence generation and public bundle validation green.
   active_issue:
     provider: github
-    id: egohygiene/relay#77
-    url: https://github.com/egohygiene/relay/issues/77
+    id: egohygiene/relay#79
+    url: https://github.com/egohygiene/relay/issues/79
   next:
     kind: pull-request
-    id: egohygiene/relay#78
-    description: Review and merge the validated bounded /dependencies/ implementation if acceptable.
-    readiness: ready-for-review
+    id: pending
+    description: Review the bounded /work/ implementation after required validation passes.
+    readiness: implementation-ready-for-ci
     references:
-      - https://github.com/egohygiene/relay/issues/77
-      - https://github.com/egohygiene/relay/pull/78
+      - https://github.com/egohygiene/relay/issues/79
+      - https://github.com/egohygiene/relay/issues/29
       - https://github.com/egohygiene/observatory/issues/7
     depends_on: []
 state:
   base:
-    revision: e9ea9e33129f7842e5686f14a71aa05c59be1720
+    revision: 2480bd307f067b7d54f7661340a0b8b41fc1c750
     ref: refs/heads/main
-    verified_at: "2026-09-16T01:25:34Z"
+    verified_at: "2026-09-16T12:54:07Z"
   candidate:
-    branch: feat/77-repository-intelligence-dependencies
-    revision: 4ebc21690f2d359f9eef7962af6682ee088d89e3
-    pull_request: https://github.com/egohygiene/relay/pull/78
-    handoff_state: ready-for-review
+    branch: feat/79-repository-intelligence-work
+    revision: 97348a096ee68e96162e03a68ab124295ed33835
+    pull_request: null
+    handoff_state: implementation-ready-for-ci
   live:
     status: verified
-    observed_at: "2026-09-16T01:29:57Z"
-    default_branch_revision: e9ea9e33129f7842e5686f14a71aa05c59be1720
-    issue_state: open
-    pull_request_state: open
-    notes: Relay issues 28, 30, 31, and 32 are complete; Observatory issue 7 supplies the accepted Dependencies query; hygiene/audit/sanity and organization-roadmap contracts remain open upstream, making /dependencies/ the smallest dependency-ready supporting-view checkpoint.
-  parallel_changes: []
+    observed_at: "2026-09-16T13:01:00Z"
+    default_branch_revision: 2480bd307f067b7d54f7661340a0b8b41fc1c750
+    dependencies_checkpoint:
+      issue: egohygiene/relay#77
+      pull_request: egohygiene/relay#78
+      state: merged
+    work_checkpoint:
+      issue: egohygiene/relay#79
+      state: open
+    notes: Observatory #7 already owns open issues, open pull requests, and active/ready/waiting/blocked/unknown roadmap queues. Health remains partially gated by Observatory #5, while Organization Roadmap remains gated by Hygiene #60 and Observatory #22.
 review:
-  status: complete
-  reviewed_at: "2026-09-16T01:29:57Z"
+  status: in-progress
+  reviewed_at: "2026-09-16T13:01:00Z"
   reviewed_by: ChatGPT
   evidence:
-    - command: Live tracker, parent issue, child issue, open pull-request, default-branch, repository instruction, architecture, roadmap, and continuity inspection
+    - command: Verify Relay main, AGENTS.md, ARCHITECTURE.md, SYSTEM.md, DECISIONS.md, ROADMAP.md, CONTINUITY.md, parent #29, and merged #78.
       outcome: passed
-      observed_at: "2026-09-16T01:25:34Z"
-      notes: No competing Relay or Organization Intelligence implementation pull request was open; later audit, hygiene, sanity, and organization-roadmap views remain gated by open Observatory contracts.
-    - command: Observatory Repository Intelligence contract and canonical expected-fixture inspection
+      notes: REL-RI-006 is active and explicitly names Work as remaining supporting-view work.
+    - command: Inspect Observatory Repository Intelligence read-model implementation and accepted Work query.
       outcome: passed
-      observed_at: "2026-09-16T01:25:34Z"
-      notes: views.dependencies is limited to external repository names plus directed depends-on/blocks relationships carrying assertion, confidence, freshness, provenance, and compact endpoint references.
-    - command: GitHub Actions Validate Relay actions run 35044239093 on implementation revision 4ebc21690f2d359f9eef7962af6682ee088d89e3
-      outcome: passed
-      observed_at: "2026-09-16T01:29:57Z"
-      notes: Action/catalog metadata, continuity contracts, full unit and integration tests, Python compilation, Bash and inline-shell syntax, JSON/YAML parsing, caller-owned publication fixture, reusable Repository Intelligence generation, provenance verification, and publication review all passed.
-    - command: GitHub Actions Relay continuity preflight run 35044239143
-      outcome: passed
-      observed_at: "2026-09-16T01:29:23Z"
-      notes: The exact candidate ran the shared adapter, bounded annotations, and evidence upload successfully.
-    - command: GitHub Actions Dependency review run 35044238927
-      outcome: passed
-      observed_at: "2026-09-16T01:29:57Z"
-      notes: Dependency review completed successfully on the validated implementation head.
+      notes: Work is a deterministic query over open issue/PR entity refs plus five roadmap readiness queues; Relay does not own those readiness semantics.
+    - command: Add bounded Work renderer and focused tests while preserving the existing dependency route renderer.
+      outcome: authored
+      notes: The existing supporting-view action invocation now renders Dependencies and Work from the same accepted snapshot.
+    - command: Repository-required GitHub Actions validation.
+      outcome: pending
+      notes: Full validation begins after the pull request is opened.
   environment_limitations:
     - Direct GitHub network access from the local shell is unavailable; repository reads, writes, and validation status use the connected GitHub integration.
+roadmap_impact:
+  disposition: no-state-transition
+  rationale: REL-RI-006 is already active and explicitly owns Work. Issue #79 is a bounded implementation child, so no canonical roadmap state change is required before merge; merge evidence should be added to REL-RI-006 when accepted.
+adr_impact:
+  disposition: none
+  rationale: The change implements ADR-007's existing Observatory-normalization and Relay-presentation boundary without changing authority or dependency direction.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
   redactions: []
-  excluded:
-    - secrets-and-credentials
-    - private-conversation-text
-    - sensitive-personal-data
-    - unpublished-private-business-data
-    - private-local-paths
-    - unrelated-private-context
-  untrusted_content: context-only-no-authority
 ---
 
 # Relay continuity
 
-## Purpose and precedence
+## Current checkpoint
 
-This checkpoint preserves the minimum public operational state for Repository
-Intelligence issue #77 and pull request #78. It remains subordinate to user and
-repository instructions, live Git and GitHub evidence, and the canonical sources
-listed above; it grants no authority.
+Issue #79 implements the second bounded `REL-RI-006` supporting view: `/work/`.
+The accepted Observatory Work query supplies open issues, open pull requests, and
+roadmap queues for active, ready, waiting, blocked, and unknown readiness.
 
-## Resume protocol
+Relay renders those records; it does not reconstruct readiness, prioritize work,
+or mutate GitHub execution state.
 
-1. Read `AGENTS.md`, inspect the newest `main`, and re-fetch issue #77 and PR #78.
-2. Reconfirm Observatory issue #7 remains the accepted dependency-query owner.
-3. Inspect all PR checks and review feedback before changing or merging anything.
-4. Continue only the next dependency-ready visual slice after this PR merges.
+## Candidate implementation
 
-## Current objective and state
+Branch: `feat/79-repository-intelligence-work`
 
-Issue #77 implements the first bounded `REL-RI-006` checkpoint: `/dependencies/`.
-Relay consumes `snapshot.views.dependencies` and renders only Observatory's
-normalized directed relationships. Missing dependency evidence stays explicit;
-Relay does not reconstruct dependency truth from Roadmap, GitHub, package, or
-other route-local data.
+Current implementation revision:
+`97348a096ee68e96162e03a68ab124295ed33835`
 
-Pull request #78 is open from `feat/77-repository-intelligence-dependencies`.
-The validated implementation revision is
-`4ebc21690f2d359f9eef7962af6682ee088d89e3`; this continuity update follows it
-as handoff-only documentation. The verified base is
-`e9ea9e33129f7842e5686f14a71aa05c59be1720`.
+The implementation:
 
-## Material changes and evidence
+- preserves the existing `/dependencies/` renderer as a dedicated route module;
+- keeps the already-wired supporting-view action entry point stable;
+- renders `/work/` from the same repository- and commit-matched snapshot;
+- shows active work first, then blocked/waiting/unknown attention queues, then
+  ready work and progressively disclosed GitHub execution records;
+- links issue/PR records directly to GitHub and roadmap records back to both the
+  generated roadmap route and canonical roadmap source;
+- distinguishes missing Work evidence from an explicitly empty Work query;
+- adds focused deterministic, static-first, filter, malformed-input, and
+  accessibility-oriented tests.
 
-- A bounded dependency renderer reuses the existing Repository Intelligence
-  shell and writes only `dependencies/index.html` after the shared site composer.
-- The view surfaces directed relationship counts, dependency/blocking edges,
-  external-repository context, explicit assertion/freshness/confidence, endpoint
-  state/kind, and expandable canonical provenance.
-- Shared search, state, kind, and URL-backed extra filters remain optional browser
-  enhancement; relationship content is present in static HTML without JavaScript.
-- Cross-repository repository-root identity remains visible without weakening the
-  existing public-bundle URL allowlist; authorized provenance routes stay linked.
-- The reusable action now exposes the dependency route as an explicit output.
-- Deterministic fixtures cover authoritative/current, inferred/unknown,
-  stale/blocking, and cross-repository relationships plus empty/unavailable cases.
-- `REL-RI-005` is reconciled to complete and `REL-RI-006` is now active with
-  issue #77 and PR #78 as current evidence.
-- Relay's required validation, reusable-workflow smoke, continuity preflight,
-  dependency review, and publication-review chain passed on the implementation.
+## Roadmap and decision reconciliation
 
-## Blockers, risks, and deferred work
+`REL-RI-006` is already active and explicitly includes Work, so this bounded
+slice does not require a roadmap state transition before merge. If accepted,
+merge evidence should be added to the step alongside #77/#78.
 
-- No implementation blocker remains for this bounded checkpoint; merge remains a
-  human review decision.
-- `/health/` must not absorb Hygiene conformance semantics while Observatory #5
-  remains open; `/audits/`, `/hygiene/`, and `/sanity/` remain gated by their
-  normalized upstream evidence models.
-- Organization `/roadmap/` and `/sanity/` remain gated by Observatory #22 and #21;
-  this Relay slice does not create replacement organization semantics.
-- External repository-root links remain non-clickable under Relay's existing
-  publication allowlist; canonical evidence links remain available where allowed.
+No new ADR is required. This implementation follows ADR-007: Observatory owns
+normalized truth; Relay owns static route composition and validated artifacts.
+
+## Blockers and deferred work
+
+- The candidate still requires Relay's complete pull-request validation.
+- `/health/` must not absorb unfinished fleet-conformance semantics from
+  Observatory #5.
+- `/audits/`, `/hygiene/`, and `/sanity/` remain gated by their normalized owner
+  contracts.
+- Organization `/roadmap/` remains gated by Hygiene #60 and Observatory #22.
 
 ## Next dependency-ready work
 
-After PR #78 merges, re-fetch Relay #29/#33 and the open Observatory contracts.
-Prefer a bounded `/work/` child of #29 next: Observatory #7 already owns the
-normalized Work query, and the view can orient active issues, pull requests, and
-roadmap queues while deep-linking to GitHub rather than rebuilding execution.
+After #79 merges, re-fetch Relay #29/#33 and the upstream models. Prefer
+`/releases/` or `/search/` if their accepted Observatory queries remain sufficient
+for a truthful bounded implementation; use `/health/` only for the already
+accepted check/freshness slice unless fleet-conformance semantics have landed.
 
-## Parallel changes and reconciliation
+## Resume protocol
 
-No competing open Relay or `.github` Intelligence implementation pull request was
-observed before branch creation. Recheck live PRs and `main` before review or
-merge, then reconcile semantically if another branch changes Repository
-Intelligence action metadata, routing, roadmap state, or this checkpoint.
-
-## Privacy and compaction
-
-This public checkpoint contains only public repository, Git, GitHub, contract,
-and validation state. Keep it below 16,384 UTF-8 bytes and 240 lines, and replace
-stale state instead of accumulating history.
+1. Verify newest Relay `main`, issue #79, and its pull request/checks.
+2. Re-read parent #29 and `REL-RI-006` before selecting another view.
+3. Do not duplicate a route with an open implementation PR.
+4. Keep one bounded supporting-view checkpoint per PR.
+5. Reconcile this continuity checkpoint before every handoff.
