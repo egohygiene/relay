@@ -1,0 +1,89 @@
+{
+  "schema": "egohygiene.observatory.repository-intelligence-read-model/v1",
+  "snapshot_id": "example/repository@1111111111111111111111111111111111111111",
+  "represented_commit": "1111111111111111111111111111111111111111",
+  "observed_at": "2026-08-25T14:00:00Z",
+  "repository": {
+    "id": "ri:example/repository:repository:example/repository",
+    "key": "example/repository",
+    "title": "Repository",
+    "kind": "repository",
+    "state": "active",
+    "assertion": "authoritative",
+    "confidence": "authoritative",
+    "freshness": "current",
+    "visibility": "public",
+    "canonical_url": "https://github.com/example/repository"
+  },
+  "coverage": {
+    "status": "stale"
+  },
+  "views": {
+    "health": {
+      "assertions": {
+        "authoritative": 5,
+        "inferred": 1,
+        "unknown": 1
+      },
+      "check_states": {
+        "success": 1,
+        "failure": 1,
+        "unknown": 1
+      },
+      "checks": [
+        {
+          "assertion": "authoritative",
+          "canonical_url": "https://github.com/example/repository/actions/runs/101",
+          "confidence": "authoritative",
+          "freshness": "current",
+          "id": "ri:example/repository:check:validation-101",
+          "key": "validation-101",
+          "kind": "check",
+          "repository": "example/repository",
+          "state": "success",
+          "title": "Repository validation",
+          "visibility": "public"
+        },
+        {
+          "assertion": "inferred",
+          "canonical_url": "https://github.com/example/repository/actions/runs/102",
+          "confidence": "inferred",
+          "freshness": "stale",
+          "id": "ri:example/repository:check:contracts-102",
+          "key": "contracts-102",
+          "kind": "check",
+          "repository": "example/repository",
+          "state": "failure",
+          "title": "Contract validation",
+          "visibility": "public"
+        },
+        {
+          "assertion": "unknown",
+          "canonical_url": "https://github.com/example/repository/actions/runs/103",
+          "confidence": "unknown",
+          "freshness": "unknown",
+          "id": "ri:example/repository:check:publication-103",
+          "key": "publication-103",
+          "kind": "check",
+          "repository": "example/repository",
+          "state": "unknown",
+          "title": "Publication verification",
+          "visibility": "public"
+        }
+      ],
+      "freshness": {
+        "current": 5,
+        "stale": 1,
+        "unknown": 1
+      },
+      "score": null,
+      "score_reason": "Observatory preserves evidence states instead of manufacturing a roll-up score.",
+      "stale_ids": [
+        "ri:example/repository:check:contracts-102"
+      ],
+      "unknown_ids": [
+        "ri:example/repository:check:publication-103"
+      ]
+    }
+  }
+}
