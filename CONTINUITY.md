@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-16T01:26:16Z"
+  updated_at: "2026-09-16T01:29:57Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -15,7 +15,7 @@ document:
 scope:
   purpose: Preserve the minimum verified state needed to review Relay's first REL-RI-006 supporting-view checkpoint safely.
   includes:
-    - Repository Intelligence dependency-route issue and pull request, represented Git state, accepted Observatory contract boundary, validation status, and next supporting-view dependency.
+    - Repository Intelligence dependency-route issue and pull request, represented Git state, accepted Observatory contract boundary, completed validation evidence, and next supporting-view dependency.
   excludes:
     - Conversation transcripts, duplicated architecture history, unrelated release work, and organization-level domain semantics not yet accepted upstream.
   precedence:
@@ -48,8 +48,8 @@ work:
   next:
     kind: pull-request
     id: egohygiene/relay#78
-    description: Review the bounded /dependencies/ implementation and its Repository Intelligence action integration.
-    readiness: validation-in-progress
+    description: Review and merge the validated bounded /dependencies/ implementation if acceptable.
+    readiness: ready-for-review
     references:
       - https://github.com/egohygiene/relay/issues/77
       - https://github.com/egohygiene/relay/pull/78
@@ -62,20 +62,20 @@ state:
     verified_at: "2026-09-16T01:25:34Z"
   candidate:
     branch: feat/77-repository-intelligence-dependencies
-    revision: 1463f4cebc1670b1875bf4218dcdadce5fba2382
+    revision: 4ebc21690f2d359f9eef7962af6682ee088d89e3
     pull_request: https://github.com/egohygiene/relay/pull/78
-    handoff_state: validation-in-progress
+    handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: "2026-09-16T01:26:16Z"
+    observed_at: "2026-09-16T01:29:57Z"
     default_branch_revision: e9ea9e33129f7842e5686f14a71aa05c59be1720
     issue_state: open
     pull_request_state: open
     notes: Relay issues 28, 30, 31, and 32 are complete; Observatory issue 7 supplies the accepted Dependencies query; hygiene/audit/sanity and organization-roadmap contracts remain open upstream, making /dependencies/ the smallest dependency-ready supporting-view checkpoint.
   parallel_changes: []
 review:
-  status: in-progress
-  reviewed_at: "2026-09-16T01:26:16Z"
+  status: complete
+  reviewed_at: "2026-09-16T01:29:57Z"
   reviewed_by: ChatGPT
   evidence:
     - command: Live tracker, parent issue, child issue, open pull-request, default-branch, repository instruction, architecture, roadmap, and continuity inspection
@@ -86,14 +86,18 @@ review:
       outcome: passed
       observed_at: "2026-09-16T01:25:34Z"
       notes: views.dependencies is limited to external repository names plus directed depends-on/blocks relationships carrying assertion, confidence, freshness, provenance, and compact endpoint references.
-    - command: Focused dependency-route fixture and unittest coverage authored on pull request 78
-      outcome: pending-ci
-      observed_at: "2026-09-16T01:26:16Z"
-      notes: Coverage includes populated, inferred, stale, cross-repository, empty, missing-view, missing-snapshot, malformed, deterministic, static-first, and shared-shell accessibility cases.
-    - command: GitHub Actions pull-request validation
-      outcome: pending
-      observed_at: "2026-09-16T01:26:16Z"
-      notes: The connected execution environment cannot clone GitHub directly, so repository-required validation is delegated to Relay's own GitHub Actions workflows before final handoff.
+    - command: GitHub Actions Validate Relay actions run 35044239093 on implementation revision 4ebc21690f2d359f9eef7962af6682ee088d89e3
+      outcome: passed
+      observed_at: "2026-09-16T01:29:57Z"
+      notes: Action/catalog metadata, continuity contracts, full unit and integration tests, Python compilation, Bash and inline-shell syntax, JSON/YAML parsing, caller-owned publication fixture, reusable Repository Intelligence generation, provenance verification, and publication review all passed.
+    - command: GitHub Actions Relay continuity preflight run 35044239143
+      outcome: passed
+      observed_at: "2026-09-16T01:29:23Z"
+      notes: The exact candidate ran the shared adapter, bounded annotations, and evidence upload successfully.
+    - command: GitHub Actions Dependency review run 35044238927
+      outcome: passed
+      observed_at: "2026-09-16T01:29:57Z"
+      notes: Dependency review completed successfully on the validated implementation head.
   environment_limitations:
     - Direct GitHub network access from the local shell is unavailable; repository reads, writes, and validation status use the connected GitHub integration.
 privacy:
@@ -135,7 +139,10 @@ Relay does not reconstruct dependency truth from Roadmap, GitHub, package, or
 other route-local data.
 
 Pull request #78 is open from `feat/77-repository-intelligence-dependencies`.
-The verified base is `e9ea9e33129f7842e5686f14a71aa05c59be1720`.
+The validated implementation revision is
+`4ebc21690f2d359f9eef7962af6682ee088d89e3`; this continuity update follows it
+as handoff-only documentation. The verified base is
+`e9ea9e33129f7842e5686f14a71aa05c59be1720`.
 
 ## Material changes and evidence
 
@@ -153,10 +160,13 @@ The verified base is `e9ea9e33129f7842e5686f14a71aa05c59be1720`.
   stale/blocking, and cross-repository relationships plus empty/unavailable cases.
 - `REL-RI-005` is reconciled to complete and `REL-RI-006` is now active with
   issue #77 and PR #78 as current evidence.
+- Relay's required validation, reusable-workflow smoke, continuity preflight,
+  dependency review, and publication-review chain passed on the implementation.
 
 ## Blockers, risks, and deferred work
 
-- GitHub Actions validation must pass before this candidate is ready to merge.
+- No implementation blocker remains for this bounded checkpoint; merge remains a
+  human review decision.
 - `/health/` must not absorb Hygiene conformance semantics while Observatory #5
   remains open; `/audits/`, `/hygiene/`, and `/sanity/` remain gated by their
   normalized upstream evidence models.
@@ -168,9 +178,9 @@ The verified base is `e9ea9e33129f7842e5686f14a71aa05c59be1720`.
 ## Next dependency-ready work
 
 After PR #78 merges, re-fetch Relay #29/#33 and the open Observatory contracts.
-Prefer another supporting view whose normalized query is already accepted and
-whose semantics do not overlap still-open control-loop contracts; do not start
-organization aggregation solely to satisfy tracker ordering.
+Prefer a bounded `/work/` child of #29 next: Observatory #7 already owns the
+normalized Work query, and the view can orient active issues, pull requests, and
+roadmap queues while deep-linking to GitHub rather than rebuilding execution.
 
 ## Parallel changes and reconciliation
 
