@@ -34,6 +34,10 @@ releases_renderer = load_renderer(
     "relay_repository_intelligence_releases",
     "render_repository_intelligence_releases.py",
 )
+search_renderer = load_renderer(
+    "relay_repository_intelligence_search",
+    "render_repository_intelligence_search.py",
+)
 
 # Preserve the helper surface used by focused dependency tests and existing callers.
 for exported_name in dir(dependencies_renderer):
@@ -43,10 +47,11 @@ for exported_name in dir(dependencies_renderer):
 render_dependencies_main = dependencies_renderer.main
 render_work_main = work_renderer.main
 render_releases_main = releases_renderer.main
+render_search_main = search_renderer.main
 
 
 def main() -> int:
-    """Render Dependencies, Work, then Releases from the same accepted snapshot."""
+    """Render Dependencies, Work, Releases, then Search from one accepted snapshot."""
 
     result = render_dependencies_main()
     if result != 0:
@@ -54,7 +59,10 @@ def main() -> int:
     result = render_work_main()
     if result != 0:
         return result
-    return render_releases_main()
+    result = render_releases_main()
+    if result != 0:
+        return result
+    return render_search_main()
 
 
 if __name__ == "__main__":
