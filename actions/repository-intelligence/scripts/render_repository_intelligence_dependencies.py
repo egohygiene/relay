@@ -26,6 +26,10 @@ dependencies_renderer = load_renderer(
     "relay_repository_intelligence_dependencies_route",
     "render_repository_intelligence_dependencies_route.py",
 )
+health_renderer = load_renderer(
+    "relay_repository_intelligence_health",
+    "render_repository_intelligence_health.py",
+)
 work_renderer = load_renderer(
     "relay_repository_intelligence_work",
     "render_repository_intelligence_work.py",
@@ -45,15 +49,19 @@ for exported_name in dir(dependencies_renderer):
         globals()[exported_name] = getattr(dependencies_renderer, exported_name)
 
 render_dependencies_main = dependencies_renderer.main
+render_health_main = health_renderer.main
 render_work_main = work_renderer.main
 render_releases_main = releases_renderer.main
 render_search_main = search_renderer.main
 
 
 def main() -> int:
-    """Render Dependencies, Work, Releases, then Search from one accepted snapshot."""
+    """Render Dependencies, Health, Work, Releases, then Search from one snapshot."""
 
     result = render_dependencies_main()
+    if result != 0:
+        return result
+    result = render_health_main()
     if result != 0:
         return result
     result = render_work_main()
