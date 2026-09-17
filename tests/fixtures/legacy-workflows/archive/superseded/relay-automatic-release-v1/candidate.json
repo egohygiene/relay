@@ -1,0 +1,103 @@
+{
+  "schema": "egohygiene.relay-legacy-workflow-candidate/v1-internal",
+  "id": "relay-automatic-release-v1",
+  "kind": "legacy-github-actions-workflow",
+  "lifecycle": {
+    "state": "superseded",
+    "reviewed_at": "2026-09-17",
+    "reviewer_role": "Relay maintainer"
+  },
+  "artifact": {
+    "path": "workflow.yml.disabled",
+    "media_type": "application/yaml",
+    "executable": false,
+    "sha256": "8a016693750c7fe711e8b466b7905d3117d1569745e2f82f8e67fbedd636d325"
+  },
+  "source": {
+    "visibility": "public",
+    "repository": "egohygiene/relay",
+    "path": ".github/workflows/release.yml",
+    "observed_revision": "3440dcfdcf8438667507e3190814f732374f24a4",
+    "blob_sha": "714465a3e91ddb54faee39394e37038218085d4f",
+    "observed_at": "2026-09-17T06:45:00Z",
+    "license": "MIT",
+    "url": "https://github.com/egohygiene/relay/blob/3440dcfdcf8438667507e3190814f732374f24a4/.github/workflows/release.yml"
+  },
+  "capture": {
+    "mode": "verbatim-public-source",
+    "content_state": "verbatim",
+    "transformations": [],
+    "redactions": []
+  },
+  "review": {
+    "issue": "https://github.com/egohygiene/relay/issues/59",
+    "triggers": [
+      "push:main when release.json changes",
+      "workflow_dispatch"
+    ],
+    "permissions": [
+      "contents:write"
+    ],
+    "token_sources": [
+      "implicit GITHUB_TOKEN through persisted checkout credentials",
+      "github.token exposed to GitHub CLI as GH_TOKEN"
+    ],
+    "secret_interfaces": [],
+    "dependencies": [
+      {
+        "reference": "step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c",
+        "immutable": true
+      },
+      {
+        "reference": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "immutable": true
+      }
+    ],
+    "mutations": [
+      "create an annotated immutable release tag",
+      "create a GitHub Release",
+      "force-update the moving major alias tag"
+    ],
+    "deployment_behavior": {
+      "deploys": false,
+      "targets": [
+        "Git tags",
+        "GitHub Releases"
+      ]
+    },
+    "repository_assumptions": [
+      "release.json is a trusted default-branch release request",
+      "the complete action catalog and tests can be validated in one publishing job",
+      "the default branch token may create and force-update tags",
+      "GitHub CLI is available on the runner"
+    ],
+    "reusable_suitability": "not-suitable-unchanged",
+    "findings": [
+      "an automatic path trigger is coupled to repository-wide write authority",
+      "contents:write and persisted credentials are available during validation",
+      "review, validation, tag mutation, release creation, and alias mutation share one job",
+      "the moving major alias is force-pushed directly",
+      "publication does not consume a separately preserved reviewed release plan and bundle"
+    ]
+  },
+  "disposition": {
+    "state": "superseded",
+    "reason": "Relay now separates read-only release planning, profile-bound evidence validation, immutable publication, and the manual dogfood caller.",
+    "graduation_blockers": [],
+    "replacement": {
+      "catalog_ids": [
+        "release-prepare",
+        "semantic-release",
+        "release-artifact",
+        "relay-release"
+      ],
+      "paths": [
+        ".github/workflows/release-prepare.yml",
+        ".github/workflows/semantic-release.yml",
+        ".github/workflows/release-artifact.yml",
+        ".github/workflows/release.yml"
+      ],
+      "immutable_release": "https://github.com/egohygiene/relay/releases/tag/v1.5.0"
+    }
+  }
+}
