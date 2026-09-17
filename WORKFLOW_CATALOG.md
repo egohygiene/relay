@@ -25,9 +25,19 @@ and failure semantics.
 | `dependency-review` | Internal | `egohygiene/relay` | Analyse dependency changes on every pull request and fail on high-severity or denied-license packages | `contents: read` | 10 minutes |
 | `automerge-dependabot` | Internal | `egohygiene/relay` | Classify then auto-approve and merge allowlisted low-risk Dependabot updates after all required checks | job-scoped `contents: write` and `pull-requests: write` | 5 minutes |
 
-All fourteen files under `.github/workflows/` are current and cataloged.
-A future staged candidate must first receive an owner, purpose, explicit
-contract, and `experimental` catalog state; an uncataloged workflow fails CI.
+Every executable workflow file under `.github/workflows/` is current and
+cataloged; an uncataloged workflow fails CI.
+
+## Legacy candidates
+
+Historical workflows enter Relay through the
+[legacy workflow quarantine and graduation policy](docs/legacy-workflow-lifecycle.md).
+Candidate bytes remain disabled outside `.github/workflows/` and absent from
+both machine-readable catalogs. Manual-only triggers and `experimental` catalog
+status are not quarantine: both describe executable automation. A normalized
+implementation enters the catalogs only when its permissions, contract,
+failure behavior, isolated tests, documentation, and release path are ready for
+review together.
 
 ## Security contract
 

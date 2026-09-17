@@ -8,6 +8,9 @@ All notable changes to Relay are documented in this file. The format follows
 
 ### Added
 
+- A documented quarantine and graduation lifecycle for legacy GitHub Actions,
+  with inert provenance evidence and executable guards against accidental
+  activation or catalog inclusion.
 - A bounded `release-name` input that keeps product-facing archive, tag, and
   GitHub Release names separate from Relay's artifact-class validation profile.
 
