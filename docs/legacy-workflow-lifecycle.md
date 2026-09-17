@@ -34,8 +34,9 @@ executable.
 
 ## Executable boundary
 
-GitHub discovers workflows under `.github/workflows/`. Quarantined evidence
-must therefore stay outside that directory and use a non-runnable suffix:
+GitHub discovers workflows under `.github/workflows/`. Quarantined and archived
+evidence must therefore stay outside that directory and use a non-runnable
+suffix:
 
 ```text
 tests/fixtures/legacy-workflows/
@@ -49,14 +50,14 @@ tests/fixtures/legacy-workflows/
 
 The following rules are invariant:
 
-- never place a candidate, rejected copy, or superseded copy under
+- never place a candidate, rejected, superseded, or graduated copy under
   `.github/workflows/`;
 - never use `.yml` or `.yaml` as the final suffix for quarantined evidence;
 - do not rely on `workflow_dispatch`, `workflow_call`, a false job condition,
   or branch filters as quarantine: those files remain executable workflows;
 - keep evidence as ordinary files, not symlinks or generated links into the
   executable boundary;
-- keep every non-active candidate out of `workflow-catalog.json` and
+- keep every retained evidence record out of `workflow-catalog.json` and
   `action-catalog.json`; the catalogs describe only current Relay packages;
 - do not reference quarantined files from an active workflow, action, or
   consumer example; and

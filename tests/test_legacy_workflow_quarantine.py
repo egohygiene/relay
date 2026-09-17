@@ -190,6 +190,7 @@ class LegacyWorkflowQuarantineTests(unittest.TestCase):
                 self.assertIsInstance(capture["redactions"], list)
                 self.assertIn(capture["content_state"], {"verbatim", "sanitized", "metadata-only"})
                 if source["visibility"] == "public":
+                    self.assertIn(capture["content_state"], {"verbatim", "sanitized"})
                     self.assertRegex(source["observed_revision"], FULL_SHA)
                     self.assertRegex(source["blob_sha"], FULL_SHA)
                     self.assertEqual(
@@ -198,6 +199,7 @@ class LegacyWorkflowQuarantineTests(unittest.TestCase):
                         source["url"],
                     )
                     if capture["content_state"] == "verbatim":
+                        self.assertEqual("verbatim-public-source", capture["mode"])
                         git_header = f"blob {len(artifact_bytes)}\0".encode("ascii")
                         self.assertEqual(
                             hashlib.sha1(git_header + artifact_bytes).hexdigest(),
@@ -205,11 +207,17 @@ class LegacyWorkflowQuarantineTests(unittest.TestCase):
                         )
                         self.assertEqual([], capture["transformations"])
                         self.assertEqual([], capture["redactions"])
+                    else:
+                        self.assertEqual("sanitized-public-source", capture["mode"])
+                        self.assertTrue(
+                            capture["transformations"] or capture["redactions"]
+                        )
                 else:
                     self.assertIn(source["visibility"], {"private", "restricted"})
                     self.assertTrue(source["opaque_reference"].strip())
                     self.assertTrue(capture["redaction_reason"].strip())
                     self.assertEqual("metadata-only", capture["content_state"])
+                    self.assertEqual("opaque-restricted-source", capture["mode"])
                     self.assertEqual(REDACTED_STUB, artifact_bytes)
                     self.assertTrue(capture["redactions"])
                     for forbidden in (
@@ -229,6 +237,12 @@ class LegacyWorkflowQuarantineTests(unittest.TestCase):
             (REPOSITORY_ROOT / "action-catalog.json").read_text(encoding="utf-8")
         )
         catalog_text = json.dumps([workflow_catalog, action_catalog], sort_keys=True)
+        supported_paths = {
+            entry["id"]: entry["path"] for entry in workflow_catalog["workflows"]
+        }
+        for entry in action_catalog["workflows"]:
+            self.assertIn(entry["id"], supported_paths)
+            self.assertEqual(supported_paths[entry["id"]], entry["path"])
 
         for _, directory in self.record_directories():
             manifest = json.loads((directory / "candidate.json").read_text(encoding="utf-8"))
@@ -237,6 +251,16 @@ class LegacyWorkflowQuarantineTests(unittest.TestCase):
                 self.assertNotIn(ACTIVE_WORKFLOW_ROOT.resolve(), artifact.parents)
                 self.assertNotIn(manifest["id"], catalog_text)
                 self.assertNotIn(str(artifact.relative_to(REPOSITORY_ROOT)), catalog_text)
+                replacement = manifest["disposition"]["replacement"]
+                if replacement is not None:
+                    self.assertEqual(
+                        len(replacement["catalog_ids"]), len(replacement["paths"])
+                    )
+                    for catalog_id, path in zip(
+                        replacement["catalog_ids"], replacement["paths"], strict=True
+                    ):
+                        self.assertIn(catalog_id, supported_paths)
+                        self.assertEqual(path, supported_paths[catalog_id])
 
         discovered = validator.discovered_workflow_paths(REPOSITORY_ROOT)
         self.assertFalse(any("legacy-workflows" in path for path in discovered))
