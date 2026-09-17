@@ -18,6 +18,46 @@
   },
   "workflows": [
     {
+      "id": "artifact-budget",
+      "path": ".github/workflows/artifact-budget.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Download caller-produced current and baseline artifacts under read-only authority, normalize bounded size evidence, and preserve deterministic advisory or blocking reports without executing consumer code.",
+      "audience": "reusable",
+      "status": "beta",
+      "triggers": ["workflow_call"],
+      "permissions": {"contents": "read"},
+      "timeout_minutes": 10,
+      "concurrency": {"group": "relay-artifact-budget-${{ github.repository }}-${{ github.ref }}", "cancel_in_progress": true},
+      "failure_semantics": {"mode": "fail-closed", "partial_success": false, "retry": "fresh-run", "description": "Invalid, missing, incomplete, or unsupported evidence and artifact transfer failures remain explicit; blocking mode preserves a completed report before failing the job, while advisory mode reports the same state without mutation."},
+      "inputs": [
+        {"name": "current-artifact-name", "type": "string", "required": true, "description": "Ordinary caller-produced Actions artifact containing current evidence."},
+        {"name": "baseline-artifact-name", "type": "string", "required": false, "default": "", "description": "Optional ordinary caller-produced Actions artifact containing baseline evidence."},
+        {"name": "artifact-path", "type": "string", "required": false, "default": ".", "description": "Path within the downloaded current artifact to measure or normalize."},
+        {"name": "baseline-artifact-path", "type": "string", "required": false, "default": ".", "description": "Path within the downloaded baseline artifact to measure or normalize."},
+        {"name": "adapter", "type": "string", "required": true, "description": "Measurement adapter: filesystem or size-limit-json."},
+        {"name": "artifact-kind", "type": "string", "required": true, "description": "Artifact class measured by the selected adapter."},
+        {"name": "subject", "type": "string", "required": true, "description": "Stable bounded identifier for the measured artifact or group."},
+        {"name": "current-revision", "type": "string", "required": true, "description": "Full Git SHA represented by the current artifact."},
+        {"name": "baseline-revision", "type": "string", "required": false, "default": "", "description": "Full Git SHA represented by the optional baseline artifact."},
+        {"name": "mode", "type": "string", "required": false, "default": "advisory", "description": "Advisory preserves all states; blocking fails on failed, missing, or unsupported evidence."},
+        {"name": "maximum-bytes", "type": "string", "required": false, "default": "", "description": "Optional absolute byte budget applied to every measurement."},
+        {"name": "maximum-increase-bytes", "type": "string", "required": false, "default": "", "description": "Optional maximum byte increase over baseline."},
+        {"name": "maximum-increase-percent", "type": "string", "required": false, "default": "", "description": "Optional maximum percentage increase over baseline."},
+        {"name": "warning-threshold-percent", "type": "string", "required": false, "default": "90", "description": "Percentage of a hard budget at which a passing value becomes a warning."},
+        {"name": "maximum-files", "type": "number", "required": false, "default": 10000, "description": "Maximum filesystem entries scanned in each directory artifact."},
+        {"name": "maximum-items", "type": "number", "required": false, "default": 100, "description": "Maximum Size Limit checks normalized per JSON input."},
+        {"name": "scan-maximum-bytes", "type": "number", "required": false, "default": 1073741824, "description": "Maximum raw bytes accepted from each artifact or Size Limit JSON document."},
+        {"name": "artifact-retention-days", "type": "number", "required": false, "default": 30, "description": "Retention for the normalized machine-readable budget report."}
+      ],
+      "outputs": [
+        {"name": "report-artifact-name", "type": "string", "required": true, "description": "Uploaded artifact containing the deterministic budget report."},
+        {"name": "report-sha256", "type": "string", "required": true, "description": "SHA-256 of the exact deterministic JSON report."},
+        {"name": "status", "type": "string", "required": true, "description": "Overall normalized budget state."},
+        {"name": "measurement-count", "type": "string", "required": true, "description": "Number of normalized artifact measurements."}
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/artifact-budget.yml@v1"
+    },
+    {
       "id": "continuity-preflight",
       "path": ".github/workflows/continuity-preflight.yml",
       "owner": "egohygiene/relay",

@@ -1,0 +1,131 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+
+name: Artifact Size Budget
+description: Normalize bounded filesystem or Size Limit evidence into a versioned artifact-budget report.
+
+inputs:
+  adapter:
+    description: Measurement adapter; filesystem or size-limit-json.
+    required: true
+  artifact-kind:
+    description: Artifact class measured by the selected adapter.
+    required: true
+  subject:
+    description: Stable identifier for the measured artifact or group.
+    required: true
+  current-path:
+    description: Repository-relative current artifact or Size Limit JSON path.
+    required: true
+  baseline-path:
+    description: Optional repository-relative baseline artifact or Size Limit JSON path.
+    required: false
+    default: ""
+  current-revision:
+    description: Full Git SHA represented by the current artifact.
+    required: true
+  baseline-revision:
+    description: Full Git SHA represented by the baseline artifact when supplied.
+    required: false
+    default: ""
+  mode:
+    description: Advisory preserves failure states as evidence; blocking fails on fail, missing-baseline, or unsupported states.
+    required: false
+    default: "advisory"
+  maximum-bytes:
+    description: Optional absolute byte budget applied to every normalized measurement.
+    required: false
+    default: ""
+  maximum-increase-bytes:
+    description: Optional maximum byte increase relative to the matching baseline.
+    required: false
+    default: ""
+  maximum-increase-percent:
+    description: Optional maximum percentage increase relative to the matching baseline.
+    required: false
+    default: ""
+  warning-threshold-percent:
+    description: Percentage of a hard budget at which a passing measurement becomes a warning.
+    required: false
+    default: "90"
+  maximum-files:
+    description: Maximum filesystem entries scanned in each directory artifact.
+    required: false
+    default: "10000"
+  maximum-items:
+    description: Maximum Size Limit checks normalized from each JSON input.
+    required: false
+    default: "100"
+  scan-maximum-bytes:
+    description: Maximum raw bytes accepted from each artifact or Size Limit JSON document.
+    required: false
+    default: "1073741824"
+  output:
+    description: Repository-relative path for deterministic JSON evidence.
+    required: false
+    default: ".relay/artifact-budget-report.json"
+
+outputs:
+  status:
+    description: Overall pass, warn, fail, missing-baseline, or unsupported state.
+    value: "${{ steps.evaluate.outputs.status }}"
+  report-sha256:
+    description: SHA-256 of the exact deterministic JSON report.
+    value: "${{ steps.evaluate.outputs.report-sha256 }}"
+  measurement-count:
+    description: Number of normalized artifact measurements.
+    value: "${{ steps.evaluate.outputs.measurement-count }}"
+  current-total-bytes:
+    description: Current total when every measurement exposes deterministic bytes.
+    value: "${{ steps.evaluate.outputs.current-total-bytes }}"
+  delta-total-bytes:
+    description: Aggregate byte delta when every measurement has a baseline.
+    value: "${{ steps.evaluate.outputs.delta-total-bytes }}"
+  report-path:
+    description: Caller-provided path containing the deterministic report.
+    value: "${{ inputs.output }}"
+
+runs:
+  using: composite
+  steps:
+    - id: evaluate
+      name: Normalize and evaluate artifact budget evidence
+      shell: bash
+      env:
+        INPUT_ADAPTER: "${{ inputs.adapter }}"
+        INPUT_ARTIFACT_KIND: "${{ inputs.artifact-kind }}"
+        INPUT_BASELINE_PATH: "${{ inputs.baseline-path }}"
+        INPUT_BASELINE_REVISION: "${{ inputs.baseline-revision }}"
+        INPUT_CURRENT_PATH: "${{ inputs.current-path }}"
+        INPUT_CURRENT_REVISION: "${{ inputs.current-revision }}"
+        INPUT_MAXIMUM_BYTES: "${{ inputs.maximum-bytes }}"
+        INPUT_MAXIMUM_FILES: "${{ inputs.maximum-files }}"
+        INPUT_MAXIMUM_INCREASE_BYTES: "${{ inputs.maximum-increase-bytes }}"
+        INPUT_MAXIMUM_INCREASE_PERCENT: "${{ inputs.maximum-increase-percent }}"
+        INPUT_MAXIMUM_ITEMS: "${{ inputs.maximum-items }}"
+        INPUT_MODE: "${{ inputs.mode }}"
+        INPUT_OUTPUT: "${{ inputs.output }}"
+        INPUT_SCAN_MAXIMUM_BYTES: "${{ inputs.scan-maximum-bytes }}"
+        INPUT_SUBJECT: "${{ inputs.subject }}"
+        INPUT_WARNING_THRESHOLD_PERCENT: "${{ inputs.warning-threshold-percent }}"
+      run: |
+        set -euo pipefail
+        python3 "${GITHUB_ACTION_PATH}/scripts/artifact_budget.py" \
+          --adapter "${INPUT_ADAPTER}" \
+          --artifact-kind "${INPUT_ARTIFACT_KIND}" \
+          --subject "${INPUT_SUBJECT}" \
+          --current-path "${INPUT_CURRENT_PATH}" \
+          --baseline-path "${INPUT_BASELINE_PATH}" \
+          --current-revision "${INPUT_CURRENT_REVISION}" \
+          --baseline-revision "${INPUT_BASELINE_REVISION}" \
+          --mode "${INPUT_MODE}" \
+          --maximum-bytes "${INPUT_MAXIMUM_BYTES}" \
+          --maximum-increase-bytes "${INPUT_MAXIMUM_INCREASE_BYTES}" \
+          --maximum-increase-percent "${INPUT_MAXIMUM_INCREASE_PERCENT}" \
+          --warning-threshold-percent "${INPUT_WARNING_THRESHOLD_PERCENT}" \
+          --maximum-files "${INPUT_MAXIMUM_FILES}" \
+          --maximum-items "${INPUT_MAXIMUM_ITEMS}" \
+          --scan-maximum-bytes "${INPUT_SCAN_MAXIMUM_BYTES}" \
+          --output "${INPUT_OUTPUT}" \
+          --github-output "${GITHUB_OUTPUT}"

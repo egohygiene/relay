@@ -1,0 +1,212 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Artifact Size Budget
+
+on:
+  workflow_call:
+    inputs:
+      current-artifact-name:
+        description: Ordinary caller-produced Actions artifact containing current evidence.
+        required: true
+        type: string
+      baseline-artifact-name:
+        description: Optional ordinary caller-produced Actions artifact containing baseline evidence.
+        required: false
+        default: ""
+        type: string
+      artifact-path:
+        description: Path within the downloaded current artifact to measure or normalize.
+        required: false
+        default: "."
+        type: string
+      baseline-artifact-path:
+        description: Path within the downloaded baseline artifact to measure or normalize.
+        required: false
+        default: "."
+        type: string
+      adapter:
+        description: Measurement adapter; filesystem or size-limit-json.
+        required: true
+        type: string
+      artifact-kind:
+        description: Artifact class measured by the selected adapter.
+        required: true
+        type: string
+      subject:
+        description: Stable bounded identifier for the measured artifact or group.
+        required: true
+        type: string
+      current-revision:
+        description: Full Git SHA represented by the current artifact.
+        required: true
+        type: string
+      baseline-revision:
+        description: Full Git SHA represented by the optional baseline artifact.
+        required: false
+        default: ""
+        type: string
+      mode:
+        description: Advisory records all states; blocking fails closed on failed, missing, or unsupported evidence.
+        required: false
+        default: "advisory"
+        type: string
+      maximum-bytes:
+        description: Optional absolute byte budget applied to every measurement.
+        required: false
+        default: ""
+        type: string
+      maximum-increase-bytes:
+        description: Optional maximum byte increase over baseline.
+        required: false
+        default: ""
+        type: string
+      maximum-increase-percent:
+        description: Optional maximum percentage increase over baseline.
+        required: false
+        default: ""
+        type: string
+      warning-threshold-percent:
+        description: Percentage of a hard budget at which a passing value becomes a warning.
+        required: false
+        default: "90"
+        type: string
+      maximum-files:
+        description: Maximum filesystem entries scanned in each directory artifact.
+        required: false
+        default: 10000
+        type: number
+      maximum-items:
+        description: Maximum Size Limit checks normalized per JSON input.
+        required: false
+        default: 100
+        type: number
+      scan-maximum-bytes:
+        description: Maximum raw bytes accepted from each artifact or Size Limit JSON document.
+        required: false
+        default: 1073741824
+        type: number
+      artifact-retention-days:
+        description: Retention for the normalized machine-readable budget report.
+        required: false
+        default: 30
+        type: number
+    outputs:
+      report-artifact-name:
+        description: Uploaded artifact containing the deterministic budget report.
+        value: "${{ jobs.budget.outputs.report-artifact-name }}"
+      report-sha256:
+        description: SHA-256 of the exact deterministic JSON report.
+        value: "${{ jobs.budget.outputs.report-sha256 }}"
+      status:
+        description: Overall normalized budget state.
+        value: "${{ jobs.budget.outputs.status }}"
+      measurement-count:
+        description: Number of normalized artifact measurements.
+        value: "${{ jobs.budget.outputs.measurement-count }}"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "relay-artifact-budget-${{ github.repository }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  budget:
+    name: Normalize caller-owned artifact size evidence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      report-artifact-name: "${{ steps.metadata.outputs.artifact-name }}"
+      report-sha256: "${{ steps.evaluate.outputs.report-sha256 }}"
+      status: "${{ steps.evaluate.outputs.status }}"
+      measurement-count: "${{ steps.evaluate.outputs.measurement-count }}"
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Download current caller-owned artifact
+        # actions/download-artifact v8.0.1
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: "${{ inputs.current-artifact-name }}"
+          path: ".relay/artifact-budget/current"
+
+      - name: Download baseline caller-owned artifact
+        if: "${{ inputs.baseline-artifact-name != '' }}"
+        # actions/download-artifact v8.0.1
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: "${{ inputs.baseline-artifact-name }}"
+          path: ".relay/artifact-budget/baseline"
+
+      - id: paths
+        name: Define isolated artifact paths
+        shell: bash
+        env:
+          ARTIFACT_PATH: "${{ inputs.artifact-path }}"
+          BASELINE_ARTIFACT_NAME: "${{ inputs.baseline-artifact-name }}"
+          BASELINE_ARTIFACT_PATH: "${{ inputs.baseline-artifact-path }}"
+        run: |
+          set -euo pipefail
+          current_path=".relay/artifact-budget/current"
+          if [[ "${ARTIFACT_PATH}" != "." ]]; then
+            current_path="${current_path}/${ARTIFACT_PATH}"
+          fi
+          baseline_path=""
+          if [[ -n "${BASELINE_ARTIFACT_NAME}" ]]; then
+            baseline_path=".relay/artifact-budget/baseline"
+            if [[ "${BASELINE_ARTIFACT_PATH}" != "." ]]; then
+              baseline_path="${baseline_path}/${BASELINE_ARTIFACT_PATH}"
+            fi
+          fi
+          printf 'current-path=%s\n' "${current_path}" >> "${GITHUB_OUTPUT}"
+          printf 'baseline-path=%s\n' "${baseline_path}" >> "${GITHUB_OUTPUT}"
+
+      - id: metadata
+        name: Define bounded report artifact identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'artifact-name=relay-artifact-budget-%s-%s\n' \
+            "${GITHUB_RUN_ID}" "${GITHUB_RUN_ATTEMPT}" >> "${GITHUB_OUTPUT}"
+
+      - id: evaluate
+        name: Normalize and evaluate artifact budget
+        uses: $/actions/artifact-budget
+        with:
+          adapter: "${{ inputs.adapter }}"
+          artifact-kind: "${{ inputs.artifact-kind }}"
+          subject: "${{ inputs.subject }}"
+          current-path: "${{ steps.paths.outputs.current-path }}"
+          baseline-path: "${{ steps.paths.outputs.baseline-path }}"
+          current-revision: "${{ inputs.current-revision }}"
+          baseline-revision: "${{ inputs.baseline-revision }}"
+          mode: "${{ inputs.mode }}"
+          maximum-bytes: "${{ inputs.maximum-bytes }}"
+          maximum-increase-bytes: "${{ inputs.maximum-increase-bytes }}"
+          maximum-increase-percent: "${{ inputs.maximum-increase-percent }}"
+          warning-threshold-percent: "${{ inputs.warning-threshold-percent }}"
+          maximum-files: "${{ inputs.maximum-files }}"
+          maximum-items: "${{ inputs.maximum-items }}"
+          scan-maximum-bytes: "${{ inputs.scan-maximum-bytes }}"
+          output: ".relay/artifact-budget/report.json"
+
+      - name: Upload normalized artifact-budget evidence
+        if: "${{ always() && steps.evaluate.outputs.report-sha256 != '' }}"
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "${{ steps.metadata.outputs.artifact-name }}"
+          path: ".relay/artifact-budget/report.json"
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9

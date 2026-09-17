@@ -436,8 +436,9 @@ consumer evidence is tracked in Phase 5.
 **Status:** `v1.0.0` through `v1.5.0` are published immutably. The current
 release declaration, changelog, and version authority prepare the additive
 `v1.6.0` surface: product-facing release names, legacy-workflow intake policy,
-and advisory-first stale pull-request lifecycle automation. Publication remains
-an explicit manual dispatch after review.
+advisory-first stale pull-request lifecycle automation, and reusable artifact
+size/performance budgets. Publication remains an explicit manual dispatch after
+review.
 
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 

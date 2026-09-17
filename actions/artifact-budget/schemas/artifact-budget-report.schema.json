@@ -1,0 +1,274 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/artifact-budget-report/v1/schema.json",
+  "title": "Relay artifact budget report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema",
+    "contract_version",
+    "subject",
+    "mode",
+    "revisions",
+    "sources",
+    "budget",
+    "limits",
+    "coverage",
+    "measurements",
+    "summary"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "https://egohygiene.github.io/relay/contracts/artifact-budget-report/v1/schema.json"
+    },
+    "schema": {"const": "egohygiene.relay.artifact-budget-report/v1"},
+    "contract_version": {"const": 1},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "adapter", "artifact_kind"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+        "adapter": {"enum": ["filesystem", "size-limit-json"]},
+        "artifact_kind": {
+          "enum": [
+            "archive",
+            "container-image-archive",
+            "directory",
+            "file",
+            "javascript-bundle",
+            "native-binary",
+            "other",
+            "static-site"
+          ]
+        }
+      }
+    },
+    "mode": {"enum": ["advisory", "blocking"]},
+    "revisions": {"$ref": "#/$defs/revisions"},
+    "sources": {"$ref": "#/$defs/sources"},
+    "budget": {"$ref": "#/$defs/budget"},
+    "limits": {"$ref": "#/$defs/limits"},
+    "coverage": {"$ref": "#/$defs/coverage"},
+    "measurements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/measurement"}
+    },
+    "summary": {"$ref": "#/$defs/summary"}
+  },
+  "$defs": {
+    "nullableNonNegativeInteger": {
+      "oneOf": [
+        {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+        {"type": "null"}
+      ]
+    },
+    "nullableNumber": {
+      "oneOf": [
+        {"type": "number"},
+        {"type": "null"}
+      ]
+    },
+    "nullableSha": {
+      "oneOf": [
+        {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        {"type": "null"}
+      ]
+    },
+    "state": {
+      "enum": ["pass", "warn", "fail", "missing-baseline", "unsupported"]
+    },
+    "revisions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["current", "baseline"],
+      "properties": {
+        "current": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "baseline": {"$ref": "#/$defs/nullableSha"}
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["current", "baseline"],
+      "properties": {
+        "current": {"type": "string", "minLength": 1},
+        "baseline": {
+          "oneOf": [
+            {"type": "string", "minLength": 1},
+            {"type": "null"}
+          ]
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maximum_bytes",
+        "maximum_increase_bytes",
+        "maximum_increase_percent",
+        "warning_threshold_percent"
+      ],
+      "properties": {
+        "maximum_bytes": {"$ref": "#/$defs/nullableNonNegativeInteger"},
+        "maximum_increase_bytes": {"$ref": "#/$defs/nullableNonNegativeInteger"},
+        "maximum_increase_percent": {
+          "oneOf": [
+            {"type": "number", "minimum": 0},
+            {"type": "null"}
+          ]
+        },
+        "warning_threshold_percent": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 100
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maximum_files", "maximum_items", "scan_maximum_bytes"],
+      "properties": {
+        "maximum_files": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+        "maximum_items": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+        "scan_maximum_bytes": {"type": "integer", "minimum": 1, "maximum": 9007199254740991}
+      }
+    },
+    "coverageEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "kind", "file_count", "total_bytes"],
+      "properties": {
+        "state": {"enum": ["complete", "not-provided"]},
+        "kind": {
+          "oneOf": [
+            {"enum": ["file", "directory", "size-limit-json"]},
+            {"type": "null"}
+          ]
+        },
+        "file_count": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+        "total_bytes": {"$ref": "#/$defs/nullableNonNegativeInteger"}
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["current", "baseline"],
+      "properties": {
+        "current": {"$ref": "#/$defs/coverageEntry"},
+        "baseline": {"$ref": "#/$defs/coverageEntry"}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "size_limit_bytes",
+        "passed",
+        "loading_seconds",
+        "running_seconds"
+      ],
+      "properties": {
+        "size_limit_bytes": {"$ref": "#/$defs/nullableNonNegativeInteger"},
+        "passed": {
+          "oneOf": [
+            {"type": "boolean"},
+            {"type": "null"}
+          ]
+        },
+        "loading_seconds": {
+          "oneOf": [
+            {"type": "number", "minimum": 0},
+            {"type": "null"}
+          ]
+        },
+        "running_seconds": {
+          "oneOf": [
+            {"type": "number", "minimum": 0},
+            {"type": "null"}
+          ]
+        }
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "metric",
+        "current_bytes",
+        "baseline_bytes",
+        "delta_bytes",
+        "delta_percent",
+        "source",
+        "state",
+        "reasons"
+      ],
+      "properties": {
+        "id": {"type": "string", "minLength": 1, "maxLength": 200},
+        "metric": {"const": "bytes"},
+        "current_bytes": {"$ref": "#/$defs/nullableNonNegativeInteger"},
+        "baseline_bytes": {"$ref": "#/$defs/nullableNonNegativeInteger"},
+        "delta_bytes": {
+          "oneOf": [
+            {"type": "integer"},
+            {"type": "null"}
+          ]
+        },
+        "delta_percent": {"$ref": "#/$defs/nullableNumber"},
+        "source": {"$ref": "#/$defs/source"},
+        "state": {"$ref": "#/$defs/state"},
+        "reasons": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pass", "warn", "fail", "missing-baseline", "unsupported"],
+      "properties": {
+        "pass": {"type": "integer", "minimum": 0},
+        "warn": {"type": "integer", "minimum": 0},
+        "fail": {"type": "integer", "minimum": 0},
+        "missing-baseline": {"type": "integer", "minimum": 0},
+        "unsupported": {"type": "integer", "minimum": 0}
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "counts",
+        "measurement_count",
+        "current_total_bytes",
+        "baseline_total_bytes",
+        "delta_total_bytes",
+        "delta_total_percent",
+        "blocking_failure"
+      ],
+      "properties": {
+        "state": {"$ref": "#/$defs/state"},
+        "counts": {"$ref": "#/$defs/counts"},
+        "measurement_count": {"type": "integer", "minimum": 1},
+        "current_total_bytes": {"$ref": "#/$defs/nullableNonNegativeInteger"},
+        "baseline_total_bytes": {"$ref": "#/$defs/nullableNonNegativeInteger"},
+        "delta_total_bytes": {
+          "oneOf": [
+            {"type": "integer"},
+            {"type": "null"}
+          ]
+        },
+        "delta_total_percent": {"$ref": "#/$defs/nullableNumber"},
+        "blocking_failure": {"type": "boolean"}
+      }
+    }
+  }
+}

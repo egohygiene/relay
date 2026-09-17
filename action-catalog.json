@@ -10,6 +10,17 @@
   },
   "actions": [
     {
+      "id": "artifact-budget",
+      "path": "actions/artifact-budget",
+      "name": "Artifact Size Budget",
+      "summary": "Normalize filesystem and Size Limit evidence into deterministic advisory or blocking artifact-budget reports.",
+      "status": "beta",
+      "runtime": ["bash", "python3"],
+      "permissions": {},
+      "side_effects": ["workspace-write"],
+      "consumer_ref": "egohygiene/relay/actions/artifact-budget@v1"
+    },
+    {
       "id": "normalize-repository-report",
       "path": "actions/normalize-repository-report",
       "name": "Normalize Repository Report",
@@ -138,6 +149,15 @@
     }
   ],
   "workflows": [
+    {
+      "id": "artifact-budget",
+      "path": ".github/workflows/artifact-budget.yml",
+      "name": "Artifact Size Budget",
+      "summary": "Download caller-produced size evidence and preserve a deterministic advisory or blocking budget report.",
+      "status": "beta",
+      "permissions": {"contents": "read"},
+      "consumer_ref": "egohygiene/relay/.github/workflows/artifact-budget.yml@v1"
+    },
     {
       "id": "continuity-preflight",
       "path": ".github/workflows/continuity-preflight.yml",

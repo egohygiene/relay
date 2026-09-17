@@ -10,6 +10,15 @@ out complete caller history, invokes the action from the exact called Relay
 revision through GitHub's `$/` syntax, builds the routed site, and uploads it as
 an ordinary workflow artifact.
 
+## Artifact size budgets
+
+`artifact-budget.yml` downloads caller-produced current and optional baseline
+artifacts, then normalizes filesystem bytes or consumer-produced Size Limit JSON
+into a deterministic v1 report. It never checks out or executes consumer code,
+uses only `contents: read`, and defaults to advisory evidence. Blocking mode
+uploads the report before failing on exceeded budgets, missing baselines, or
+unsupported measurements. See the [web and native examples](../../examples/workflows/artifact-budget.md).
+
 The continuity preflight checks out the exact caller candidate without
 credentials, acquires the pinned EgoLint source and checksum-locked Cargo
 dependencies, then runs the shared adapter offline. It emits at most twenty

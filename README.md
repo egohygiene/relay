@@ -12,6 +12,7 @@ and deployment.
 
 | Capability | Discovery alias |
 | ---------- | --------------- |
+| Artifact size and performance budgets | `egohygiene/relay/actions/artifact-budget@v1` |
 | Repository Intelligence site | `egohygiene/relay/actions/repository-intelligence@v1` |
 | Canonical labels and pull-request metadata | `egohygiene/relay/actions/repository-labels@v1` |
 | Warning-first stale pull-request lifecycle | `egohygiene/relay/actions/stale-pull-requests@v1` |
@@ -32,6 +33,7 @@ and deployment.
 | Read-only pull-request label plan | `egohygiene/relay/.github/workflows/pull-request-label-plan.yml@v1` |
 | Trusted pull-request label apply | `egohygiene/relay/.github/workflows/pull-request-label-apply.yml@v1` |
 | Advisory-first stale pull-request lifecycle | `egohygiene/relay/.github/workflows/stale-pull-requests.yml@v1` |
+| Advisory or blocking artifact budgets | `egohygiene/relay/.github/workflows/artifact-budget.yml@v1` |
 
 These moving aliases advertise the release surface. Production consumers use a
 reviewed full commit SHA, as shown below.
@@ -177,6 +179,16 @@ the caller opts in explicitly.
 The caller owns the schedule and repository labels. See the
 [minimal scheduled integration](examples/workflows/stale-pull-requests.md) for
 read-only adoption, enforcement permissions, recovery, and immutable pinning.
+
+## Enforce artifact budgets without running consumer builds
+
+The artifact-budget action normalizes already-produced filesystem artifacts or
+consumer-pinned Size Limit JSON into one deterministic v1 report. It supports
+absolute, byte-delta, percentage-delta, and warning thresholds for JavaScript
+bundles, static sites, native binaries, archives, and container-image archives.
+The reusable workflow downloads only caller-owned Actions artifacts, never
+checks out or executes consumer code, and defaults to advisory mode. See the
+[web and native adoption examples](examples/workflows/artifact-budget.md).
 
 ## Architecture boundary
 

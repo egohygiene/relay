@@ -10,6 +10,7 @@ and failure semantics.
 
 | Workflow | Audience | Owner | Purpose | Maximum authority | Timeout |
 | --- | --- | --- | --- | --- | --- |
+| `artifact-budget` | Reusable | `egohygiene/relay` | Normalize caller-produced artifact size evidence and enforce advisory or blocking budgets | `contents: read` | 10 minutes |
 | `relay-validation` | Internal | `egohygiene/relay` | Validate packages, contracts, metadata, and the reusable smoke path | `actions: read`, `contents: read` | 15 minutes |
 | `relay-release` | Internal | `egohygiene/relay` | Dogfood the reviewed semantic-release handoff | job-scoped `contents: write` | 15 minutes |
 | `release-artifact` | Reusable | `egohygiene/relay` | Validate a profile-bound caller artifact and publish immutable release evidence | job-scoped `contents: write` | 15 minutes |
@@ -132,6 +133,15 @@ identity, so every workflow with `issues: write` or `pull-requests: write` is
 inside this trust boundary; the marker does not claim unique workflow-file
 identity.
 
+Artifact-budget evaluation consumes only caller-produced Actions artifacts.
+The workflow does not check out or execute consumer code: JavaScript callers
+run their own pinned Size Limit installation and upload its JSON, while static
+sites, native binaries, archives, and container-image archives use bounded raw
+filesystem measurement. Missing baselines and unsupported runtime-only Size
+Limit checks remain explicit report states. Blocking mode uploads the completed
+report before failing; advisory mode preserves the same evidence without
+granting mutation authority.
+
 **Emergency disable**: remove the `automerge-dependabot` workflow file or set
 `if: false` on the `approve-and-merge` job to immediately stop automated
 merges without affecting dependency-review analysis. Disable
@@ -150,7 +160,7 @@ than closure authority.
 
 ## Reusable caller contract
 
-`repository-intelligence`, `publication-review`, `publication-pages`,
+`artifact-budget`, `repository-intelligence`, `publication-review`, `publication-pages`,
 `release-artifact`, `release-prepare`, `semantic-release`, `label-sync-plan`,
 `label-sync-apply`, `pull-request-label-plan`, `pull-request-label-apply`, and
 `stale-pull-requests` are the reusable workflows in v1. Their inputs, defaults,
