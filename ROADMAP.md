@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-09-15
+updated: 2026-09-16
 governed_by:
   - architecture-roadmap
 depends_on:
@@ -33,7 +33,7 @@ repository: egohygiene/relay
 visibility: public
 publication: central
 route: /roadmap/relay/
-updated: 2026-09-15
+updated: 2026-09-16
 -->
 ## 2026-08-25 execution snapshot
 
@@ -314,7 +314,7 @@ releases, and deployments across meaningful epochs.
 id: REL-RI-006
 status: active
 depends_on: [REL-RI-005]
-issues: [29, 33, 77]
+issues: [29, 33, 77, 79, 81, 83, 86, 88, 90]
 -->
 #### REL-RI-006 — Complete supporting views and the intelligence dashboard
 
@@ -331,10 +331,16 @@ organization dashboard form one consistent evidence-navigation system.
 
 **Current evidence:**
 
-- Issue #77 and PR #78 implement the first bounded REL-RI-006 slice by rendering
-  `/dependencies/` from Observatory's accepted normalized dependency query.
-- Health, Releases, Work, Search, Compare, and final deterministic publication
-  remain tracked by issues #29 and #33 or their bounded child issues.
+- Dependencies (#77/#78), Work (#79/#80), Releases (#81/#82), Search (#83/#85),
+  Compare (#86/#87), and core Health (#88/#89) are merged as bounded supporting
+  views over accepted Observatory evidence.
+- Issue #90 is the current #33 child checkpoint to restore reusable-workflow
+  parity with the complete snapshot/comparison evidence boundary and lock that
+  parity with executable tests.
+- Empathy and Akashic already compose immutable-pinned Repository Intelligence
+  action output into consumer-owned Pages pipelines; representative migrations
+  to one current hardened workflow revision and public-route verification remain
+  required before #33 or REL-RI-006 can be considered complete.
 
 ### Repository continuity preflight track
 

@@ -688,7 +688,7 @@
       "id": "repository-intelligence",
       "path": ".github/workflows/repository-intelligence.yml",
       "owner": "egohygiene/relay",
-      "purpose": "Build, provenance-check, and upload one routed repository intelligence site, including its roadmap quest line, ADR decision ledger, and semantic Git journey, as a bounded workflow artifact.",
+      "purpose": "Build, provenance-check, and upload the complete routed Repository Intelligence site from optional commit-matched Observatory snapshot/comparison evidence as a bounded workflow artifact.",
       "audience": "reusable",
       "status": "beta",
       "triggers": ["workflow_call", "workflow_dispatch"],
@@ -702,7 +702,7 @@
         "mode": "fail-closed",
         "partial_success": false,
         "retry": "fresh-run",
-        "description": "Generation, provenance validation, missing output, or upload failure prevents the artifact output from being reported."
+        "description": "Generation, provenance validation, incompatible Observatory evidence, missing output, or upload failure prevents the artifact output from being reported."
       },
       "inputs": [
         {
@@ -732,6 +732,13 @@
           "required": false,
           "default": "",
           "description": "Optional public-safe Observatory read model for the represented commit."
+        },
+        {
+          "name": "observatory-comparison",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional public-safe Observatory comparison whose after boundary matches the snapshot and represented commit."
         },
         {
           "name": "default-branch",

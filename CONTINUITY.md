@@ -7,20 +7,19 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-16T15:01:17Z"
+  updated_at: "2026-09-16T15:23:03Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Preserve the minimum verified state needed to review the sixth bounded REL-RI-006 supporting-view checkpoint.
+  purpose: Preserve the minimum verified state needed to review the bounded Relay #33 reusable Repository Intelligence publication-workflow checkpoint.
   includes:
-    - Repository Intelligence Health issue, pull request, exact implementation revision, and accepted source contract.
-    - Core Observatory check-state, assertion, freshness, stale-ID, unknown-ID, and null-score semantics.
-    - Merged Dependencies, Work, Releases, Search, and Compare checkpoints.
-    - Roadmap disposition, ADR disposition, exact validation evidence, upstream gates, and next-work guidance.
+    - Relay #90, PR #91, verified base revision, independently green implementation revision, and exact CI evidence.
+    - Reusable Repository Intelligence workflow input/catalog parity for Observatory snapshot and structural comparison evidence.
+    - Consumer-owned publication boundary, current Empathy/Akashic adoption evidence, roadmap and ADR disposition, and remaining #33 canary work.
   excludes:
-    - Conversation transcripts, raw provider data, fleet-wide Hygiene conformance, synthetic health scores, and organization semantics not accepted upstream.
+    - Consumer repository migrations, Pages deployment authority changes, Observatory semantic changes, organization-roadmap implementation, and conversation transcripts.
   precedence:
     - user-and-runtime-instructions
     - scoped-repository-instructions
@@ -33,87 +32,93 @@ scope:
     - SYSTEM.md
     - DECISIONS.md
     - ROADMAP.md
+    - workflow-catalog.json
+    - .github/workflows/repository-intelligence.yml
     - actions/repository-intelligence/action.yml
-    - actions/repository-intelligence/scripts/generate_repository_intelligence_site.py
-    - actions/repository-intelligence/scripts/render_repository_intelligence_health.py
-    - https://github.com/egohygiene/observatory/blob/main/docs/repository-intelligence-read-model.md
+    - docs/repository-intelligence-publication.md
+    - tests/test_repository_intelligence_workflow.py
 work:
-  objective: Materialize Repository Intelligence /health/ from Observatory's accepted core Health query without creating Relay-local conformance or score semantics.
+  objective: Restore the reusable Repository Intelligence artifact workflow to the complete current Observatory evidence-input boundary without changing consumer-owned deployment authority.
   success_conditions:
-    - Show normalized check-state counts and current check records with canonical evidence links.
-    - Keep assertion and freshness distributions visible without reducing them to a score.
-    - Preserve explicit stale IDs and unknown IDs as distinct evidence states.
-    - Keep missing, partial, empty, stale, unknown, and populated states distinct.
-    - Keep score null and reject incompatible or contradictory Health evidence.
-    - Keep Repository Intelligence generation and public bundle validation green.
+    - Expose optional observatory-snapshot and observatory-comparison on workflow_call and workflow_dispatch.
+    - Forward both paths unchanged to the Repository Intelligence action resolved from the exact called Relay revision.
+    - Keep the reusable workflow contents-read and artifact-only, with no Pages or repository-write authority.
+    - Keep workflow-catalog.json synchronized with the executable input contract.
+    - Preserve the existing no-snapshot reusable-workflow smoke as an explicit partial-adoption canary.
+    - Document direct-action site composition separately from reusable artifact generation.
+    - Keep the complete Relay validation/publication review chain green.
   active_issue:
     provider: github
-    id: egohygiene/relay#88
-    url: https://github.com/egohygiene/relay/issues/88
+    id: egohygiene/relay#90
+    url: https://github.com/egohygiene/relay/issues/90
+  parent_issue:
+    provider: github
+    id: egohygiene/relay#33
+    url: https://github.com/egohygiene/relay/issues/33
   next:
     kind: pull-request
-    id: egohygiene/relay#89
-    description: Review and merge the validated bounded /health/ implementation if acceptable.
+    id: egohygiene/relay#91
+    description: Review and merge the validated reusable-workflow parity checkpoint if acceptable.
     readiness: ready-for-review-after-final-head-ci
     references:
-      - https://github.com/egohygiene/relay/issues/88
-      - https://github.com/egohygiene/relay/pull/89
-      - https://github.com/egohygiene/relay/issues/29
-      - https://github.com/egohygiene/observatory/issues/7
-      - https://github.com/egohygiene/observatory/issues/5
+      - https://github.com/egohygiene/relay/issues/90
+      - https://github.com/egohygiene/relay/pull/91
+      - https://github.com/egohygiene/relay/issues/33
     depends_on: []
 state:
   base:
-    revision: ce4d92c15d24e19d621097ba3212cad05dcde60a
+    revision: 1c5f059c934782babebfcec2ec0b7958c778fd54
     ref: refs/heads/main
-    verified_at: "2026-09-16T14:53:33Z"
+    verified_at: "2026-09-16T15:12:55Z"
   candidate:
-    branch: feat/88-repository-intelligence-health
-    implementation_revision: 4c7c758f079f6ef69d092d372528c39461a1ebd8
-    pull_request: https://github.com/egohygiene/relay/pull/89
+    branch: feat/90-repository-intelligence-workflow-parity
+    implementation_revision: 470b83a64b0e35c0f383b9e3a314161347a5087f
+    pull_request: https://github.com/egohygiene/relay/pull/91
     handoff_state: ready-for-review-after-final-head-ci
   live:
     status: verified
-    observed_at: "2026-09-16T15:01:17Z"
-    default_branch_revision: ce4d92c15d24e19d621097ba3212cad05dcde60a
+    observed_at: "2026-09-16T15:23:03Z"
+    default_branch_revision: 1c5f059c934782babebfcec2ec0b7958c778fd54
     dependencies_checkpoint: {issue: egohygiene/relay#77, pull_request: egohygiene/relay#78, state: merged}
     work_checkpoint: {issue: egohygiene/relay#79, pull_request: egohygiene/relay#80, state: merged}
     releases_checkpoint: {issue: egohygiene/relay#81, pull_request: egohygiene/relay#82, state: merged}
     search_checkpoint: {issue: egohygiene/relay#83, pull_request: egohygiene/relay#85, state: merged}
     compare_checkpoint: {issue: egohygiene/relay#86, pull_request: egohygiene/relay#87, state: merged}
-    health_checkpoint: {issue: egohygiene/relay#88, pull_request: egohygiene/relay#89, state: open}
-    notes: Observatory #7 owns the accepted core Health query and deliberately leaves score null. Fleet-wide Hygiene conformance remains separately owned by open Observatory #5. Organization Roadmap remains gated by open Hygiene #60 and Observatory #22.
+    health_checkpoint: {issue: egohygiene/relay#88, pull_request: egohygiene/relay#89, state: merged}
+    publication_checkpoint: {issue: egohygiene/relay#90, pull_request: egohygiene/relay#91, state: open}
+    organization_roadmap_gate: {hygiene_60: open, observatory_22: open, github_29: open}
+    fleet_conformance_gate: {observatory_5: open}
 review:
   status: complete-for-implementation-revision
-  reviewed_at: "2026-09-16T15:01:17Z"
+  reviewed_at: "2026-09-16T15:23:03Z"
   reviewed_by: ChatGPT
   evidence:
-    - command: Verify Relay main, merged Compare PR #87, parent #29/#33, open work, repository instructions, and organization-roadmap upstreams.
+    - command: Verify newest Relay main, #33, open PRs, repository architecture/decision/roadmap guidance, reusable workflow, workflow catalog, validation workflow, and consumer integrations.
       outcome: passed
-      notes: No competing Relay PR existed; live main was ce4d92c15d24e19d621097ba3212cad05dcde60a. Hygiene #60, Observatory #22, and Observatory #5 remain open.
-    - command: Inspect Observatory #7 read-model documentation and accepted Health fixture shape.
+      notes: Main is merge of PR #89 at 1c5f059c934782babebfcec2ec0b7958c778fd54; no competing Relay PR existed. Empathy and Akashic pin the Repository Intelligence action in consumer-owned Pages pipelines.
+    - command: Compare reusable Repository Intelligence workflow inputs to the current composite action boundary.
       outcome: passed
-      notes: Core Health owns check records, check-state counts, assertion/freshness distributions, stale_ids, unknown_ids, and score null; it does not claim fleet conformance.
-    - command: Add bounded Health renderer, deterministic mixed-state fixture, focused fail-closed/static/accessibility tests, and supporting-view pipeline integration.
+      notes: The action already accepted observatory-comparison, but the reusable workflow exposed only observatory-snapshot; #90 owns that bounded parity defect.
+    - command: Add workflow_call/workflow_dispatch comparison input, exact forwarding, catalog synchronization, publication-boundary documentation, immutable example guidance, and executable workflow-parity tests.
       outcome: passed
-      notes: Existing Dependencies, Work, Releases, Search, and Compare authority boundaries remain unchanged.
-    - command: GitHub Actions Validate Relay actions run 35112288260, run 68, on 4c7c758f079f6ef69d092d372528c39461a1ebd8.
+      notes: No Pages deployment or write authority was added; comparison semantics remain owned by Observatory and validated by the underlying action.
+    - command: GitHub Actions Validate Relay actions run 35114787480, run 71, on 470b83a64b0e35c0f383b9e3a314161347a5087f.
       outcome: passed
-      notes: Action/catalog metadata, continuity-contract validation, unit/integration tests, Python compilation, Bash and inline-shell syntax, JSON/YAML parsing, caller-owned publication fixture, reusable Repository Intelligence generation/provenance, publication review, and reviewed-byte preservation passed.
-    - command: GitHub Actions Relay continuity preflight run 35112288292, run 19.
+      notes: Action/catalog metadata, continuity-contract validation, complete unit/integration tests, Python compilation, Bash and inline-shell syntax, JSON/YAML parsing, caller-owned publication fixture, reusable Repository Intelligence generation/provenance, publication review, exact reviewed-byte preservation, and review-only output confirmation passed.
+    - command: GitHub Actions Relay continuity preflight run 35114787533, run 21.
       outcome: passed
       notes: Shared continuity adapter and bounded evidence path passed on the implementation candidate.
-    - command: GitHub Actions Dependency review run 35112286544, run 26.
+    - command: GitHub Actions Dependency review run 35114783148, run 28.
       outcome: passed
-      notes: Dependency review passed; Dependabot automerge run 35112281318 / #26 skipped as expected.
+      notes: Dependency review passed; Dependabot automerge run 35114783119 / #28 skipped as expected.
   environment_limitations:
-    - Direct GitHub network access from the local shell is unavailable; repository reads, writes, and validation status use the connected GitHub integration.
+    - Direct GitHub network access from the local shell is unavailable; repository reads, writes, and validation evidence use the connected GitHub integration and GitHub Actions.
 roadmap_impact:
-  disposition: no-state-transition
-  rationale: REL-RI-006 remains active. Health is the sixth bounded repository supporting-view candidate, but deterministic publication and the organization dashboard remain incomplete. ROADMAP.md therefore keeps its current state until reviewed evidence warrants reconciliation.
+  disposition: evidence-reconciled-no-state-transition
+  rationale: REL-RI-006 remains active. All six bounded supporting views are merged and #90 restores reusable workflow evidence parity, but parent #33 still requires representative hardened consumer migrations and public-route/canary proof before deterministic publication is complete.
 adr_impact:
   disposition: none
-  rationale: The change follows ADR-007 and Observatory's accepted Health contract without changing authority, dependency direction, public contract ownership, or system boundaries.
+  rationale: No authority or dependency direction changed. The checkpoint reinforces ADR-003 immutable consumer references, ADR-006 workflow catalog authority, and ADR-007 Observatory truth / Relay static composition / consumer-owned deployment.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -124,69 +129,93 @@ privacy:
 
 ## Current checkpoint
 
-Issue #88 implements the sixth bounded `REL-RI-006` supporting view: `/health/`.
-Observatory owns normalized core Health truth; Relay statically presents the supplied
-checks and evidence states without upgrading them into fleet conformance or a score.
+Issue #90 is the current bounded child of `relay#33` and `REL-RI-006`. It fixes
+one concrete orchestration drift: the Repository Intelligence composite action
+already supported Observatory snapshot plus structural comparison evidence, but
+the reusable artifact workflow could forward only the snapshot.
 
 ## Candidate implementation
 
-Branch: `feat/88-repository-intelligence-health`
+Branch: `feat/90-repository-intelligence-workflow-parity`
 
 Implementation revision:
-`4c7c758f079f6ef69d092d372528c39461a1ebd8`
+`470b83a64b0e35c0f383b9e3a314161347a5087f`
 
-Pull request: https://github.com/egohygiene/relay/pull/89
+Pull request: https://github.com/egohygiene/relay/pull/91
 
 The implementation:
 
-- renders check-state posture, normalized check records, assertion/freshness distributions, stale IDs, and unknown IDs;
-- keeps represented commit and snapshot freshness in the existing shared shell;
-- deep-links each normalized check to its canonical evidence;
-- preserves Observatory ordering and explicit unavailable/partial/empty/stale/unknown states;
-- preserves `score: null` and explains why no Relay-local percentage, grade, maturity rating, or security posture is calculated;
-- uses progressive disclosure and existing static-first, mobile, keyboard, screen-reader, and reduced-motion shell behavior;
-- fails closed on unsafe links, duplicate check IDs, contradictory check-state counts, invalid distributions, duplicate/overlapping stale and unknown IDs, freshness-count mismatches, and any non-null score;
-- does not consume unfinished fleet-wide conformance semantics from Observatory #5.
+- exposes optional `observatory-comparison` beside `observatory-snapshot` on both reusable invocation surfaces;
+- forwards both evidence paths unchanged to `$/actions/repository-intelligence` from the exact called Relay revision;
+- leaves malformed/mismatched comparison fail-closed behavior in the underlying action where it already belongs;
+- synchronizes the workflow catalog and adds a dedicated drift test across YAML, catalog, permissions, forwarding, and smoke behavior;
+- keeps the workflow statically `contents: read`, ordinary-artifact-only, and free of Pages deployment authority;
+- documents that direct action use is correct for caller-owned site composition while the reusable workflow is a standalone review-artifact boundary;
+- records Empathy and Akashic as live direct-action/consumer-owned Pages integrations without claiming they have completed the hardened reusable-workflow migration;
+- preserves the no-snapshot Relay smoke path as explicit partial-adoption coverage.
 
 ## Validation evidence
 
-On implementation revision `4c7c758f079f6ef69d092d372528c39461a1ebd8`:
+On implementation revision `470b83a64b0e35c0f383b9e3a314161347a5087f`:
 
-- `Validate Relay actions` run 35112288260 / #68 passed its complete chain.
-- `Relay continuity preflight` run 35112288292 / #19 passed.
-- `Dependency review` run 35112286544 / #26 passed.
-- Dependabot automerge run 35112281318 / #26 skipped as expected.
+- `Validate Relay actions` run 35114787480 / #71 passed its complete chain.
+- `Relay continuity preflight` run 35114787533 / #21 passed.
+- `Dependency review` run 35114783148 / #28 passed.
+- Dependabot automerge run 35114783119 / #28 skipped as expected.
 
-This continuity-only update creates a new final PR head. Verify the same required
-workflows on that exact head before merge.
+This continuity-only update creates a new final PR head. The diff from the
+independently green implementation revision must contain only `CONTINUITY.md`,
+and the same required workflows must pass on that exact final head before merge.
+
+## Architecture boundary
+
+```text
+canonical repository + authorized evidence
+        ↓
+Relay reusable artifact workflow
+        ↓
+Relay Repository Intelligence builder
+        ↓
+validated static /intelligence/ artifact
+        ↓
+consumer-owned site composition / deployment
+```
+
+The reusable workflow does not become a deployer. Observatory still owns
+normalized snapshot/comparison truth; Relay validates/composes static artifacts;
+the consumer remains the only owner of its authoritative site deployment.
 
 ## Roadmap and decision reconciliation
 
-`REL-RI-006` remains active. Dependencies (#77/#78), Work (#79/#80), Releases
-(#81/#82), Search (#83/#85), and Compare (#86/#87) are merged; Health (#88/#89)
-is the current candidate. No roadmap state transition is appropriate yet.
+`REL-RI-006` remains active. Dependencies, Work, Releases, Search, Compare, and
+core Health are merged. `ROADMAP.md` now records #90 as the current #33 child
+and preserves representative consumer migrations/public-route verification as
+the remaining deterministic-publication proof.
 
-No new ADR is required. The implementation follows ADR-007: Observatory owns
-normalized truth; Relay owns static composition and validated publication artifacts.
+No new ADR is required. This checkpoint follows ADR-003, ADR-006, and ADR-007.
 
-## Blockers and deferred work
+## Known limitations and gates
 
-- No implementation blocker remains for core `/health/`; final-head CI and review remain.
-- Fleet-wide Hygiene conformance remains gated by Observatory #5 and must not be inferred from core Health evidence.
-- Organization `/roadmap/` remains gated by Hygiene #60 and Observatory #22; `.github#29` must not invent the missing organization-roadmap semantics.
-- Deterministic Repository Intelligence publication/canary rollout remains owned by Relay #33.
+- Parent #33 remains open; this PR restores orchestration parity but does not prove the required real consumer migrations by itself.
+- Empathy and Akashic currently prove immutable-pinned direct-action composition and public Pages integration, not the final hardened workflow migration target.
+- The reusable workflow cannot inject files dynamically produced by another job into its checkout; callers needing generated evidence and site composition should use the composite action in the owning job until a reviewed artifact-transfer contract exists.
+- Organization `/roadmap/` remains gated by open Hygiene #60 and Observatory #22; `.github#29` must not invent those semantics.
+- Fleet-wide Hygiene conformance remains separately gated by open Observatory #5.
 
 ## Next dependency-ready work
 
-After #89 merges, re-fetch Relay #33 and the organization-roadmap upstream chain.
-If Hygiene #60 or Observatory #22 is still open, prefer the bounded deterministic
-publication/canary checkpoint in #33. Pivot to Organization Intelligence `/roadmap/`
-only after its normalized upstream contract is accepted.
+After PR #91 merges, continue `relay#33` with the first real representative
+consumer canary. Prefer an already-public Repository Intelligence consumer such
+as Empathy: pin one reviewed current Relay revision, verify deterministic
+`/intelligence/` publication and route preservation in its existing Pages build,
+and capture failure/rollback behavior without adding a second deployment owner.
+Then repeat on a materially different second consumer (Akashic is an existing
+candidate) before considering #33 complete.
 
 ## Resume protocol
 
-1. Verify newest Relay `main`, issue #88, PR #89, and exact-head checks.
-2. Re-read #29, #33, `REL-RI-006`, and ADR-007 before selecting more work.
-3. Re-fetch Hygiene #60, Observatory #22/#5, `.github#29`, and `.github#30` before organization work.
-4. Do not duplicate a route with an open implementation PR.
-5. Keep one bounded visual checkpoint per PR and reconcile continuity before handoff.
+1. Verify newest Relay `main`, issue #90, PR #91, and exact final-head checks.
+2. Verify that the implementation-to-final diff is continuity-only.
+3. Keep #33 and REL-RI-006 open after #91 unless representative consumer canary acceptance is separately satisfied.
+4. Re-fetch live Empathy/Akashic integration state before selecting the next canary; do not overwrite parallel consumer work.
+5. Preserve Observatory truth, Relay static composition, and consumer-owned deployment in every canary.
