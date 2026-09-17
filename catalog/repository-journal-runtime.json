@@ -1,0 +1,120 @@
+{
+  "$schema": "../schemas/repository-journal-runtime-profile.v1.schema.json",
+  "schema_version": "relay.repository-journal-runtime-profile/v1",
+  "version": "1.0.0-alpha.1",
+  "status": "proposed",
+  "owner": "egohygiene/relay",
+  "updated": "2026-09-17",
+  "purpose": "Bind repository-journal agent execution to one checksum-locked Copilot CLI runtime, explicit authentication modes, bounded cost, and fail-closed connection evidence.",
+  "toolchain": {
+    "node": {
+      "minimum_major": 22,
+      "selected_major": 24
+    },
+    "package": {
+      "name": "@github/copilot",
+      "version": "1.0.85",
+      "integrity": "sha512-cZ/4wZ7hHkfRs+zlMJLv9WmQhl1qZgQW/Edq0nEBBTmoHacc+BJZ4YUPVKTfwHwd8k+FeB4S27fhZasVjJPCHw==",
+      "license": "SEE LICENSE IN LICENSE.md",
+      "repository": "https://github.com/github/copilot-cli"
+    },
+    "lock": {
+      "manifest_path": "vendor/copilot-cli/package.json",
+      "manifest_sha256": "3f3af15ded15f300e1e39d4bab3f3363ac2c794ebd64830a673374af35a1f4bf",
+      "lock_path": "vendor/copilot-cli/package-lock.json",
+      "lock_sha256": "906fad5a71aa4029cba0def9a55a034d6351368f790c191bcb6cc8021c6df506",
+      "install_command": [
+        "npm",
+        "ci",
+        "--ignore-scripts",
+        "--no-audit",
+        "--no-fund"
+      ]
+    }
+  },
+  "authentication": {
+    "preferred": {
+      "mode": "github-token",
+      "credential_environment": "GITHUB_TOKEN",
+      "required_workflow_permissions": {
+        "contents": "read",
+        "copilot-requests": "write"
+      },
+      "organization_policy": "allow-copilot-cli-billed-to-organization",
+      "billing_principal": "organization",
+      "long_lived_secret": false
+    },
+    "fallback": {
+      "mode": "fine-grained-pat",
+      "workflow_secret": "REPOSITORY_JOURNAL_COPILOT_TOKEN",
+      "credential_environment": "COPILOT_GITHUB_TOKEN",
+      "required_account_permission": "Copilot Requests",
+      "required_token_prefix": "github_pat_",
+      "repository_access": "selected-repositories",
+      "billing_principal": "token-owner",
+      "automatic": false,
+      "classic_pat_allowed": false
+    },
+    "credential_precedence": [
+      "COPILOT_GITHUB_TOKEN",
+      "GH_TOKEN",
+      "GITHUB_TOKEN"
+    ],
+    "unexpected_credential_behavior": "fail-closed"
+  },
+  "execution": {
+    "mode": "programmatic",
+    "interactive_authentication": "forbidden",
+    "credential_persistence": "forbidden",
+    "repository_checkout": "forbidden",
+    "consumer_code_execution": "forbidden",
+    "tool_authority": "deny-by-default",
+    "maximum_agent_invocations_per_run": 1,
+    "maximum_attempts_per_invocation": 1,
+    "timeout_minutes": 5
+  },
+  "cost": {
+    "preferred_billing": "organization-metered",
+    "fallback_billing": "token-owner-seat",
+    "automatic_fallback": false,
+    "maximum_scheduled_runs_per_day": 1,
+    "usage_observation": "github-organization-billing-and-usage"
+  },
+  "failure": {
+    "default_outcome": "unavailable",
+    "preflight_authorizes_journal": false,
+    "fail_closed_on": [
+      "cli-unavailable",
+      "cli-version-mismatch",
+      "credential-missing",
+      "credential-type-unsupported",
+      "credential-precedence-conflict",
+      "organization-policy-disabled",
+      "organization-policy-unverified",
+      "permission-missing",
+      "permission-unverified",
+      "billing-unacknowledged",
+      "authentication-rejected",
+      "rate-limited"
+    ],
+    "secret_output": "forbidden"
+  },
+  "connection": {
+    "status": "manual-verification-required",
+    "live_probe": "deferred-until-user-authorized",
+    "required_checks": [
+      "organization-policy-enabled",
+      "workflow-permission-granted",
+      "billing-principal-acknowledged",
+      "exact-cli-version-observed",
+      "approved-credential-present",
+      "conflicting-credentials-absent"
+    ]
+  },
+  "references": [
+    "https://docs.github.com/en/copilot/concepts/agents/copilot-cli/copilot-cli-in-github-actions",
+    "https://docs.github.com/en/copilot/how-tos/copilot-cli/use-copilot-cli-in-actions",
+    "https://docs.github.com/en/copilot/how-tos/copilot-cli/set-up-copilot-cli/authenticate-copilot-cli",
+    "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-programmatic-reference"
+  ]
+}

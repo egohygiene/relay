@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/repository-journal-runtime-preflight-result/v1/schema.json",
+  "title": "Relay repository journal runtime preflight result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "profile_version",
+    "profile_sha256",
+    "status",
+    "auth_mode",
+    "safe_to_invoke",
+    "checks",
+    "observed",
+    "failure_reasons"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "relay.repository-journal-runtime-preflight-result/v1"
+    },
+    "profile_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "profile_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "unavailable"
+      ]
+    },
+    "auth_mode": {
+      "enum": [
+        "github-token",
+        "fine-grained-pat"
+      ]
+    },
+    "safe_to_invoke": {
+      "type": "boolean"
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cli_version",
+        "credential",
+        "credential_precedence",
+        "organization_policy",
+        "permission",
+        "billing"
+      ],
+      "properties": {
+        "cli_version": {
+          "$ref": "#/$defs/checkStatus"
+        },
+        "credential": {
+          "$ref": "#/$defs/checkStatus"
+        },
+        "credential_precedence": {
+          "$ref": "#/$defs/checkStatus"
+        },
+        "organization_policy": {
+          "$ref": "#/$defs/checkStatus"
+        },
+        "permission": {
+          "$ref": "#/$defs/checkStatus"
+        },
+        "billing": {
+          "$ref": "#/$defs/checkStatus"
+        }
+      }
+    },
+    "observed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cli_version",
+        "credential_present",
+        "policy_state",
+        "permission_state",
+        "billing_acknowledged",
+        "conflicting_environment_variables"
+      ],
+      "properties": {
+        "cli_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "credential_present": {
+          "type": "boolean"
+        },
+        "policy_state": {
+          "enum": [
+            "enabled",
+            "disabled",
+            "unknown",
+            "not-applicable"
+          ]
+        },
+        "permission_state": {
+          "enum": [
+            "granted",
+            "missing",
+            "unknown"
+          ]
+        },
+        "billing_acknowledged": {
+          "type": "boolean"
+        },
+        "conflicting_environment_variables": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "COPILOT_GITHUB_TOKEN",
+              "GH_TOKEN"
+            ]
+          }
+        }
+      }
+    },
+    "failure_reasons": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/failureReason"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "ready"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "safe_to_invoke": {
+            "const": true
+          },
+          "failure_reasons": {
+            "maxItems": 0
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "safe_to_invoke": {
+            "const": false
+          },
+          "failure_reasons": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "checkStatus": {
+      "enum": [
+        "pass",
+        "fail",
+        "not-applicable"
+      ]
+    },
+    "failureReason": {
+      "enum": [
+        "cli-unavailable",
+        "cli-version-mismatch",
+        "credential-missing",
+        "credential-type-unsupported",
+        "credential-precedence-conflict",
+        "organization-policy-disabled",
+        "organization-policy-unverified",
+        "permission-missing",
+        "permission-unverified",
+        "billing-unacknowledged"
+      ]
+    }
+  }
+}

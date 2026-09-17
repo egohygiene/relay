@@ -1,0 +1,416 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/repository-journal-runtime-profile/v1/schema.json",
+  "title": "Relay repository journal runtime profile v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "version",
+    "status",
+    "owner",
+    "updated",
+    "purpose",
+    "toolchain",
+    "authentication",
+    "execution",
+    "cost",
+    "failure",
+    "connection",
+    "references"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "../schemas/repository-journal-runtime-profile.v1.schema.json"
+    },
+    "schema_version": {
+      "const": "relay.repository-journal-runtime-profile/v1"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-alpha\\.[0-9]+)?$"
+    },
+    "status": {
+      "enum": [
+        "proposed",
+        "active",
+        "deprecated"
+      ]
+    },
+    "owner": {
+      "const": "egohygiene/relay"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date"
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node",
+        "package",
+        "lock"
+      ],
+      "properties": {
+        "node": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "minimum_major",
+            "selected_major"
+          ],
+          "properties": {
+            "minimum_major": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "selected_major": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "package": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "version",
+            "integrity",
+            "license",
+            "repository"
+          ],
+          "properties": {
+            "name": {
+              "const": "@github/copilot"
+            },
+            "version": {
+              "type": "string",
+              "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+            },
+            "integrity": {
+              "type": "string",
+              "pattern": "^sha512-[A-Za-z0-9+/]+={0,2}$"
+            },
+            "license": {
+              "type": "string",
+              "minLength": 1
+            },
+            "repository": {
+              "const": "https://github.com/github/copilot-cli"
+            }
+          }
+        },
+        "lock": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "manifest_path",
+            "manifest_sha256",
+            "lock_path",
+            "lock_sha256",
+            "install_command"
+          ],
+          "properties": {
+            "manifest_path": {
+              "const": "vendor/copilot-cli/package.json"
+            },
+            "manifest_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "lock_path": {
+              "const": "vendor/copilot-cli/package-lock.json"
+            },
+            "lock_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "install_command": {
+              "const": [
+                "npm",
+                "ci",
+                "--ignore-scripts",
+                "--no-audit",
+                "--no-fund"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "preferred",
+        "fallback",
+        "credential_precedence",
+        "unexpected_credential_behavior"
+      ],
+      "properties": {
+        "preferred": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "credential_environment",
+            "required_workflow_permissions",
+            "organization_policy",
+            "billing_principal",
+            "long_lived_secret"
+          ],
+          "properties": {
+            "mode": {
+              "const": "github-token"
+            },
+            "credential_environment": {
+              "const": "GITHUB_TOKEN"
+            },
+            "required_workflow_permissions": {
+              "const": {
+                "contents": "read",
+                "copilot-requests": "write"
+              }
+            },
+            "organization_policy": {
+              "const": "allow-copilot-cli-billed-to-organization"
+            },
+            "billing_principal": {
+              "const": "organization"
+            },
+            "long_lived_secret": {
+              "const": false
+            }
+          }
+        },
+        "fallback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "workflow_secret",
+            "credential_environment",
+            "required_account_permission",
+            "required_token_prefix",
+            "repository_access",
+            "billing_principal",
+            "automatic",
+            "classic_pat_allowed"
+          ],
+          "properties": {
+            "mode": {
+              "const": "fine-grained-pat"
+            },
+            "workflow_secret": {
+              "const": "REPOSITORY_JOURNAL_COPILOT_TOKEN"
+            },
+            "credential_environment": {
+              "const": "COPILOT_GITHUB_TOKEN"
+            },
+            "required_account_permission": {
+              "const": "Copilot Requests"
+            },
+            "required_token_prefix": {
+              "const": "github_pat_"
+            },
+            "repository_access": {
+              "const": "selected-repositories"
+            },
+            "billing_principal": {
+              "const": "token-owner"
+            },
+            "automatic": {
+              "const": false
+            },
+            "classic_pat_allowed": {
+              "const": false
+            }
+          }
+        },
+        "credential_precedence": {
+          "const": [
+            "COPILOT_GITHUB_TOKEN",
+            "GH_TOKEN",
+            "GITHUB_TOKEN"
+          ]
+        },
+        "unexpected_credential_behavior": {
+          "const": "fail-closed"
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "interactive_authentication",
+        "credential_persistence",
+        "repository_checkout",
+        "consumer_code_execution",
+        "tool_authority",
+        "maximum_agent_invocations_per_run",
+        "maximum_attempts_per_invocation",
+        "timeout_minutes"
+      ],
+      "properties": {
+        "mode": {
+          "const": "programmatic"
+        },
+        "interactive_authentication": {
+          "const": "forbidden"
+        },
+        "credential_persistence": {
+          "const": "forbidden"
+        },
+        "repository_checkout": {
+          "const": "forbidden"
+        },
+        "consumer_code_execution": {
+          "const": "forbidden"
+        },
+        "tool_authority": {
+          "const": "deny-by-default"
+        },
+        "maximum_agent_invocations_per_run": {
+          "const": 1
+        },
+        "maximum_attempts_per_invocation": {
+          "const": 1
+        },
+        "timeout_minutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "preferred_billing",
+        "fallback_billing",
+        "automatic_fallback",
+        "maximum_scheduled_runs_per_day",
+        "usage_observation"
+      ],
+      "properties": {
+        "preferred_billing": {
+          "const": "organization-metered"
+        },
+        "fallback_billing": {
+          "const": "token-owner-seat"
+        },
+        "automatic_fallback": {
+          "const": false
+        },
+        "maximum_scheduled_runs_per_day": {
+          "const": 1
+        },
+        "usage_observation": {
+          "const": "github-organization-billing-and-usage"
+        }
+      }
+    },
+    "failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default_outcome",
+        "preflight_authorizes_journal",
+        "fail_closed_on",
+        "secret_output"
+      ],
+      "properties": {
+        "default_outcome": {
+          "const": "unavailable"
+        },
+        "preflight_authorizes_journal": {
+          "const": false
+        },
+        "fail_closed_on": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/failureReason"
+          }
+        },
+        "secret_output": {
+          "const": "forbidden"
+        }
+      }
+    },
+    "connection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "live_probe",
+        "required_checks"
+      ],
+      "properties": {
+        "status": {
+          "const": "manual-verification-required"
+        },
+        "live_probe": {
+          "const": "deferred-until-user-authorized"
+        },
+        "required_checks": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "organization-policy-enabled",
+              "workflow-permission-granted",
+              "billing-principal-acknowledged",
+              "exact-cli-version-observed",
+              "approved-credential-present",
+              "conflicting-credentials-absent"
+            ]
+          }
+        }
+      }
+    },
+    "references": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "format": "uri",
+        "pattern": "^https://docs\\.github\\.com/"
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "failureReason": {
+      "enum": [
+        "cli-unavailable",
+        "cli-version-mismatch",
+        "credential-missing",
+        "credential-type-unsupported",
+        "credential-precedence-conflict",
+        "organization-policy-disabled",
+        "organization-policy-unverified",
+        "permission-missing",
+        "permission-unverified",
+        "billing-unacknowledged",
+        "authentication-rejected",
+        "rate-limited"
+      ]
+    }
+  }
+}
