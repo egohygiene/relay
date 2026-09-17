@@ -14,6 +14,7 @@ and deployment.
 | ---------- | --------------- |
 | Repository Intelligence site | `egohygiene/relay/actions/repository-intelligence@v1` |
 | Canonical labels and pull-request metadata | `egohygiene/relay/actions/repository-labels@v1` |
+| Warning-first stale pull-request lifecycle | `egohygiene/relay/actions/stale-pull-requests@v1` |
 | Scanner report normalization | `egohygiene/relay/actions/normalize-repository-report@v1` |
 | Guarded report snapshot publication | `egohygiene/relay/actions/publish-report-snapshot@v1` |
 | Opinionated intelligence artifact workflow | `egohygiene/relay/.github/workflows/repository-intelligence.yml@v1` |
@@ -30,6 +31,7 @@ and deployment.
 | Reviewed canonical label apply | `egohygiene/relay/.github/workflows/label-sync-apply.yml@v1` |
 | Read-only pull-request label plan | `egohygiene/relay/.github/workflows/pull-request-label-plan.yml@v1` |
 | Trusted pull-request label apply | `egohygiene/relay/.github/workflows/pull-request-label-apply.yml@v1` |
+| Advisory-first stale pull-request lifecycle | `egohygiene/relay/.github/workflows/stale-pull-requests.yml@v1` |
 
 These moving aliases advertise the release surface. Production consumers use a
 reviewed full commit SHA, as shown below.
@@ -153,6 +155,28 @@ not infer active work from analytics. Private collection data remains in the
 configured work directory—`.cache/repository-intelligence/` by default—and
 must never be uploaded as site content. Only a bundle whose provenance is
 classified `public-safe` is eligible for public-site composition.
+
+## Manage stale pull requests without silent closure
+
+The stale pull-request workflow evaluates open work in a read-only job and
+uploads a checksum-bound plan before any mutation is possible. Advisory mode is
+the default. Its matching apply job runs only when the caller explicitly sets
+`advisory: false` and grants write permission; closure remains independently
+disabled until `close-enabled: true` is also reviewed. The default conditional
+path has only pull-request authority. Issues permissions appear only in the
+alternate jobs selected by `process-issues: true`.
+
+Every automated close requires both the configured stale label and a visible,
+trusted Relay warning marker from an earlier run. New activity, a reopen event,
+or an explicit exemption prevents closure and clears lifecycle labels on the
+next enforcing run. Drafts and bot-authored work are exempt by default, as are
+the `do-not-stale`, `pinned`, `critical`, `security`, `dependencies`,
+`priority:p0`, and `area:security` labels. Issue processing is disabled unless
+the caller opts in explicitly.
+
+The caller owns the schedule and repository labels. See the
+[minimal scheduled integration](examples/workflows/stale-pull-requests.md) for
+read-only adoption, enforcement permissions, recovery, and immutable pinning.
 
 ## Architecture boundary
 

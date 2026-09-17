@@ -13,9 +13,15 @@ Relay v1.1.0 commit. A reviewed dependency update replaces both the full commit
 SHA and its adjacent release comment. The moving `v1` alias is useful for
 discovery but is not a production pin.
 
-The reusable workflow owns checkout, generation, provenance verification, and
-ordinary artifact upload. It does not deploy Pages, write repository content,
-or receive caller secrets. A consumer that needs site composition should use
+[`stale-pull-requests.md`](stale-pull-requests.md) shows the consumer-owned
+scheduled caller. It starts with read-only advisory evidence, then documents
+the separate write authority required for warnings, resets, and optional
+warning-gated closure.
+
+The Repository Intelligence reusable workflow owns checkout, generation,
+provenance verification, and ordinary artifact upload. It does not deploy
+Pages, write repository content, or receive caller secrets. A consumer that
+needs site composition should use
 the composite action in its existing build job instead.
 
 ## Publication Pages lifecycle

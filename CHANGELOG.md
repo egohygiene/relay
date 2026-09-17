@@ -8,6 +8,9 @@ All notable changes to Relay are documented in this file. The format follows
 
 ### Added
 
+- An advisory-first stale pull-request action and reusable workflow with
+  explicit exemptions, checksum-bound plans, mandatory visible warnings,
+  optional delayed closure, bounded summaries, and reopen recovery.
 - A documented quarantine and graduation lifecycle for legacy GitHub Actions,
   with inert provenance evidence and executable guards against accidental
   activation or catalog inclusion.

@@ -419,6 +419,60 @@
       "consumer_ref": "egohygiene/relay/.github/workflows/pull-request-label-apply.yml@v1"
     },
     {
+      "id": "stale-pull-requests",
+      "path": ".github/workflows/stale-pull-requests.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Evaluate inactivity and explicit exemptions under a conditional read-only permission boundary, then optionally apply the exact warning-first lifecycle plan; Issues authority exists only when issue processing is explicitly enabled.",
+      "audience": "reusable",
+      "status": "beta",
+      "triggers": ["workflow_call"],
+      "permissions": {
+        "actions": "read",
+        "contents": "read",
+        "issues": "write",
+        "pull-requests": "write"
+      },
+      "timeout_minutes": 10,
+      "concurrency": {
+        "group": "relay-stale-pull-requests-${{ github.repository }}",
+        "cancel_in_progress": false
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": true,
+        "retry": "fresh-run",
+        "description": "A non-default-branch apply, invalid bounds, missing labels, incomplete provider evidence, plan checksum drift, or moved live state fails before mutation. Provider failure during a multi-item apply may leave earlier writes visible. Fresh runs reconcile open-item warnings and resets; optional metadata that fails after a successful close needs maintainer review or reopen recovery. No item can close without its own prior trusted warning marker."
+      },
+      "inputs": [
+        {"name": "advisory", "type": "boolean", "required": false, "default": true, "description": "Plan and summarize lifecycle changes without mutating provider state."},
+        {"name": "inactivity-days", "type": "number", "required": false, "default": 30, "description": "Positive whole inactive days before an open item becomes warning-eligible."},
+        {"name": "warning-days", "type": "number", "required": false, "default": 7, "description": "Positive whole days after Relay's visible warning before closure is eligible."},
+        {"name": "stale-label", "type": "string", "required": false, "default": "stale", "description": "Existing repository label marking Relay's visible warning phase."},
+        {"name": "closed-label", "type": "string", "required": false, "default": "", "description": "Existing optional label retained on items closed by Relay."},
+        {"name": "exempt-labels", "type": "string", "required": false, "default": "do-not-stale,pinned,critical,security,dependencies,priority:p0,area:security", "description": "Comma-separated exact labels that exempt an item from this lifecycle."},
+        {"name": "exempt-users", "type": "string", "required": false, "default": "", "description": "Comma-separated author, assignee, or requested-reviewer logins to exempt."},
+        {"name": "exempt-review-teams", "type": "string", "required": false, "default": "", "description": "Comma-separated requested-review team slugs to exempt without resolving organization membership."},
+        {"name": "exempt-drafts", "type": "boolean", "required": false, "default": true, "description": "Exempt draft pull requests."},
+        {"name": "exempt-bots", "type": "boolean", "required": false, "default": true, "description": "Exempt pull requests and issues authored by bot accounts."},
+        {"name": "process-issues", "type": "boolean", "required": false, "default": false, "description": "Explicitly opt issues into the same lifecycle."},
+        {"name": "close-enabled", "type": "boolean", "required": false, "default": false, "description": "Permit warned items to become closure-eligible after the warning window."},
+        {"name": "maximum-items", "type": "number", "required": false, "default": 100, "description": "Maximum lifecycle changes proposed in one bounded run; whole number 1 through 100."},
+        {"name": "warning-message", "type": "string", "required": false, "default": "", "description": "Optional warning text before Relay appends its lifecycle marker."},
+        {"name": "close-message", "type": "string", "required": false, "default": "", "description": "Optional closure text before Relay appends recovery guidance and its lifecycle marker."},
+        {"name": "artifact-retention-days", "type": "number", "required": false, "default": 14, "description": "Retention for the checksum-bound advisory plan and apply evidence."}
+      ],
+      "outputs": [
+        {"name": "plan-artifact-name", "type": "string", "required": true, "description": "Artifact containing the checksum-bound lifecycle plan."},
+        {"name": "plan-sha256", "type": "string", "required": true, "description": "SHA-256 binding the exact evaluated plan."},
+        {"name": "candidate-count", "type": "string", "required": true, "description": "Items with a proposed warning, closure, or lifecycle reset."},
+        {"name": "warning-count", "type": "string", "required": true, "description": "Items that would enter or repair the visible warning phase."},
+        {"name": "closure-count", "type": "string", "required": true, "description": "Previously warned items eligible for closure in this run."},
+        {"name": "reset-count", "type": "string", "required": true, "description": "Items whose managed lifecycle labels would be cleared."},
+        {"name": "exemption-count", "type": "string", "required": true, "description": "Exempt items, including exempt items with a proposed lifecycle reset."}
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/stale-pull-requests.yml@v1"
+    },
+    {
       "id": "publication-review",
       "path": ".github/workflows/publication-review.yml",
       "owner": "egohygiene/relay",

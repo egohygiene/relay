@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-09-16
+updated: 2026-09-17
 governed_by:
   - architecture-roadmap
 depends_on:
@@ -33,7 +33,7 @@ repository: egohygiene/relay
 visibility: public
 publication: central
 route: /roadmap/relay/
-updated: 2026-09-16
+updated: 2026-09-17
 -->
 ## 2026-08-25 execution snapshot
 
@@ -435,7 +435,9 @@ consumer evidence is tracked in Phase 5.
 
 **Status:** `v1.0.0` through `v1.5.0` are published immutably. The current
 release declaration, changelog, and version authority prepare the additive
-`v1.6.0` product-facing release-name contract for explicit manual dispatch.
+`v1.6.0` surface: product-facing release names, legacy-workflow intake policy,
+and advisory-first stale pull-request lifecycle automation. Publication remains
+an explicit manual dispatch after review.
 
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 

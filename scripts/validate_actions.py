@@ -451,7 +451,7 @@ def validate_workflow_catalog(repository_root: Path, errors: list[str]) -> None:
             errors.append(f"{label}.failure_semantics is incomplete")
         elif (
             failure.get("mode") not in {"fail-closed", "resume-verified-release"}
-            or failure.get("partial_success") is not False
+            or not isinstance(failure.get("partial_success"), bool)
             or failure.get("retry") not in {"fresh-run", "matching-commit-only"}
             or not isinstance(failure.get("description"), str)
             or not failure["description"].strip()

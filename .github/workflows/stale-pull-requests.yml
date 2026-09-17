@@ -1,0 +1,398 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Stale Pull Request Lifecycle
+
+on:
+  workflow_call:
+    inputs:
+      advisory:
+        description: Plan and summarize lifecycle changes without mutating provider state.
+        required: false
+        type: boolean
+        default: true
+      inactivity-days:
+        description: Positive whole inactive days before an open item becomes warning-eligible.
+        required: false
+        type: number
+        default: 30
+      warning-days:
+        description: Positive whole days after Relay's visible warning before closure is eligible.
+        required: false
+        type: number
+        default: 7
+      stale-label:
+        description: Existing repository label marking Relay's visible warning phase.
+        required: false
+        type: string
+        default: "stale"
+      closed-label:
+        description: Existing optional label retained on items closed by Relay.
+        required: false
+        type: string
+        default: ""
+      exempt-labels:
+        description: Comma-separated labels that exempt an item from this lifecycle.
+        required: false
+        type: string
+        default: "do-not-stale,pinned,critical,security,dependencies,priority:p0,area:security"
+      exempt-users:
+        description: Comma-separated author, assignee, or requested-reviewer logins to exempt.
+        required: false
+        type: string
+        default: ""
+      exempt-review-teams:
+        description: Comma-separated requested-review team slugs to exempt; this does not resolve organization membership.
+        required: false
+        type: string
+        default: ""
+      exempt-drafts:
+        description: Exempt draft pull requests.
+        required: false
+        type: boolean
+        default: true
+      exempt-bots:
+        description: Exempt pull requests and issues authored by bot accounts.
+        required: false
+        type: boolean
+        default: true
+      process-issues:
+        description: Explicitly opt issues into the same lifecycle; false keeps issue staleness disabled.
+        required: false
+        type: boolean
+        default: false
+      close-enabled:
+        description: Permit warned items to become closure-eligible after the warning window.
+        required: false
+        type: boolean
+        default: false
+      maximum-items:
+        description: Maximum lifecycle changes proposed in one bounded run; whole number 1 through 100.
+        required: false
+        type: number
+        default: 100
+      warning-message:
+        description: Optional warning text; Relay always appends its machine-readable lifecycle marker.
+        required: false
+        type: string
+        default: ""
+      close-message:
+        description: Optional closure text; Relay always appends recovery guidance and its lifecycle marker.
+        required: false
+        type: string
+        default: ""
+      artifact-retention-days:
+        description: Retention for the checksum-bound advisory plan and apply evidence.
+        required: false
+        type: number
+        default: 14
+    outputs:
+      plan-artifact-name:
+        description: Artifact containing the checksum-bound lifecycle plan.
+        value: "${{ jobs.plan_pull_requests.outputs.artifact-name || jobs.plan_pull_requests_and_issues.outputs.artifact-name }}"
+      plan-sha256:
+        description: SHA-256 binding the exact evaluated plan.
+        value: "${{ jobs.plan_pull_requests.outputs.plan-sha256 || jobs.plan_pull_requests_and_issues.outputs.plan-sha256 }}"
+      candidate-count:
+        description: Items with a proposed warning, closure, or lifecycle reset.
+        value: "${{ jobs.plan_pull_requests.outputs.candidate-count || jobs.plan_pull_requests_and_issues.outputs.candidate-count }}"
+      warning-count:
+        description: Items that would enter or repair the visible warning phase.
+        value: "${{ jobs.plan_pull_requests.outputs.warning-count || jobs.plan_pull_requests_and_issues.outputs.warning-count }}"
+      closure-count:
+        description: Previously warned items eligible for closure in this run.
+        value: "${{ jobs.plan_pull_requests.outputs.closure-count || jobs.plan_pull_requests_and_issues.outputs.closure-count }}"
+      reset-count:
+        description: Items whose managed lifecycle labels would be cleared.
+        value: "${{ jobs.plan_pull_requests.outputs.reset-count || jobs.plan_pull_requests_and_issues.outputs.reset-count }}"
+      exemption-count:
+        description: Exempt items, including exempt items with a proposed lifecycle reset.
+        value: "${{ jobs.plan_pull_requests.outputs.exemption-count || jobs.plan_pull_requests_and_issues.outputs.exemption-count }}"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "relay-stale-pull-requests-${{ github.repository }}"
+  cancel-in-progress: false
+
+jobs:
+  plan_pull_requests:
+    name: Evaluate pull-request lifecycle without mutation
+    if: "${{ inputs.process-issues == false }}"
+    permissions:
+      contents: read
+      pull-requests: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      artifact-name: "${{ steps.identity.outputs.artifact-name }}"
+      plan-sha256: "${{ steps.plan.outputs.plan-sha256 }}"
+      candidate-count: "${{ steps.plan.outputs.candidate-count }}"
+      warning-count: "${{ steps.plan.outputs.warning-count }}"
+      closure-count: "${{ steps.plan.outputs.closure-count }}"
+      reset-count: "${{ steps.plan.outputs.reset-count }}"
+      exemption-count: "${{ steps.plan.outputs.exemption-count }}"
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - id: plan
+        name: Build checksum-bound stale lifecycle plan
+        uses: $/actions/stale-pull-requests
+        env:
+          GH_TOKEN: "${{ github.token }}"
+        with:
+          operation: "plan"
+          repository: "${{ github.repository }}"
+          inactivity-days: "${{ inputs.inactivity-days }}"
+          warning-days: "${{ inputs.warning-days }}"
+          stale-label: "${{ inputs.stale-label }}"
+          closed-label: "${{ inputs.closed-label }}"
+          exempt-labels: "${{ inputs.exempt-labels }}"
+          exempt-users: "${{ inputs.exempt-users }}"
+          exempt-review-teams: "${{ inputs.exempt-review-teams }}"
+          exempt-drafts: "${{ inputs.exempt-drafts }}"
+          exempt-bots: "${{ inputs.exempt-bots }}"
+          process-issues: "${{ inputs.process-issues }}"
+          close-enabled: "${{ inputs.close-enabled }}"
+          maximum-items: "${{ inputs.maximum-items }}"
+          warning-message: "${{ inputs.warning-message }}"
+          close-message: "${{ inputs.close-message }}"
+          output: ".relay/stale-pull-request-plan.json"
+
+      - id: identity
+        name: Bind the advisory artifact to its plan checksum
+        shell: bash
+        env:
+          PLAN_SHA256: "${{ steps.plan.outputs.plan-sha256 }}"
+        run: |
+          set -euo pipefail
+          printf 'artifact-name=relay-stale-plan-%s\n' "${PLAN_SHA256}" >> "${GITHUB_OUTPUT}"
+
+      - name: Upload bounded advisory evidence
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "${{ steps.identity.outputs.artifact-name }}"
+          path: ".relay/stale-pull-request-plan.json"
+          if-no-files-found: error
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9
+
+  plan_pull_requests_and_issues:
+    name: Evaluate pull-request and issue lifecycle without mutation
+    if: "${{ inputs.process-issues == true }}"
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      artifact-name: "${{ steps.identity.outputs.artifact-name }}"
+      plan-sha256: "${{ steps.plan.outputs.plan-sha256 }}"
+      candidate-count: "${{ steps.plan.outputs.candidate-count }}"
+      warning-count: "${{ steps.plan.outputs.warning-count }}"
+      closure-count: "${{ steps.plan.outputs.closure-count }}"
+      reset-count: "${{ steps.plan.outputs.reset-count }}"
+      exemption-count: "${{ steps.plan.outputs.exemption-count }}"
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - id: plan
+        name: Build checksum-bound stale lifecycle plan
+        uses: $/actions/stale-pull-requests
+        env:
+          GH_TOKEN: "${{ github.token }}"
+        with:
+          operation: "plan"
+          repository: "${{ github.repository }}"
+          inactivity-days: "${{ inputs.inactivity-days }}"
+          warning-days: "${{ inputs.warning-days }}"
+          stale-label: "${{ inputs.stale-label }}"
+          closed-label: "${{ inputs.closed-label }}"
+          exempt-labels: "${{ inputs.exempt-labels }}"
+          exempt-users: "${{ inputs.exempt-users }}"
+          exempt-review-teams: "${{ inputs.exempt-review-teams }}"
+          exempt-drafts: "${{ inputs.exempt-drafts }}"
+          exempt-bots: "${{ inputs.exempt-bots }}"
+          process-issues: "${{ inputs.process-issues }}"
+          close-enabled: "${{ inputs.close-enabled }}"
+          maximum-items: "${{ inputs.maximum-items }}"
+          warning-message: "${{ inputs.warning-message }}"
+          close-message: "${{ inputs.close-message }}"
+          output: ".relay/stale-pull-request-plan.json"
+
+      - id: identity
+        name: Bind the advisory artifact to its plan checksum
+        shell: bash
+        env:
+          PLAN_SHA256: "${{ steps.plan.outputs.plan-sha256 }}"
+        run: |
+          set -euo pipefail
+          printf 'artifact-name=relay-stale-plan-%s\n' "${PLAN_SHA256}" >> "${GITHUB_OUTPUT}"
+
+      - name: Upload bounded advisory evidence
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "${{ steps.identity.outputs.artifact-name }}"
+          path: ".relay/stale-pull-request-plan.json"
+          if-no-files-found: error
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9
+
+  apply_pull_requests:
+    name: Apply the exact live lifecycle plan
+    needs: plan_pull_requests
+    if: "${{ inputs.advisory == false && inputs.process-issues == false }}"
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Authorize default-branch enforcement
+        shell: bash
+        env:
+          DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
+          REQUESTED_REF: "${{ github.ref }}"
+        run: |
+          set -euo pipefail
+          [[ -n "${DEFAULT_BRANCH}" ]]
+          [[ "${REQUESTED_REF}" == "refs/heads/${DEFAULT_BRANCH}" ]]
+
+      - name: Download the exact checksum-bound plan
+        # actions/download-artifact v7.0.1
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: "${{ needs.plan_pull_requests.outputs.artifact-name }}"
+          path: ".relay/handoff"
+
+      - id: apply
+        name: Revalidate live state and apply authorized changes
+        uses: $/actions/stale-pull-requests
+        env:
+          GH_TOKEN: "${{ github.token }}"
+        with:
+          operation: "apply"
+          repository: "${{ github.repository }}"
+          plan: ".relay/handoff/stale-pull-request-plan.json"
+          expected-plan-sha256: "${{ needs.plan_pull_requests.outputs.plan-sha256 }}"
+          inactivity-days: "${{ inputs.inactivity-days }}"
+          warning-days: "${{ inputs.warning-days }}"
+          stale-label: "${{ inputs.stale-label }}"
+          closed-label: "${{ inputs.closed-label }}"
+          exempt-labels: "${{ inputs.exempt-labels }}"
+          exempt-users: "${{ inputs.exempt-users }}"
+          exempt-review-teams: "${{ inputs.exempt-review-teams }}"
+          exempt-drafts: "${{ inputs.exempt-drafts }}"
+          exempt-bots: "${{ inputs.exempt-bots }}"
+          process-issues: "${{ inputs.process-issues }}"
+          close-enabled: "${{ inputs.close-enabled }}"
+          maximum-items: "${{ inputs.maximum-items }}"
+          warning-message: "${{ inputs.warning-message }}"
+          close-message: "${{ inputs.close-message }}"
+          output: ".relay/stale-pull-request-apply.json"
+
+      - name: Upload apply evidence
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "relay-stale-apply-${{ needs.plan_pull_requests.outputs.plan-sha256 }}"
+          path: ".relay/stale-pull-request-apply.json"
+          if-no-files-found: error
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9
+
+  apply_pull_requests_and_issues:
+    name: Apply the exact live pull-request and issue lifecycle plan
+    needs: plan_pull_requests_and_issues
+    if: "${{ inputs.advisory == false && inputs.process-issues == true }}"
+    permissions:
+      actions: read
+      contents: read
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Authorize default-branch enforcement
+        shell: bash
+        env:
+          DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
+          REQUESTED_REF: "${{ github.ref }}"
+        run: |
+          set -euo pipefail
+          [[ -n "${DEFAULT_BRANCH}" ]]
+          [[ "${REQUESTED_REF}" == "refs/heads/${DEFAULT_BRANCH}" ]]
+
+      - name: Download the exact checksum-bound plan
+        # actions/download-artifact v7.0.1
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: "${{ needs.plan_pull_requests_and_issues.outputs.artifact-name }}"
+          path: ".relay/handoff"
+
+      - id: apply
+        name: Revalidate live state and apply authorized changes
+        uses: $/actions/stale-pull-requests
+        env:
+          GH_TOKEN: "${{ github.token }}"
+        with:
+          operation: "apply"
+          repository: "${{ github.repository }}"
+          plan: ".relay/handoff/stale-pull-request-plan.json"
+          expected-plan-sha256: "${{ needs.plan_pull_requests_and_issues.outputs.plan-sha256 }}"
+          inactivity-days: "${{ inputs.inactivity-days }}"
+          warning-days: "${{ inputs.warning-days }}"
+          stale-label: "${{ inputs.stale-label }}"
+          closed-label: "${{ inputs.closed-label }}"
+          exempt-labels: "${{ inputs.exempt-labels }}"
+          exempt-users: "${{ inputs.exempt-users }}"
+          exempt-review-teams: "${{ inputs.exempt-review-teams }}"
+          exempt-drafts: "${{ inputs.exempt-drafts }}"
+          exempt-bots: "${{ inputs.exempt-bots }}"
+          process-issues: "${{ inputs.process-issues }}"
+          close-enabled: "${{ inputs.close-enabled }}"
+          maximum-items: "${{ inputs.maximum-items }}"
+          warning-message: "${{ inputs.warning-message }}"
+          close-message: "${{ inputs.close-message }}"
+          output: ".relay/stale-pull-request-apply.json"
+
+      - name: Upload apply evidence
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "relay-stale-apply-${{ needs.plan_pull_requests_and_issues.outputs.plan-sha256 }}"
+          path: ".relay/stale-pull-request-apply.json"
+          if-no-files-found: error
+          retention-days: "${{ inputs.artifact-retention-days }}"
+          compression-level: 9

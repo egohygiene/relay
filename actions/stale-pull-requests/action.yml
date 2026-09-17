@@ -1,0 +1,227 @@
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+
+name: "Stale Pull Request Lifecycle"
+description: >-
+  Plan or apply a bounded, checksum-bound stale lifecycle without executing
+  consumer code.
+
+inputs:
+  operation:
+    description: "Plan provider transitions or apply one reviewed plan."
+    required: true
+  repository:
+    description: "Target repository in owner/name form."
+    required: true
+  inactivity-days:
+    description: "Positive whole days without activity before a warning."
+    required: false
+    default: "30"
+  warning-days:
+    description: "Whole days after a trusted warning before closure; minimum one."
+    required: false
+    default: "7"
+  stale-label:
+    description: "Existing repository label that marks the warning state."
+    required: false
+    default: "stale"
+  closed-label:
+    description: "Optional existing label added after a successful close."
+    required: false
+    default: ""
+  exempt-labels:
+    description: "Exact comma-separated label names that exempt an item."
+    required: false
+    default: "do-not-stale,pinned,critical,security,dependencies,priority:p0,area:security"
+  exempt-users:
+    description: >-
+      Exact comma-separated author, assignee, or requested-reviewer logins that
+      exempt an item.
+    required: false
+    default: ""
+  exempt-review-teams:
+    description: "Exact comma-separated currently requested team slugs."
+    required: false
+    default: ""
+  exempt-drafts:
+    description: "Keep draft pull requests outside the lifecycle."
+    required: false
+    default: "true"
+  exempt-bots:
+    description: "Keep bot-authored items outside the lifecycle."
+    required: false
+    default: "true"
+  process-issues:
+    description: "Also evaluate ordinary issues; disabled by default."
+    required: false
+    default: "false"
+  close-enabled:
+    description: "Allow a reviewed apply plan to close warned items."
+    required: false
+    default: "false"
+  maximum-items:
+    description: "Maximum lifecycle changes in one plan; whole number 1 through 100."
+    required: false
+    default: "100"
+  warning-message:
+    description: "Optional visible warning prefix; Relay appends its policy."
+    required: false
+    default: ""
+  close-message:
+    description: "Optional post-close message; Relay appends recovery guidance."
+    required: false
+    default: ""
+  evaluation-time:
+    description: "Plan-only non-future RFC 3339 time for deterministic replay."
+    required: false
+    default: ""
+  plan:
+    description: "Repository-relative checksum-bound plan path for apply."
+    required: false
+    default: ".relay/stale-plan.json"
+  expected-plan-sha256:
+    description: "Reviewed lowercase SHA-256 required by apply."
+    required: false
+    default: ""
+  output:
+    description: "Repository-relative plan or apply-result JSON path."
+    required: false
+    default: ".relay/stale-plan.json"
+
+outputs:
+  result:
+    description: "Repository-relative result path."
+    value: "${{ inputs.output }}"
+  plan-sha256:
+    description: "Checksum binding the exact reviewed plan."
+    value: "${{ steps.lifecycle.outputs.plan-sha256 }}"
+  scanned-count:
+    description: "Number of items represented in the bounded result."
+    value: "${{ steps.lifecycle.outputs.scanned-count }}"
+  candidate-count:
+    description: "Number of warning, closure, or reset candidates."
+    value: "${{ steps.lifecycle.outputs.candidate-count }}"
+  warning-count:
+    description: "Number of planned or applied warnings."
+    value: "${{ steps.lifecycle.outputs.warning-count }}"
+  closure-count:
+    description: "Number of planned or applied closures."
+    value: "${{ steps.lifecycle.outputs.closure-count }}"
+  reset-count:
+    description: "Number of items whose managed lifecycle labels clear."
+    value: "${{ steps.lifecycle.outputs.reset-count }}"
+  exemption-count:
+    description: "Number of exempt items, including exempt lifecycle resets."
+    value: "${{ steps.lifecycle.outputs.exemption-count }}"
+  status:
+    description: "Planned or applied."
+    value: "${{ steps.lifecycle.outputs.status }}"
+
+branding:
+  icon: "clock"
+  color: "orange"
+
+runs:
+  using: "composite"
+  steps:
+    - id: lifecycle
+      name: "🕰️ Resolve stale lifecycle"
+      shell: bash
+      env:
+        GH_TOKEN: "${{ github.token }}"
+        INPUT_CLOSE_ENABLED: "${{ inputs.close-enabled }}"
+        INPUT_CLOSE_MESSAGE: "${{ inputs.close-message }}"
+        INPUT_CLOSED_LABEL: "${{ inputs.closed-label }}"
+        INPUT_EVALUATION_TIME: "${{ inputs.evaluation-time }}"
+        INPUT_EXEMPT_BOTS: "${{ inputs.exempt-bots }}"
+        INPUT_EXEMPT_DRAFTS: "${{ inputs.exempt-drafts }}"
+        INPUT_EXEMPT_LABELS: "${{ inputs.exempt-labels }}"
+        INPUT_EXEMPT_REVIEW_TEAMS: "${{ inputs.exempt-review-teams }}"
+        INPUT_EXEMPT_USERS: "${{ inputs.exempt-users }}"
+        INPUT_EXPECTED_PLAN_SHA256: "${{ inputs.expected-plan-sha256 }}"
+        INPUT_INACTIVITY_DAYS: "${{ inputs.inactivity-days }}"
+        INPUT_MAXIMUM_ITEMS: "${{ inputs.maximum-items }}"
+        INPUT_OPERATION: "${{ inputs.operation }}"
+        INPUT_OUTPUT: "${{ inputs.output }}"
+        INPUT_PLAN: "${{ inputs.plan }}"
+        INPUT_PROCESS_ISSUES: "${{ inputs.process-issues }}"
+        INPUT_REPOSITORY: "${{ inputs.repository }}"
+        INPUT_STALE_LABEL: "${{ inputs.stale-label }}"
+        INPUT_WARNING_DAYS: "${{ inputs.warning-days }}"
+        INPUT_WARNING_MESSAGE: "${{ inputs.warning-message }}"
+      run: |
+        set -euo pipefail
+
+        arguments=(
+          "${INPUT_OPERATION}"
+          --repository "${INPUT_REPOSITORY}"
+          --output "${INPUT_OUTPUT}"
+        )
+        case "${INPUT_OPERATION}" in
+          plan)
+            arguments+=(
+              --inactivity-days "${INPUT_INACTIVITY_DAYS}"
+              --warning-days "${INPUT_WARNING_DAYS}"
+              --stale-label "${INPUT_STALE_LABEL}"
+              --closed-label "${INPUT_CLOSED_LABEL}"
+              --exempt-labels "${INPUT_EXEMPT_LABELS}"
+              --exempt-users "${INPUT_EXEMPT_USERS}"
+              --exempt-review-teams "${INPUT_EXEMPT_REVIEW_TEAMS}"
+              --exempt-drafts "${INPUT_EXEMPT_DRAFTS}"
+              --exempt-bots "${INPUT_EXEMPT_BOTS}"
+              --process-issues "${INPUT_PROCESS_ISSUES}"
+              --close-enabled "${INPUT_CLOSE_ENABLED}"
+              --maximum-items "${INPUT_MAXIMUM_ITEMS}"
+              --warning-message "${INPUT_WARNING_MESSAGE}"
+              --close-message "${INPUT_CLOSE_MESSAGE}"
+              --evaluation-time "${INPUT_EVALUATION_TIME}"
+            )
+            ;;
+          apply)
+            if [[ -n "${INPUT_EVALUATION_TIME}" ]]; then
+              printf 'evaluation-time is plan-only and must be empty during apply\n' >&2
+              exit 2
+            fi
+            arguments+=(
+              --plan "${INPUT_PLAN}"
+              --expected-plan-sha256 "${INPUT_EXPECTED_PLAN_SHA256}"
+              --inactivity-days "${INPUT_INACTIVITY_DAYS}"
+              --warning-days "${INPUT_WARNING_DAYS}"
+              --stale-label "${INPUT_STALE_LABEL}"
+              --closed-label "${INPUT_CLOSED_LABEL}"
+              --exempt-labels "${INPUT_EXEMPT_LABELS}"
+              --exempt-users "${INPUT_EXEMPT_USERS}"
+              --exempt-review-teams "${INPUT_EXEMPT_REVIEW_TEAMS}"
+              --exempt-drafts "${INPUT_EXEMPT_DRAFTS}"
+              --exempt-bots "${INPUT_EXEMPT_BOTS}"
+              --process-issues "${INPUT_PROCESS_ISSUES}"
+              --close-enabled "${INPUT_CLOSE_ENABLED}"
+              --maximum-items "${INPUT_MAXIMUM_ITEMS}"
+              --warning-message "${INPUT_WARNING_MESSAGE}"
+              --close-message "${INPUT_CLOSE_MESSAGE}"
+            )
+            ;;
+          *)
+            printf 'operation must be plan or apply\n' >&2
+            exit 2
+            ;;
+        esac
+
+        python3 "${GITHUB_ACTION_PATH}/scripts/stale_pull_requests.py" "${arguments[@]}"
+        python3 - "${INPUT_OUTPUT}" "${GITHUB_OUTPUT}" <<'PYTHON'
+        import json
+        import sys
+        from pathlib import Path
+
+        result = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+        counts = result["counts"]
+        with Path(sys.argv[2]).open("a", encoding="utf-8") as output:
+            output.write(f"plan-sha256={result['plan_sha256']}\n")
+            output.write(f"scanned-count={counts['scanned']}\n")
+            output.write(f"candidate-count={counts['candidate']}\n")
+            output.write(f"warning-count={counts['warning']}\n")
+            output.write(f"closure-count={counts['closure']}\n")
+            output.write(f"reset-count={counts['reset']}\n")
+            output.write(f"exemption-count={counts['exemption']}\n")
+            output.write(f"status={result['status']}\n")
+        PYTHON
