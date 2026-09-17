@@ -34,6 +34,7 @@ class ActionCatalogTests(unittest.TestCase):
                 "actions/repository-continuity-preflight",
                 "actions/repository-intelligence",
                 "actions/repository-labels",
+                "actions/stale-pull-requests",
                 "actions/validate-release-bundle",
                 "actions/validate-publication-site",
                 "actions/verify-publication-pages",
@@ -62,6 +63,7 @@ class ActionCatalogTests(unittest.TestCase):
                 ".github/workflows/release-prepare.yml",
                 ".github/workflows/repository-intelligence.yml",
                 ".github/workflows/semantic-release.yml",
+                ".github/workflows/stale-pull-requests.yml",
             },
         )
 

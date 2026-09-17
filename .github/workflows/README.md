@@ -130,3 +130,29 @@ static permissions; see the
 [Antidote](../../examples/workflows/publication-pages-antidote.md) and
 [Reflector](../../examples/workflows/publication-pages-reflector.md) examples.
 Production consumers pin the full v1.3.0 Relay commit. Refs #38.
+
+## Stale pull-request lifecycle
+
+`stale-pull-requests.yml` is caller-scheduled and advisory by default. Exactly
+one conditional plan job reads provider metadata, applies explicit exemptions,
+and uploads one checksum-bound lifecycle plan. The default pull-request-only
+path has no Issues permission; the issue-enabled path exists only when
+`process-issues: true`. Neither path checks out or executes consumer code. The
+matching apply job is separately gated by `advisory: false`, downloads that
+exact plan, revalidates live state, and holds the only label, comment, and close
+authority. Its Issues write permission is likewise absent from the default
+pull-request-only path.
+
+No item can close on its first eligible run. Relay first applies the configured
+stale label and posts a visible warning with a versioned marker. A later run may
+close only if the complete warning window has elapsed, the marker and label are
+still present, closure is explicitly enabled, and provider activity has not
+advanced. Activity and reopen events instead clear Relay lifecycle labels.
+Issues remain outside the scan unless `process-issues: true` is explicitly set.
+
+The consumer owns the schedule, label creation, permission ceiling, and mode.
+The apply job also rejects any request not running from the configured default
+branch.
+Start with the [read-only caller](../../examples/workflows/stale-pull-requests.md),
+review the bounded plan, and grant write authority only when warnings or closure
+are intentionally enabled.

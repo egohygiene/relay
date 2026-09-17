@@ -68,6 +68,20 @@
       "consumer_ref": "egohygiene/relay/actions/repository-labels@v1"
     },
     {
+      "id": "stale-pull-requests",
+      "path": "actions/stale-pull-requests",
+      "name": "Stale Pull Request Lifecycle",
+      "summary": "Plan or apply a warning-first pull-request lifecycle with explicit exemptions, bounded evidence, and recoverable closure.",
+      "status": "beta",
+      "runtime": ["bash", "python3", "gh"],
+      "permissions": {
+        "issues": "write",
+        "pull-requests": "write"
+      },
+      "side_effects": ["repository-write", "workspace-write"],
+      "consumer_ref": "egohygiene/relay/actions/stale-pull-requests@v1"
+    },
+    {
       "id": "validate-release-bundle",
       "path": "actions/validate-release-bundle",
       "name": "Validate Release Bundle",
@@ -183,6 +197,20 @@
         "pull-requests": "write"
       },
       "consumer_ref": "egohygiene/relay/.github/workflows/pull-request-label-apply.yml@v1"
+    },
+    {
+      "id": "stale-pull-requests",
+      "path": ".github/workflows/stale-pull-requests.yml",
+      "name": "Stale Pull Request Lifecycle",
+      "summary": "Evaluate pull-request inactivity under read-only authority, then optionally apply the exact warning-first lifecycle plan in a write-scoped job.",
+      "status": "beta",
+      "permissions": {
+        "actions": "read",
+        "contents": "read",
+        "issues": "write",
+        "pull-requests": "write"
+      },
+      "consumer_ref": "egohygiene/relay/.github/workflows/stale-pull-requests.yml@v1"
     },
     {
       "id": "publication-review",

@@ -22,6 +22,7 @@ and failure semantics.
 | `label-sync-apply` | Reusable | `egohygiene/relay` | Recompute and apply an approved label plan | job-scoped `issues: write` | 10 minutes |
 | `pull-request-label-plan` | Reusable | `egohygiene/relay` | Plan PR labels and contributor checks without executing PR code | `contents: read`, `issues: read`, `pull-requests: read` | 10 minutes |
 | `pull-request-label-apply` | Reusable | `egohygiene/relay` | Validate the trusted plan handoff and apply managed metadata | job-scoped `issues: write` and `pull-requests: write` | 10 minutes |
+| `stale-pull-requests` | Reusable | `egohygiene/relay` | Plan inactivity and exemptions, then optionally apply a warning-first stale lifecycle | conditional read-only plan; `pull-requests: write` apply, plus `issues: write` only when issues are opted in | 10 minutes |
 | `dependency-review` | Internal | `egohygiene/relay` | Analyse dependency changes on every pull request and fail on high-severity or denied-license packages | `contents: read` | 10 minutes |
 | `automerge-dependabot` | Internal | `egohygiene/relay` | Classify then auto-approve and merge allowlisted low-risk Dependabot updates after all required checks | job-scoped `contents: write` and `pull-requests: write` | 5 minutes |
 
@@ -100,6 +101,37 @@ workflow identity, event, run, repository, artifact count, and live head/base SH
 before writing. Neither stage uses `pull_request_target` or executes contributor
 code with a token.
 
+Stale pull-request management uses a read/plan/apply boundary inside one
+non-cancelling reusable workflow. Its advisory default runs exactly one of two
+statically scoped read-only plan jobs and preserves a checksum-bound artifact
+plus bounded summary. The pull-request-only path has no Issues permission. Only
+`process-issues: true` selects the alternate plan and apply jobs that add Issues
+authority. The matching conditional apply job must receive explicit caller
+write authority, consumes that exact artifact, and revalidates live item state
+before changing labels, posting comments, or closing. A failure reports no
+successful result; a fresh run converges earlier open-item idempotent mutations.
+GitHub does not provide a transaction across multiple items, so the catalog
+declares bounded partial success: an earlier item may already be updated when a
+later provider call fails, while that run still fails overall. Fresh runs
+reconcile open warnings and resets. If optional metadata fails after the
+provider has already closed an item, a maintainer reviews that closed item or
+reopens it; open-item scans do not pretend that post-close metadata was repaired.
+
+Closure requires the configured stale label and Relay's trusted visible warning
+marker from an earlier run. A manually added label, missing marker, incomplete
+warning window, later activity, exemption, or reopen event cannot authorize
+closure. A partial warning that applied only the label is repaired with a
+visible warning on the next run and still cannot close. Issues are excluded by
+default and enter the same explicit lifecycle only through `process-issues`.
+The Lucide workflow and `actions/stale` v11 informed the lifecycle vocabulary
+but are not runtime dependencies: the reference has divergent message/timing
+settings and disabled closure, while the upstream action does not expose the
+author/team exemptions or bounded candidate/exemption evidence required here.
+The exact marker author is GitHub's repository-wide `github-actions[bot]`
+identity, so every workflow with `issues: write` or `pull-requests: write` is
+inside this trust boundary; the marker does not claim unique workflow-file
+identity.
+
 **Emergency disable**: remove the `automerge-dependabot` workflow file or set
 `if: false` on the `approve-and-merge` job to immediately stop automated
 merges without affecting dependency-review analysis. Disable
@@ -110,12 +142,19 @@ lose the blocking check until a fresh commit re-triggers the workflow.
 push to the default branch. The prior behavior takes effect on the next
 pull-request event. No provider-side state accumulates.
 
+**Stale lifecycle emergency disable**: remove or disable the consumer-owned
+schedule, or return its call to `advisory: true`. Existing labels and closed
+items remain visible provider state. Maintainers may remove lifecycle labels or
+reopen an item; a later enforcing run treats that activity as recovery rather
+than closure authority.
+
 ## Reusable caller contract
 
 `repository-intelligence`, `publication-review`, `publication-pages`,
 `release-artifact`, `release-prepare`, `semantic-release`, `label-sync-plan`,
-`label-sync-apply`, `pull-request-label-plan`, and `pull-request-label-apply` are the
-reusable workflows in v1. Their inputs, defaults, outputs, permission ceilings,
+`label-sync-apply`, `pull-request-label-plan`, `pull-request-label-apply`, and
+`stale-pull-requests` are the reusable workflows in v1. Their inputs, defaults,
+outputs, permission ceilings,
 timeouts, concurrency keys, and failure semantics are recorded in the catalog
 and checked against their workflow sources.
 

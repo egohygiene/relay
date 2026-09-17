@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-09-09
+updated: 2026-09-17
 governed_by:
   - architecture-architecture
 depends_on:
@@ -65,6 +65,9 @@ The diagram is conceptual. [SYSTEM.md](SYSTEM.md) remains authoritative for resp
 ```text
 actions/
 ├── repository-intelligence/      # read-only collector and static renderer
+├── repository-continuity-preflight/ # pinned offline continuity adapter
+├── repository-labels/            # governed label and PR metadata engine
+├── stale-pull-requests/           # warning-first lifecycle plan and apply
 ├── normalize-repository-report/  # producer contract adapter
 ├── publish-report-snapshot/      # guarded default-branch writer
 ├── validate-publication-site/    # host-neutral local publication proof
@@ -74,12 +77,21 @@ actions/
 
 .github/workflows/
 ├── repository-intelligence.yml   # reusable artifact orchestration
+├── continuity-preflight.yml      # reusable read-only continuity evidence
+├── continuity-preflight-dogfood.yml # Relay PR caller
+├── label-sync-plan.yml           # read-only label synchronization plan
+├── label-sync-apply.yml          # reviewed label synchronization apply
+├── pull-request-label-plan.yml   # untrusted-PR-safe metadata plan
+├── pull-request-label-apply.yml  # trusted workflow-run metadata apply
+├── stale-pull-requests.yml       # advisory-first stale lifecycle
 ├── publication-review.yml        # statically read-only byte review
 ├── publication-pages.yml         # authorized Pages deployment
 ├── release-artifact.yml          # profile-bound immutable release evidence
 ├── release-prepare.yml           # statically read-only release review
 ├── semantic-release.yml          # reviewed immutable publication handoff
 ├── validate.yml                  # pull-request and default-branch gate
+├── dependency-review.yml         # pull-request dependency policy
+├── automerge-dependabot.yml      # bounded trusted dependency updates
 └── release.yml                   # Relay manual-dispatch dogfood caller
 
 action-catalog.json               # public composite-action surface
@@ -208,8 +220,8 @@ The architecture favors independently usable local and self-hosted operation. Op
 
 ## Evidence and uncertainty
 
-- **Observed:** Relay contains machine-readable action and workflow catalogs,
-  seven independently consumable composite actions, six reusable workflows,
+- **Observed:** Relay contains complete machine-readable action and workflow
+  catalogs, independently consumable composite actions and reusable workflows,
   immutable-pin adoption examples, security validation gates, and an
   Aether-declared manual semantic-release workflow with verified recovery. Empathy,
   Akashic, and Optiflow have existing Repository Intelligence integrations;

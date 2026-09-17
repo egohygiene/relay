@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-09-09
+updated: 2026-09-17
 governed_by:
   - architecture-system
 depends_on:
@@ -32,10 +32,10 @@ This document identifies Relay's logical systems and responsibilities. It answer
 
 | System | State | Responsibility |
 | --- | --- | --- |
-| Composite-action library | Active | Publishes three independently consumable, repository-versioned composite actions. |
+| Composite-action library | Active | Publishes the independently consumable, repository-versioned actions inventoried by `action-catalog.json`. |
 | Reusable-workflow library | Active | Publishes bounded orchestration with explicit caller inputs, outputs, authority, and failure states. |
 | Contract metadata | Active | Owns versioned action, workflow, release, artifact, and provenance schemas and catalogs. |
-| Continuity preflight contract, local adapter, and PR workflow | Proposed | Pins upstream continuity owners and exposes matching offline and read-only CI evidence without modifying the inspected checkout. |
+| Continuity preflight contract, local adapter, and PR workflow | Active | Pins upstream continuity owners and exposes matching offline and read-only CI evidence without modifying the inspected checkout. |
 | Security and permission tests | Active | Rejects uncataloged workflows, mutable dependencies, broad authority, unsafe triggers, and unbounded runner jobs. |
 | Release and versioning | Active | Publishes verified immutable repository releases and a controlled moving major alias. |
 | Consumer examples | Active | Demonstrates complete caller-owned workflows with least privilege and immutable Relay pins. |
