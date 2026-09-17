@@ -45,6 +45,9 @@ jobs:
       - name: Validate continuity preflight contracts
         run: python3 scripts/validate_continuity_preflight_contract.py validate
 
+      - name: Validate repository journal runtime contract
+        run: python3 scripts/validate_repository_journal_runtime.py validate
+
       - name: Run unit and integration tests
         run: >-
           python3 -m unittest discover
