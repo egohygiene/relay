@@ -6,6 +6,7 @@ documentation, implementation, contracts, and tests.
 
 | Action                                                        | Capability                                                  | Side effects                  |
 | ------------------------------------------------------------- | ----------------------------------------------------------- | ----------------------------- |
+| [`artifact-budget`](artifact-budget/)                         | Normalize bounded filesystem or Size Limit evidence and evaluate absolute or baseline-relative budgets | Workspace report only |
 | [`repository-continuity-preflight`](repository-continuity-preflight/) | Run pinned offline continuity validation and normalize evidence | Workspace evidence only |
 | [`repository-intelligence`](repository-intelligence/)         | Build operational, roadmap, decision, and journey Repository Intelligence views | Workspace files only          |
 | [`repository-labels`](repository-labels/)                     | Plan and apply canonical labels and pull-request metadata   | Optional repository metadata writes |

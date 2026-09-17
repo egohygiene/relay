@@ -18,6 +18,11 @@ scheduled caller. It starts with read-only advisory evidence, then documents
 the separate write authority required for warnings, resets, and optional
 warning-gated closure.
 
+[`artifact-budget.md`](artifact-budget.md) shows both a web producer that runs
+its own pinned Size Limit installation and a native archive producer measured
+through the filesystem adapter. Relay consumes only their uploaded evidence;
+advisory and blocking policy stays explicit in the caller.
+
 The Repository Intelligence reusable workflow owns checkout, generation,
 provenance verification, and ordinary artifact upload. It does not deploy
 Pages, write repository content, or receive caller secrets. A consumer that

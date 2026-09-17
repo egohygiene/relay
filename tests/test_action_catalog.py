@@ -29,6 +29,7 @@ class ActionCatalogTests(unittest.TestCase):
         self.assertEqual(
             validator.discovered_action_paths(REPOSITORY_ROOT),
             {
+                "actions/artifact-budget",
                 "actions/normalize-repository-report",
                 "actions/publish-report-snapshot",
                 "actions/repository-continuity-preflight",
@@ -52,6 +53,7 @@ class ActionCatalogTests(unittest.TestCase):
         self.assertEqual(
             validator.discovered_reusable_workflows(REPOSITORY_ROOT),
             {
+                ".github/workflows/artifact-budget.yml",
                 ".github/workflows/publication-pages.yml",
                 ".github/workflows/publication-review.yml",
                 ".github/workflows/continuity-preflight.yml",
@@ -117,6 +119,7 @@ class ActionCatalogTests(unittest.TestCase):
         self.assertIn("python3 -m compileall", validation)
         self.assertIn("bash -n", validation)
         self.assertIn("uses: $/.github/workflows/repository-intelligence.yml", validation)
+        self.assertIn("uses: $/.github/workflows/artifact-budget.yml", validation)
         self.assertIn("Verify reusable-workflow generator provenance", reusable)
         self.assertIn('EXPECTED_WORKFLOW_REF: "${{ job.workflow_ref }}"', reusable)
         self.assertIn("workflow_dispatch:", release)
@@ -143,6 +146,8 @@ class ActionCatalogTests(unittest.TestCase):
 
     def test_extracted_v1_contract_ids_remain_compatible(self) -> None:
         expected_ids = {
+            "actions/artifact-budget/schemas/artifact-budget-report.schema.json":
+                "https://egohygiene.github.io/relay/contracts/artifact-budget-report/v1/schema.json",
             "actions/repository-intelligence/schemas/repository-analytics.schema.json":
                 "https://egohygiene.github.io/contracts/repository-analytics/v1/schema.json",
             "actions/repository-intelligence/schemas/repository-tree.schema.json":

@@ -137,6 +137,100 @@ jobs:
             puts "Parsed #{paths.length} YAML metadata documents"
           '
 
+  artifact-budget-fixture:
+    name: Build caller-owned artifact budget fixtures
+    needs: validate
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Stage deterministic current and baseline artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYTHON'
+          from pathlib import Path
+
+          Path(".relay/current").mkdir(parents=True)
+          Path(".relay/baseline").mkdir(parents=True)
+          Path(".relay/current/index.html").write_bytes(b"current artifact\n")
+          Path(".relay/baseline/index.html").write_bytes(b"baseline\n")
+          PYTHON
+
+      - name: Upload current artifact fixture
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: relay-artifact-budget-current
+          path: .relay/current
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload baseline artifact fixture
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: relay-artifact-budget-baseline
+          path: .relay/baseline
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+
+  artifact-budget-smoke:
+    name: Evaluate caller-owned artifact budget fixtures
+    needs: artifact-budget-fixture
+    permissions:
+      contents: read
+    uses: $/.github/workflows/artifact-budget.yml
+    with:
+      current-artifact-name: relay-artifact-budget-current
+      baseline-artifact-name: relay-artifact-budget-baseline
+      adapter: filesystem
+      artifact-kind: static-site
+      subject: relay-static-site
+      current-revision: "${{ github.sha }}"
+      baseline-revision: "${{ github.sha }}"
+      mode: blocking
+      maximum-increase-bytes: "16"
+      artifact-retention-days: 1
+
+  artifact-budget-smoke-outputs:
+    name: Confirm artifact budget outputs
+    needs: artifact-budget-smoke
+    permissions: {}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Validate artifact budget evidence outputs
+        shell: bash
+        env:
+          MEASUREMENT_COUNT: "${{ needs.artifact-budget-smoke.outputs.measurement-count }}"
+          REPORT_ARTIFACT_NAME: "${{ needs.artifact-budget-smoke.outputs.report-artifact-name }}"
+          REPORT_SHA256: "${{ needs.artifact-budget-smoke.outputs.report-sha256 }}"
+          STATUS: "${{ needs.artifact-budget-smoke.outputs.status }}"
+        run: |
+          set -euo pipefail
+          [[ "${STATUS}" == "pass" ]]
+          [[ "${MEASUREMENT_COUNT}" == "1" ]]
+          [[ "${REPORT_ARTIFACT_NAME}" == relay-artifact-budget-* ]]
+          [[ "${REPORT_SHA256}" =~ ^[0-9a-f]{64}$ ]]
+
   publication-site-fixture:
     name: Build caller-owned publication fixture
     needs: validate

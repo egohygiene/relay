@@ -64,6 +64,7 @@ The diagram is conceptual. [SYSTEM.md](SYSTEM.md) remains authoritative for resp
 
 ```text
 actions/
+├── artifact-budget/              # bounded size evidence and budgets
 ├── repository-intelligence/      # read-only collector and static renderer
 ├── repository-continuity-preflight/ # pinned offline continuity adapter
 ├── repository-labels/            # governed label and PR metadata engine
@@ -76,6 +77,7 @@ actions/
 └── verify-release-plan/          # Aether intent and prepared-release proof
 
 .github/workflows/
+├── artifact-budget.yml           # read-only caller artifact normalization
 ├── repository-intelligence.yml   # reusable artifact orchestration
 ├── continuity-preflight.yml      # reusable read-only continuity evidence
 ├── continuity-preflight-dogfood.yml # Relay PR caller

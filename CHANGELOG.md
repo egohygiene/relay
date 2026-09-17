@@ -8,6 +8,9 @@ All notable changes to Relay are documented in this file. The format follows
 
 ### Added
 
+- A reusable artifact-budget action and workflow with Size Limit JSON and
+  filesystem adapters, absolute and baseline-relative thresholds, explicit
+  advisory or blocking enforcement, and deterministic machine-readable reports.
 - An advisory-first stale pull-request action and reusable workflow with
   explicit exemptions, checksum-bound plans, mandatory visible warnings,
   optional delayed closure, bounded summaries, and reopen recovery.
