@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/repository-journal-candidate/v1/schema.json",
+  "title": "Relay repository journal candidate v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "repository",
+    "revision",
+    "interval",
+    "sections",
+    "repository_sections"
+  ],
+  "properties": {
+    "schema_version": {"const": "relay.repository-journal-candidate/v1"},
+    "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "interval": {"$ref": "#/$defs/interval"},
+    "sections": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "merged_work": {"$ref": "#/$defs/items"},
+        "releases": {"$ref": "#/$defs/items"},
+        "open_work": {"$ref": "#/$defs/items"},
+        "stale_work": {"$ref": "#/$defs/items"},
+        "ci": {"$ref": "#/$defs/items"},
+        "dependency_security": {"$ref": "#/$defs/items"},
+        "risks_blockers": {"$ref": "#/$defs/items"},
+        "follow_ups": {"$ref": "#/$defs/items"}
+      }
+    },
+    "repository_sections": {
+      "type": "object",
+      "maxProperties": 8,
+      "propertyNames": {"pattern": "^[A-Za-z0-9][A-Za-z0-9 _./()-]{0,79}$"},
+      "additionalProperties": {"$ref": "#/$defs/items"}
+    }
+  },
+  "$defs": {
+    "interval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": {"type": "string", "format": "date-time", "pattern": "Z$"},
+        "end": {"type": "string", "format": "date-time", "pattern": "Z$"}
+      }
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["text", "evidence_refs"],
+        "properties": {
+          "text": {"type": "string", "minLength": 1, "maxLength": 512},
+          "evidence_refs": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 10,
+            "uniqueItems": true,
+            "items": {"type": "string", "pattern": "^[a-z][a-z_]{0,39}:[0-9]+$"}
+          }
+        }
+      }
+    }
+  }
+}

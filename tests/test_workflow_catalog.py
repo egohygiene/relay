@@ -77,6 +77,10 @@ class WorkflowCatalogTests(unittest.TestCase):
                 "egohygiene/relay/.github/workflows/"
                 "repository-intelligence.yml@v1",
                 "egohygiene/relay/.github/workflows/"
+                "repository-journal-copilot.yml@v1",
+                "egohygiene/relay/.github/workflows/"
+                "repository-journal.yml@v1",
+                "egohygiene/relay/.github/workflows/"
                 "semantic-release.yml@v1",
                 "egohygiene/relay/.github/workflows/"
                 "stale-pull-requests.yml@v1",

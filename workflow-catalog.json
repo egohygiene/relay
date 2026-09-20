@@ -874,6 +874,137 @@
       "consumer_ref": "egohygiene/relay/.github/workflows/repository-intelligence.yml@v1"
     },
     {
+      "id": "repository-journal",
+      "path": ".github/workflows/repository-journal.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Collect bounded read-only GitHub evidence and preserve a validated deterministic, reviewed-manual, or intentionally unavailable Aether repository journal without executing consumer code or requiring AI billing.",
+      "audience": "reusable",
+      "status": "experimental",
+      "triggers": ["workflow_call"],
+      "permissions": {
+        "actions": "read",
+        "contents": "read",
+        "issues": "read",
+        "pull-requests": "read",
+        "security-events": "read"
+      },
+      "timeout_minutes": 10,
+      "concurrency": {
+        "group": "relay-repository-journal-${{ github.repository }}-${{ github.ref }}",
+        "cancel_in_progress": true
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Invalid identity, interval, evidence, references, bounds, pinned bytes, rendering, or artifact preservation fails after retaining bounded failure evidence; unavailable provider sources remain explicit rather than becoming invented summaries."
+      },
+      "inputs": [
+        {"name": "mode", "type": "string", "required": false, "default": "deterministic", "description": "No-billing generation adapter; deterministic, manual, or unavailable."},
+        {"name": "repository-id", "type": "string", "required": true, "description": "Exact owner/name repository identity."},
+        {"name": "repository-revision", "type": "string", "required": true, "description": "Full Git SHA represented by the journal."},
+        {"name": "interval-start", "type": "string", "required": true, "description": "Inclusive UTC RFC 3339 reporting interval start."},
+        {"name": "interval-end", "type": "string", "required": true, "description": "Inclusive UTC RFC 3339 reporting interval end."},
+        {"name": "generated-at", "type": "string", "required": true, "description": "Explicit UTC RFC 3339 generation timestamp."},
+        {"name": "evidence-artifact-name", "type": "string", "required": false, "default": "", "description": "Optional caller-produced artifact containing normalized evidence."},
+        {"name": "candidate-artifact-name", "type": "string", "required": false, "default": "", "description": "Reviewed manual candidate artifact."},
+        {"name": "previous-result-artifact-name", "type": "string", "required": false, "default": "", "description": "Optional prior successful result artifact."},
+        {"name": "maximum-pages", "type": "number", "required": false, "default": 2, "description": "Maximum GitHub API pages read per evidence source."},
+        {"name": "maximum-records", "type": "number", "required": false, "default": 50, "description": "Maximum normalized records retained per evidence source."},
+        {"name": "maximum-items", "type": "number", "required": false, "default": 100, "description": "Maximum accepted candidate items across all sections."},
+        {"name": "artifact-retention-days", "type": "number", "required": false, "default": 30, "description": "Retention for the complete journal evidence bundle."}
+      ],
+      "outputs": [
+        {"name": "journal-artifact-name", "type": "string", "required": true, "description": "Uploaded complete journal evidence bundle."},
+        {"name": "result-sha256", "type": "string", "required": true, "description": "SHA-256 of the exact machine-readable result."},
+        {"name": "status", "type": "string", "required": true, "description": "Complete, partial, unavailable, or failed journal state."},
+        {"name": "evidence-completeness", "type": "string", "required": true, "description": "Complete, partial, or unavailable evidence state."}
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/repository-journal.yml@v1"
+    },
+    {
+      "id": "repository-journal-copilot",
+      "path": ".github/workflows/repository-journal-copilot.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Generate at most one no-tool Copilot journal candidate after explicit pinned-runtime, credential, policy, permission, and billing preflight, then validate it through the same evidence and Aether boundary.",
+      "audience": "reusable",
+      "status": "experimental",
+      "triggers": ["workflow_call"],
+      "permissions": {
+        "actions": "read",
+        "contents": "read",
+        "copilot-requests": "write",
+        "issues": "read",
+        "pull-requests": "read",
+        "security-events": "read"
+      },
+      "timeout_minutes": 10,
+      "concurrency": {
+        "group": "relay-repository-journal-copilot-${{ github.repository }}-${{ github.ref }}",
+        "cancel_in_progress": true
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Missing or contradictory policy, permission, credential, billing, runtime, provider, candidate, or rendering evidence prevents a successful journal; preflight unavailability makes no agent request and remains explicit."
+      },
+      "inputs": [
+        {"name": "repository-id", "type": "string", "required": true, "description": "Exact owner/name repository identity."},
+        {"name": "repository-revision", "type": "string", "required": true, "description": "Full Git SHA represented by the journal."},
+        {"name": "interval-start", "type": "string", "required": true, "description": "Inclusive UTC RFC 3339 reporting interval start."},
+        {"name": "interval-end", "type": "string", "required": true, "description": "Inclusive UTC RFC 3339 reporting interval end."},
+        {"name": "generated-at", "type": "string", "required": true, "description": "Explicit UTC RFC 3339 generation timestamp."},
+        {"name": "evidence-artifact-name", "type": "string", "required": false, "default": "", "description": "Optional caller-produced artifact containing normalized evidence."},
+        {"name": "previous-result-artifact-name", "type": "string", "required": false, "default": "", "description": "Optional prior successful result artifact."},
+        {"name": "auth-mode", "type": "string", "required": false, "default": "github-token", "description": "Explicit GitHub token or fine-grained PAT authentication mode."},
+        {"name": "organization-policy-state", "type": "string", "required": false, "default": "unknown", "description": "Reviewed organization Copilot CLI policy state."},
+        {"name": "permission-state", "type": "string", "required": false, "default": "unknown", "description": "Reviewed Copilot Requests workflow permission state."},
+        {"name": "billing-acknowledged", "type": "boolean", "required": false, "default": false, "description": "Explicit acknowledgement of the selected billing principal."},
+        {"name": "maximum-pages", "type": "number", "required": false, "default": 2, "description": "Maximum GitHub API pages read per evidence source."},
+        {"name": "maximum-records", "type": "number", "required": false, "default": 50, "description": "Maximum normalized records retained per evidence source."},
+        {"name": "maximum-items", "type": "number", "required": false, "default": 100, "description": "Maximum accepted Copilot candidate items across all sections."},
+        {"name": "artifact-retention-days", "type": "number", "required": false, "default": 30, "description": "Retention for the complete journal evidence bundle."}
+      ],
+      "outputs": [
+        {"name": "journal-artifact-name", "type": "string", "required": true, "description": "Uploaded complete journal evidence bundle."},
+        {"name": "result-sha256", "type": "string", "required": true, "description": "SHA-256 of the exact machine-readable result."},
+        {"name": "status", "type": "string", "required": true, "description": "Complete, partial, unavailable, or failed journal state."},
+        {"name": "evidence-completeness", "type": "string", "required": true, "description": "Complete, partial, or unavailable evidence state."}
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/repository-journal-copilot.yml@v1"
+    },
+    {
+      "id": "repository-journal-dogfood",
+      "path": ".github/workflows/repository-journal-dogfood.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Run Relay's weekly and manual deterministic no-billing repository journal through the reusable read-only workflow.",
+      "audience": "internal",
+      "status": "experimental",
+      "triggers": ["schedule", "workflow_dispatch"],
+      "permissions": {
+        "actions": "read",
+        "contents": "read",
+        "issues": "read",
+        "pull-requests": "read",
+        "security-events": "read"
+      },
+      "timeout_minutes": null,
+      "concurrency": {
+        "group": "relay-repository-journal-dogfood-${{ github.ref }}",
+        "cancel_in_progress": true
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Interval calculation or reusable journal failure fails the caller; partial or unavailable provider evidence remains visible in the retained result."
+      },
+      "inputs": [],
+      "outputs": [],
+      "consumer_ref": null
+    },
+    {
       "id": "dependency-review",
       "path": ".github/workflows/dependency-review.yml",
       "owner": "egohygiene/relay",

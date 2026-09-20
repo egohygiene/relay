@@ -140,6 +140,70 @@ jobs:
             puts "Parsed #{paths.length} YAML metadata documents"
           '
 
+      - name: Upload repository-journal evidence fixture
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: relay-repository-journal-evidence
+          path: tests/fixtures/repository-journal/repository-journal-evidence.json
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload repository-journal candidate fixture
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: relay-repository-journal-candidate
+          path: tests/fixtures/repository-journal/repository-journal-candidate.json
+          if-no-files-found: error
+          retention-days: 1
+
+  repository-journal-manual-smoke:
+    name: Validate reviewed manual repository-journal fixtures
+    needs: validate
+    permissions:
+      actions: read
+      contents: read
+    uses: $/.github/workflows/repository-journal.yml
+    with:
+      mode: manual
+      repository-id: egohygiene/relay
+      repository-revision: "1111111111111111111111111111111111111111"
+      interval-start: "2026-09-01T00:00:00Z"
+      interval-end: "2026-09-08T00:00:00Z"
+      generated-at: "2026-09-08T00:00:00Z"
+      evidence-artifact-name: relay-repository-journal-evidence
+      candidate-artifact-name: relay-repository-journal-candidate
+      artifact-retention-days: 1
+
+  repository-journal-smoke-outputs:
+    name: Confirm repository-journal outputs
+    needs: repository-journal-manual-smoke
+    permissions: {}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Validate repository-journal evidence outputs
+        shell: bash
+        env:
+          COMPLETENESS: "${{ needs.repository-journal-manual-smoke.outputs.evidence-completeness }}"
+          JOURNAL_ARTIFACT_NAME: "${{ needs.repository-journal-manual-smoke.outputs.journal-artifact-name }}"
+          RESULT_SHA256: "${{ needs.repository-journal-manual-smoke.outputs.result-sha256 }}"
+          STATUS: "${{ needs.repository-journal-manual-smoke.outputs.status }}"
+        run: |
+          set -euo pipefail
+          [[ "${STATUS}" == "complete" ]]
+          [[ "${COMPLETENESS}" == "complete" ]]
+          [[ "${JOURNAL_ARTIFACT_NAME}" == relay-repository-journal-* ]]
+          [[ "${RESULT_SHA256}" =~ ^[0-9a-f]{64}$ ]]
+
   artifact-budget-fixture:
     name: Build caller-owned artifact budget fixtures
     needs: validate

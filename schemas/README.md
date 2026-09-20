@@ -17,6 +17,9 @@ https://egohygiene.github.io/relay/contracts/repository-continuity-preflight-res
 https://egohygiene.github.io/relay/contracts/artifact-budget-report/v1/schema.json
 https://egohygiene.github.io/relay/contracts/repository-journal-runtime-profile/v1/schema.json
 https://egohygiene.github.io/relay/contracts/repository-journal-runtime-preflight-result/v1/schema.json
+https://egohygiene.github.io/relay/contracts/repository-journal-evidence/v1/schema.json
+https://egohygiene.github.io/relay/contracts/repository-journal-candidate/v1/schema.json
+https://egohygiene.github.io/relay/contracts/repository-journal-result/v1/schema.json
 https://egohygiene.github.io/relay/contracts/repository-journal-aether-profile/v1/schema.json
 ```
 

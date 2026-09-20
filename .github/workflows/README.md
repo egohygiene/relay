@@ -10,6 +10,21 @@ out complete caller history, invokes the action from the exact called Relay
 revision through GitHub's `$/` syntax, builds the routed site, and uploads it as
 an ordinary workflow artifact.
 
+## Repository journals
+
+`repository-journal.yml` is the default no-billing surface. It collects bounded
+GitHub evidence or accepts caller-produced evidence, validates deterministic or
+reviewed-manual candidate statements against exact evidence record IDs, renders
+through the pinned Aether contract, and retains the complete result. It has no
+Copilot permission and never checks out consumer code.
+
+`repository-journal-copilot.yml` is a separate explicit opt-in with job-scoped
+`copilot-requests: write`. Unknown policy, permission, billing, credential, or
+runtime state prevents the single no-tool invocation and produces an honest
+unavailable result. Relay's weekly/manual dogfood caller uses deterministic
+mode, so the current capability works without account setup. See the
+[contract and recovery guide](../../docs/repository-journal.md).
+
 ## Artifact size budgets
 
 `artifact-budget.yml` downloads caller-produced current and optional baseline

@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/repository-journal-result/v1/schema.json",
+  "title": "Relay repository journal result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "mode",
+    "repository",
+    "revision",
+    "interval",
+    "generated_at",
+    "runtime",
+    "contract",
+    "evidence",
+    "candidate",
+    "outputs",
+    "last_successful",
+    "failure_reasons"
+  ],
+  "properties": {
+    "schema_version": {"const": "relay.repository-journal-result/v1"},
+    "status": {"enum": ["complete", "partial", "unavailable", "failed"]},
+    "mode": {"enum": ["manual", "deterministic", "copilot", "unavailable"]},
+    "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "interval": {"$ref": "#/$defs/interval"},
+    "generated_at": {"type": "string", "format": "date-time", "pattern": "Z$"},
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "adapter", "copilot_cli_version"],
+      "properties": {
+        "id": {"const": "relay.repository-journal-runner/v1"},
+        "adapter": {"enum": ["manual", "deterministic", "copilot", "unavailable"]},
+        "copilot_cli_version": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        }
+      }
+    },
+    "contract": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "version", "lifecycle", "source_revision", "spec_digest"],
+          "properties": {
+            "id": {"type": "string"},
+            "version": {"type": "string"},
+            "lifecycle": {"type": "string"},
+            "source_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "spec_digest": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["algorithm", "value"],
+              "properties": {
+                "algorithm": {"const": "sha256-utf8-lf"},
+                "value": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+              }
+            }
+          }
+        }
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["completeness", "sha256", "source_statuses", "record_count"],
+      "properties": {
+        "completeness": {"enum": ["complete", "partial", "unavailable"]},
+        "sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "source_statuses": {"type": "object", "additionalProperties": {"type": "string"}},
+        "record_count": {"type": "integer", "minimum": 0, "maximum": 600}
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["present", "sha256"],
+      "properties": {
+        "present": {"type": "boolean"},
+        "sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aether_input_sha256", "markdown_sha256", "json_sha256"],
+      "properties": {
+        "aether_input_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "markdown_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "json_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "last_successful": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["generated_at", "repository", "revision", "result_sha256"],
+          "properties": {
+            "generated_at": {"type": "string"},
+            "repository": {"type": "string"},
+            "revision": {"type": "string"},
+            "result_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        }
+      ]
+    },
+    "failure_reasons": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1, "maxLength": 240}
+    }
+  },
+  "$defs": {
+    "interval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": {"type": "string", "format": "date-time", "pattern": "Z$"},
+        "end": {"type": "string", "format": "date-time", "pattern": "Z$"}
+      }
+    }
+  }
+}

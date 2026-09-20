@@ -938,6 +938,18 @@ def validate_repository(repository_root: Path = REPOSITORY_ROOT) -> list[str]:
             "https://egohygiene.github.io/relay/contracts/"
             "repository-journal-runtime-preflight-result/v1/schema.json"
         ),
+        "repository-journal-evidence.v1.schema.json": (
+            "https://egohygiene.github.io/relay/contracts/"
+            "repository-journal-evidence/v1/schema.json"
+        ),
+        "repository-journal-candidate.v1.schema.json": (
+            "https://egohygiene.github.io/relay/contracts/"
+            "repository-journal-candidate/v1/schema.json"
+        ),
+        "repository-journal-result.v1.schema.json": (
+            "https://egohygiene.github.io/relay/contracts/"
+            "repository-journal-result/v1/schema.json"
+        ),
     }
     for filename, schema_id in expected_schemas.items():
         path = repository_root / "schemas" / filename

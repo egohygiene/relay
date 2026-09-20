@@ -23,6 +23,10 @@ its own pinned Size Limit installation and a native archive producer measured
 through the filesystem adapter. Relay consumes only their uploaded evidence;
 advisory and blocking policy stays explicit in the caller.
 
+[`repository-journal.md`](repository-journal.md) shows the scheduled
+deterministic no-billing caller, the reviewed-manual candidate seam, and the
+separately authorized future Copilot opt-in.
+
 The Repository Intelligence reusable workflow owns checkout, generation,
 provenance verification, and ordinary artifact upload. It does not deploy
 Pages, write repository content, or receive caller secrets. A consumer that

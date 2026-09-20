@@ -8,6 +8,10 @@ All notable changes to Relay are documented in this file. The format follows
 
 ### Added
 
+- A reusable evidence-bound repository journal with deterministic and
+  reviewed-manual no-billing modes, a separately permissioned future Copilot
+  adapter, pinned Aether rendering, explicit incomplete states, and Relay
+  scheduled/manual dogfood.
 - A reusable artifact-budget action and workflow with Size Limit JSON and
   filesystem adapters, absolute and baseline-relative thresholds, explicit
   advisory or blocking enforcement, and deterministic machine-readable reports.

@@ -307,6 +307,12 @@ class RepositoryJournalRuntimeTests(unittest.TestCase):
                 "repository-journal-runtime-profile/v1/schema.json",
             "repository-journal-runtime-preflight-result.v1.schema.json":
                 "repository-journal-runtime-preflight-result/v1/schema.json",
+            "repository-journal-evidence.v1.schema.json":
+                "repository-journal-evidence/v1/schema.json",
+            "repository-journal-candidate.v1.schema.json":
+                "repository-journal-candidate/v1/schema.json",
+            "repository-journal-result.v1.schema.json":
+                "repository-journal-result/v1/schema.json",
         }
         for filename, suffix in expected.items():
             with self.subTest(schema=filename):

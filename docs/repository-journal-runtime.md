@@ -1,15 +1,18 @@
 # Repository journal runtime and account connection
 
-Relay issue #15 will execute an Aether-governed repository journal through a
-bounded agent adapter. This document owns only the runtime and authentication
-preflight from issue #95 step 1. Evidence collection, agent tools, journal
-schemas, rendering, reusable workflows, and canary execution remain later
-checkpoints.
+Relay issue #15 executes an Aether-governed repository journal through bounded
+deterministic, reviewed-manual, unavailable, and optional agent adapters. This
+document owns the optional Copilot runtime and authentication preflight from
+issue #95 step 1. The complete evidence, rendering, and workflow contract is in
+[`repository-journal.md`](repository-journal.md).
 
 ## Current decision
 
-The preferred CI identity is the short-lived GitHub Actions `GITHUB_TOKEN`.
-The future agent job must declare only:
+The current Relay schedule uses deterministic no-billing mode. No Copilot
+account connection is required for that workflow.
+
+When the separate Copilot workflow is enabled later, the preferred CI identity
+is the short-lived GitHub Actions `GITHUB_TOKEN`. Its agent job declares:
 
 ```yaml
 permissions:
@@ -58,8 +61,8 @@ repository code.
    broader permission than its evidence collector requires.
 4. Run the offline preflight with the policy, permission, and billing facts
    explicitly acknowledged.
-5. Perform a separately authorized live canary only after the agent boundary
-   and journal contract are implemented.
+5. Perform a separately authorized live canary through
+   `repository-journal-copilot.yml`.
 
 No credential should be pasted into an issue, pull request, chat, command-line
 argument, or workflow log.
@@ -110,9 +113,12 @@ or unsupported credentials, credential-precedence conflicts, version drift,
 unacknowledged billing, authentication rejection, and rate limiting are
 `unavailable` outcomes. They cannot produce a successful journal.
 
-The preflight is not a security sandbox and does not authorize the later agent
-to inspect repository source or execute tools. Those boundaries are defined and
-tested in later issue #95 checkpoints.
+The preflight is not a security sandbox. The implemented adapter separately
+provides no available tools, disables built-in MCP servers and custom
+instructions, runs in an isolated temporary directory, and passes only bounded
+normalized evidence. It never checks out repository source. Leaving billing or
+policy unacknowledged prevents invocation but does not affect the deterministic
+or manual no-billing workflows.
 
 ## Primary references
 

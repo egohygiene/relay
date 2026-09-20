@@ -1,0 +1,44 @@
+{
+  "interval": {
+    "end": "2026-09-08T00:00:00Z",
+    "start": "2026-09-01T00:00:00Z"
+  },
+  "repository": "egohygiene/relay",
+  "repository_sections": {},
+  "revision": "1111111111111111111111111111111111111111",
+  "schema_version": "relay.repository-journal-candidate/v1",
+  "sections": {
+    "ci": [
+      {
+        "evidence_refs": [
+          "workflow_run:900003"
+        ],
+        "text": "Relay validation completed successfully."
+      }
+    ],
+    "follow_ups": [
+      {
+        "evidence_refs": [
+          "issue:900002"
+        ],
+        "text": "Review the fixture follow-up."
+      }
+    ],
+    "merged_work": [
+      {
+        "evidence_refs": [
+          "pull_request:900001"
+        ],
+        "text": "The fixture journal change was merged."
+      }
+    ],
+    "open_work": [
+      {
+        "evidence_refs": [
+          "issue:900002"
+        ],
+        "text": "The fixture follow-up remains open."
+      }
+    ]
+  }
+}

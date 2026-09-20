@@ -14,6 +14,7 @@ and deployment.
 | ---------- | --------------- |
 | Artifact size and performance budgets | `egohygiene/relay/actions/artifact-budget@v1` |
 | Repository Intelligence site | `egohygiene/relay/actions/repository-intelligence@v1` |
+| Validated repository journal | `egohygiene/relay/actions/repository-journal@v1` |
 | Canonical labels and pull-request metadata | `egohygiene/relay/actions/repository-labels@v1` |
 | Warning-first stale pull-request lifecycle | `egohygiene/relay/actions/stale-pull-requests@v1` |
 | Scanner report normalization | `egohygiene/relay/actions/normalize-repository-report@v1` |
@@ -34,6 +35,8 @@ and deployment.
 | Trusted pull-request label apply | `egohygiene/relay/.github/workflows/pull-request-label-apply.yml@v1` |
 | Advisory-first stale pull-request lifecycle | `egohygiene/relay/.github/workflows/stale-pull-requests.yml@v1` |
 | Advisory or blocking artifact budgets | `egohygiene/relay/.github/workflows/artifact-budget.yml@v1` |
+| Read-only no-billing repository journal | `egohygiene/relay/.github/workflows/repository-journal.yml@v1` |
+| Explicit Copilot repository journal | `egohygiene/relay/.github/workflows/repository-journal-copilot.yml@v1` |
 
 These moving aliases advertise the release surface. Production consumers use a
 reviewed full commit SHA, as shown below.
@@ -189,6 +192,21 @@ bundles, static sites, native binaries, archives, and container-image archives.
 The reusable workflow downloads only caller-owned Actions artifacts, never
 checks out or executes consumer code, and defaults to advisory mode. See the
 [web and native adoption examples](examples/workflows/artifact-budget.md).
+
+## Publish repository journals without requiring AI billing
+
+The repository-journal workflow collects bounded GitHub metadata, preserves
+empty, partial, unavailable, and complete source states, and renders through a
+checksum-pinned Aether contract. Its default deterministic mode and reviewed
+manual-candidate mode require no Copilot account or billing policy. Each
+candidate statement cites normalized evidence retained in the same artifact.
+
+Copilot generation is a separate reusable workflow with job-scoped
+`copilot-requests: write`; it makes no request unless exact runtime, credential,
+policy, permission, and billing checks pass. Neither workflow checks out
+consumer code, writes repository state, or owns Slack, Discord, or another
+delivery secret. See the [contract](docs/repository-journal.md) and
+[caller examples](examples/workflows/repository-journal.md).
 
 ## Architecture boundary
 
