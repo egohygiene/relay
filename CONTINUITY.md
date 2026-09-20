@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-20T01:32:21Z"
+  updated_at: "2026-09-20T01:44:44Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -70,8 +70,8 @@ work:
   next:
     kind: exact-head-validation
     id: repository-journal-pr-validation
-    description: "Publish the implementation and continuity commits, inspect PR #96 exact-head checks and feedback, then mark it ready only if the head is green and review finds no blocker."
-    readiness: implementation-complete-publish-pending
+    description: "Publish the validated CI permission correction, inspect PR #96 exact-head checks and feedback, then mark it ready only if the head is green and review finds no blocker."
+    readiness: ci-startup-permission-fix-publish-pending
     references:
       - https://github.com/egohygiene/relay/issues/15
       - https://github.com/egohygiene/relay/issues/95
@@ -84,21 +84,21 @@ state:
     verified_at: "2026-09-20T01:30:00Z"
   candidate:
     branch: feat/15-repository-journal
-    implementation_revision: c78e4253819d4c61aa86520b0ce5a8dc40486285
-    implementation_tree: b72cb0bb054ce9fb7657c3c85b49ef7fcb99f715
+    implementation_revision: 2e49937569cd704f5a98edf1c2eca337aee6c2b5
+    implementation_tree: 95075a480553596bb5353d294882a1a28e9bcc0c
     pull_request: https://github.com/egohygiene/relay/pull/96
-    handoff_state: implementation-complete-exact-head-validation-pending
+    handoff_state: ci-startup-permission-fix-validated-exact-head-pending
   live:
-    status: verified-before-publication
-    observed_at: "2026-09-20T01:30:00Z"
+    status: verified-after-initial-publication
+    observed_at: "2026-09-20T01:44:44Z"
     default_branch_revision: 325382e2baba094319373d6931b57f54743832f1
-    remote_pull_request_head: fa2cf1cd0c5800b1638a68ac1a03ba84ea4cb9dc
+    remote_pull_request_head: a49e6a8db64861d72a2e43f51a350774a1b97092
     active_pull_requests:
       - egohygiene/relay#96
-    notes: "PR #96 is open, draft, and mergeable with no duplicate implementation PR. Issues #15 and #95 remain open. The local implementation is one commit ahead of the published head."
+    notes: "PR #96 is open, draft, and mergeable with no duplicate implementation PR. Continuity and dependency checks passed at a49e6a8; validation had a startup failure because the new reusable smoke caller did not pass through its read scopes. The permission-only correction is locally validated and not yet published."
 review:
   status: implementation-validated-exact-head-pending
-  reviewed_at: "2026-09-20T01:32:21Z"
+  reviewed_at: "2026-09-20T01:44:44Z"
   reviewed_by: ChatGPT
   evidence:
     - command: "Reconcile live main, issues #15/#95, their checkpoint state, PR #96, repository instructions, architecture, decisions, roadmap, catalogs, and continuity."
@@ -128,6 +128,9 @@ review:
     - command: Final implementation, permission, secret-flow, prompt-injection, provenance, failure-retention, contract, and documentation review.
       outcome: passed
       notes: No known blocker, major, or minor finding remains locally. Exact-head GitHub Actions and review feedback remain pending publication.
+    - command: Inspect initial exact-head GitHub Actions and correct the reusable smoke caller permission ceiling.
+      outcome: passed
+      notes: "Validate Relay actions failed before job startup at a49e6a8; the caller now passes only the read scopes already required by repository-journal.yml, the catalog records the maximum authority, a regression test covers the seam, and all 395 tests pass."
   environment_limitations:
     - A generic JSON Schema implementation is unavailable locally; closed repository validators, shape tests, fixture tests, and JSON parsing passed.
     - Ruby is unavailable locally; PyYAML parsed all action/workflow YAML and Bash parsed every extracted inline shell block. Canonical CI repeats the repository's Ruby/Psych checks.
@@ -163,7 +166,7 @@ permission, credential, and billing checks are acknowledged.
 
 ## Implementation boundary
 
-Implementation commit: `c78e4253819d4c61aa86520b0ce5a8dc40486285`
+Implementation commit: `2e49937569cd704f5a98edf1c2eca337aee6c2b5`
 
 The implementation pins Aether's draft journal distribution and Copilot CLI,
 collects bounded provider metadata, preserves source completeness, validates
@@ -174,7 +177,7 @@ kinds; human reviewers retain semantic authority over free-form prose.
 
 ## Remaining gates
 
-1. Publish the implementation and continuity commits to PR #96.
+1. Publish the CI permission correction and updated continuity evidence to PR #96.
 2. Inspect exact-head validation, continuity, dependency, review, and merge state.
 3. If green, mark PR #96 ready for the user to merge; do not merge it here.
 4. After merge, verify current `main`, manually dispatch the deterministic Relay
