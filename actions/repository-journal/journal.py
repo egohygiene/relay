@@ -790,8 +790,12 @@ def record_text(item: dict[str, Any]) -> str:
     return f"{item['title']} ({item['state']}) {item['url']}"
 
 
-def deterministic_candidate(evidence: dict[str, Any]) -> dict[str, Any]:
-    """Map normalized provider records into a factual non-agent candidate."""
+def deterministic_candidate(
+    evidence: dict[str, Any],
+    maximum_items: int,
+    maximum_bytes: int,
+) -> tuple[dict[str, Any], list[str]]:
+    """Map records into one breadth-first, bounded non-agent candidate."""
 
     sources = evidence["sources"]
     merged = sources["merged_pull_requests"]["records"]
@@ -821,6 +825,7 @@ def deterministic_candidate(evidence: dict[str, Any]) -> dict[str, Any]:
         "risks_blockers": risks,
     }
     sections: dict[str, list[dict[str, Any]]] = {}
+    included_records: dict[str, list[dict[str, Any]]] = {}
     for name, records in mappings.items():
         source_names = {
             "merged_work": ("merged_pull_requests",),
@@ -836,10 +841,9 @@ def deterministic_candidate(evidence: dict[str, Any]) -> dict[str, Any]:
             for source in source_names
         ):
             continue
-        sections[name] = [
-            candidate_item(record_text(item), [item["id"]]) for item in records
-        ]
-    return {
+        sections[name] = []
+        included_records[name] = records
+    candidate = {
         "schema_version": CANDIDATE_SCHEMA,
         "repository": evidence["repository"],
         "revision": evidence["revision"],
@@ -847,6 +851,30 @@ def deterministic_candidate(evidence: dict[str, Any]) -> dict[str, Any]:
         "sections": sections,
         "repository_sections": {},
     }
+    queue = [
+        (name, records[index])
+        for index in range(
+            max(
+                (len(records) for records in included_records.values()),
+                default=0,
+            )
+        )
+        for name, records in included_records.items()
+        if index < len(records)
+    ]
+    limit_reasons: list[str] = []
+    selected_count = 0
+    for name, item in queue:
+        if selected_count >= maximum_items:
+            limit_reasons.append("candidate:item-limit")
+            break
+        sections[name].append(candidate_item(record_text(item), [item["id"]]))
+        if len(canonical_json(candidate)) > maximum_bytes:
+            sections[name].pop()
+            limit_reasons.append("candidate:byte-limit")
+            break
+        selected_count += 1
+    return candidate, limit_reasons
 
 
 def validate_candidate(
@@ -1290,7 +1318,14 @@ def run_journal(args: argparse.Namespace) -> int:
                 raise JournalError("manual mode requires a candidate")
             candidate = load_json(args.candidate, args.maximum_candidate_bytes)
         elif args.mode == "deterministic":
-            candidate = deterministic_candidate(evidence)
+            candidate, deterministic_limits = deterministic_candidate(
+                evidence,
+                args.maximum_items,
+                args.maximum_candidate_bytes,
+            )
+            if deterministic_limits:
+                status = "partial"
+                failures.extend(deterministic_limits)
         elif args.mode == "copilot":
             if args.preflight is None:
                 raise ProviderUnavailable("copilot-preflight-unavailable")

@@ -220,7 +220,10 @@ class RepositoryJournalTests(unittest.TestCase):
         record = evidence["sources"]["merged_pull_requests"]["records"][0]
         record["title"] = "![load](https://attacker.invalid/pixel) <script>"
         identifiers = journal.validate_evidence(evidence)
-        candidate = journal.deterministic_candidate(evidence)
+        candidate, reasons = journal.deterministic_candidate(
+            evidence, 100, 65536
+        )
+        self.assertEqual(reasons, [])
         journal.validate_candidate(candidate, evidence, identifiers, 100)
 
         aether_input = journal.candidate_to_aether(candidate)
@@ -232,17 +235,123 @@ class RepositoryJournalTests(unittest.TestCase):
     def test_deterministic_candidate_is_evidence_bound(self) -> None:
         evidence = self.evidence()
         identifiers = journal.validate_evidence(evidence)
-        candidate = journal.deterministic_candidate(evidence)
+        candidate, reasons = journal.deterministic_candidate(
+            evidence, 100, 65536
+        )
 
         journal.validate_candidate(candidate, evidence, identifiers, 100)
+        self.assertEqual(reasons, [])
         item = candidate["sections"]["merged_work"][0]
         self.assertEqual(item["evidence_refs"], ["pull_request:96"])
         self.assertIn("Add repository journal", item["text"])
 
+    def test_deterministic_candidate_round_robins_under_item_bound(self) -> None:
+        evidence = self.evidence()
+        evidence["sources"]["merged_pull_requests"]["records"].append(
+            journal.record(
+                identifier="pull_request:97",
+                kind="pull-request-merged",
+                repository=self.repository,
+                url="https://github.com/egohygiene/relay/pull/97",
+                title="Follow-up",
+                state="merged",
+                observed_at=self.generated,
+            )
+        )
+        evidence["sources"]["releases"] = self.source(
+            [
+                journal.record(
+                    identifier="release:1",
+                    kind="release",
+                    repository=self.repository,
+                    url="https://github.com/egohygiene/relay/releases/tag/v1.0.0",
+                    title="v1.0.0",
+                    state="published",
+                    observed_at=self.generated,
+                )
+            ]
+        )
+        evidence["sources"]["workflow_runs"] = self.source(
+            [
+                journal.record(
+                    identifier="workflow_run:1",
+                    kind="workflow-run",
+                    repository=self.repository,
+                    url="https://github.com/egohygiene/relay/actions/runs/1",
+                    title="Validation",
+                    state="success",
+                    observed_at=self.generated,
+                )
+            ]
+        )
+        identifiers = journal.validate_evidence(evidence)
+
+        candidate, reasons = journal.deterministic_candidate(evidence, 3, 65536)
+
+        journal.validate_candidate(candidate, evidence, identifiers, 3)
+        self.assertEqual(reasons, ["candidate:item-limit"])
+        self.assertEqual(len(candidate["sections"]["merged_work"]), 1)
+        self.assertEqual(len(candidate["sections"]["releases"]), 1)
+        self.assertEqual(len(candidate["sections"]["ci"]), 1)
+
+    def test_deterministic_candidate_stays_within_byte_bound(self) -> None:
+        evidence = self.evidence()
+        evidence["sources"]["merged_pull_requests"]["records"] = [
+            journal.record(
+                identifier=f"pull_request:{number}",
+                kind="pull-request-merged",
+                repository=self.repository,
+                url=f"https://github.com/egohygiene/relay/pull/{number}",
+                title="x" * 400,
+                state="merged",
+                observed_at=self.generated,
+            )
+            for number in range(96, 100)
+        ]
+        identifiers = journal.validate_evidence(evidence)
+
+        candidate, reasons = journal.deterministic_candidate(evidence, 100, 1024)
+
+        journal.validate_candidate(candidate, evidence, identifiers, 100)
+        self.assertEqual(reasons, ["candidate:byte-limit"])
+        self.assertLessEqual(len(journal.canonical_json(candidate)), 1024)
+
+    def test_deterministic_run_reports_candidate_limit_as_partial(self) -> None:
+        evidence = self.evidence()
+        evidence["sources"]["merged_pull_requests"]["records"].append(
+            journal.record(
+                identifier="pull_request:97",
+                kind="pull-request-merged",
+                repository=self.repository,
+                url="https://github.com/egohygiene/relay/pull/97",
+                title="Follow-up",
+                state="merged",
+                observed_at=self.generated,
+            )
+        )
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        evidence_path = root / "evidence.json"
+        journal.write_json(evidence_path, evidence)
+        arguments = self.run_arguments(root, evidence_path)
+        arguments.maximum_items = 1
+
+        self.assertEqual(journal.run_journal(arguments), 0)
+
+        result = json.loads(
+            (root / "output/repository-journal-result.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(result["status"], "partial")
+        self.assertEqual(result["evidence"]["completeness"], "complete")
+        self.assertIn("candidate:item-limit", result["failure_reasons"])
+
     def test_manual_candidate_cannot_invent_evidence_reference(self) -> None:
         evidence = self.evidence()
         identifiers = journal.validate_evidence(evidence)
-        candidate = journal.deterministic_candidate(evidence)
+        candidate, _ = journal.deterministic_candidate(evidence, 100, 65536)
         candidate["sections"]["merged_work"][0]["evidence_refs"] = ["issue:999"]
 
         with self.assertRaisesRegex(journal.JournalError, "evidence references"):
@@ -251,7 +360,7 @@ class RepositoryJournalTests(unittest.TestCase):
     def test_manual_candidate_cannot_misclassify_evidence(self) -> None:
         evidence = self.evidence()
         identifiers = journal.validate_evidence(evidence)
-        candidate = journal.deterministic_candidate(evidence)
+        candidate, _ = journal.deterministic_candidate(evidence, 100, 65536)
         candidate["sections"]["releases"] = [
             journal.candidate_item("Not a release", ["pull_request:96"])
         ]
@@ -448,7 +557,7 @@ class RepositoryJournalTests(unittest.TestCase):
             billing_acknowledged=True,
             profile_bytes=profile_bytes,
         )
-        candidate = journal.deterministic_candidate(evidence)
+        candidate, _ = journal.deterministic_candidate(evidence, 100, 65536)
         completed = subprocess.CompletedProcess(
             args=[],
             returncode=0,

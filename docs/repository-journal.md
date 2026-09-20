@@ -19,6 +19,13 @@ receives `copilot-requests: write`. `repository-journal-copilot.yml` is the
 separate, explicit future opt-in. Relay's own schedule currently calls the
 deterministic workflow.
 
+Deterministic generation distributes its bounded item budget breadth-first
+across populated journal sections while preserving provider order inside each
+section. If the configured item or candidate-byte ceiling omits remaining
+records, the run succeeds as `partial`, retains the complete normalized
+evidence, and reports `candidate:item-limit` or `candidate:byte-limit` instead
+of failing or implying that the rendered summary is exhaustive.
+
 Manual validation proves identity, interval, shape, bounds, safe normalized
 text, and evidence-reference integrity. It does not pretend that software can
 prove the semantic accuracy of arbitrary reviewer prose. The candidate,
