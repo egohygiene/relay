@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-20T15:23:04Z"
+  updated_at: "2026-09-20T15:28:20Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -65,17 +65,20 @@ work:
     checkpoint: 1
     checkpoint_name: freeze-upstream-profile-and-evidence-contracts
   next:
-    kind: pull-request
-    summary: "Publish checkpoint 1 from feat/5-architecture-validation, verify exact-head CI, and return merge authority to the user."
+    kind: pull-request-review
+    summary: "Verify PR #100 exact-head CI and review state, then return merge authority to the user."
 state:
   branch: feat/5-architecture-validation
   base_branch: main
   base_revision: b8c9cfbae7f74b8c7c6daf735a38a59ac72096d9
   base_tree: f4116c15ff34d9bd6af10287f1acb5141796ffac
-  active_pull_requests: []
+  implementation_revision: f40cc332f92b1b4ee9d77fc3a5901add4a21b963
+  implementation_tree: b6a14b92065f9a6b8654688f2c55ed752b55c7b8
+  active_pull_requests:
+    - egohygiene/relay#100
   issue_state: open
   plan_issue_state: open
-  notes: "No duplicate #5 pull request existed at checkpoint start. PR #98 had merged cleanly and #6 was closed."
+  notes: "PR #100 is the sole open Relay pull request and contains the exact reviewed implementation tree. PR #98 had merged cleanly and #6 was closed before this checkpoint began."
 upstream_evidence:
   hygiene:
     revision: c589587395750cd1c79c6fa0bef010189c547249
@@ -90,8 +93,8 @@ upstream_evidence:
     role: materialization
     release_included: false
 review:
-  status: local-validation-passed
-  reviewed_at: "2026-09-20T15:23:04Z"
+  status: published-exact-head-validation-pending
+  reviewed_at: "2026-09-20T15:28:20Z"
   reviewed_by: ChatGPT
   evidence:
     - command: "Verify current main, issues #5/#99, open pull requests, dependencies, repository guidance, architecture, decisions, roadmap, catalogs, and current CI."
@@ -115,6 +118,9 @@ review:
     - command: "Compile Python; parse JSON and YAML; validate inline and checked-in Bash; validate continuity structure and git diff whitespace."
       outcome: passed
       notes: "66 JSON documents, 34 YAML documents, and 91 inline Bash blocks parsed or passed syntax checks; CONTINUITY.md remained within its 240-line and 16-KiB bounds."
+    - command: "Publish the exact reviewed tree through the GitHub connector and open PR #100."
+      outcome: passed
+      notes: "Remote implementation commit f40cc332f92b1b4ee9d77fc3a5901add4a21b963 has tree b6a14b92065f9a6b8654688f2c55ed752b55c7b8, identical to the locally validated implementation tree."
   environment_limitations:
     - "A generic JSON Schema implementation is unavailable locally; the dependency-free validator, schema-shape tests, fixture validation, and JSON parsing provide the local check."
     - "Ruby is unavailable locally; PyYAML parsed action/workflow YAML and Bash validated extracted inline shell blocks. Canonical CI repeats Ruby/Psych parsing."
@@ -141,7 +147,7 @@ privacy:
 ## Current checkpoint
 
 Issue #99 decomposes parent #5 into six ordered checkpoints. Checkpoint 1 is
-implemented on `feat/5-architecture-validation` from exact main
+published in PR #100 from `feat/5-architecture-validation` and exact main
 `b8c9cfbae7f74b8c7c6daf735a38a59ac72096d9`. It freezes the immutable upstream
 profile and closed request/result seam only; it does not advertise a callable
 action or workflow.
@@ -158,9 +164,8 @@ advisory mode.
 
 ## Remaining gates
 
-1. Run the complete Relay validation suite and review the final diff.
-2. Publish one checkpoint-1 pull request advancing #5 and #99.
-3. Verify the exact PR head, reviews, mergeability, and all required checks.
-4. Return merge authority to the user; do not merge in this session.
-5. After the user merges, begin checkpoint 2 as a separate offline-adapter PR.
-6. Keep release publication and the moving `v1` alias deferred for the later batched release.
+1. Verify the exact PR head, reviews, mergeability, and all required checks.
+2. Resolve any blocking or substantive review finding in PR #100.
+3. Return merge authority to the user; do not merge in this session.
+4. After the user merges, begin checkpoint 2 as a separate offline-adapter PR.
+5. Keep release publication and the moving `v1` alias deferred for the later batched release.
