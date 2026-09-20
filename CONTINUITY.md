@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-20T03:10:32Z"
+  updated_at: "2026-09-20T03:15:50Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -70,12 +70,13 @@ work:
   next:
     kind: corrective-pull-request
     id: repository-journal-live-item-bound
-    description: "Publish the bounded deterministic-summary correction, obtain green exact-head review, return merge authority to the user, and then rerun the manual canary."
-    readiness: local-validation-passed-publication-pending
+    description: "Inspect PR #97 at its exact head, obtain green review, return merge authority to the user, and then rerun the manual canary after merge."
+    readiness: published-exact-head-validation-pending
     references:
       - https://github.com/egohygiene/relay/issues/15
       - https://github.com/egohygiene/relay/issues/95
       - https://github.com/egohygiene/relay/pull/96
+      - https://github.com/egohygiene/relay/pull/97
       - https://github.com/egohygiene/relay/actions/runs/35485517452
     depends_on: []
 state:
@@ -94,20 +95,21 @@ state:
     branch: fix/15-journal-live-item-bound
     implementation_revision: eb50cc532d06c9da34fa965ed41a3657d138043f
     implementation_tree: ecdca9760a61a12bb13b1148494e1122acc75ad1
-    pull_request: null
-    handoff_state: locally-validated-publication-pending
+    pull_request: https://github.com/egohygiene/relay/pull/97
+    handoff_state: published-exact-head-validation-pending
   live:
     status: corrective-follow-up-required
     observed_at: "2026-09-20T03:04:00Z"
     default_branch_revision: d77ac85a73d5911e84d9a07719620f7ce70e71b8
-    active_pull_requests: []
+    active_pull_requests:
+      - egohygiene/relay#97
     manual_run: https://github.com/egohygiene/relay/actions/runs/35485517452
     artifact_id: 10597169408
     artifact_digest: sha256:23861f9583ba42c0d7fdc5a3825559466afea51b982aa63fd4e5c5f564497c80
     notes: "The first main-branch manual canary used the expected read-only permissions and collected live evidence, but deterministic expansion exceeded the 100-item candidate ceiling. Sanitized failure result and summary artifacts were retained."
 review:
-  status: corrective-implementation-validated-publication-pending
-  reviewed_at: "2026-09-20T03:10:32Z"
+  status: corrective-implementation-published-exact-head-pending
+  reviewed_at: "2026-09-20T03:15:50Z"
   reviewed_by: ChatGPT
   evidence:
     - command: Reconcile merged PR #96, current main, issues #15/#95, roadmap, architecture, decisions, catalogs, continuity, CI, and late review feedback.
@@ -153,7 +155,8 @@ privacy:
 
 ## Current checkpoint
 
-PR #96 merged cleanly into `main`. Step 11 of #95 is active. The first manual
+PR #96 merged cleanly into `main`, and corrective PR #97 is published. Step 11
+of #95 is active. The first manual
 default-branch canary retained sanitized failure artifacts and revealed one
 bounded implementation defect: more than 100 valid provider records caused the
 deterministic generator to reject its own summary candidate.
@@ -175,8 +178,7 @@ closed when they violate the configured ceiling.
 
 ## Remaining gates
 
-1. Publish one corrective PR from `fix/15-journal-live-item-bound` and verify its
-   exact head, checks, review feedback, and mergeability.
+1. Verify PR #97's exact head, checks, review feedback, and mergeability.
 2. Return merge authority to the user; do not merge the PR here.
 3. After merge, rerun the deterministic manual canary on current `main` and
    inspect the summary, logs, evidence, candidate, Aether input, rendered
