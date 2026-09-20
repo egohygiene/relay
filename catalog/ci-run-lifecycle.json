@@ -1,0 +1,94 @@
+{
+  "$schema": "../schemas/ci-run-lifecycle.schema.json",
+  "schema": "egohygiene.relay.ci-run-lifecycle/v1",
+  "schema_version": 1,
+  "owner": "egohygiene/relay",
+  "workflow_classes": {
+    "supersedable-check": {
+      "cancel_in_progress": true,
+      "authority": "no-repository-mutation",
+      "group_requirement": "repository-and-work-identity",
+      "description": "A newer run representing the same ref may replace stale read-only analysis."
+    },
+    "evidence-preserving-check": {
+      "cancel_in_progress": false,
+      "authority": "no-repository-mutation",
+      "group_requirement": "repository-and-work-identity",
+      "description": "Accepted bytes or evidence must finish even when a newer run begins."
+    },
+    "serialized-write": {
+      "cancel_in_progress": false,
+      "authority": "purpose-bound-write",
+      "group_requirement": "repository-or-mutation-target",
+      "description": "Repository or deployment mutations serialize so cancellation cannot orphan provider state."
+    },
+    "immutable-publication": {
+      "cancel_in_progress": false,
+      "authority": "purpose-bound-write",
+      "group_requirement": "repository-and-immutable-identity",
+      "description": "Release publication serializes by immutable version and resumes only matching evidence."
+    }
+  },
+  "report_policy": {
+    "root": ".reports",
+    "producer_directory": ".reports/<producer>",
+    "producer_pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+    "artifact_name": "relay-report-<producer>-<run-id>-<run-attempt>",
+    "default_retention_days": 30,
+    "minimum_retention_days": 1,
+    "maximum_retention_days": 90,
+    "default_maximum_files": 100,
+    "default_maximum_bytes": 104857600,
+    "failure_upload_condition": "always",
+    "missing_failure_evidence": "unavailable-not-success"
+  },
+  "workflows": [
+    {"id": "artifact-budget", "path": ".github/workflows/artifact-budget.yml", "class": "supersedable-check"},
+    {"id": "continuity-preflight", "path": ".github/workflows/continuity-preflight.yml", "class": "supersedable-check"},
+    {"id": "continuity-preflight-dogfood", "path": ".github/workflows/continuity-preflight-dogfood.yml", "class": "supersedable-check"},
+    {"id": "relay-validation", "path": ".github/workflows/validate.yml", "class": "supersedable-check"},
+    {"id": "relay-release", "path": ".github/workflows/release.yml", "class": "immutable-publication"},
+    {"id": "release-artifact", "path": ".github/workflows/release-artifact.yml", "class": "immutable-publication"},
+    {"id": "release-prepare", "path": ".github/workflows/release-prepare.yml", "class": "supersedable-check"},
+    {"id": "semantic-release", "path": ".github/workflows/semantic-release.yml", "class": "immutable-publication"},
+    {"id": "label-sync-plan", "path": ".github/workflows/label-sync-plan.yml", "class": "supersedable-check"},
+    {"id": "label-sync-apply", "path": ".github/workflows/label-sync-apply.yml", "class": "serialized-write"},
+    {"id": "pull-request-label-plan", "path": ".github/workflows/pull-request-label-plan.yml", "class": "supersedable-check"},
+    {"id": "pull-request-label-apply", "path": ".github/workflows/pull-request-label-apply.yml", "class": "serialized-write"},
+    {"id": "stale-pull-requests", "path": ".github/workflows/stale-pull-requests.yml", "class": "serialized-write"},
+    {"id": "publication-review", "path": ".github/workflows/publication-review.yml", "class": "evidence-preserving-check"},
+    {"id": "publication-pages", "path": ".github/workflows/publication-pages.yml", "class": "serialized-write"},
+    {"id": "repository-intelligence", "path": ".github/workflows/repository-intelligence.yml", "class": "supersedable-check"},
+    {"id": "repository-journal", "path": ".github/workflows/repository-journal.yml", "class": "supersedable-check"},
+    {"id": "repository-journal-copilot", "path": ".github/workflows/repository-journal-copilot.yml", "class": "supersedable-check"},
+    {"id": "repository-journal-dogfood", "path": ".github/workflows/repository-journal-dogfood.yml", "class": "supersedable-check"},
+    {"id": "dependency-review", "path": ".github/workflows/dependency-review.yml", "class": "supersedable-check"},
+    {"id": "automerge-dependabot", "path": ".github/workflows/automerge-dependabot.yml", "class": "serialized-write"}
+  ],
+  "adoption_evidence": [
+    {
+      "id": "empathy-osv-scan",
+      "kind": "reviewed-consumer",
+      "repository": "egohygiene/empathy",
+      "revision": "98778e8442d3be3ea7a3d1f62b71f33969346ecc",
+      "path": ".github/workflows/osv-scan.yml",
+      "class": "supersedable-check",
+      "report_directory": ".reports/osv",
+      "retention_days": 30,
+      "failure_upload_condition": "always",
+      "proof_run_url": "https://github.com/egohygiene/empathy/actions/runs/35354888576",
+      "proof_snapshot_revision": "c9800ed19293e7c1b1d4a70c3bea006c1f2b64f5"
+    },
+    {
+      "id": "relay-disposable-failure-smoke",
+      "kind": "executable-fixture",
+      "repository": "egohygiene/relay",
+      "revision": "pull-request-head",
+      "path": ".github/workflows/validate.yml",
+      "class": "supersedable-check",
+      "report_directory": ".reports/ci-report-lifecycle-smoke",
+      "retention_days": 1,
+      "failure_upload_condition": "always"
+    }
+  ]
+}

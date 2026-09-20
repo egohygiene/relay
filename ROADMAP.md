@@ -446,7 +446,10 @@ This roadmap describes capability evolution, not promised dates or an issue queu
 
 **Status:** Complete for the v1 action and workflow contracts. Every current
 workflow is inventoried by owner and purpose with machine-checked permissions,
-timeouts, concurrency, parameters, and failure semantics.
+timeouts, concurrency, parameters, and failure semantics. Issue #6 adds a
+separate versioned lifecycle catalog for cancellation classes plus bounded,
+run-bound success and failure report preservation without changing the workflow
+catalog v1 schema.
 
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 
@@ -479,8 +482,8 @@ consumer evidence is tracked in Phase 5.
 release declaration, changelog, and version authority prepare the additive
 `v1.6.0` surface: product-facing release names, legacy-workflow intake policy,
 advisory-first stale pull-request lifecycle automation, and reusable artifact
-size/performance budgets. Publication remains an explicit manual dispatch after
-review.
+size/performance budgets, plus bounded CI report preservation. Publication
+remains an explicit manual dispatch after review.
 
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 

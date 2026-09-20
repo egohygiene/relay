@@ -8,6 +8,9 @@ All notable changes to Relay are documented in this file. The format follows
 
 ### Added
 
+- A versioned CI run lifecycle contract and reusable report-preservation action
+  with explicit cancellation classes, stable `.reports/<producer>` paths,
+  bounded checksummed manifests, failure-safe upload, and retention policy.
 - A reusable evidence-bound repository journal with deterministic and
   reviewed-manual no-billing modes, a separately permissioned future Copilot
   adapter, pinned Aether rendering, explicit incomplete states, and Relay

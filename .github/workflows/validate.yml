@@ -42,6 +42,9 @@ jobs:
       - name: Validate action catalog and metadata
         run: python3 scripts/validate_actions.py
 
+      - name: Validate CI run lifecycle contract
+        run: python3 scripts/validate_ci_run_lifecycle.py
+
       - name: Validate continuity preflight contracts
         run: python3 scripts/validate_continuity_preflight_contract.py validate
 
@@ -139,6 +142,41 @@ jobs:
             paths.each { |path| Psych.parse_file(path) }
             puts "Parsed #{paths.length} YAML metadata documents"
           '
+
+      - name: Exercise disposable failing report producer
+        id: ci-report-lifecycle-check
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ".reports/ci-report-lifecycle-smoke"
+          printf '{"expected_outcome":"failure","fixture":"disposable"}\n' \
+            > ".reports/ci-report-lifecycle-smoke/result.json"
+          exit 1
+
+      - name: Preserve disposable failure evidence
+        id: ci-report-lifecycle-report
+        if: "${{ always() }}"
+        uses: ./actions/preserve-ci-report
+        with:
+          producer: "ci-report-lifecycle-smoke"
+          outcome: "${{ steps.ci-report-lifecycle-check.outcome }}"
+          retention-days: "1"
+
+      - name: Verify disposable failure evidence
+        if: "${{ always() }}"
+        shell: bash
+        env:
+          CI_REPORT_ARTIFACT_ID: "${{ steps.ci-report-lifecycle-report.outputs.artifact-id }}"
+          CI_REPORT_CHECK_OUTCOME: "${{ steps.ci-report-lifecycle-check.outcome }}"
+          CI_REPORT_COMPLETENESS: "${{ steps.ci-report-lifecycle-report.outputs.completeness }}"
+          CI_REPORT_MANIFEST_SHA256: "${{ steps.ci-report-lifecycle-report.outputs.manifest-sha256 }}"
+        run: |
+          set -euo pipefail
+          [[ "${CI_REPORT_CHECK_OUTCOME}" == "failure" ]]
+          [[ "${CI_REPORT_COMPLETENESS}" == "partial" ]]
+          [[ -n "${CI_REPORT_ARTIFACT_ID}" ]]
+          [[ "${CI_REPORT_MANIFEST_SHA256}" =~ ^[0-9a-f]{64}$ ]]
 
       - name: Upload repository-journal evidence fixture
         # actions/upload-artifact v7.0.1

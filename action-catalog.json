@@ -32,6 +32,17 @@
       "consumer_ref": "egohygiene/relay/actions/normalize-repository-report@v1"
     },
     {
+      "id": "preserve-ci-report",
+      "path": "actions/preserve-ci-report",
+      "name": "Preserve CI Report",
+      "summary": "Bind bounded success or failure evidence to a workflow run and preserve it as a checksummed artifact.",
+      "status": "beta",
+      "runtime": ["bash", "python3"],
+      "permissions": {},
+      "side_effects": ["artifact-write", "workspace-write"],
+      "consumer_ref": "egohygiene/relay/actions/preserve-ci-report@v1"
+    },
+    {
       "id": "publish-report-snapshot",
       "path": "actions/publish-report-snapshot",
       "name": "Publish Report Snapshot",

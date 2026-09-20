@@ -71,6 +71,7 @@ actions/
 ├── repository-labels/            # governed label and PR metadata engine
 ├── stale-pull-requests/           # warning-first lifecycle plan and apply
 ├── normalize-repository-report/  # producer contract adapter
+├── preserve-ci-report/            # bounded run-bound artifact evidence
 ├── publish-report-snapshot/      # guarded default-branch writer
 ├── validate-publication-site/    # host-neutral local publication proof
 ├── validate-release-bundle/      # profile and immutable evidence validation
@@ -102,6 +103,7 @@ actions/
 
 action-catalog.json               # public composite-action surface
 workflow-catalog.json             # complete owner, authority, and failure inventory
+catalog/ci-run-lifecycle.json     # cancellation classes and report retention
 release-profiles.json             # versioned release artifact and rollback contract
 catalog/repository-continuity-preflight.json
                                   # pinned, release-gated continuity input profile
