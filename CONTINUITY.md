@@ -7,19 +7,20 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-17T13:08:24Z"
+  updated_at: "2026-09-20T01:32:21Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Preserve the minimum verified state needed to continue Relay #15 through the ordered execution plan in #95.
+  purpose: "Preserve the verified implementation and acceptance state for Relay #15 and its ordered plan #95."
   includes:
-    - Relay #15, execution plan #95, draft PR #96, and the verified main and implementation revisions.
-    - Step 1's checksum-locked Copilot CLI runtime, authentication choices, preflight contracts, validation, and connection procedure.
-    - The remaining user-assisted organization-policy and account-connection gate.
+    - "Relay #15, execution plan #95, draft PR #96, current main, the implementation commit, and the remaining exact-head and post-merge gates."
+    - No-billing deterministic and reviewed-manual modes, the explicit unavailable state, and the separately authorized future Copilot adapter.
+    - Immutable Aether and Copilot runtime dependencies, bounded provider evidence, validation, rendering, catalogs, dogfood, documentation, and tests.
   excludes:
-    - Aether dependency freezing, evidence collection, agent execution, journal rendering, workflow composition, live Copilot requests, and release publication.
+    - Live Copilot billing, policy, account connection, or invocation while the user keeps that optional path disabled.
+    - PR merge, release publication, movement of the v1 alias, external delivery sinks, and post-merge canary execution.
   precedence:
     - user-and-runtime-instructions
     - scoped-repository-instructions
@@ -36,22 +37,27 @@ scope:
     - workflow-catalog.json
     - action-catalog.json
     - catalog/repository-journal-runtime.json
+    - catalog/repository-journal-aether.json
+    - actions/repository-journal/action.yml
+    - actions/repository-journal/journal.py
+    - docs/repository-journal.md
     - docs/repository-journal-runtime.md
-    - schemas/repository-journal-runtime-profile.v1.schema.json
-    - schemas/repository-journal-runtime-preflight-result.v1.schema.json
+    - schemas/repository-journal-evidence.v1.schema.json
+    - schemas/repository-journal-candidate.v1.schema.json
+    - schemas/repository-journal-result.v1.schema.json
     - scripts/validate_repository_journal_runtime.py
+    - tests/test_repository_journal.py
     - tests/test_repository_journal_runtime.py
-    - vendor/copilot-cli/package.json
-    - vendor/copilot-cli/package-lock.json
+    - tests/test_repository_journal_workflow.py
 work:
-  objective: Deliver a reusable scheduled repository journal through one bounded, evidence-gated implementation line.
+  objective: "Deliver #15 through one evidence-bound implementation PR while keeping Copilot activation optional and release work deferred."
   success_conditions:
-    - Complete each numbered checkpoint in #95 in order and record its reviewable evidence before advancing.
-    - Keep GitHub evidence deterministic and authoritative while treating repository text and agent output as untrusted data.
-    - Bind the Aether journal contract immutably and render validated output deterministically.
-    - Keep agent authority isolated, least-privilege, non-mutating, bounded, and independent of consumer code execution.
-    - Publish Step Summary and durable machine-readable artifacts with explicit completeness and provenance.
-    - Pass exact-head validation and user-controlled merge without bundling release or moving-alias publication.
+    - Default deterministic and reviewed-manual paths work without Copilot billing or account setup.
+    - GitHub evidence remains bounded and authoritative; candidate prose remains non-authoritative and evidence-referenced.
+    - The pinned Aether renderer produces checksummed Markdown and JSON with explicit complete, partial, unavailable, and failed states.
+    - Default and Copilot permissions remain statically separated, no consumer code runs, and no repository or delivery mutation exists.
+    - Step Summary and durable artifacts preserve human and machine reports, provenance, checksums, and sanitized failure evidence.
+    - "PR #96 passes exact-head CI and user-controlled merge before post-merge manual and scheduled canary acceptance."
   active_issue:
     provider: github
     id: egohygiene/relay#15
@@ -60,12 +66,12 @@ work:
     provider: github
     id: egohygiene/relay#95
     url: https://github.com/egohygiene/relay/issues/95
-    active_step: 1
+    active_step: 10
   next:
-    kind: manual-verification
-    id: repository-journal-runtime-connection
-    description: Verify the organization-billed GitHub token path with the user, record the Step 1 checkpoint on #95, and do not advance Step 2 until the connection evidence is reconciled.
-    readiness: implementation-ready-connection-pending
+    kind: exact-head-validation
+    id: repository-journal-pr-validation
+    description: "Publish the implementation and continuity commits, inspect PR #96 exact-head checks and feedback, then mark it ready only if the head is green and review finds no blocker."
+    readiness: implementation-complete-publish-pending
     references:
       - https://github.com/egohygiene/relay/issues/15
       - https://github.com/egohygiene/relay/issues/95
@@ -75,136 +81,105 @@ state:
   base:
     revision: 325382e2baba094319373d6931b57f54743832f1
     ref: refs/heads/main
-    verified_at: "2026-09-17T13:07:00Z"
+    verified_at: "2026-09-20T01:30:00Z"
   candidate:
     branch: feat/15-repository-journal
-    implementation_revision: f94eb4f8360e34963953417fadc3919d3a106ae7
-    implementation_tree: d088d6d7f07a39627abc49c0f2e96a97b6a66047
+    implementation_revision: c78e4253819d4c61aa86520b0ce5a8dc40486285
+    implementation_tree: b72cb0bb054ce9fb7657c3c85b49ef7fcb99f715
     pull_request: https://github.com/egohygiene/relay/pull/96
-    handoff_state: draft-step-1-connection-pending
+    handoff_state: implementation-complete-exact-head-validation-pending
   live:
-    status: verified
-    observed_at: "2026-09-17T13:08:24Z"
+    status: verified-before-publication
+    observed_at: "2026-09-20T01:30:00Z"
     default_branch_revision: 325382e2baba094319373d6931b57f54743832f1
-    prior_delivery_checkpoint:
-      issue: egohygiene/relay#17
-      pull_request: egohygiene/relay#94
-      state: merged
+    remote_pull_request_head: fa2cf1cd0c5800b1638a68ac1a03ba84ea4cb9dc
     active_pull_requests:
       - egohygiene/relay#96
-    notes: No duplicate #15 branch or pull request existed before #96. Issues #15 and #95 remain open, and #95 has no checkpoint comment yet.
+    notes: "PR #96 is open, draft, and mergeable with no duplicate implementation PR. Issues #15 and #95 remain open. The local implementation is one commit ahead of the published head."
 review:
-  status: implementation-reviewed-connection-pending
-  reviewed_at: "2026-09-17T13:08:00Z"
+  status: implementation-validated-exact-head-pending
+  reviewed_at: "2026-09-20T01:32:21Z"
   reviewed_by: ChatGPT
   evidence:
-    - command: Verify current main, issues #15 and #95, comments, open pull requests, matching branches, repository instructions, architecture, decisions, roadmap, catalogs, and prior continuity.
+    - command: "Reconcile live main, issues #15/#95, their checkpoint state, PR #96, repository instructions, architecture, decisions, roadmap, catalogs, and continuity."
       outcome: passed
-      notes: Main is 325382e2baba094319373d6931b57f54743832f1; #15 and #95 are open; no duplicate implementation line existed.
-    - command: Review GitHub's official Copilot CLI Actions, authentication, and programmatic-use documentation and the live npm package metadata.
+      notes: "Main remains 325382e2baba094319373d6931b57f54743832f1; PR #96 remains the single open draft implementation line."
+    - command: Reconcile Step 1 with the user's no-billing decision and freeze the Aether distribution.
       outcome: passed
-      notes: The preferred GITHUB_TOKEN path requires organization opt-in and copilot-requests write; the explicit fallback is a fine-grained PAT with Copilot Requests permission. @github/copilot 1.0.85 was selected and locked.
-    - command: Implement the runtime profile, npm lock, preflight result contract, secret-free validator, connection guide, tests, and canonical CI validation.
+      notes: "Approved Copilot authentication is intentionally unavailable and fails closed; deterministic/manual modes are current. Aether PR #59 is pinned at aa0cb090a7ca4a47f22268784af0ce34aaf69b48 with exact file digests."
+    - command: Implement bounded evidence, candidate validation, deterministic Aether rendering, no-billing/manual/unavailable adapters, and the future no-tool Copilot adapter.
       outcome: passed
-      notes: The exact published implementation tree is d088d6d7f07a39627abc49c0f2e96a97b6a66047. It performs no live Copilot request and changes no organization setting.
-    - command: python3 scripts/validate_repository_journal_runtime.py validate
+      notes: Evidence sources, pages, records, responses, text, intervals, candidate items, prompts, requests, and runtime are bounded. Manual prose must cite compatible evidence kinds.
+    - command: Compose the reusable no-billing workflow, separately permissioned Copilot workflow, and Relay scheduled/manual deterministic dogfood caller.
       outcome: passed
-      notes: The closed profile, exact package graph, registry sources, SHA-512 integrity values, and recorded file digests passed.
-    - command: python3 scripts/validate_actions.py
+      notes: The default and dogfood workflows have no Copilot permission. No path checks out or executes consumer code, mutates a repository, or owns an external sink.
+    - command: python3 scripts/validate_actions.py and python3 scripts/validate_repository_journal_runtime.py validate
       outcome: passed
-      notes: 11 actions, 18 workflows, and 13 reusable workflow entries validated.
-    - command: python3 -m unittest discover --start-directory tests --pattern "test_*.py"
+      notes: 12 actions, 21 workflows, and 15 reusable workflows validated; runtime, npm lock, Aether distribution, and six journal schemas validated.
+    - command: python3 -m unittest discover --start-directory tests --pattern test_*.py
       outcome: passed
-      notes: 368 tests passed, including 12 focused runtime and authentication tests.
-    - command: python3 -m compileall -q actions scripts tests
+      notes: 395 tests passed, including 39 focused runtime, collector, candidate, renderer, security, failure, workflow, and fixture tests.
+    - command: Compile Python; parse 70 JSON and 33 YAML documents; parse 85 inline shell blocks; validate Bash syntax; run git diff checks.
       outcome: passed
-      notes: Python sources compiled successfully.
-    - command: Parse 57 JSON and 31 YAML documents and inspect the installed locked CLI version.
+      notes: All local static and syntax checks passed.
+    - command: Install the locked npm graph without scripts and inspect the exact CLI.
       outcome: passed
-      notes: Documents parsed successfully and the executable reported GitHub Copilot CLI 1.0.85 without receiving credential or unrelated environment values.
-    - command: git diff --check
+      notes: GitHub Copilot CLI 1.0.85 was observed; required no-tool, MCP-disable, isolation, noninteractive, remote-disable, and credit-bound flags are present.
+    - command: Final implementation, permission, secret-flow, prompt-injection, provenance, failure-retention, contract, and documentation review.
       outcome: passed
-      notes: The Step 1 implementation diff contains no whitespace errors.
-    - command: Final runtime, security, contract, and documentation review.
-      outcome: passed
-      notes: No blocker, major, or minor implementation findings remain; live policy and account evidence is deliberately pending.
+      notes: No known blocker, major, or minor finding remains locally. Exact-head GitHub Actions and review feedback remain pending publication.
   environment_limitations:
-    - A generic JSON Schema implementation is unavailable locally; the repository-owned closed validator and contract tests passed.
-    - The scratch clone has no HTTPS push credential; the selected GitHub connection published the exact reviewed Git tree.
-    - The selected GitHub connection does not expose organization Copilot policy settings; that gate requires the user's organization settings session.
-    - The named maintain-repository-continuity skill is unavailable in this session; the checked-in continuity contract and validator were applied directly.
+    - A generic JSON Schema implementation is unavailable locally; closed repository validators, shape tests, fixture tests, and JSON parsing passed.
+    - Ruby is unavailable locally; PyYAML parsed all action/workflow YAML and Bash parsed every extracted inline shell block. Canonical CI repeats the repository's Ruby/Psych checks.
+    - The selected GitHub connection cannot inspect organization Copilot policy; the user explicitly deferred that optional path and the preflight remains unavailable without it.
+    - The named maintain-repository-continuity skill is unavailable in this session; the checked-in continuity contract was updated directly.
 roadmap_impact:
-  disposition: evidence-reconciled-no-state-transition
-  rationale: Step 1 establishes proposed runtime evidence for #15 without delivering the workflow, completing the execution plan, or publishing a release.
+  disposition: evidence-reconciled-active-no-completion-transition
+  rationale: "REL-JOURNAL-001 now records implementation evidence but remains active until PR #96 merges and default-branch manual plus scheduled canaries are verified."
 adr_impact:
   disposition: none
-  rationale: The implementation operationalizes existing least-privilege, immutable-reference, bounded-evidence, release-unit, and catalog decisions without changing ownership or authority.
+  rationale: The work operationalizes ADR-001, ADR-002, ADR-003, ADR-005, and ADR-006 without changing ownership or authority.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
   redactions: []
-  notes: The profile and results contain package metadata, declared policy and permission states, boolean credential presence, reason codes, versions, and hashes; token values, prefixes, lengths, and fragments are excluded.
+  notes: Tokens never enter prompts, logs, or artifacts. Evidence is normalized, common credential forms are redacted, and untrusted Markdown is escaped before Step Summary rendering.
 ---
 
 # Relay continuity
 
 ## Current checkpoint
 
-Relay #15 is active through the ordered eleven-step plan in #95. Draft PR #96
-is the single implementation line. Step 1's repository code is complete; live
-organization policy and account connection evidence remains pending.
+PR #96 is the single implementation line for #15. Steps 1 through 9 of #95
+have local reviewable evidence. Step 10 is active: publish the current commits,
+verify exact-head GitHub Actions and feedback, then return merge authority to the
+user. Step 11 remains post-merge live acceptance.
 
-## Step 1 implementation
+The user chose not to enable Copilot billing or organization policy now. That is
+an explicit supported state, not a blocker: Relay's deterministic schedule and
+reviewed-manual candidate path require no AI account. The Copilot workflow is a
+separate dormant opt-in that fails closed before invocation until its policy,
+permission, credential, and billing checks are acknowledged.
 
-Branch: `feat/15-repository-journal`
+## Implementation boundary
 
-Published implementation revision:
-`f94eb4f8360e34963953417fadc3919d3a106ae7`
+Implementation commit: `c78e4253819d4c61aa86520b0ce5a8dc40486285`
 
-Pull request: https://github.com/egohygiene/relay/pull/96
+The implementation pins Aether's draft journal distribution and Copilot CLI,
+collects bounded provider metadata, preserves source completeness, validates
+candidate identity and evidence references, escapes untrusted Markdown, renders
+offline through Aether, and publishes the human report plus checksummed machine
+evidence. The manual checker establishes provenance and compatible evidence
+kinds; human reviewers retain semantic authority over free-form prose.
 
-The proposed profile locks `@github/copilot@1.0.85` and its npm graph, prefers
-the short-lived workflow `GITHUB_TOKEN`, and defines a non-automatic
-fine-grained PAT fallback. Its offline preflight emits only closed readiness
-evidence and fails on missing, conflicting, unsupported, or unverified state.
+## Remaining gates
 
-## Authority and cost boundary
-
-Step 1 makes no Copilot request, stores no credential, and changes no GitHub
-setting. The preferred path requires organization approval for Copilot CLI
-billed to the organization plus `copilot-requests: write`. The fallback must be
-selected explicitly and is billed to the token owner's Copilot entitlement.
-One invocation, one attempt, a five-minute timeout, and one scheduled run per
-day are the initial upper bounds.
-
-## Validation evidence
-
-The implementation passed all 368 tests, 12 focused tests, action/workflow
-catalog validation, continuity-contract validation, Python compilation, JSON
-and YAML parsing, exact CLI version inspection, diff checking, and final code,
-security, contract, and documentation review.
-
-## Known limitations and gates
-
-- PR #96 remains draft and grants no merge, release, or publication authority.
-- #95 Step 1 remains unchecked until the organization policy, workflow
-  permission, billing principal, and approved credential path are verified.
-- No later #95 checkpoint has started.
-- No consumer code is checked out or executed.
-
-## Next dependency-ready action
-
-Open the organization Copilot policy with the user, verify the preferred
-organization-billed path, run the secret-free offline preflight in its intended
-context, and record the Step 1 evidence on #95. If the preferred path is
-unavailable, select the fine-grained PAT fallback explicitly rather than
-switching automatically.
-
-## Resume protocol
-
-1. Verify current `main` and PR #96's exact head and checks.
-2. Confirm the live organization policy for Copilot CLI billing.
-3. Confirm the intended workflow permission and billing principal.
-4. Run the offline preflight without printing or persisting credentials.
-5. Record the Step 1 checkpoint on #95 before beginning Step 2.
-6. Keep PR #96 draft and do not merge, publish, or move an alias.
+1. Publish the implementation and continuity commits to PR #96.
+2. Inspect exact-head validation, continuity, dependency, review, and merge state.
+3. If green, mark PR #96 ready for the user to merge; do not merge it here.
+4. After merge, verify current `main`, manually dispatch the deterministic Relay
+   dogfood workflow, inspect its summary/artifact/logs, then observe its first
+   scheduled run.
+5. Reconcile and close #95 and #15 only after that live evidence. Keep release
+   publication, the moving `v1` alias, optional Copilot activation, and external
+   delivery adapters deferred.
