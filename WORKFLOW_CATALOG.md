@@ -11,7 +11,7 @@ and failure semantics.
 | Workflow | Audience | Owner | Purpose | Maximum authority | Timeout |
 | --- | --- | --- | --- | --- | --- |
 | `artifact-budget` | Reusable | `egohygiene/relay` | Normalize caller-produced artifact size evidence and enforce advisory or blocking budgets | `contents: read` | 10 minutes |
-| `relay-validation` | Internal | `egohygiene/relay` | Validate packages, contracts, metadata, and the reusable smoke path | `actions: read`, `contents: read` | 15 minutes |
+| `relay-validation` | Internal | `egohygiene/relay` | Validate packages, contracts, metadata, and the reusable smoke path | `actions: read`, `contents: read`, `issues: read`, `pull-requests: read`, `security-events: read` | 15 minutes |
 | `relay-release` | Internal | `egohygiene/relay` | Dogfood the reviewed semantic-release handoff | job-scoped `contents: write` | 15 minutes |
 | `release-artifact` | Reusable | `egohygiene/relay` | Validate a profile-bound caller artifact and publish immutable release evidence | job-scoped `contents: write` | 15 minutes |
 | `release-prepare` | Reusable | `egohygiene/relay` | Plan or verify Aether-declared release intent and retain evidence | `actions: read`, `contents: read` | 10 minutes |
@@ -19,6 +19,9 @@ and failure semantics.
 | `publication-review` | Reusable | `egohygiene/relay` | Validate and preserve exact caller-built publication bytes | `actions: read`, `contents: read` | 10 minutes |
 | `publication-pages` | Reusable | `egohygiene/relay` | Deploy the exact read-only reviewed artifact and remotely prove it | job-scoped `pages: write` and `id-token: write` | 20 minutes |
 | `repository-intelligence` | Reusable | `egohygiene/relay` | Build, verify, and upload one bounded intelligence artifact | `contents: read` | 15 minutes |
+| `repository-journal` | Reusable | `egohygiene/relay` | Render validated deterministic or reviewed-manual journal evidence without AI billing | `actions: read`, provider metadata reads | 10 minutes |
+| `repository-journal-copilot` | Reusable | `egohygiene/relay` | Generate one no-tool candidate behind explicit account preflight | read permissions plus job-scoped `copilot-requests: write` | 10 minutes |
+| `repository-journal-dogfood` | Internal | `egohygiene/relay` | Schedule and manually dispatch Relay's deterministic no-billing canary | read-only provider metadata | reusable caller |
 | `label-sync-plan` | Reusable | `egohygiene/relay` | Preview canonical label synchronization | `contents: read`, `issues: read` | 10 minutes |
 | `label-sync-apply` | Reusable | `egohygiene/relay` | Recompute and apply an approved label plan | job-scoped `issues: write` | 10 minutes |
 | `pull-request-label-plan` | Reusable | `egohygiene/relay` | Plan PR labels and contributor checks without executing PR code | `contents: read`, `issues: read`, `pull-requests: read` | 10 minutes |
@@ -44,7 +47,9 @@ review together.
 ## Security contract
 
 - Workflow defaults grant only `contents: read`.
-- Write permission is job-scoped and bound to release or Pages deployment.
+- Repository and deployment write permissions are job-scoped and purpose-bound.
+- Copilot request permission exists only in the separately callable Copilot
+  journal workflow; the default journal and dogfood schedule cannot receive it.
 - `write-all` and `pull_request_target` are prohibited.
 - Every remote action or reusable workflow is pinned to a full 40-character
   commit SHA. The human-readable release remains in an adjacent comment.
@@ -142,6 +147,24 @@ Limit checks remain explicit report states. Blocking mode uploads the completed
 report before failing; advisory mode preserves the same evidence without
 granting mutation authority.
 
+Repository-journal generation separates deterministic provider evidence from
+non-authoritative candidate prose and deterministic rendering. The default
+reusable workflow supports deterministic, reviewed-manual, and intentionally
+unavailable modes with read-only provider permissions and no AI account or
+billing dependency. Each candidate statement cites an exact normalized record
+ID; Relay validates identity, interval, bounds, references, and safe text, then
+retains the candidate beside its evidence. Manual validation establishes that
+provenance boundary but does not claim semantic proof of free-form prose.
+
+The separately callable Copilot workflow is the only journal surface with
+`copilot-requests: write`. It checks a checksum-bound, secret-free account
+preflight before at most one no-tool invocation. Unknown policy, permission,
+billing, credential, or runtime state makes no request and yields an explicit
+unavailable result. Provider truncation or unavailability remains partial or
+unavailable evidence; invalid input or rendering preserves bounded failure
+evidence before the job fails. Neither path checks out consumer code, mutates a
+repository, or owns an external delivery sink.
+
 **Emergency disable**: remove the `automerge-dependabot` workflow file or set
 `if: false` on the `approve-and-merge` job to immediately stop automated
 merges without affecting dependency-review analysis. Disable
@@ -160,7 +183,8 @@ than closure authority.
 
 ## Reusable caller contract
 
-`artifact-budget`, `repository-intelligence`, `publication-review`, `publication-pages`,
+`artifact-budget`, `repository-intelligence`, `repository-journal`,
+`repository-journal-copilot`, `publication-review`, `publication-pages`,
 `release-artifact`, `release-prepare`, `semantic-release`, `label-sync-plan`,
 `label-sync-apply`, `pull-request-label-plan`, `pull-request-label-apply`, and
 `stale-pull-requests` are the reusable workflows in v1. Their inputs, defaults,

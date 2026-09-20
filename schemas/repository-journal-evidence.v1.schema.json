@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/repository-journal-evidence/v1/schema.json",
+  "title": "Relay repository journal evidence v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "repository",
+    "revision",
+    "interval",
+    "collected_at",
+    "limits",
+    "sources"
+  ],
+  "properties": {
+    "schema_version": {"const": "relay.repository-journal-evidence/v1"},
+    "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "interval": {"$ref": "#/$defs/interval"},
+    "collected_at": {"type": "string", "format": "date-time", "pattern": "Z$"},
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maximum_pages_per_source",
+        "maximum_records_per_source",
+        "maximum_response_bytes",
+        "maximum_text_bytes"
+      ],
+      "properties": {
+        "maximum_pages_per_source": {"type": "integer", "minimum": 1, "maximum": 5},
+        "maximum_records_per_source": {"type": "integer", "minimum": 1, "maximum": 100},
+        "maximum_response_bytes": {"const": 2097152},
+        "maximum_text_bytes": {"const": 512}
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "merged_pull_requests",
+        "open_pull_requests",
+        "open_issues",
+        "releases",
+        "workflow_runs",
+        "dependency_security"
+      ],
+      "properties": {
+        "merged_pull_requests": {"$ref": "#/$defs/source"},
+        "open_pull_requests": {"$ref": "#/$defs/source"},
+        "open_issues": {"$ref": "#/$defs/source"},
+        "releases": {"$ref": "#/$defs/source"},
+        "workflow_runs": {"$ref": "#/$defs/source"},
+        "dependency_security": {"$ref": "#/$defs/source"}
+      }
+    }
+  },
+  "$defs": {
+    "interval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": {"type": "string", "format": "date-time", "pattern": "Z$"},
+        "end": {"type": "string", "format": "date-time", "pattern": "Z$"}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason", "records"],
+      "properties": {
+        "status": {"enum": ["complete", "empty", "truncated", "unavailable"]},
+        "reason": {"type": ["string", "null"], "maxLength": 160},
+        "records": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {"$ref": "#/$defs/record"}
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "url", "title", "state", "observed_at", "labels"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z_]{0,39}:[0-9]+$"},
+        "kind": {"type": "string", "minLength": 1, "maxLength": 80},
+        "url": {"type": "string", "format": "uri", "pattern": "^https://github.com/"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 512},
+        "state": {"type": "string", "minLength": 1, "maxLength": 80},
+        "observed_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "labels": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 80}
+        }
+      }
+    }
+  }
+}

@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-09-17
+updated: 2026-09-20
 governed_by:
   - architecture-roadmap
 depends_on:
@@ -33,7 +33,7 @@ repository: egohygiene/relay
 visibility: public
 publication: central
 route: /roadmap/relay/
-updated: 2026-09-17
+updated: 2026-09-20
 -->
 ## 2026-08-25 execution snapshot
 
@@ -371,6 +371,43 @@ locally before pull-request presentation and through a read-only CI backstop.
   reusable workflow/dogfood #63.
 - All upstream inputs are immutable reviewed commits but remain unreleased;
   promotion is capped at `observe`.
+
+### Repository journal track
+
+<!-- roadmap-step
+id: REL-JOURNAL-001
+status: active
+depends_on: [REL-Q01]
+issues: [15, 95]
+-->
+#### REL-JOURNAL-001 — Ship the evidence-bound repository journal
+
+**State:** `active`
+**Depends on:** `REL-Q01`
+
+**Outcome:** Repositories can schedule or manually dispatch an inspectable
+Aether journal without requiring AI billing, while a separately permissioned
+Copilot adapter remains available for explicit later activation.
+
+**Exit criteria:**
+
+- [x] The Aether 1.0.0 draft distribution and Copilot runtime are bound by
+  immutable revisions, package locks, and checksums.
+- [x] Bounded provider evidence, candidate, result, completeness, provenance,
+  and deterministic-rendering contracts are implemented and tested.
+- [x] Read-only no-billing and separately authorized Copilot reusable workflows
+  are cataloged; Relay owns a scheduled/manual deterministic canary caller.
+- [ ] PR #96 is merged and the implementation is verified on current `main`.
+- [ ] A default-branch manual canary and the first scheduled execution retain
+  valid summaries, artifacts, provenance, permissions, and sanitized logs.
+
+**Current evidence:**
+
+- Issue #95 owns the ordered eleven-step evidence plan for parent #15.
+- PR #96 is the single implementation line. Deterministic and reviewed-manual
+  modes are the present no-billing path; organization Copilot connection is an
+  optional later activation rather than an implementation prerequisite.
+- Release publication and movement of the `v1` alias remain outside this track.
 
 ### Roadmap-to-issue handoff
 

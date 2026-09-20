@@ -1,0 +1,89 @@
+{
+  "$schema": "../schemas/repository-journal-aether-profile.v1.schema.json",
+  "schema_version": "relay.repository-journal-aether-profile/v1",
+  "version": "1.0.0-alpha.1",
+  "status": "proposed",
+  "owner": "egohygiene/relay",
+  "updated": "2026-09-20",
+  "source": {
+    "repository": "egohygiene/aether",
+    "revision": "aa0cb090a7ca4a47f22268784af0ce34aaf69b48",
+    "tree": "f123061d1eb494a70feff8bab49261b2066dc2f4",
+    "pull_request": "https://github.com/egohygiene/aether/pull/59"
+  },
+  "contract": {
+    "id": "repository-journal",
+    "version": "1.0.0",
+    "lifecycle": "draft",
+    "schema_id": "https://egohygiene.io/schemas/aether/repository-journal/v1.json",
+    "spec_digest": {
+      "algorithm": "sha256-utf8-lf",
+      "value": "330ffbc376821cff40c95ff25c8f53538a61846ced2f86d35acb6b8b10c7251b"
+    }
+  },
+  "distribution": {
+    "id": "distribution/create-repository-journal",
+    "artifact_id": "skill/create-repository-journal",
+    "version": "1.0.0",
+    "source_digest": {
+      "algorithm": "sha256-utf8-lf",
+      "value": "20478640d878d5d9b4d06e934f6a72f825e7292bec9acfc78c909e4f8f4702c7"
+    }
+  },
+  "files": [
+    {
+      "role": "schema",
+      "upstream_path": "catalog/schemas/aether.repository-journal.v1.schema.json",
+      "vendor_path": "vendor/aether/catalog/schemas/aether.repository-journal.v1.schema.json",
+      "sha256": "8788ec86d062baf73d6320f080643396abc5d4dadd69996b88b6493b6d2c654e",
+      "bytes": 1518
+    },
+    {
+      "role": "distribution-metadata",
+      "upstream_path": "dist/skills/create-repository-journal/distribution-manifest.v1.json",
+      "vendor_path": "vendor/aether/distribution-manifest.v1.json",
+      "sha256": "ecf0dcebb6fadba38273c1883ae8366b35b0f87c2531d198d21f06447367c53d",
+      "bytes": 1045
+    },
+    {
+      "role": "skill-metadata",
+      "upstream_path": "library/organization/skills/quality/create-repository-journal/SKILL.md",
+      "vendor_path": "vendor/aether/library/organization/skills/quality/create-repository-journal/SKILL.md",
+      "sha256": "20478640d878d5d9b4d06e934f6a72f825e7292bec9acfc78c909e4f8f4702c7",
+      "bytes": 1961
+    },
+    {
+      "role": "report-contract",
+      "upstream_path": "library/organization/skills/quality/create-repository-journal/references/report-contract.md",
+      "vendor_path": "vendor/aether/library/organization/skills/quality/create-repository-journal/references/report-contract.md",
+      "sha256": "a29016e80a49c80e26ce263905e5e41492df16f27a903c5996965d023d3d9786",
+      "bytes": 401
+    },
+    {
+      "role": "renderer",
+      "upstream_path": "library/organization/skills/quality/create-repository-journal/scripts/repository-journal.py",
+      "vendor_path": "vendor/aether/library/organization/skills/quality/create-repository-journal/scripts/repository-journal.py",
+      "sha256": "be5652953a0cbaa038e5c98cf2b093b100153ffcd85d69068cff8affae5adee3",
+      "bytes": 4771
+    },
+    {
+      "role": "input-template",
+      "upstream_path": "library/organization/skills/quality/create-repository-journal/templates/repository-journal-input.template.json",
+      "vendor_path": "vendor/aether/library/organization/skills/quality/create-repository-journal/templates/repository-journal-input.template.json",
+      "sha256": "2b617aec8b572bf6924d9d08162eaeffc06b70f6404bbacc01b79533a75ca074",
+      "bytes": 239
+    },
+    {
+      "role": "specification",
+      "upstream_path": "library/organization/specs/quality/repository-journal.spec.md",
+      "vendor_path": "vendor/aether/library/organization/specs/quality/repository-journal.spec.md",
+      "sha256": "330ffbc376821cff40c95ff25c8f53538a61846ced2f86d35acb6b8b10c7251b",
+      "bytes": 2291
+    }
+  ],
+  "execution": {
+    "renderer": "vendor/aether/library/organization/skills/quality/create-repository-journal/scripts/repository-journal.py",
+    "network": "forbidden",
+    "upstream_maturity_behavior": "observe-with-explicit-draft-provenance"
+  }
+}

@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-09-17
+updated: 2026-09-20
 governed_by:
   - architecture-architecture
 depends_on:
@@ -66,6 +66,7 @@ The diagram is conceptual. [SYSTEM.md](SYSTEM.md) remains authoritative for resp
 actions/
 ├── artifact-budget/              # bounded size evidence and budgets
 ├── repository-intelligence/      # read-only collector and static renderer
+├── repository-journal/           # evidence-bound journal adapters and renderer
 ├── repository-continuity-preflight/ # pinned offline continuity adapter
 ├── repository-labels/            # governed label and PR metadata engine
 ├── stale-pull-requests/           # warning-first lifecycle plan and apply
@@ -79,6 +80,9 @@ actions/
 .github/workflows/
 ├── artifact-budget.yml           # read-only caller artifact normalization
 ├── repository-intelligence.yml   # reusable artifact orchestration
+├── repository-journal.yml        # read-only no-billing journal core
+├── repository-journal-copilot.yml # separately authorized agent adapter
+├── repository-journal-dogfood.yml # scheduled/manual deterministic canary
 ├── continuity-preflight.yml      # reusable read-only continuity evidence
 ├── continuity-preflight-dogfood.yml # Relay PR caller
 ├── label-sync-plan.yml           # read-only label synchronization plan
@@ -144,6 +148,29 @@ The tested Observatory and Holon boundaries are pinned in
 The snapshot publisher is isolated as a
 separate action because it requires `contents: write`; all other v1 action jobs
 operate with read-only repository permissions.
+
+## Repository journal boundary
+
+The journal is a one-way evidence pipeline: bounded GitHub provider reads feed
+a closed Relay evidence contract; an adapter creates a non-authoritative
+candidate; Relay validates every candidate reference; and the checksum-pinned
+Aether renderer produces the final Markdown and JSON. Evidence, candidate, and
+rendered output remain separate inspectable artifacts.
+
+The default reusable workflow admits deterministic, reviewed-manual, and
+intentionally unavailable adapters. It has no Copilot permission and requires
+no billing setup. The optional Copilot adapter lives in a separate reusable
+workflow whose job alone may receive `copilot-requests: write`. Even there, a
+checksum-bound preflight must confirm exact runtime, credential mode, policy,
+permission, and billing acknowledgement before a single no-tool invocation.
+No mode checks out consumer code, mutates provider state, or sends an external
+notification.
+
+Repository text and generated prose are untrusted data. Provider scans are
+bounded per source and preserve empty, truncated, unavailable, and complete
+states. Manual and Copilot prose must cite normalized record IDs, but semantic
+review remains human authority. The pinned Aether `draft` lifecycle is reported
+as upstream evidence rather than promoted into Relay-owned policy.
 
 ## Continuity preflight boundary
 

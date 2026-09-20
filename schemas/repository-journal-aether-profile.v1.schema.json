@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/repository-journal-aether-profile/v1/schema.json",
+  "title": "Relay repository journal Aether profile v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "version",
+    "status",
+    "owner",
+    "updated",
+    "source",
+    "contract",
+    "distribution",
+    "files",
+    "execution"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "../schemas/repository-journal-aether-profile.v1.schema.json"
+    },
+    "schema_version": {
+      "const": "relay.repository-journal-aether-profile/v1"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-alpha\\.[0-9]+)?$"
+    },
+    "status": {
+      "const": "proposed"
+    },
+    "owner": {
+      "const": "egohygiene/relay"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "revision", "tree", "pull_request"],
+      "properties": {
+        "repository": {
+          "const": "egohygiene/aether"
+        },
+        "revision": {
+          "$ref": "#/$defs/gitSha"
+        },
+        "tree": {
+          "$ref": "#/$defs/gitSha"
+        },
+        "pull_request": {
+          "const": "https://github.com/egohygiene/aether/pull/59"
+        }
+      }
+    },
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "lifecycle", "schema_id", "spec_digest"],
+      "properties": {
+        "id": {
+          "const": "repository-journal"
+        },
+        "version": {
+          "const": "1.0.0"
+        },
+        "lifecycle": {
+          "const": "draft"
+        },
+        "schema_id": {
+          "const": "https://egohygiene.io/schemas/aether/repository-journal/v1.json"
+        },
+        "spec_digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "distribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "artifact_id", "version", "source_digest"],
+      "properties": {
+        "id": {
+          "const": "distribution/create-repository-journal"
+        },
+        "artifact_id": {
+          "const": "skill/create-repository-journal"
+        },
+        "version": {
+          "const": "1.0.0"
+        },
+        "source_digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "files": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "upstream_path", "vendor_path", "sha256", "bytes"],
+        "properties": {
+          "role": {
+            "enum": [
+              "schema",
+              "distribution-metadata",
+              "skill-metadata",
+              "report-contract",
+              "renderer",
+              "input-template",
+              "specification"
+            ]
+          },
+          "upstream_path": {
+            "$ref": "#/$defs/path"
+          },
+          "vendor_path": {
+            "$ref": "#/$defs/path"
+          },
+          "sha256": {
+            "$ref": "#/$defs/sha256"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1048576
+          }
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["renderer", "network", "upstream_maturity_behavior"],
+      "properties": {
+        "renderer": {
+          "const": "vendor/aether/library/organization/skills/quality/create-repository-journal/scripts/repository-journal.py"
+        },
+        "network": {
+          "const": "forbidden"
+        },
+        "upstream_maturity_behavior": {
+          "const": "observe-with-explicit-draft-provenance"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "gitSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "value"],
+      "properties": {
+        "algorithm": {
+          "const": "sha256-utf8-lf"
+        },
+        "value": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "path": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    }
+  }
+}

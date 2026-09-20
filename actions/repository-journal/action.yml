@@ -1,0 +1,237 @@
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+
+name: Repository Journal
+description: Collect bounded GitHub evidence and render a validated Aether repository journal.
+
+inputs:
+  mode:
+    description: Generation adapter; deterministic, manual, unavailable, or explicitly authorized copilot.
+    required: false
+    default: deterministic
+  repository:
+    description: Exact owner/name repository identity.
+    required: true
+  revision:
+    description: Full lowercase Git SHA represented by the journal.
+    required: true
+  interval-start:
+    description: Inclusive UTC RFC 3339 reporting interval start.
+    required: true
+  interval-end:
+    description: Inclusive UTC RFC 3339 reporting interval end.
+    required: true
+  generated-at:
+    description: Explicit UTC RFC 3339 generation timestamp.
+    required: true
+  github-token:
+    description: Token used only for bounded GitHub evidence reads and preferred Copilot authentication.
+    required: false
+    default: ""
+  evidence-path:
+    description: Optional normalized evidence JSON; empty collects live evidence.
+    required: false
+    default: ""
+  candidate-path:
+    description: Required reviewed candidate JSON path in manual mode.
+    required: false
+    default: ""
+  previous-result-path:
+    description: Optional prior successful result JSON for last-known-good context.
+    required: false
+    default: ""
+  auth-mode:
+    description: Copilot authentication mode; github-token or fine-grained-pat.
+    required: false
+    default: github-token
+  copilot-token:
+    description: Explicit fine-grained PAT fallback; never selected automatically.
+    required: false
+    default: ""
+  organization-policy-state:
+    description: Reviewed Copilot CLI organization policy state.
+    required: false
+    default: unknown
+  permission-state:
+    description: Reviewed Copilot Requests workflow permission state.
+    required: false
+    default: unknown
+  billing-acknowledged:
+    description: Whether the selected billing principal has been explicitly acknowledged.
+    required: false
+    default: "false"
+  maximum-pages:
+    description: Maximum GitHub API pages read per evidence source.
+    required: false
+    default: "2"
+  maximum-records:
+    description: Maximum normalized records retained per evidence source.
+    required: false
+    default: "50"
+  maximum-items:
+    description: Maximum items accepted across all candidate sections.
+    required: false
+    default: "100"
+  maximum-evidence-bytes:
+    description: Maximum normalized evidence JSON bytes.
+    required: false
+    default: "1048576"
+  maximum-candidate-bytes:
+    description: Maximum candidate JSON bytes.
+    required: false
+    default: "65536"
+  maximum-prompt-bytes:
+    description: Maximum Copilot prompt bytes including normalized evidence.
+    required: false
+    default: "1048576"
+  output-directory:
+    description: Directory receiving the complete journal evidence bundle.
+    required: false
+    default: .relay/repository-journal
+
+outputs:
+  status:
+    description: Complete, partial, unavailable, or failed journal status.
+    value: "${{ steps.journal.outputs.status }}"
+  evidence-completeness:
+    description: Complete, partial, or unavailable evidence state.
+    value: "${{ steps.journal.outputs.evidence-completeness }}"
+  result-sha256:
+    description: SHA-256 of the exact machine-readable result.
+    value: "${{ steps.journal.outputs.result-sha256 }}"
+  summary-path:
+    description: Path to the bounded Markdown summary.
+    value: "${{ steps.journal.outputs.summary-path }}"
+  output-directory:
+    description: Directory containing all generated journal evidence.
+    value: "${{ inputs.output-directory }}"
+
+runs:
+  using: composite
+  steps:
+    - id: journal
+      name: Collect, validate, and render repository journal
+      shell: bash
+      env:
+        INPUT_AUTH_MODE: "${{ inputs.auth-mode }}"
+        INPUT_BILLING_ACKNOWLEDGED: "${{ inputs.billing-acknowledged }}"
+        INPUT_CANDIDATE_PATH: "${{ inputs.candidate-path }}"
+        INPUT_COPILOT_TOKEN: "${{ inputs.copilot-token }}"
+        INPUT_EVIDENCE_PATH: "${{ inputs.evidence-path }}"
+        INPUT_GENERATED_AT: "${{ inputs.generated-at }}"
+        INPUT_GITHUB_TOKEN: "${{ inputs.github-token }}"
+        INPUT_INTERVAL_END: "${{ inputs.interval-end }}"
+        INPUT_INTERVAL_START: "${{ inputs.interval-start }}"
+        INPUT_MAXIMUM_CANDIDATE_BYTES: "${{ inputs.maximum-candidate-bytes }}"
+        INPUT_MAXIMUM_EVIDENCE_BYTES: "${{ inputs.maximum-evidence-bytes }}"
+        INPUT_MAXIMUM_ITEMS: "${{ inputs.maximum-items }}"
+        INPUT_MAXIMUM_PAGES: "${{ inputs.maximum-pages }}"
+        INPUT_MAXIMUM_PROMPT_BYTES: "${{ inputs.maximum-prompt-bytes }}"
+        INPUT_MAXIMUM_RECORDS: "${{ inputs.maximum-records }}"
+        INPUT_MODE: "${{ inputs.mode }}"
+        INPUT_ORGANIZATION_POLICY_STATE: "${{ inputs.organization-policy-state }}"
+        INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
+        INPUT_PERMISSION_STATE: "${{ inputs.permission-state }}"
+        INPUT_PREVIOUS_RESULT_PATH: "${{ inputs.previous-result-path }}"
+        INPUT_REPOSITORY: "${{ inputs.repository }}"
+        INPUT_REVISION: "${{ inputs.revision }}"
+      run: |
+        set -euo pipefail
+
+        preserve_failure() {
+          status="${1:-$?}"
+          trap - ERR
+          result_path="${INPUT_OUTPUT_DIRECTORY}/repository-journal-result.json"
+          if [[ ! -f "${result_path}" ]]; then
+            python3 "${GITHUB_ACTION_PATH}/journal.py" fail \
+              --mode "${INPUT_MODE}" \
+              --repository "${INPUT_REPOSITORY}" \
+              --revision "${INPUT_REVISION}" \
+              --interval-start "${INPUT_INTERVAL_START}" \
+              --interval-end "${INPUT_INTERVAL_END}" \
+              --generated-at "${INPUT_GENERATED_AT}" \
+              --reason execution-failed \
+              --output-directory "${INPUT_OUTPUT_DIRECTORY}" || true
+          fi
+          exit "${status}"
+        }
+        trap preserve_failure ERR
+
+        evidence_path="${INPUT_EVIDENCE_PATH}"
+        if [[ -z "${evidence_path}" ]]; then
+          evidence_path="${RUNNER_TEMP}/relay-repository-journal-evidence.json"
+          GITHUB_TOKEN="${INPUT_GITHUB_TOKEN}" \
+            python3 "${GITHUB_ACTION_PATH}/journal.py" collect \
+              --repository "${INPUT_REPOSITORY}" \
+              --revision "${INPUT_REVISION}" \
+              --interval-start "${INPUT_INTERVAL_START}" \
+              --interval-end "${INPUT_INTERVAL_END}" \
+              --collected-at "${INPUT_GENERATED_AT}" \
+              --maximum-pages "${INPUT_MAXIMUM_PAGES}" \
+              --maximum-records "${INPUT_MAXIMUM_RECORDS}" \
+              --output "${evidence_path}"
+        fi
+
+        arguments=(
+          run
+          --mode "${INPUT_MODE}"
+          --repository "${INPUT_REPOSITORY}"
+          --revision "${INPUT_REVISION}"
+          --interval-start "${INPUT_INTERVAL_START}"
+          --interval-end "${INPUT_INTERVAL_END}"
+          --generated-at "${INPUT_GENERATED_AT}"
+          --evidence "${evidence_path}"
+          --maximum-evidence-bytes "${INPUT_MAXIMUM_EVIDENCE_BYTES}"
+          --maximum-candidate-bytes "${INPUT_MAXIMUM_CANDIDATE_BYTES}"
+          --maximum-prompt-bytes "${INPUT_MAXIMUM_PROMPT_BYTES}"
+          --maximum-items "${INPUT_MAXIMUM_ITEMS}"
+          --output-directory "${INPUT_OUTPUT_DIRECTORY}"
+        )
+        if [[ -n "${INPUT_CANDIDATE_PATH}" ]]; then
+          arguments+=(--candidate "${INPUT_CANDIDATE_PATH}")
+        fi
+        if [[ -n "${INPUT_PREVIOUS_RESULT_PATH}" ]]; then
+          arguments+=(--previous-result "${INPUT_PREVIOUS_RESULT_PATH}")
+        fi
+
+        if [[ "${INPUT_MODE}" == "copilot" ]]; then
+          repository_root="$(dirname "$(dirname "${GITHUB_ACTION_PATH}")")"
+          runtime_root="${repository_root}/vendor/copilot-cli"
+          env --ignore-environment \
+            PATH="${PATH}" \
+            npm_config_cache="${RUNNER_TEMP}/relay-repository-journal-npm-cache" \
+            npm ci \
+            --prefix "${runtime_root}" \
+            --ignore-scripts \
+            --no-audit \
+            --no-fund
+          copilot_command="${runtime_root}/node_modules/.bin/copilot"
+          preflight_path="${RUNNER_TEMP}/relay-repository-journal-preflight.json"
+          preflight_arguments=(
+            preflight
+            --auth-mode "${INPUT_AUTH_MODE}"
+            --organization-policy-state "${INPUT_ORGANIZATION_POLICY_STATE}"
+            --permission-state "${INPUT_PERMISSION_STATE}"
+            --copilot-command "${copilot_command}"
+            --output "${preflight_path}"
+          )
+          if [[ "${INPUT_BILLING_ACKNOWLEDGED}" == "true" ]]; then
+            preflight_arguments+=(--billing-acknowledged)
+          fi
+          preflight_status=0
+          GITHUB_TOKEN="${INPUT_GITHUB_TOKEN}" \
+          COPILOT_GITHUB_TOKEN="${INPUT_COPILOT_TOKEN}" \
+            python3 "${repository_root}/scripts/validate_repository_journal_runtime.py" \
+              "${preflight_arguments[@]}" || preflight_status=$?
+          if [[ "${preflight_status}" -ne 0 && "${preflight_status}" -ne 2 ]]; then
+            preserve_failure "${preflight_status}"
+          fi
+          arguments+=(
+            --preflight "${preflight_path}"
+            --copilot-command "${copilot_command}"
+          )
+        fi
+
+        GITHUB_TOKEN="${INPUT_GITHUB_TOKEN}" \
+        COPILOT_GITHUB_TOKEN="${INPUT_COPILOT_TOKEN}" \
+          python3 "${GITHUB_ACTION_PATH}/journal.py" "${arguments[@]}"

@@ -34,6 +34,7 @@ class ActionCatalogTests(unittest.TestCase):
                 "actions/publish-report-snapshot",
                 "actions/repository-continuity-preflight",
                 "actions/repository-intelligence",
+                "actions/repository-journal",
                 "actions/repository-labels",
                 "actions/stale-pull-requests",
                 "actions/validate-release-bundle",
@@ -50,6 +51,12 @@ class ActionCatalogTests(unittest.TestCase):
 
         self.assertIn("uses: $/actions/repository-intelligence", workflow)
         self.assertNotIn("uses: ./actions/repository-intelligence", workflow)
+        for filename in ("repository-journal.yml", "repository-journal-copilot.yml"):
+            journal_workflow = (
+                REPOSITORY_ROOT / ".github/workflows" / filename
+            ).read_text(encoding="utf-8")
+            self.assertIn("uses: $/actions/repository-journal", journal_workflow)
+            self.assertNotIn("uses: ./actions/repository-journal", journal_workflow)
         self.assertEqual(
             validator.discovered_reusable_workflows(REPOSITORY_ROOT),
             {
@@ -64,6 +71,8 @@ class ActionCatalogTests(unittest.TestCase):
                 ".github/workflows/release-artifact.yml",
                 ".github/workflows/release-prepare.yml",
                 ".github/workflows/repository-intelligence.yml",
+                ".github/workflows/repository-journal-copilot.yml",
+                ".github/workflows/repository-journal.yml",
                 ".github/workflows/semantic-release.yml",
                 ".github/workflows/stale-pull-requests.yml",
             },

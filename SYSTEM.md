@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-09-17
+updated: 2026-09-20
 governed_by:
   - architecture-system
 depends_on:
@@ -34,6 +34,7 @@ This document identifies Relay's logical systems and responsibilities. It answer
 | --- | --- | --- |
 | Composite-action library | Active | Publishes the independently consumable, repository-versioned actions inventoried by `action-catalog.json`. |
 | Reusable-workflow library | Active | Publishes bounded orchestration with explicit caller inputs, outputs, authority, and failure states. |
+| Repository journal pipeline | Experimental | Collects bounded GitHub evidence and renders deterministic, reviewed-manual, unavailable, or separately authorized Copilot candidates through the pinned Aether contract. |
 | Contract metadata | Active | Owns versioned action, workflow, release, artifact, and provenance schemas and catalogs. |
 | Continuity preflight contract, local adapter, and PR workflow | Active | Pins upstream continuity owners and exposes matching offline and read-only CI evidence without modifying the inspected checkout. |
 | Security and permission tests | Active | Rejects uncataloged workflows, mutable dependencies, broad authority, unsafe triggers, and unbounded runner jobs. |

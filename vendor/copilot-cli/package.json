@@ -1,0 +1,13 @@
+{
+  "name": "@egohygiene/relay-copilot-cli-runtime",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Checksum-locked GitHub Copilot CLI runtime for Relay repository journals.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@github/copilot": "1.0.85"
+  }
+}

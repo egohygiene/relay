@@ -54,6 +54,24 @@
       "consumer_ref": "egohygiene/relay/actions/repository-intelligence@v1"
     },
     {
+      "id": "repository-journal",
+      "path": "actions/repository-journal",
+      "name": "Repository Journal",
+      "summary": "Collect bounded GitHub evidence and render deterministic, reviewed-manual, unavailable, or explicitly authorized Copilot journal candidates through a pinned Aether contract.",
+      "status": "experimental",
+      "runtime": ["bash", "node", "python3"],
+      "permissions": {
+        "actions": "read",
+        "contents": "read",
+        "copilot-requests": "write",
+        "issues": "read",
+        "pull-requests": "read",
+        "security-events": "read"
+      },
+      "side_effects": ["network-read", "workspace-write"],
+      "consumer_ref": "egohygiene/relay/actions/repository-journal@v1"
+    },
+    {
       "id": "repository-continuity-preflight",
       "path": "actions/repository-continuity-preflight",
       "name": "Repository Continuity Preflight",
@@ -302,6 +320,37 @@
       "status": "beta",
       "permissions": {"contents": "read"},
       "consumer_ref": "egohygiene/relay/.github/workflows/repository-intelligence.yml@v1"
+    },
+    {
+      "id": "repository-journal",
+      "path": ".github/workflows/repository-journal.yml",
+      "name": "Repository Journal",
+      "summary": "Collect bounded read-only GitHub evidence and preserve a validated deterministic or reviewed-manual repository journal without AI billing.",
+      "status": "experimental",
+      "permissions": {
+        "actions": "read",
+        "contents": "read",
+        "issues": "read",
+        "pull-requests": "read",
+        "security-events": "read"
+      },
+      "consumer_ref": "egohygiene/relay/.github/workflows/repository-journal.yml@v1"
+    },
+    {
+      "id": "repository-journal-copilot",
+      "path": ".github/workflows/repository-journal-copilot.yml",
+      "name": "Repository Journal with Copilot",
+      "summary": "Generate one no-tool Copilot candidate only after explicit policy, permission, credential, billing, and pinned-runtime preflight checks.",
+      "status": "experimental",
+      "permissions": {
+        "actions": "read",
+        "contents": "read",
+        "copilot-requests": "write",
+        "issues": "read",
+        "pull-requests": "read",
+        "security-events": "read"
+      },
+      "consumer_ref": "egohygiene/relay/.github/workflows/repository-journal-copilot.yml@v1"
     }
   ]
 }

@@ -1,0 +1,6 @@
+{
+  "schema_version": "aether.repository-journal-input/v1",
+  "repository": "owner/repository",
+  "interval": {"start": "2026-08-01T00:00:00Z", "end": "2026-08-08T00:00:00Z"},
+  "evidence": {"merged_work": [], "open_work": [], "ci": []}
+}
