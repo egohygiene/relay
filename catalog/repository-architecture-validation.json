@@ -1,0 +1,267 @@
+{
+  "$schema": "../schemas/repository-architecture-validation-profile.v1.schema.json",
+  "schema_version": "relay.repository-architecture-validation-profile/v1",
+  "version": "1.0.0-alpha.1",
+  "status": "proposed",
+  "owner": "egohygiene/relay",
+  "updated": "2026-09-20",
+  "purpose": "Bind Relay architecture validation to immutable Hygiene policy, EgoLint semantics, and Holon materialization evidence without copying sibling authority.",
+  "rollout": {
+    "default_mode": "advisory",
+    "supported_modes": [
+      "advisory",
+      "required"
+    ],
+    "maximum_mode_before_release": "advisory",
+    "activation_gate": [
+      "The pinned EgoLint architecture and repository-intelligence capability is released immutably",
+      "The complete Relay adapter and reusable workflow fixture matrix is reviewed",
+      "A maintainer explicitly enables required mode in the consumer repository"
+    ],
+    "unavailable_behavior": "explicit-unavailable-result"
+  },
+  "sources": [
+    {
+      "id": "hygiene-repository-architecture",
+      "role": "organization-policy",
+      "repository": "egohygiene/hygiene",
+      "revision": "c589587395750cd1c79c6fa0bef010189c547249",
+      "version": "architecture-v0.1.0+adr-1.1.0",
+      "lifecycle": "accepted",
+      "release_included": false,
+      "artifacts": [
+        {
+          "id": "repository-catalog",
+          "path": "catalog/repositories.yaml",
+          "sha256": "5a28e13d656d374f2002a3013e494399fa2e97cdb84e5834168d9e58092adf75"
+        },
+        {
+          "id": "repository-catalog-schema",
+          "path": "schemas/repository-catalog.v1.schema.json",
+          "sha256": "3a06f19e8c0be6590223b04f580aef7ee9c9b23bcb11e8b3da3db6dd1e764724"
+        },
+        {
+          "id": "repository-context-contract",
+          "path": "contracts/repository-context.v1.toml",
+          "sha256": "85d670c094b5e72360de684bfa5b9d5332caa2868565285ddc8216f80e489cf8"
+        },
+        {
+          "id": "repository-context-schema",
+          "path": "schemas/repository-context.v1.schema.json",
+          "sha256": "35a11253986cd15e17d2bf9d1af33c1ef05f1d81de7bd6aabe6f08f2f2a8e4db"
+        },
+        {
+          "id": "dependency-boundary-register",
+          "path": "catalog/dependency-boundaries.yaml",
+          "sha256": "6d0a1bc65d328435585355271974ab0b88e49e72da1eff99ca46393396067554"
+        },
+        {
+          "id": "dependency-boundary-schema",
+          "path": "schemas/dependency-boundary-register.v1.schema.json",
+          "sha256": "c6ca721858b78c4adce7a83d6dcbaf1cccbf09896e48c52dd1dc84a6161053c9"
+        },
+        {
+          "id": "architecture-decision-policy",
+          "path": "docs/decisions/POLICY.md",
+          "sha256": "e8b1f3c379a56d389d7689d187b2932ff3cfdf5e80acc829d244fb2527fcd361"
+        },
+        {
+          "id": "architecture-decision-ratification",
+          "path": "docs/decisions/RATIFICATION.md",
+          "sha256": "0d3569c85955ae0412b4cd6778c1d6cdc899f4fc9b93e89795343ea82af043d1"
+        },
+        {
+          "id": "architecture-decision-schema",
+          "path": "schemas/architecture-decision.v1.schema.json",
+          "sha256": "491eae26e498ee311bb37d5eff23a51d682eb687196c80a3df10ac1ce98e04d4"
+        },
+        {
+          "id": "architecture-decision-policy-reference-schema",
+          "path": "schemas/architecture-decision-policy-reference.v1.schema.json",
+          "sha256": "fdf451cfa38ba666ec579aa75d2acbd52a56b95e73c7437565b79dfcfb689216"
+        }
+      ]
+    },
+    {
+      "id": "egolint-repository-validation",
+      "role": "validator",
+      "repository": "egohygiene/egolint",
+      "revision": "8b99ec4377eb84044fac411dff6b8074317ec094",
+      "version": "0.1.0-alpha.1",
+      "lifecycle": "proposed",
+      "release_included": false,
+      "artifacts": [
+        {
+          "id": "portability-rules",
+          "path": ".config/rules/portability.toml",
+          "sha256": "343fea47c219a951fb17cfb8e6a03f340cef90ab465b88b8759ed45af3cc8f3b"
+        },
+        {
+          "id": "repository-intelligence-rules",
+          "path": ".config/rules/repository-intelligence.v1.toml",
+          "sha256": "ee43fbb1be5d8a185627393fab132119fbcb12d70dd557723648f4406a7f4b84"
+        },
+        {
+          "id": "repository-contract-schema",
+          "path": "schemas/repository-contract.schema.json",
+          "sha256": "6d744fd50bfbc65c8f1113a7d90ea9b69b62b65e86a114501ccd92cec0350feb"
+        },
+        {
+          "id": "repository-intelligence-policy-schema",
+          "path": "schemas/repository-intelligence.schema.json",
+          "sha256": "3e5718fc75fb83376d5acef39ff18ad5e4d964631da0522886fa5699ce0c375d"
+        },
+        {
+          "id": "repository-intelligence-report-schema",
+          "path": "schemas/repository-intelligence-report.schema.json",
+          "sha256": "fa2d0ac0660a6ebdca23f450aa2400017835bfa6a0ae8b3ddaecf7f352155716"
+        },
+        {
+          "id": "run-report-schema",
+          "path": "schemas/report.schema.json",
+          "sha256": "f8feef090c1295454d9531e95996e18f52151cd3ede68eb03a6dcdcd450bf76f"
+        },
+        {
+          "id": "finding-schema",
+          "path": "schemas/finding.schema.json",
+          "sha256": "5554c9b4b54c2c5f712e3786adb7a0ee48f27bfcb06f62336e339a92c370736b"
+        },
+        {
+          "id": "cargo-lock",
+          "path": "Cargo.lock",
+          "sha256": "ecca8f57ebf40c8207ae113a7e14e4522393a8a10dc5f6576b59b6f7b48a96ab"
+        }
+      ]
+    },
+    {
+      "id": "holon-architecture-decisions",
+      "role": "materializer",
+      "repository": "egohygiene/holon",
+      "revision": "660b941f99618806fcadd589bcdae61c519f96e4",
+      "version": "1.0.0",
+      "lifecycle": "accepted",
+      "release_included": false,
+      "artifacts": [
+        {
+          "id": "architecture-decision-blueprint",
+          "path": "blueprints/architecture-decisions/blueprint.json",
+          "sha256": "071432623f77def6cf0f263e3dae7c522169b8f00b8e101de0adef30043f73c6"
+        },
+        {
+          "id": "architecture-decision-blueprint-schema",
+          "path": "schemas/architecture-decision-blueprint.v1.schema.json",
+          "sha256": "91be4e32e0ef0e5caebdfb136994d9a346a469f3514bd847bcba500e90837fef"
+        },
+        {
+          "id": "architecture-decision-template",
+          "path": "blueprints/architecture-decisions/files/docs/decisions/ADR-TEMPLATE.md",
+          "sha256": "d426afbd06c1472559892291b6aabcfa58c9083127df5ab59c65c2b6c970b22d"
+        }
+      ]
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "repository-contracts",
+      "owner": "egohygiene/egolint",
+      "state": "available",
+      "policy_sources": [
+        "hygiene-repository-architecture"
+      ],
+      "rule_families": [
+        "EGO-CONTRACT",
+        "EGO-PORT"
+      ],
+      "unavailable_behavior": "incomplete"
+    },
+    {
+      "id": "architecture-records",
+      "owner": "egohygiene/egolint",
+      "state": "available",
+      "policy_sources": [
+        "hygiene-repository-architecture",
+        "holon-architecture-decisions"
+      ],
+      "rule_families": [
+        "EGO-INTEL-ADOPTION",
+        "EGO-INTEL-ADR",
+        "EGO-INTEL-CONTRACT",
+        "EGO-INTEL-CYCLE",
+        "EGO-INTEL-LINK"
+      ],
+      "unavailable_behavior": "incomplete"
+    },
+    {
+      "id": "diagram-sources",
+      "owner": "egohygiene/relay",
+      "state": "planned",
+      "policy_sources": [
+        "hygiene-repository-architecture"
+      ],
+      "rule_families": [],
+      "unavailable_behavior": "incomplete"
+    }
+  ],
+  "interfaces": {
+    "request_contract": "relay.repository-architecture-validation-request/v1",
+    "result_contract": "relay.repository-architecture-validation-result/v1",
+    "validator_report_contract": "egolint.repository-intelligence-validation/v1",
+    "local_ci_result_parity": true,
+    "coverage_surfaces": [
+      "repository-contracts",
+      "architecture-records",
+      "diagram-sources"
+    ]
+  },
+  "execution": {
+    "default_network": "denied-after-acquisition",
+    "consumer_code_execution": "forbidden",
+    "semantic_authoring": "forbidden",
+    "implicit_writes": "reports-and-temporary-workspace-only",
+    "forbidden_authority": [
+      "stage",
+      "commit",
+      "push",
+      "open-pull-request",
+      "comment",
+      "merge",
+      "release",
+      "deploy",
+      "publish"
+    ]
+  },
+  "bounds": {
+    "maximum_repository_contracts": 16,
+    "maximum_diagram_roots": 16,
+    "maximum_findings": 256,
+    "maximum_annotations": 20,
+    "maximum_scanned_files": 10000,
+    "maximum_scanned_bytes": 104857600,
+    "maximum_result_bytes": 1048576
+  },
+  "information_safety": {
+    "minimum_necessary": true,
+    "repository_paths": "relative-only",
+    "private_output": "workflow-access-controlled-artifact",
+    "annotations": "bounded-diagnostics-only",
+    "untrusted_content": "data-only-no-authority",
+    "excluded": [
+      "secrets-and-credentials",
+      "absolute-local-paths",
+      "raw-file-content",
+      "environment-values",
+      "provider-tokens",
+      "workflow-logs",
+      "private-cross-repository-content"
+    ]
+  },
+  "ownership": {
+    "organization_policy": "egohygiene/hygiene",
+    "validation_semantics": "egohygiene/egolint",
+    "materialization": "egohygiene/holon",
+    "local_records": "consumer-repository",
+    "orchestration_and_evidence": "egohygiene/relay",
+    "fleet_rollout": "egohygiene/pace",
+    "aggregation": "egohygiene/observatory"
+  }
+}

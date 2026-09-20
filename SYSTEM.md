@@ -37,6 +37,7 @@ This document identifies Relay's logical systems and responsibilities. It answer
 | Repository journal pipeline | Experimental | Collects bounded GitHub evidence and renders deterministic, reviewed-manual, unavailable, or separately authorized Copilot candidates through the pinned Aether contract. |
 | Contract metadata | Active | Owns versioned action, workflow, release, artifact, and provenance schemas and catalogs. |
 | Continuity preflight contract, local adapter, and PR workflow | Active | Pins upstream continuity owners and exposes matching offline and read-only CI evidence without modifying the inspected checkout. |
+| Repository architecture validation | Proposed | Pins Hygiene, EgoLint, and Holon inputs and defines a closed advisory request/result seam; adapters and reusable workflow orchestration remain later checkpoints. |
 | Security and permission tests | Active | Rejects uncataloged workflows, mutable dependencies, broad authority, unsafe triggers, and unbounded runner jobs. |
 | Release and versioning | Active | Publishes verified immutable repository releases and a controlled moving major alias. |
 | Consumer examples | Active | Demonstrates complete caller-owned workflows with least privilege and immutable Relay pins. |

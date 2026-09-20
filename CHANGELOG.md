@@ -8,6 +8,10 @@ All notable changes to Relay are documented in this file. The format follows
 
 ### Added
 
+- A proposed, advisory-first repository-architecture validation profile with
+  immutable Hygiene, EgoLint, and Holon inputs; closed local/CI request and
+  result contracts; bounded privacy-safe fixtures; and explicit planned or
+  unavailable diagram coverage.
 - A versioned CI run lifecycle contract and reusable report-preservation action
   with explicit cancellation classes, stable `.reports/<producer>` paths,
   bounded checksummed manifests, failure-safe upload, and retention policy.

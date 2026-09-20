@@ -107,6 +107,8 @@ catalog/ci-run-lifecycle.json     # cancellation classes and report retention
 release-profiles.json             # versioned release artifact and rollback contract
 catalog/repository-continuity-preflight.json
                                   # pinned, release-gated continuity input profile
+catalog/repository-architecture-validation.json
+                                  # pinned, advisory architecture-validation profile
 examples/workflows/               # immutable-pin caller examples
 ```
 
@@ -193,6 +195,28 @@ structural, declared-freshness, local-Git, and external-live states separately.
 Evidence contains bounded findings and remediation only, never the free-form
 checkpoint body. Unreleased inputs cap the profile at `observe`, and no
 continuity result grants repository or provider write authority.
+
+## Repository architecture validation boundary
+
+Relay owns the future execution seam and normalized evidence for repository
+architecture checks. Hygiene remains the organization-policy authority,
+EgoLint remains the validation-semantics authority, Holon remains the
+materialization authority, and the consumer repository remains the authority
+for its own contracts, decisions, and diagrams.
+
+The proposed profile pins reviewed artifacts from all three sibling owners by
+full commit SHA and SHA-256 digest. Closed request and result schemas preserve
+adoption, visibility, coverage, provenance, truncation, and privacy states
+without copying sibling rules into Relay. Local and CI adapters must use the
+same result shape, operate offline after dependency acquisition, avoid
+consumer-code execution, and write only bounded reports and temporary data.
+
+Repository-contract and architecture-record semantics are already exposed by
+the pinned EgoLint source. Diagram semantics remain explicitly planned because
+no reviewed upstream validator owns them yet. Unreleased inputs keep the
+profile proposed and advisory-only; unavailable or partial coverage cannot be
+reported as conformance. Action and reusable-workflow entry points remain later
+checkpoints rather than an implied release surface.
 
 ## Publication deployment boundary
 
