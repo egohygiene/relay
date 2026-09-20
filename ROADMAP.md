@@ -404,9 +404,14 @@ Copilot adapter remains available for explicit later activation.
 **Current evidence:**
 
 - Issue #95 owns the ordered eleven-step evidence plan for parent #15.
-- PR #96 is the single implementation line. Deterministic and reviewed-manual
-  modes are the present no-billing path; organization Copilot connection is an
-  optional later activation rather than an implementation prerequisite.
+- PR #96 merged as `d77ac85a73d5911e84d9a07719620f7ce70e71b8`; its tree exactly
+  matches the reviewed head. Deterministic and reviewed-manual modes are the
+  present no-billing path; organization Copilot connection is an optional later
+  activation rather than an implementation prerequisite.
+- Default-branch manual run 35485517452 retained sanitized failure evidence and
+  exposed that valid live evidence could exceed the deterministic candidate
+  item ceiling. A bounded follow-up selects across sections and reports the
+  limit as partial before live acceptance is retried.
 - Release publication and movement of the `v1` alias remain outside this track.
 
 ### Roadmap-to-issue handoff

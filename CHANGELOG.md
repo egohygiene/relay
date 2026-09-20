@@ -28,6 +28,12 @@ All notable changes to Relay are documented in this file. The format follows
 
 - Relay dogfood releases now use `relay` as their explicit product-facing name.
 
+### Fixed
+
+- Deterministic repository journals now select a breadth-first bounded summary
+  and report candidate truncation as partial instead of failing when live
+  provider evidence exceeds the configured item or byte ceiling.
+
 ## [1.5.0] - 2026-09-12
 
 ### Added
