@@ -33,6 +33,16 @@ and failure semantics.
 Every executable workflow file under `.github/workflows/` is current and
 cataloged; an uncataloged workflow fails CI.
 
+The companion
+[`catalog/ci-run-lifecycle.json`](catalog/ci-run-lifecycle.json) assigns every
+entry to a cancellation class without changing this catalog's v1 schema.
+`supersedable-check` workflows cancel stale work on the same repository/ref;
+`evidence-preserving-check`, `serialized-write`, and `immutable-publication`
+workflows do not cancel because accepted evidence or provider mutations must
+finish or reconcile. The complete report-directory, retention, and failure
+evidence contract is documented in
+[`docs/ci-run-lifecycle.md`](docs/ci-run-lifecycle.md).
+
 ## Legacy candidates
 
 Historical workflows enter Relay through the
@@ -146,6 +156,13 @@ filesystem measurement. Missing baselines and unsupported runtime-only Size
 Limit checks remain explicit report states. Blocking mode uploads the completed
 report before failing; advisory mode preserves the same evidence without
 granting mutation authority.
+
+Generic check producers can use `preserve-ci-report` after capturing their raw
+step outcome. The action requires `.reports/<producer>/`, adds a checksummed
+run manifest, applies bounded file and byte limits, and uploads with explicit
+1–90 day retention. Consumers invoke it with `always()` and reassert the check
+failure afterward. A failed check without native files remains `unavailable`,
+never successful.
 
 Repository-journal generation separates deterministic provider evidence from
 non-authoritative candidate prose and deterministic rendering. The default

@@ -18,6 +18,7 @@ and deployment.
 | Canonical labels and pull-request metadata | `egohygiene/relay/actions/repository-labels@v1` |
 | Warning-first stale pull-request lifecycle | `egohygiene/relay/actions/stale-pull-requests@v1` |
 | Scanner report normalization | `egohygiene/relay/actions/normalize-repository-report@v1` |
+| Bounded success and failure report preservation | `egohygiene/relay/actions/preserve-ci-report@v1` |
 | Guarded report snapshot publication | `egohygiene/relay/actions/publish-report-snapshot@v1` |
 | Opinionated intelligence artifact workflow | `egohygiene/relay/.github/workflows/repository-intelligence.yml@v1` |
 | Publication-site contract validation | `egohygiene/relay/actions/validate-publication-site@v1` |
@@ -46,6 +47,8 @@ The complete action and workflow inventories live in
 [`workflow-catalog.json`](workflow-catalog.json). See
 [`actions/README.md`](actions/README.md) and
 [`WORKFLOW_CATALOG.md`](WORKFLOW_CATALOG.md) for their human contracts.
+Workflow cancellation classes and durable report retention are defined in
+[`docs/ci-run-lifecycle.md`](docs/ci-run-lifecycle.md).
 The complete release lifecycle and repository-class boundaries are documented
 in [`SEMANTIC_RELEASE.md`](SEMANTIC_RELEASE.md).
 

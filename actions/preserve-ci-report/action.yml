@@ -1,0 +1,113 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-action.json
+
+name: "Preserve CI Report"
+description: >-
+  Validate a bounded .reports producer directory, bind it to the current run,
+  and upload success or failure evidence with explicit retention.
+
+inputs:
+  producer:
+    description: "Stable lowercase producer identifier used beneath .reports/."
+    required: true
+  outcome:
+    description: "Outcome of the check whose report is being preserved."
+    required: true
+  retention-days:
+    description: "Artifact retention in days, from 1 through 90."
+    required: false
+    default: "30"
+  maximum-files:
+    description: "Maximum number of producer files accepted before Relay metadata is added."
+    required: false
+    default: "100"
+  maximum-bytes:
+    description: "Maximum aggregate producer bytes accepted."
+    required: false
+    default: "104857600"
+
+outputs:
+  artifact-id:
+    description: "GitHub artifact identifier for the preserved report bundle."
+    value: "${{ steps.upload.outputs.artifact-id }}"
+  artifact-url:
+    description: "Authenticated GitHub URL for the preserved report bundle."
+    value: "${{ steps.upload.outputs.artifact-url }}"
+  artifact-digest:
+    description: "GitHub SHA-256 digest for the uploaded artifact archive."
+    value: "${{ steps.upload.outputs.artifact-digest }}"
+  artifact-name:
+    description: "Unique report artifact name bound to the run and attempt."
+    value: "${{ steps.prepare.outputs.artifact-name }}"
+  completeness:
+    description: "Complete, partial, or unavailable report evidence state."
+    value: "${{ steps.prepare.outputs.completeness }}"
+  manifest-path:
+    description: "Repository-relative path to the generated report manifest."
+    value: "${{ steps.prepare.outputs.manifest-path }}"
+  manifest-sha256:
+    description: "SHA-256 of the exact report manifest."
+    value: "${{ steps.prepare.outputs.manifest-sha256 }}"
+
+branding:
+  icon: "archive"
+  color: "blue"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Validate and bind CI report evidence"
+      id: prepare
+      shell: bash
+      env:
+        INPUT_MAXIMUM_BYTES: "${{ inputs.maximum-bytes }}"
+        INPUT_MAXIMUM_FILES: "${{ inputs.maximum-files }}"
+        INPUT_OUTCOME: "${{ inputs.outcome }}"
+        INPUT_PRODUCER: "${{ inputs.producer }}"
+        INPUT_RETENTION_DAYS: "${{ inputs.retention-days }}"
+      run: |
+        set -euo pipefail
+        python3 "${GITHUB_ACTION_PATH}/scripts/preserve_ci_report.py" \
+          --producer "${INPUT_PRODUCER}" \
+          --outcome "${INPUT_OUTCOME}" \
+          --repository "${GITHUB_REPOSITORY}" \
+          --represented-revision "${GITHUB_SHA}" \
+          --run-id "${GITHUB_RUN_ID}" \
+          --run-attempt "${GITHUB_RUN_ATTEMPT}" \
+          --retention-days "${INPUT_RETENTION_DAYS}" \
+          --maximum-files "${INPUT_MAXIMUM_FILES}" \
+          --maximum-bytes "${INPUT_MAXIMUM_BYTES}" \
+          --github-output "${GITHUB_OUTPUT}"
+
+    - name: "Upload bounded CI report evidence"
+      id: upload
+      # actions/upload-artifact v7.0.1
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: "${{ steps.prepare.outputs.artifact-name }}"
+        path: "${{ steps.prepare.outputs.report-directory }}"
+        if-no-files-found: error
+        include-hidden-files: true
+        retention-days: "${{ inputs.retention-days }}"
+        compression-level: 9
+
+    - name: "Summarize preserved CI report"
+      shell: bash
+      env:
+        ARTIFACT_NAME: "${{ steps.prepare.outputs.artifact-name }}"
+        COMPLETENESS: "${{ steps.prepare.outputs.completeness }}"
+        MANIFEST_SHA256: "${{ steps.prepare.outputs.manifest-sha256 }}"
+        OUTCOME: "${{ inputs.outcome }}"
+        PRODUCER: "${{ inputs.producer }}"
+      run: |
+        set -euo pipefail
+        {
+          printf '## Preserved CI report\n\n'
+          printf -- '- Producer: `%s`\n' "${PRODUCER}"
+          printf -- '- Check outcome: `%s`\n' "${OUTCOME}"
+          printf -- '- Evidence completeness: `%s`\n' "${COMPLETENESS}"
+          printf -- '- Artifact: `%s`\n' "${ARTIFACT_NAME}"
+          printf -- '- Manifest SHA-256: `%s`\n' "${MANIFEST_SHA256}"
+        } >> "${GITHUB_STEP_SUMMARY}"

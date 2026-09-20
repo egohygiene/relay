@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/ci-run-lifecycle/v1/schema.json",
+  "title": "Relay CI run lifecycle v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema",
+    "schema_version",
+    "owner",
+    "workflow_classes",
+    "report_policy",
+    "workflows",
+    "adoption_evidence"
+  ],
+  "properties": {
+    "$schema": {"type": "string"},
+    "schema": {"const": "egohygiene.relay.ci-run-lifecycle/v1"},
+    "schema_version": {"const": 1},
+    "owner": {"const": "egohygiene/relay"},
+    "workflow_classes": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/workflowClass"}
+    },
+    "report_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root",
+        "producer_directory",
+        "producer_pattern",
+        "artifact_name",
+        "default_retention_days",
+        "minimum_retention_days",
+        "maximum_retention_days",
+        "default_maximum_files",
+        "default_maximum_bytes",
+        "failure_upload_condition",
+        "missing_failure_evidence"
+      ],
+      "properties": {
+        "root": {"const": ".reports"},
+        "producer_directory": {"const": ".reports/<producer>"},
+        "producer_pattern": {"type": "string"},
+        "artifact_name": {"const": "relay-report-<producer>-<run-id>-<run-attempt>"},
+        "default_retention_days": {"const": 30},
+        "minimum_retention_days": {"const": 1},
+        "maximum_retention_days": {"const": 90},
+        "default_maximum_files": {"const": 100},
+        "default_maximum_bytes": {"const": 104857600},
+        "failure_upload_condition": {"const": "always"},
+        "missing_failure_evidence": {"const": "unavailable-not-success"}
+      }
+    },
+    "workflows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/workflow"}
+    },
+    "adoption_evidence": {
+      "type": "array",
+      "minItems": 2,
+      "items": {"$ref": "#/$defs/adoptionEvidence"}
+    }
+  },
+  "$defs": {
+    "identifier": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "workflowClass": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cancel_in_progress", "authority", "group_requirement", "description"],
+      "properties": {
+        "cancel_in_progress": {"type": "boolean"},
+        "authority": {"enum": ["no-repository-mutation", "purpose-bound-write"]},
+        "group_requirement": {
+          "enum": [
+            "repository-and-work-identity",
+            "repository-or-mutation-target",
+            "repository-and-immutable-identity"
+          ]
+        },
+        "description": {"type": "string", "minLength": 1}
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "class"],
+      "properties": {
+        "id": {"$ref": "#/$defs/identifier"},
+        "path": {"type": "string", "pattern": "^\\.github/workflows/.+\\.(yml|yaml)$"},
+        "class": {
+          "enum": [
+            "supersedable-check",
+            "evidence-preserving-check",
+            "serialized-write",
+            "immutable-publication"
+          ]
+        }
+      }
+    },
+    "adoptionEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "repository",
+        "revision",
+        "path",
+        "class",
+        "report_directory",
+        "retention_days",
+        "failure_upload_condition"
+      ],
+      "properties": {
+        "id": {"$ref": "#/$defs/identifier"},
+        "kind": {"enum": ["reviewed-consumer", "executable-fixture"]},
+        "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "revision": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "minLength": 1},
+        "class": {"const": "supersedable-check"},
+        "report_directory": {"type": "string", "pattern": "^\\.reports/[a-z0-9]+(?:-[a-z0-9]+)*$"},
+        "retention_days": {"type": "integer", "minimum": 1, "maximum": 90},
+        "failure_upload_condition": {"const": "always"},
+        "proof_run_url": {"type": "string", "format": "uri"},
+        "proof_snapshot_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    }
+  }
+}

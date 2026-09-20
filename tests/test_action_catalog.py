@@ -31,6 +31,7 @@ class ActionCatalogTests(unittest.TestCase):
             {
                 "actions/artifact-budget",
                 "actions/normalize-repository-report",
+                "actions/preserve-ci-report",
                 "actions/publish-report-snapshot",
                 "actions/repository-continuity-preflight",
                 "actions/repository-intelligence",
@@ -165,6 +166,8 @@ class ActionCatalogTests(unittest.TestCase):
                 "https://egohygiene.dev/schemas/repository-intelligence-dashboard/v3.json",
             "actions/normalize-repository-report/schemas/repository-report-summary.schema.json":
                 "https://egohygiene.dev/schemas/repository-report-summary/v1.json",
+            "actions/preserve-ci-report/schemas/ci-report-manifest.schema.json":
+                "https://egohygiene.github.io/relay/contracts/ci-report-manifest/v1/schema.json",
         }
 
         for relative_path, expected_id in expected_ids.items():

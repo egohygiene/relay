@@ -13,6 +13,7 @@ documentation, implementation, contracts, and tests.
 | [`repository-labels`](repository-labels/)                     | Plan and apply canonical labels and pull-request metadata   | Optional repository metadata writes |
 | [`stale-pull-requests`](stale-pull-requests/)                 | Plan and apply warning-first stale pull-request lifecycle transitions | Optional labels, comments, and closure |
 | [`normalize-repository-report`](normalize-repository-report/) | Normalize OSV, MegaLinter, and Scorecard producer summaries | Workspace files only          |
+| [`preserve-ci-report`](preserve-ci-report/)                   | Bind bounded success or failure evidence to one run and upload it | Workspace files and artifact upload |
 | [`publish-report-snapshot`](publish-report-snapshot/)         | Guard and publish stable `.reports` snapshots               | Git commit and default-branch push |
 | [`validate-publication-site`](validate-publication-site/)     | Validate product-owned publication hub bytes and checksums  | Workspace evidence only       |
 | [`verify-publication-pages`](verify-publication-pages/)       | Prove deployed HTTPS publication bytes and routes           | Network reads and workspace evidence |
@@ -31,6 +32,7 @@ egohygiene/relay/actions/repository-journal
 egohygiene/relay/actions/repository-labels
 egohygiene/relay/actions/stale-pull-requests
 egohygiene/relay/actions/normalize-repository-report
+egohygiene/relay/actions/preserve-ci-report
 egohygiene/relay/actions/publish-report-snapshot
 egohygiene/relay/actions/validate-publication-site
 egohygiene/relay/actions/verify-publication-pages
