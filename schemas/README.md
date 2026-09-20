@@ -17,6 +17,7 @@ https://egohygiene.github.io/relay/contracts/repository-continuity-preflight-res
 https://egohygiene.github.io/relay/contracts/artifact-budget-report/v1/schema.json
 https://egohygiene.github.io/relay/contracts/repository-journal-runtime-profile/v1/schema.json
 https://egohygiene.github.io/relay/contracts/repository-journal-runtime-preflight-result/v1/schema.json
+https://egohygiene.github.io/relay/contracts/repository-journal-aether-profile/v1/schema.json
 ```
 
 `action-catalog.json` inventories public composite actions and reusable entry
@@ -41,6 +42,9 @@ measurements, baseline deltas, thresholds, coverage, and enforcement state.
 The repository-journal runtime profile locks the Copilot CLI package and
 authentication choices; its preflight result records only credential presence,
 policy and permission assertions, version evidence, and safe failure reasons.
+The repository-journal Aether profile binds the upstream draft contract,
+renderer, schema, template, and distribution metadata to one immutable commit
+and verifies every vendored byte before execution.
 
 The schemas packaged inside the Intelligence actions intentionally retain the
 public identities established while the implementation was incubated in

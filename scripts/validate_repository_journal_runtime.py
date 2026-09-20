@@ -19,7 +19,9 @@ from typing import Any, Mapping, Sequence
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 PROFILE_PATH = REPOSITORY_ROOT / "catalog/repository-journal-runtime.json"
+AETHER_PROFILE_PATH = REPOSITORY_ROOT / "catalog/repository-journal-aether.json"
 PROFILE_SCHEMA = "relay.repository-journal-runtime-profile/v1"
+AETHER_PROFILE_SCHEMA = "relay.repository-journal-aether-profile/v1"
 RESULT_SCHEMA = "relay.repository-journal-runtime-preflight-result/v1"
 AUTH_MODES = {"github-token", "fine-grained-pat"}
 POLICY_STATES = {"enabled", "disabled", "unknown", "not-applicable"}
@@ -60,6 +62,60 @@ SECRET_ENVIRONMENT_VARIABLES = {
     "GH_TOKEN",
     "GITHUB_TOKEN",
     "COPILOT_PROVIDER_API_KEY",
+}
+AETHER_REVISION = "aa0cb090a7ca4a47f22268784af0ce34aaf69b48"
+AETHER_TREE = "f123061d1eb494a70feff8bab49261b2066dc2f4"
+AETHER_FILES = {
+    "schema": (
+        "catalog/schemas/aether.repository-journal.v1.schema.json",
+        "vendor/aether/catalog/schemas/aether.repository-journal.v1.schema.json",
+        "8788ec86d062baf73d6320f080643396abc5d4dadd69996b88b6493b6d2c654e",
+        1518,
+    ),
+    "distribution-metadata": (
+        "dist/skills/create-repository-journal/distribution-manifest.v1.json",
+        "vendor/aether/distribution-manifest.v1.json",
+        "ecf0dcebb6fadba38273c1883ae8366b35b0f87c2531d198d21f06447367c53d",
+        1045,
+    ),
+    "skill-metadata": (
+        "library/organization/skills/quality/create-repository-journal/SKILL.md",
+        "vendor/aether/library/organization/skills/quality/"
+        "create-repository-journal/SKILL.md",
+        "20478640d878d5d9b4d06e934f6a72f825e7292bec9acfc78c909e4f8f4702c7",
+        1961,
+    ),
+    "report-contract": (
+        "library/organization/skills/quality/create-repository-journal/"
+        "references/report-contract.md",
+        "vendor/aether/library/organization/skills/quality/"
+        "create-repository-journal/references/report-contract.md",
+        "a29016e80a49c80e26ce263905e5e41492df16f27a903c5996965d023d3d9786",
+        401,
+    ),
+    "renderer": (
+        "library/organization/skills/quality/create-repository-journal/"
+        "scripts/repository-journal.py",
+        "vendor/aether/library/organization/skills/quality/"
+        "create-repository-journal/scripts/repository-journal.py",
+        "be5652953a0cbaa038e5c98cf2b093b100153ffcd85d69068cff8affae5adee3",
+        4771,
+    ),
+    "input-template": (
+        "library/organization/skills/quality/create-repository-journal/"
+        "templates/repository-journal-input.template.json",
+        "vendor/aether/library/organization/skills/quality/"
+        "create-repository-journal/templates/repository-journal-input.template.json",
+        "2b617aec8b572bf6924d9d08162eaeffc06b70f6404bbacc01b79533a75ca074",
+        239,
+    ),
+    "specification": (
+        "library/organization/specs/quality/repository-journal.spec.md",
+        "vendor/aether/library/organization/specs/quality/"
+        "repository-journal.spec.md",
+        "330ffbc376821cff40c95ff25c8f53538a61846ced2f86d35acb6b8b10c7251b",
+        2291,
+    ),
 }
 
 
@@ -470,6 +526,143 @@ def validate_locked_toolchain(
     return errors
 
 
+def validate_aether_profile(
+    profile: dict[str, Any],
+    repository_root: Path = REPOSITORY_ROOT,
+) -> list[str]:
+    """Verify the immutable Aether journal contract and every vendored byte."""
+
+    errors: list[str] = []
+    if not exact_keys(
+        profile,
+        {
+            "$schema",
+            "schema_version",
+            "version",
+            "status",
+            "owner",
+            "updated",
+            "source",
+            "contract",
+            "distribution",
+            "files",
+            "execution",
+        },
+        "Aether profile",
+        errors,
+    ):
+        return errors
+    expected_header = {
+        "$schema": "../schemas/repository-journal-aether-profile.v1.schema.json",
+        "schema_version": AETHER_PROFILE_SCHEMA,
+        "version": "1.0.0-alpha.1",
+        "status": "proposed",
+        "owner": "egohygiene/relay",
+        "updated": "2026-09-20",
+    }
+    for field, expected in expected_header.items():
+        if profile[field] != expected:
+            errors.append(f"Aether profile {field} is unsupported")
+
+    if profile["source"] != {
+        "repository": "egohygiene/aether",
+        "revision": AETHER_REVISION,
+        "tree": AETHER_TREE,
+        "pull_request": "https://github.com/egohygiene/aether/pull/59",
+    }:
+        errors.append("Aether profile source must remain pinned to merged PR #59")
+    if profile["contract"] != {
+        "id": "repository-journal",
+        "version": "1.0.0",
+        "lifecycle": "draft",
+        "schema_id": "https://egohygiene.io/schemas/aether/repository-journal/v1.json",
+        "spec_digest": {
+            "algorithm": "sha256-utf8-lf",
+            "value": AETHER_FILES["specification"][2],
+        },
+    }:
+        errors.append("Aether journal contract identity or maturity drifted")
+    if profile["distribution"] != {
+        "id": "distribution/create-repository-journal",
+        "artifact_id": "skill/create-repository-journal",
+        "version": "1.0.0",
+        "source_digest": {
+            "algorithm": "sha256-utf8-lf",
+            "value": AETHER_FILES["skill-metadata"][2],
+        },
+    }:
+        errors.append("Aether journal distribution identity drifted")
+    if profile["execution"] != {
+        "renderer": AETHER_FILES["renderer"][1],
+        "network": "forbidden",
+        "upstream_maturity_behavior": "observe-with-explicit-draft-provenance",
+    }:
+        errors.append("Aether journal execution boundary drifted")
+
+    records = profile["files"]
+    if not isinstance(records, list):
+        return [*errors, "Aether profile files must be an array"]
+    observed: dict[str, tuple[Any, Any, Any, Any]] = {}
+    for index, record in enumerate(records):
+        label = f"Aether profile files[{index}]"
+        if not exact_keys(
+            record,
+            {"role", "upstream_path", "vendor_path", "sha256", "bytes"},
+            label,
+            errors,
+        ):
+            continue
+        role = record["role"]
+        if not isinstance(role, str) or role not in AETHER_FILES:
+            errors.append(f"{label}.role is unsupported")
+            continue
+        if role in observed:
+            errors.append(f"Aether profile contains duplicate role {role}")
+            continue
+        observed[role] = (
+            record["upstream_path"],
+            record["vendor_path"],
+            record["sha256"],
+            record["bytes"],
+        )
+    if observed != AETHER_FILES:
+        errors.append("Aether profile file inventory does not match the pinned distribution")
+
+    for role, (_, vendor_path, expected_sha, expected_bytes) in AETHER_FILES.items():
+        if not safe_relative_path(vendor_path) or not vendor_path.startswith(
+            "vendor/aether/"
+        ):
+            errors.append(f"Aether {role} vendor path is unsafe")
+            continue
+        path = repository_root / vendor_path
+        if not path.is_file():
+            errors.append(f"Aether {role} is missing: {vendor_path}")
+            continue
+        content = path.read_bytes()
+        if len(content) != expected_bytes:
+            errors.append(f"Aether {role} byte count mismatch")
+        if hashlib.sha256(content).hexdigest() != expected_sha:
+            errors.append(f"Aether {role} checksum mismatch")
+
+    manifest_path = repository_root / AETHER_FILES["distribution-metadata"][1]
+    schema_path = repository_root / AETHER_FILES["schema"][1]
+    if manifest_path.is_file():
+        manifest = load_object(manifest_path)
+        if manifest.get("distribution_id") != profile["distribution"]["id"]:
+            errors.append("Aether distribution manifest ID mismatch")
+        if manifest.get("artifact_version") != profile["distribution"]["version"]:
+            errors.append("Aether distribution manifest version mismatch")
+        if manifest.get("source_digest") != profile["distribution"]["source_digest"]:
+            errors.append("Aether distribution manifest source digest mismatch")
+    if schema_path.is_file():
+        schema = load_object(schema_path)
+        if schema.get("$id") != profile["contract"]["schema_id"]:
+            errors.append("Aether journal schema identity mismatch")
+        if schema.get("additionalProperties") is not False:
+            errors.append("Aether journal schema must remain closed")
+    return errors
+
+
 def inspect_cli_version(command: str) -> str | None:
     """Read an installed Copilot CLI version without passing credentials."""
 
@@ -715,7 +908,7 @@ def validate_result(result: dict[str, Any]) -> list[str]:
 
 
 def validate_repository(repository_root: Path = REPOSITORY_ROOT) -> list[str]:
-    """Validate the profile, locked npm graph, and owned JSON schemas."""
+    """Validate the runtime, Aether distribution, and owned JSON schemas."""
 
     profile_path = repository_root / "catalog/repository-journal-runtime.json"
     try:
@@ -724,7 +917,19 @@ def validate_repository(repository_root: Path = REPOSITORY_ROOT) -> list[str]:
         return [str(error)]
     errors = validate_profile(profile)
     errors.extend(validate_locked_toolchain(profile, repository_root))
+    try:
+        aether_profile = load_object(
+            repository_root / "catalog/repository-journal-aether.json"
+        )
+    except (OSError, ValueError, json.JSONDecodeError) as error:
+        errors.append(str(error))
+    else:
+        errors.extend(validate_aether_profile(aether_profile, repository_root))
     expected_schemas = {
+        "repository-journal-aether-profile.v1.schema.json": (
+            "https://egohygiene.github.io/relay/contracts/"
+            "repository-journal-aether-profile/v1/schema.json"
+        ),
         "repository-journal-runtime-profile.v1.schema.json": (
             "https://egohygiene.github.io/relay/contracts/"
             "repository-journal-runtime-profile/v1/schema.json"

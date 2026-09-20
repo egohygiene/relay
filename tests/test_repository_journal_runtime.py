@@ -23,6 +23,7 @@ assert SPEC is not None and SPEC.loader is not None
 runtime = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(runtime)
 PROFILE_PATH = REPOSITORY_ROOT / "catalog/repository-journal-runtime.json"
+AETHER_PROFILE_PATH = REPOSITORY_ROOT / "catalog/repository-journal-aether.json"
 SCHEMA_DIRECTORY = REPOSITORY_ROOT / "schemas"
 
 
@@ -33,6 +34,7 @@ class RepositoryJournalRuntimeTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.profile_bytes = PROFILE_PATH.read_bytes()
         cls.profile = json.loads(cls.profile_bytes)
+        cls.aether_profile = json.loads(AETHER_PROFILE_PATH.read_bytes())
 
     def result(
         self,
@@ -111,6 +113,63 @@ class RepositoryJournalRuntimeTests(unittest.TestCase):
                 for error in runtime.validate_locked_toolchain(self.profile, root)
             )
         )
+
+    def test_aether_distribution_is_immutable_and_executable(self) -> None:
+        self.assertEqual(
+            runtime.validate_aether_profile(self.aether_profile, REPOSITORY_ROOT),
+            [],
+        )
+        renderer = (
+            REPOSITORY_ROOT
+            / self.aether_profile["execution"]["renderer"]
+        )
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        output = Path(temporary.name) / "journal.md"
+        machine = Path(temporary.name) / "journal.json"
+        source = (
+            REPOSITORY_ROOT
+            / "vendor/aether/library/organization/skills/quality/"
+            "create-repository-journal/templates/"
+            "repository-journal-input.template.json"
+        )
+        completed = subprocess.run(
+            [
+                "python3",
+                str(renderer),
+                "render",
+                "--input",
+                str(source),
+                "--output",
+                str(output),
+                "--json-output",
+                str(machine),
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        rendered = json.loads(machine.read_text(encoding="utf-8"))
+        self.assertEqual(rendered["contract_version"], "1.0.0")
+        self.assertEqual(
+            rendered["contract_digest"]["value"],
+            self.aether_profile["contract"]["spec_digest"]["value"],
+        )
+
+    def test_aether_revision_or_vendored_byte_drift_is_rejected(self) -> None:
+        mutable = deepcopy(self.aether_profile)
+        mutable["source"]["revision"] = "f" * 40
+        self.assertTrue(runtime.validate_aether_profile(mutable, REPOSITORY_ROOT))
+
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        shutil.copytree(REPOSITORY_ROOT / "vendor", root / "vendor")
+        renderer_path = root / runtime.AETHER_FILES["renderer"][1]
+        renderer_path.write_text("# drift\n", encoding="utf-8")
+        errors = runtime.validate_aether_profile(self.aether_profile, root)
+        self.assertTrue(any("renderer" in error for error in errors))
 
     def test_preferred_github_token_mode_can_be_ready(self) -> None:
         result = self.result()
@@ -242,6 +301,8 @@ class RepositoryJournalRuntimeTests(unittest.TestCase):
 
     def test_owned_schemas_are_closed_and_use_relay_ids(self) -> None:
         expected = {
+            "repository-journal-aether-profile.v1.schema.json":
+                "repository-journal-aether-profile/v1/schema.json",
             "repository-journal-runtime-profile.v1.schema.json":
                 "repository-journal-runtime-profile/v1/schema.json",
             "repository-journal-runtime-preflight-result.v1.schema.json":

@@ -1,0 +1,25 @@
+{
+  "artifact_id": "skill/create-repository-journal",
+  "artifact_version": "1.0.0",
+  "compatibility": {
+    "required_tools": [
+      "python3"
+    ]
+  },
+  "distribution_id": "distribution/create-repository-journal",
+  "generated_paths": [
+    "dist/skills/create-repository-journal/SKILL.md",
+    "dist/skills/create-repository-journal/evals/evals.json",
+    "dist/skills/create-repository-journal/references/report-contract.md",
+    "dist/skills/create-repository-journal/templates/repository-journal-input.template.json",
+    "dist/skills/create-repository-journal/scripts/repository-journal.py",
+    "dist/skills/create-repository-journal/references/aether.repository-journal.v1.schema.json",
+    "dist/skills/create-repository-journal/distribution-manifest.v1.json"
+  ],
+  "generator": "library/organization/skills/build-distributions.py",
+  "schema_version": "aether.distribution-manifest/v1",
+  "source_digest": {
+    "algorithm": "sha256-utf8-lf",
+    "value": "20478640d878d5d9b4d06e934f6a72f825e7292bec9acfc78c909e4f8f4702c7"
+  }
+}

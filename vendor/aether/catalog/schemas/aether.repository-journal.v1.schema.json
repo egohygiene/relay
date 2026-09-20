@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.io/schemas/aether/repository-journal/v1.json",
+  "title": "Aether repository journal input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "repository", "interval", "evidence"],
+  "properties": {
+    "schema_version": {"const": "aether.repository-journal-input/v1"},
+    "repository": {"type": "string", "pattern": "^[^/[:space:]]+/[^/[:space:]]+$"},
+    "interval": {
+      "type": "object", "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {"start": {"type": "string", "format": "date-time"}, "end": {"type": "string", "format": "date-time"}}
+    },
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "merged_work": {"type": "array", "items": {"type": "string"}},
+        "releases": {"type": "array", "items": {"type": "string"}},
+        "open_work": {"type": "array", "items": {"type": "string"}},
+        "stale_work": {"type": "array", "items": {"type": "string"}},
+        "ci": {"type": "array", "items": {"type": "string"}},
+        "dependency_security": {"type": "array", "items": {"type": "string"}},
+        "risks_blockers": {"type": "array", "items": {"type": "string"}},
+        "follow_ups": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "repository_sections": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}}
+  }
+}
