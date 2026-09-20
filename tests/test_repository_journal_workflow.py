@@ -91,6 +91,17 @@ class RepositoryJournalWorkflowTests(unittest.TestCase):
         validation = (WORKFLOW_ROOT / "validate.yml").read_text(encoding="utf-8")
 
         self.assertIn("repository-journal-manual-smoke:", validation)
+        smoke = validation.split(
+            "  repository-journal-manual-smoke:\n", maxsplit=1
+        )[1].split("\n  repository-journal-smoke-outputs:\n", maxsplit=1)[0]
+        for permission in (
+            "actions: read",
+            "contents: read",
+            "issues: read",
+            "pull-requests: read",
+            "security-events: read",
+        ):
+            self.assertIn(permission, smoke)
         self.assertIn("evidence-artifact-name: relay-repository-journal-evidence", validation)
         self.assertIn("candidate-artifact-name: relay-repository-journal-candidate", validation)
         self.assertIn('[[ "${STATUS}" == "complete" ]]', validation)

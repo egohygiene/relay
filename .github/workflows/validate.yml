@@ -164,6 +164,9 @@ jobs:
     permissions:
       actions: read
       contents: read
+      issues: read
+      pull-requests: read
+      security-events: read
     uses: $/.github/workflows/repository-journal.yml
     with:
       mode: manual

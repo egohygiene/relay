@@ -11,7 +11,7 @@ and failure semantics.
 | Workflow | Audience | Owner | Purpose | Maximum authority | Timeout |
 | --- | --- | --- | --- | --- | --- |
 | `artifact-budget` | Reusable | `egohygiene/relay` | Normalize caller-produced artifact size evidence and enforce advisory or blocking budgets | `contents: read` | 10 minutes |
-| `relay-validation` | Internal | `egohygiene/relay` | Validate packages, contracts, metadata, and the reusable smoke path | `actions: read`, `contents: read` | 15 minutes |
+| `relay-validation` | Internal | `egohygiene/relay` | Validate packages, contracts, metadata, and the reusable smoke path | `actions: read`, `contents: read`, `issues: read`, `pull-requests: read`, `security-events: read` | 15 minutes |
 | `relay-release` | Internal | `egohygiene/relay` | Dogfood the reviewed semantic-release handoff | job-scoped `contents: write` | 15 minutes |
 | `release-artifact` | Reusable | `egohygiene/relay` | Validate a profile-bound caller artifact and publish immutable release evidence | job-scoped `contents: write` | 15 minutes |
 | `release-prepare` | Reusable | `egohygiene/relay` | Plan or verify Aether-declared release intent and retain evidence | `actions: read`, `contents: read` | 10 minutes |
