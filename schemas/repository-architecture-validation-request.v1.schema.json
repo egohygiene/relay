@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/repository-architecture-validation-request/v1/schema.json",
+  "title": "Relay repository architecture validation request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "profile", "repository", "mode", "adoption", "inputs", "bounds", "output"],
+  "properties": {
+    "schema_version": {"const": "relay.repository-architecture-validation-request/v1"},
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "sha256"],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "visibility", "root", "represented_revision"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "visibility": {"enum": ["public", "private", "internal"]},
+        "root": {"const": "."},
+        "represented_revision": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|working-tree|unknown|not-applicable)$"}
+      }
+    },
+    "mode": {"enum": ["advisory", "required"]},
+    "adoption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository-contracts", "architecture-records", "diagram-sources"],
+      "properties": {
+        "repository-contracts": {"enum": ["present", "legacy", "unknown", "not-applicable"]},
+        "architecture-records": {"enum": ["present", "legacy", "unknown", "not-applicable"]},
+        "diagram-sources": {"enum": ["present", "legacy", "unknown", "not-applicable"]}
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_contracts", "repository_intelligence_policy", "diagram_roots"],
+      "properties": {
+        "repository_contracts": {"type": "array", "maxItems": 16, "uniqueItems": true, "items": {"$ref": "#/$defs/path"}},
+        "repository_intelligence_policy": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/path"}]},
+        "diagram_roots": {"type": "array", "maxItems": 16, "uniqueItems": true, "items": {"$ref": "#/$defs/path"}}
+      }
+    },
+    "bounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maximum_findings", "maximum_scanned_files", "maximum_scanned_bytes"],
+      "properties": {
+        "maximum_findings": {"type": "integer", "minimum": 1, "maximum": 256},
+        "maximum_scanned_files": {"type": "integer", "minimum": 1, "maximum": 10000},
+        "maximum_scanned_bytes": {"type": "integer", "minimum": 1, "maximum": 104857600}
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format", "path"],
+      "properties": {
+        "format": {"const": "json"},
+        "path": {"type": "string", "pattern": "^\\.reports/architecture-validation/[A-Za-z0-9._/-]+\\.json$"}
+      }
+    }
+  },
+  "$defs": {
+    "path": {"type": "string", "minLength": 1, "maxLength": 240, "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)(?!.*\\/$)[A-Za-z0-9._/-]+$"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"adoption": {"properties": {"repository-contracts": {"enum": ["present", "legacy"]}}}}},
+      "then": {"properties": {"inputs": {"properties": {"repository_contracts": {"minItems": 1}}}}}
+    },
+    {
+      "if": {"properties": {"adoption": {"properties": {"repository-contracts": {"enum": ["unknown", "not-applicable"]}}}}},
+      "then": {"properties": {"inputs": {"properties": {"repository_contracts": {"maxItems": 0}}}}}
+    },
+    {
+      "if": {"properties": {"adoption": {"properties": {"architecture-records": {"enum": ["present", "legacy"]}}}}},
+      "then": {"properties": {"inputs": {"properties": {"repository_intelligence_policy": {"type": "string"}}}}}
+    },
+    {
+      "if": {"properties": {"adoption": {"properties": {"architecture-records": {"enum": ["unknown", "not-applicable"]}}}}},
+      "then": {"properties": {"inputs": {"properties": {"repository_intelligence_policy": {"type": "null"}}}}}
+    },
+    {
+      "if": {"properties": {"adoption": {"properties": {"diagram-sources": {"enum": ["present", "legacy"]}}}}},
+      "then": {"properties": {"inputs": {"properties": {"diagram_roots": {"minItems": 1}}}}}
+    },
+    {
+      "if": {"properties": {"adoption": {"properties": {"diagram-sources": {"enum": ["unknown", "not-applicable"]}}}}},
+      "then": {"properties": {"inputs": {"properties": {"diagram_roots": {"maxItems": 0}}}}}
+    }
+  ]
+}

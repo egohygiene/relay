@@ -14,6 +14,9 @@ https://egohygiene.github.io/relay/contracts/release-publication-outcome/v1/sche
 https://egohygiene.github.io/relay/contracts/repository-continuity-preflight-profile/v1/schema.json
 https://egohygiene.github.io/relay/contracts/repository-continuity-preflight-request/v1/schema.json
 https://egohygiene.github.io/relay/contracts/repository-continuity-preflight-result/v1/schema.json
+https://egohygiene.github.io/relay/contracts/repository-architecture-validation-profile/v1/schema.json
+https://egohygiene.github.io/relay/contracts/repository-architecture-validation-request/v1/schema.json
+https://egohygiene.github.io/relay/contracts/repository-architecture-validation-result/v1/schema.json
 https://egohygiene.github.io/relay/contracts/artifact-budget-report/v1/schema.json
 https://egohygiene.github.io/relay/contracts/repository-journal-runtime-profile/v1/schema.json
 https://egohygiene.github.io/relay/contracts/repository-journal-runtime-preflight-result/v1/schema.json
@@ -40,6 +43,10 @@ publication job results even when the write handoff fails.
 The continuity-preflight profile pins Aether, Hygiene, EgoLint, and Holon
 inputs; its request and result schemas keep local and future CI evidence
 byte-compatible without copying or publishing consumer handoff prose.
+The repository-architecture validation profile pins Hygiene policy, EgoLint
+semantics, and Holon materialization inputs; its request and result schemas keep
+future local and CI architecture evidence bounded, advisory-first, and honest
+about planned or unavailable diagram coverage.
 The artifact-budget report normalizes bounded filesystem and Size Limit JSON
 measurements, baseline deltas, thresholds, coverage, and enforcement state.
 The repository-journal runtime profile locks the Copilot CLI package and

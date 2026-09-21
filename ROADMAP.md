@@ -342,6 +342,50 @@ organization dashboard form one consistent evidence-navigation system.
   to one current hardened workflow revision and public-route verification remain
   required before #33 or REL-RI-006 can be considered complete.
 
+### Repository architecture validation track
+
+<!-- roadmap-step
+id: REL-ARCH-001
+status: active
+depends_on: [REL-Q01]
+issues: [5, 99]
+-->
+#### REL-ARCH-001 — Establish the architecture-validation evidence boundary
+
+**State:** `active`
+**Depends on:** `REL-Q01`
+
+**Outcome:** Repositories can validate repository contracts, architecture
+records, and diagram evidence through one immutable, privacy-safe local and CI
+contract without moving sibling policy into Relay.
+
+**Exit criteria:**
+
+- [x] Hygiene policy, EgoLint semantics, and Holon materialization artifacts
+  are pinned by full revision and digest in a versioned profile.
+- [x] Closed request and result schemas preserve adoption, coverage,
+  provenance, bounds, truncation, and privacy states.
+- [ ] An offline adapter normalizes pinned EgoLint evidence without executing
+  consumer code or mutating the inspected checkout.
+- [ ] Diagram evidence is either validated by a reviewed owner or reported as
+  explicitly planned or unavailable.
+- [ ] A least-privilege reusable workflow proves local/CI parity across public,
+  private, legacy, missing, and nonconformant fixtures.
+- [ ] The capability is released immutably and adopted by representative
+  consumers before required mode can be enabled.
+
+**Current evidence:**
+
+- Issue #99 decomposes parent #5 into six ordered, reviewable checkpoints.
+- The checkpoint-1 profile and fixture corpus make the current boundary
+  advisory-only because the complete upstream validator surface is not yet
+  included in immutable releases.
+- Repository-contract and architecture-record rules are present in the pinned
+  EgoLint source. No reviewed diagram semantic validator was found, so Relay
+  records that surface as planned instead of claiming conformance.
+- This checkpoint adds no action, reusable workflow, provider write, release,
+  or moving-alias change.
+
 ### Repository continuity preflight track
 
 <!-- roadmap-step
@@ -397,7 +441,7 @@ Copilot adapter remains available for explicit later activation.
   and deterministic-rendering contracts are implemented and tested.
 - [x] Read-only no-billing and separately authorized Copilot reusable workflows
   are cataloged; Relay owns a scheduled/manual deterministic canary caller.
-- [ ] PR #96 is merged and the implementation is verified on current `main`.
+- [x] PR #96 is merged and the implementation is verified on current `main`.
 - [ ] A default-branch manual canary and the first scheduled execution retain
   valid summaries, artifacts, provenance, permissions, and sanitized logs.
 
@@ -446,7 +490,7 @@ This roadmap describes capability evolution, not promised dates or an issue queu
 
 **Status:** Complete for the v1 action and workflow contracts. Every current
 workflow is inventoried by owner and purpose with machine-checked permissions,
-timeouts, concurrency, parameters, and failure semantics. Issue #6 adds a
+timeouts, concurrency, parameters, and failure semantics. Issue #6 added a
 separate versioned lifecycle catalog for cancellation classes plus bounded,
 run-bound success and failure report preservation without changing the workflow
 catalog v1 schema.

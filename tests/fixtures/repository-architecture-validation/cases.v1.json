@@ -1,0 +1,413 @@
+{
+  "schema_version": "relay.repository-architecture-validation-fixtures/v1",
+  "profile_sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f",
+  "requests": {
+    "public-present-advisory": {
+      "schema_version": "relay.repository-architecture-validation-request/v1",
+      "profile": {
+        "version": "1.0.0-alpha.1",
+        "sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f"
+      },
+      "repository": {
+        "id": "egohygiene/example",
+        "visibility": "public",
+        "root": ".",
+        "represented_revision": "1111111111111111111111111111111111111111"
+      },
+      "mode": "advisory",
+      "adoption": {
+        "repository-contracts": "present",
+        "architecture-records": "present",
+        "diagram-sources": "present"
+      },
+      "inputs": {
+        "repository_contracts": [
+          ".config/egolint/repository-context.toml"
+        ],
+        "repository_intelligence_policy": ".config/egolint/repository-intelligence.toml",
+        "diagram_roots": [
+          "docs/architecture"
+        ]
+      },
+      "bounds": {
+        "maximum_findings": 256,
+        "maximum_scanned_files": 10000,
+        "maximum_scanned_bytes": 104857600
+      },
+      "output": {
+        "format": "json",
+        "path": ".reports/architecture-validation/result.json"
+      }
+    },
+    "private-legacy-required": {
+      "schema_version": "relay.repository-architecture-validation-request/v1",
+      "profile": {
+        "version": "1.0.0-alpha.1",
+        "sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f"
+      },
+      "repository": {
+        "id": "example/private-legacy",
+        "visibility": "private",
+        "root": ".",
+        "represented_revision": "working-tree"
+      },
+      "mode": "required",
+      "adoption": {
+        "repository-contracts": "legacy",
+        "architecture-records": "legacy",
+        "diagram-sources": "legacy"
+      },
+      "inputs": {
+        "repository_contracts": [
+          ".config/egolint/legacy-context.toml"
+        ],
+        "repository_intelligence_policy": ".config/egolint/legacy-intelligence.toml",
+        "diagram_roots": [
+          "docs/legacy-diagrams"
+        ]
+      },
+      "bounds": {
+        "maximum_findings": 128,
+        "maximum_scanned_files": 5000,
+        "maximum_scanned_bytes": 52428800
+      },
+      "output": {
+        "format": "json",
+        "path": ".reports/architecture-validation/result.json"
+      }
+    },
+    "unknown-adoption-advisory": {
+      "schema_version": "relay.repository-architecture-validation-request/v1",
+      "profile": {
+        "version": "1.0.0-alpha.1",
+        "sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f"
+      },
+      "repository": {
+        "id": "example/unclassified",
+        "visibility": "internal",
+        "root": ".",
+        "represented_revision": "unknown"
+      },
+      "mode": "advisory",
+      "adoption": {
+        "repository-contracts": "unknown",
+        "architecture-records": "unknown",
+        "diagram-sources": "unknown"
+      },
+      "inputs": {
+        "repository_contracts": [],
+        "repository_intelligence_policy": null,
+        "diagram_roots": []
+      },
+      "bounds": {
+        "maximum_findings": 64,
+        "maximum_scanned_files": 1000,
+        "maximum_scanned_bytes": 10485760
+      },
+      "output": {
+        "format": "json",
+        "path": ".reports/architecture-validation/result.json"
+      }
+    }
+  },
+  "results": {
+    "conformant-public": {
+      "schema_version": "relay.repository-architecture-validation-result/v1",
+      "profile": {
+        "version": "1.0.0-alpha.1",
+        "sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f"
+      },
+      "repository": {
+        "id": "egohygiene/example",
+        "visibility": "public",
+        "represented_revision": "1111111111111111111111111111111111111111"
+      },
+      "mode": "advisory",
+      "semantic_status": "conformant",
+      "outcome": "passed",
+      "coverage": {
+        "repository-contracts": "passed",
+        "architecture-records": "passed",
+        "diagram-sources": "not-applicable"
+      },
+      "provenance": [
+        {
+          "repository": "egohygiene/hygiene",
+          "revision": "c589587395750cd1c79c6fa0bef010189c547249",
+          "profile_source_id": "hygiene-repository-architecture"
+        },
+        {
+          "repository": "egohygiene/egolint",
+          "revision": "8b99ec4377eb84044fac411dff6b8074317ec094",
+          "profile_source_id": "egolint-repository-validation"
+        },
+        {
+          "repository": "egohygiene/holon",
+          "revision": "660b941f99618806fcadd589bcdae61c519f96e4",
+          "profile_source_id": "holon-architecture-decisions"
+        }
+      ],
+      "findings": [],
+      "counts": {
+        "info": 0,
+        "warning": 0,
+        "error": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "bounds": {
+        "maximum_findings": 256,
+        "observed_findings": 0,
+        "findings_truncated": false,
+        "maximum_scanned_files": 10000,
+        "observed_scanned_files": 48,
+        "maximum_scanned_bytes": 104857600,
+        "observed_scanned_bytes": 65536,
+        "scan_truncated": false
+      },
+      "artifacts": {
+        "egolint_run": ".reports/egolint/run.json",
+        "egolint_sarif": ".reports/egolint/report.sarif",
+        "repository_intelligence": ".reports/egolint/repository-intelligence.json",
+        "diagram_evidence": null
+      },
+      "privacy": {
+        "classification": "public-repository",
+        "contains_source_content": false,
+        "path_policy": "repository-relative-only",
+        "redaction": "bounded-diagnostics-only"
+      }
+    },
+    "legacy-private-advisory": {
+      "schema_version": "relay.repository-architecture-validation-result/v1",
+      "profile": {
+        "version": "1.0.0-alpha.1",
+        "sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f"
+      },
+      "repository": {
+        "id": "example/private-legacy",
+        "visibility": "private",
+        "represented_revision": "working-tree"
+      },
+      "mode": "advisory",
+      "semantic_status": "legacy",
+      "outcome": "warning",
+      "coverage": {
+        "repository-contracts": "partial",
+        "architecture-records": "partial",
+        "diagram-sources": "unavailable"
+      },
+      "provenance": [
+        {
+          "repository": "egohygiene/hygiene",
+          "revision": "c589587395750cd1c79c6fa0bef010189c547249",
+          "profile_source_id": "hygiene-repository-architecture"
+        },
+        {
+          "repository": "egohygiene/egolint",
+          "revision": "8b99ec4377eb84044fac411dff6b8074317ec094",
+          "profile_source_id": "egolint-repository-validation"
+        },
+        {
+          "repository": "egohygiene/holon",
+          "revision": "660b941f99618806fcadd589bcdae61c519f96e4",
+          "profile_source_id": "holon-architecture-decisions"
+        }
+      ],
+      "findings": [
+        {
+          "id": "RELAY-ARCH-MIGRATION-001",
+          "severity": "warning",
+          "source": "relay",
+          "path": "DECISIONS.md",
+          "line": null,
+          "summary": "Legacy architecture records require an explicit migration state.",
+          "remediation": "Preserve the legacy records and adopt the pinned Holon scaffold through a reviewed migration."
+        }
+      ],
+      "counts": {
+        "info": 0,
+        "warning": 1,
+        "error": 0,
+        "critical": 0,
+        "total": 1
+      },
+      "bounds": {
+        "maximum_findings": 128,
+        "observed_findings": 1,
+        "findings_truncated": false,
+        "maximum_scanned_files": 5000,
+        "observed_scanned_files": 82,
+        "maximum_scanned_bytes": 52428800,
+        "observed_scanned_bytes": 131072,
+        "scan_truncated": false
+      },
+      "artifacts": {
+        "egolint_run": ".reports/egolint/run.json",
+        "egolint_sarif": ".reports/egolint/report.sarif",
+        "repository_intelligence": ".reports/egolint/repository-intelligence.json",
+        "diagram_evidence": null
+      },
+      "privacy": {
+        "classification": "private-repository",
+        "contains_source_content": false,
+        "path_policy": "repository-relative-only",
+        "redaction": "bounded-diagnostics-only"
+      }
+    },
+    "nonconformant-required": {
+      "schema_version": "relay.repository-architecture-validation-result/v1",
+      "profile": {
+        "version": "1.0.0-alpha.1",
+        "sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f"
+      },
+      "repository": {
+        "id": "example/required",
+        "visibility": "public",
+        "represented_revision": "2222222222222222222222222222222222222222"
+      },
+      "mode": "required",
+      "semantic_status": "nonconformant",
+      "outcome": "failed",
+      "coverage": {
+        "repository-contracts": "failed",
+        "architecture-records": "passed",
+        "diagram-sources": "not-applicable"
+      },
+      "provenance": [
+        {
+          "repository": "egohygiene/hygiene",
+          "revision": "c589587395750cd1c79c6fa0bef010189c547249",
+          "profile_source_id": "hygiene-repository-architecture"
+        },
+        {
+          "repository": "egohygiene/egolint",
+          "revision": "8b99ec4377eb84044fac411dff6b8074317ec094",
+          "profile_source_id": "egolint-repository-validation"
+        },
+        {
+          "repository": "egohygiene/holon",
+          "revision": "660b941f99618806fcadd589bcdae61c519f96e4",
+          "profile_source_id": "holon-architecture-decisions"
+        }
+      ],
+      "findings": [
+        {
+          "id": "EGO-CONTRACT-FILE-001",
+          "severity": "error",
+          "source": "egolint",
+          "path": "docs/ecosystem/CONTEXT.md",
+          "line": null,
+          "summary": "The required generated repository context is missing.",
+          "remediation": "Materialize the pinned Hygiene repository-context projection and review the result."
+        }
+      ],
+      "counts": {
+        "info": 0,
+        "warning": 0,
+        "error": 1,
+        "critical": 0,
+        "total": 1
+      },
+      "bounds": {
+        "maximum_findings": 256,
+        "observed_findings": 1,
+        "findings_truncated": false,
+        "maximum_scanned_files": 10000,
+        "observed_scanned_files": 54,
+        "maximum_scanned_bytes": 104857600,
+        "observed_scanned_bytes": 70000,
+        "scan_truncated": false
+      },
+      "artifacts": {
+        "egolint_run": ".reports/egolint/run.json",
+        "egolint_sarif": ".reports/egolint/report.sarif",
+        "repository_intelligence": ".reports/egolint/repository-intelligence.json",
+        "diagram_evidence": null
+      },
+      "privacy": {
+        "classification": "public-repository",
+        "contains_source_content": false,
+        "path_policy": "repository-relative-only",
+        "redaction": "bounded-diagnostics-only"
+      }
+    },
+    "unavailable-validator": {
+      "schema_version": "relay.repository-architecture-validation-result/v1",
+      "profile": {
+        "version": "1.0.0-alpha.1",
+        "sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f"
+      },
+      "repository": {
+        "id": "example/unavailable",
+        "visibility": "internal",
+        "represented_revision": "unknown"
+      },
+      "mode": "advisory",
+      "semantic_status": "unavailable",
+      "outcome": "unavailable",
+      "coverage": {
+        "repository-contracts": "unavailable",
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable"
+      },
+      "provenance": [
+        {
+          "repository": "egohygiene/hygiene",
+          "revision": "c589587395750cd1c79c6fa0bef010189c547249",
+          "profile_source_id": "hygiene-repository-architecture"
+        },
+        {
+          "repository": "egohygiene/egolint",
+          "revision": "8b99ec4377eb84044fac411dff6b8074317ec094",
+          "profile_source_id": "egolint-repository-validation"
+        },
+        {
+          "repository": "egohygiene/holon",
+          "revision": "660b941f99618806fcadd589bcdae61c519f96e4",
+          "profile_source_id": "holon-architecture-decisions"
+        }
+      ],
+      "findings": [
+        {
+          "id": "RELAY-ARCH-AVAIL-001",
+          "severity": "error",
+          "source": "relay",
+          "path": null,
+          "line": null,
+          "summary": "The exact pinned validator was unavailable.",
+          "remediation": "Provide the digest-verified source checkout and checksum-locked dependencies, then rerun offline."
+        }
+      ],
+      "counts": {
+        "info": 0,
+        "warning": 0,
+        "error": 1,
+        "critical": 0,
+        "total": 1
+      },
+      "bounds": {
+        "maximum_findings": 64,
+        "observed_findings": 1,
+        "findings_truncated": false,
+        "maximum_scanned_files": 1000,
+        "observed_scanned_files": 0,
+        "maximum_scanned_bytes": 10485760,
+        "observed_scanned_bytes": 0,
+        "scan_truncated": false
+      },
+      "artifacts": {
+        "egolint_run": null,
+        "egolint_sarif": null,
+        "repository_intelligence": null,
+        "diagram_evidence": null
+      },
+      "privacy": {
+        "classification": "internal-repository",
+        "contains_source_content": false,
+        "path_policy": "repository-relative-only",
+        "redaction": "bounded-diagnostics-only"
+      }
+    }
+  }
+}

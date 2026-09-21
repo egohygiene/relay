@@ -49,6 +49,9 @@ The complete action and workflow inventories live in
 [`WORKFLOW_CATALOG.md`](WORKFLOW_CATALOG.md) for their human contracts.
 Workflow cancellation classes and durable report retention are defined in
 [`docs/ci-run-lifecycle.md`](docs/ci-run-lifecycle.md).
+The proposed repository-architecture validation boundary, immutable upstream
+pins, and future local/CI evidence seam are defined in
+[`docs/repository-architecture-validation.md`](docs/repository-architecture-validation.md).
 The complete release lifecycle and repository-class boundaries are documented
 in [`SEMANTIC_RELEASE.md`](SEMANTIC_RELEASE.md).
 
@@ -318,6 +321,27 @@ python3 scripts/validate_continuity_preflight_contract.py validate
 The local adapter executes the pinned EgoLint source entirely offline and
 normalizes its report without modifying the inspected checkout. The reusable
 pull-request workflow remains tracked by Relay issue #63.
+
+## Repository architecture validation
+
+Relay's proposed architecture-validation profile pins Hygiene policy, EgoLint
+semantics, and Holon materialization artifacts by full commit SHA and SHA-256.
+It defines closed request and result contracts for repository contracts,
+architecture records, and future diagram evidence while keeping Relay limited
+to orchestration and normalized evidence.
+
+Checkpoint 1 is contract-only: no action or reusable workflow is advertised.
+Unreleased upstream inputs cap the profile at advisory mode, diagram semantics
+remain explicitly planned, and unavailable coverage stays visible.
+
+```bash
+python3 scripts/validate_repository_architecture_contract.py validate
+```
+
+See
+[`docs/repository-architecture-validation.md`](docs/repository-architecture-validation.md)
+for the ownership, privacy, bounds, immutable pins, and ordered implementation
+gates.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for structural boundaries and
 [ROADMAP.md](ROADMAP.md) for extraction and adoption sequencing.
