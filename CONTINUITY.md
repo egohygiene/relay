@@ -7,22 +7,21 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-22T04:39:11Z"
+  updated_at: "2026-09-22T07:48:49Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: "Reconcile Relay issue #29 against its six merged supporting views and publish the bounded integration checkpoint for review."
+  purpose: "Implement Relay checkpoint #104's Repository Intelligence workflow trust boundary and durable failure evidence, then publish the exact review handoff."
   includes:
-    - "Repository Intelligence route, shell, action-output, partial-adoption, documentation, and test reconciliation."
-    - "The exact Hygiene repository route-profile pin and the upstream Search attribution handoff."
+    - "The trusted/fork pull-request, default-push, reusable-call, and manual-rebuild event and authority contract."
+    - "Revision-scoped site artifacts, sanitized fixed-retention run reports, workflow gates, schemas, fixtures, catalogs, and documentation."
     - "Review-only pull-request publication; merge authority remains with the user."
   excludes:
-    - "Observatory field-attribution implementation or Relay issue #102 implementation."
-    - "Observatory #5 conformance evidence or Relay #75 rendering of the full Hygiene matrix."
-    - "Consumer deployment, redirect creation, canonical-origin metadata, release publication, or movement of v1."
-    - "Unrelated Relay roadmap work."
+    - "Pages deployment, artifact-to-deployment provenance, deployment receipts, and rollback verification owned by #105."
+    - "Akashic or Empathy consumer migration, final #33 reconciliation, product polish, or fleet rollout."
+    - "Observatory #24, Relay #102, release publication, or movement of the v1 alias."
   precedence:
     - user-and-runtime-instructions
     - scoped-repository-instructions
@@ -37,82 +36,89 @@ scope:
     - DECISIONS.md
     - ROADMAP.md
     - README.md
+    - .github/workflows/repository-intelligence.yml
     - actions/repository-intelligence/action.yml
-    - actions/repository-intelligence/README.md
-    - actions/repository-intelligence/contracts/repository-intelligence-siblings.v1.lock.json
+    - actions/repository-intelligence/workflow-evidence/action.yml
+    - actions/repository-intelligence/workflow-evidence/schemas/repository-intelligence-workflow-report.schema.json
+    - actions/preserve-ci-report/action.yml
     - docs/repository-intelligence-publication.md
+    - workflow-catalog.json
 work:
-  objective: "Complete #29's currently unblocked Relay integration gaps, retain the upstream Search gap explicitly, and present one exact validated PR."
+  objective: "Present one exact, locally validated #104 implementation PR while retaining post-merge provider evidence as open closeout work."
   success_conditions:
-    - "All six supporting views retain distinct evidence questions, one shared shell, and deterministic rendering."
-    - "Cross-view navigation preserves applicable filters, time ranges, comparison selectors, and stable selected-entity context."
-    - "Optional Health, Work, and Search adoption cannot invalidate otherwise compatible evidence."
-    - "The public action outputs, docs, catalog, roadmap, dashboard navigation, and bundle validator agree."
-    - "Hygiene's repository canonical routes are pinned and tested without transferring publication authority to Relay."
-    - "Field-attributed Search work remains visible in Observatory #24 and Relay #102 instead of being inferred locally."
+    - "Every supported event/invocation class has documented executable coverage under one explicit read-only authority ceiling."
+    - "Fork input cannot access secrets or tokens, write state, use trusted caches, publish Pages, or execute consumer-owned control-plane code."
+    - "All third-party actions are immutable-pinned and Relay-local helpers resolve from the exact called revision."
+    - "Concurrency cancels only the same repository, caller-workflow-ref, target-ref, and contract identity."
+    - "Success sites and success/failure reports have revision/run identities, digests, bounded retention, and fail-closed gates."
+    - "Reports expose only closed stage, code, revision, version, artifact, and remediation metadata from an isolated runner-temporary path."
+    - "Negative fixtures and mutation tests reject unsafe identity, input, path, permission, gate, schema, and diagnostic states."
   active_issue:
     provider: github
-    id: egohygiene/relay#29
-    url: https://github.com/egohygiene/relay/issues/29
+    id: egohygiene/relay#104
+    url: https://github.com/egohygiene/relay/issues/104
   next:
     kind: issue
-    id: egohygiene/relay#33
-    description: "After this #29 checkpoint merges, advance deterministic consumer publication and verification in #33 while #29 remains blocked on #24 and #102."
-    readiness: ready
+    id: egohygiene/relay#105
+    description: "After #104 merges and its required provider evidence is recorded, bind deterministic Repository Intelligence artifacts to consumer-owned deployment provenance."
+    readiness: blocked-by-104-merge-and-closeout
     references:
+      - https://github.com/egohygiene/relay/issues/105
       - https://github.com/egohygiene/relay/issues/33
-      - https://github.com/egohygiene/relay/issues/102
-      - https://github.com/egohygiene/observatory/issues/24
-      - https://github.com/egohygiene/.github/issues/30
-    depends_on: []
+    depends_on:
+      - egohygiene/relay#104
 state:
   base:
-    revision: 4fa92e187a6a980fea202c8309749a204a1ccae5
+    revision: 4a1f86acf570b9bc5b337f7ef3fbd00d951c2e85
     ref: refs/heads/main
-    verified_at: "2026-09-22T03:19:13Z"
+    verified_at: "2026-09-22T07:48:49Z"
   candidate:
-    branch: codex/relay-29-supporting-view-integration
-    revision: a19f835365b4381729ca7a07012e96d953a25097
-    pull_request: https://github.com/egohygiene/relay/pull/103
-    handoff_state: ready-for-review
+    branch: codex/relay-104-intelligence-trust-failures
+    revision: 3556bfabbd55993a03a9a208d938e00013c9f0e0
+    tree: eb5c6a053743c5e7df90e498a2c9f3fec986b7b6
+    pull_request: https://github.com/egohygiene/relay/pull/107
+    handoff_state: draft-awaiting-provider-validation
   live:
     status: verified
-    observed_at: "2026-09-22T04:39:03Z"
-    default_branch_revision: 4fa92e187a6a980fea202c8309749a204a1ccae5
+    observed_at: "2026-09-22T07:48:49Z"
+    default_branch_revision: 4a1f86acf570b9bc5b337f7ef3fbd00d951c2e85
     issue_state: open
-    pull_request_state: ready-for-review
-    notes: "PR #103 is ready for review from the exact candidate branch; main remains the verified base, all applicable implementation-head checks passed, and no merge is claimed."
+    pull_request_state: draft
+    notes: "PR #107 contains the exact locally reviewed implementation tree. No merge, issue closure, default-branch run, deployment, or completed #33 evidence update is claimed."
   parallel_changes: []
 review:
-  status: passed
-  reviewed_at: "2026-09-22T04:39:11Z"
+  status: local-passed-provider-validation-pending
+  reviewed_at: "2026-09-22T07:48:49Z"
   reviewed_by: ChatGPT
   evidence:
-    - command: "Inspect live Relay issues #27, #29, #33, #75, #77, #79, #81, #83, #86, #88, #90, and #101 plus open pull requests and exact main."
+    - command: "Verify live Relay #104, #105, #106, main, open pull-request state, repository guidance, architecture, decisions, roadmap, and catalogs."
       outcome: passed
-      observed_at: "2026-09-22T03:19:13Z"
-      notes: "The six route children and workflow-parity child are merged; #29 still required acceptance reconciliation."
-    - command: "Fetch Hygiene main and verify catalog/public-site-surface-registry.json."
-      outcome: passed
-      observed_at: "2026-09-22T03:19:13Z"
-      notes: "Verified merge revision 63d313b1ddf8669808e897853b74928505494da0 and SHA-256 95c9db34dc0b66bb090bd92f89ce16cb7f850a0bbf9a47bd3d64f7ac3d0ad7f3."
-    - command: "python3 -m unittest focused Repository Intelligence site, six views, bundle, and workflow modules -v"
-      outcome: passed
-      observed_at: "2026-09-22T04:39:11Z"
-      notes: "124 focused tests passed, including overview/Now separation, cross-route context behavior, truthful route freshness, accessible entity restoration, placeholder rejection, route lock, state vocabulary, and incremental adoption."
+      observed_at: "2026-09-22T07:48:49Z"
+      notes: "Main remains 4a1f86acf570b9bc5b337f7ef3fbd00d951c2e85; #104-#106 are open and retain their ordered boundaries."
     - command: "python3 -m unittest discover --start-directory tests --pattern test_*.py --verbose"
       outcome: passed
-      observed_at: "2026-09-22T04:39:11Z"
-      notes: "All 427 repository tests passed."
-    - command: "Run five repository contract validators; compile Python; parse 61 JSON and 34 YAML documents; validate checked-in and 91 inline Bash blocks; parse both JavaScript assets; run git diff --check."
+      observed_at: "2026-09-22T07:48:49Z"
+      notes: "All 474 unit and integration tests passed, including event/trust, hostile checkout, schema contradiction, stage-gate mutation, path/symlink, and sanitizer coverage."
+    - command: "Run validate_actions.py, validate_ci_run_lifecycle.py, validate_continuity_preflight_contract.py, validate_repository_architecture_contract.py, and validate_repository_journal_runtime.py."
       outcome: passed
-      observed_at: "2026-09-22T04:39:11Z"
-      notes: "All deterministic local validation passed; Ruby was unavailable, so YAML metadata was parsed with PyYAML 6.0.3."
-    - command: "Independent read-only JavaScript, Python, documentation, and acceptance review."
+      observed_at: "2026-09-22T07:48:49Z"
+      notes: "All five catalog and contract validators passed."
+    - command: "Compile Python; parse 63 JSON and 35 YAML documents with duplicate-key checks; validate 94 inline Bash blocks, checked-in shell, both JavaScript assets, and git diff whitespace."
       outcome: passed
-      observed_at: "2026-09-22T04:39:11Z"
-      notes: "Final code, documentation, UX, and acceptance re-reviews found no blockers; Search field attribution remains explicitly deferred to Observatory #24 and Relay #102."
+      observed_at: "2026-09-22T07:48:49Z"
+      notes: "All deterministic syntax, metadata, and whitespace checks passed with PyYAML 6.0.3; Ruby/Psych remains a canonical-CI check."
+    - command: "Independent read-only security, correctness, and #104 acceptance reviews."
+      outcome: passed
+      observed_at: "2026-09-22T07:48:49Z"
+      notes: "The final reviews found no implementation blocker; one valid-ref portability edge was repaired and revalidated."
+    - command: "Publish implementation commit through the connected GitHub API and compare its tree to the locally validated commit."
+      outcome: passed
+      observed_at: "2026-09-22T07:48:49Z"
+      notes: "Remote commit 3556bfabbd55993a03a9a208d938e00013c9f0e0 and the local implementation have identical tree eb5c6a053743c5e7df90e498a2c9f3fec986b7b6."
   environment_limitations:
+    - "GitHub PR checks and trusted-PR run artifacts are pending after the continuity update."
+    - "Exact merged revision plus default-push, fork, manual, retained artifact, and completed #33 evidence are necessarily post-merge closeout work; #104 remains open."
+    - "Ruby is unavailable locally; PyYAML and duplicate-key traversal parsed metadata, while canonical CI repeats parsing with Ruby/Psych."
     - "The maintain-repository-continuity skill is unavailable in this session; this checkpoint was refreshed directly from the pinned local Aether template under AGENTS.md."
 privacy:
   classification: public-repository
@@ -132,73 +138,52 @@ privacy:
 
 ## Purpose and precedence
 
-This checkpoint records the bounded #29 integration reconciliation. It does not
-replace the canonical architecture, roadmap, Git history, live issues, or PR
-state. Resolve conflicts using the front-matter precedence.
+This checkpoint records #104's bounded workflow-trust and durable-evidence
+implementation. It does not replace canonical architecture, roadmap, Git
+history, live issues, or PR state. Resolve conflicts using the precedence above.
+
+## Current state
+
+- Base: live `main` at `4a1f86acf570b9bc5b337f7ef3fbd00d951c2e85`.
+- Implementation: `3556bfabbd55993a03a9a208d938e00013c9f0e0`, exact tree
+  `eb5c6a053743c5e7df90e498a2c9f3fec986b7b6`, in draft PR #107.
+- Local verification: 474 tests, five contract validators, all static checks,
+  and three independent reviews passed.
+- Live: #104 and parent #33 remain open. No merge or deployment is claimed.
+
+## Material changes
+
+- Added a pre-checkout event, invocation, identity, input, and retention gate.
+- Enforced explicit read-only/no-secret/no-cache/no-Pages authority and exact
+  immutable third-party or revision-bound Relay-local resolution.
+- Isolated site names by contract/repository/revision/run and cancellation by
+  caller workflow ref plus target ref.
+- Added a closed sanitized report schema, runner-temporary report creation,
+  fixed 30-day preservation, and failure reassertion for every actionable stage.
+- Hardened Python imports, CLI values, Git refs, path/symlink boundaries, stage
+  sequencing, upload-digest claims, workflow gates, and mutation validation.
+- Updated fixtures, catalogs, lifecycle docs, adoption guidance, changelog, and
+  the roadmap without transferring deployment authority from consumers.
+
+## Remaining evidence and next work
+
+PR #107 must pass provider checks and return to the user for merge. Keep #104
+open afterward until its exact merged revision, representative event/trust run
+URLs, success/failure artifact names and digests, retention, permission audit,
+negative-fixture results, and completed-evidence update to #33 are recorded.
+Only then is #105 dependency-ready; it owns build-to-deployment provenance.
 
 ## Resume protocol
 
-1. Read repository instructions and the canonical sources above.
-2. Verify main, this branch, #29, #33, #102, Observatory #24, and the active PR.
-3. Re-run failed or stale validation before changing the candidate.
-4. Continue only the dependency-ready work named here unless the user redirects.
+1. Re-verify main, #104, #105, #33, PR #107, and the exact PR head.
+2. Inspect every provider check and the Repository Intelligence site/report
+   artifacts before marking the PR ready.
+3. Resolve substantive review findings on this branch; do not merge for the user.
+4. After user merge, collect the closeout evidence above before closing #104 or
+   beginning #105.
 
-## Current objective and success conditions
+## Privacy and compaction
 
-Finish the currently unblocked Relay supporting-view integration, keep upstream
-attribution work explicit, validate the exact tree, and return merge authority
-to the user without predicting #29 closure.
-
-## State snapshot
-
-- Base: exact live `main` at `4fa92e187a6a980fea202c8309749a204a1ccae5`.
-- Candidate implementation: `a19f835365b4381729ca7a07012e96d953a25097`
-  on `codex/relay-29-supporting-view-integration`, ready for review in PR #103.
-- Live: #29 and #33 open; merged route children verified; PR #103 ready for review.
-
-## Completed and material changes
-
-- Added cross-view URL/filter/time and stable entity-ID context propagation.
-- Made the overview and Now distinct registered surfaces.
-- Allowed optional Health/Work and Compare-before-Search incremental adoption.
-- Completed action outputs, dashboard navigation, docs, catalog, and route lock.
-- Created Observatory #24 and Relay #102 for field-attributed Search evidence.
-
-## Validation and review evidence
-
-- Focused Repository Intelligence suite: 124 tests passed.
-- Full repository suite: 427 tests passed; all static and contract checks passed.
-
-## Blockers, risks, unknowns, and deferred work
-
-- Blockers: none for this integration checkpoint; #29 completion remains blocked
-  on Observatory #24 followed by Relay #102.
-- Risk: live consumer aliases and canonical origins cannot be proven by a builder
-  artifact; #33 retains that deployment acceptance.
-- Deferred: Search field attribution (#24 → #102) and full conformance (#5 → #75).
-
-## Next dependency-ready work
-
-After this PR merges, continue Relay #33. Keep #29 open: Search attribution
-remains blocked until Observatory #24 supplies its accepted contract and Relay
-#102 renders it.
-
-## Parallel changes and reconciliation
-
-No open Relay PR existed at branch creation. Recheck before publication and
-before merge; never infer merge state from this checkpoint.
-
-## Privacy and redaction
-
-This public checkpoint contains only repository identifiers, public issue URLs,
-revisions, route contracts, validation outcomes, and bounded handoff state.
-
-## Handoff update protocol
-
-After full validation and before PR handoff, replace stale candidate fields with
-the exact commit, PR, and review evidence. Do not predict merge.
-
-## Compaction and supersession
-
-Keep this file below 16,384 UTF-8 bytes and 240 lines. Replace stale state rather
-than accumulating history; Git and GitHub own chronology.
+This public checkpoint contains only public repository identifiers, revisions,
+issue/PR URLs, contract names, and bounded validation outcomes. Keep it below
+16,384 UTF-8 bytes and 240 lines; replace stale state instead of appending history.
