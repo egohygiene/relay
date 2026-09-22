@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-22T18:12:07Z"
+  updated_at: "2026-09-22T18:51:08Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -76,13 +76,13 @@ state:
     verified_at: "2026-09-22T18:12:07Z"
   candidate:
     branch: codex/relay-105-deployment-provenance
-    revision: 5161555b243d5dc0e71110033f8616eb323b93fa
-    tree: ee85f6b7bbbe34508554042a14b61665a5a12da4
+    revision: 5737d22c05dd518d7c90e857d5460fed7305a45e
+    tree: e6584debbe22c611d7f90d847af46cc242c66565
     pull_request: https://github.com/egohygiene/relay/pull/108
-    handoff_state: implementation-validated-continuity-update-pending
+    handoff_state: implementation-and-provider-fixture-validated-review-ready
   live:
     status: verified
-    observed_at: "2026-09-22T18:12:07Z"
+    observed_at: "2026-09-22T18:51:08Z"
     default_branch_revision: ecdf1d9bd8eda0d1aa2388a7caffe867968578a7
     issue_state: open
     parent_issue_state: open
@@ -90,8 +90,8 @@ state:
     notes: "Checkpoint #104 and PR #107 are complete at the exact base revision. PR #108 contains the locally validated #105 implementation tree. No merge, issue closure, production deployment, Akashic/Empathy migration, or completed #33 evidence is claimed."
   parallel_changes: []
 review:
-  status: passed-local-exact-head-provider-checks-pending
-  reviewed_at: "2026-09-22T18:12:07Z"
+  status: passed-local-and-provider-at-implementation-head
+  reviewed_at: "2026-09-22T18:51:08Z"
   reviewed_by: ChatGPT
   evidence:
     - command: "Verify live main, #104, #105, #33, open pull requests, related branches, and supplied #104 provider evidence."
@@ -100,22 +100,26 @@ review:
       notes: "Main is ecdf1d9bd8eda0d1aa2388a7caffe867968578a7; #104 is completed, #105 and #33 are open, and no competing #105 branch or pull request preceded this work. The intentional RIW-002 run 35747527356 remains expected negative evidence."
     - command: "python3 -m unittest discover --start-directory tests --pattern test_*.py --verbose"
       outcome: passed
-      observed_at: "2026-09-22T18:12:07Z"
+      observed_at: "2026-09-22T18:51:08Z"
       notes: "All 489 unit and integration tests passed, including passing receipt generation plus revision, digest, version, route, freshness, non-clobber, alias-target, incomplete-receipt, unsafe-URL, pre-write path-boundary, and read-only workflow-smoke fixtures."
     - command: "Run validate_actions.py, validate_ci_run_lifecycle.py, validate_continuity_preflight_contract.py, validate_repository_architecture_contract.py, and validate_repository_journal_runtime.py."
       outcome: passed
-      observed_at: "2026-09-22T18:12:07Z"
+      observed_at: "2026-09-22T18:51:08Z"
       notes: "All catalog, lifecycle, continuity, architecture, and journal contract validators passed."
     - command: "Compile Python; parse JSON with duplicate-key rejection and YAML metadata; validate checked-in Bash, 99 inline Bash blocks, JavaScript syntax, and git diff whitespace."
       outcome: passed
-      observed_at: "2026-09-22T18:12:07Z"
+      observed_at: "2026-09-22T18:51:08Z"
       notes: "All available deterministic syntax, metadata, and whitespace checks passed."
     - command: "Publish the implementation tree through the connected GitHub API and open draft PR #108."
       outcome: passed
       observed_at: "2026-09-22T18:12:07Z"
       notes: "Remote commit 5161555b243d5dc0e71110033f8616eb323b93fa and the locally validated checkpoint share exact tree ee85f6b7bbbe34508554042a14b61665a5a12da4."
+    - command: "Inspect every GitHub check attached to implementation head 5737d22c05dd518d7c90e857d5460fed7305a45e."
+      outcome: passed
+      observed_at: "2026-09-22T18:51:08Z"
+      notes: "Validation run 35768100209 passed, including the consumer-owned Intelligence deployment provenance fixture; continuity preflight and dependency review also passed, and authority-gated jobs were expectedly skipped."
   environment_limitations:
-    - "The final continuity commit still requires exact-head GitHub Actions inspection before handoff."
+    - "The executable implementation and provider fixture passed at 5737d22c05dd518d7c90e857d5460fed7305a45e; the final continuity-only successor remains subject to the PR's exact-head checks."
     - "Relay fixtures prove the reference contract, not a real consumer production deployment; consumer run, URL, retained receipt, and remote-byte evidence remain consumer-owned."
     - "Exact merged revision and post-merge provider evidence are necessarily closeout work; #105 and parent #33 remain open."
     - "Ruby is unavailable locally; PyYAML parsed all metadata while canonical CI repeats YAML parsing with Ruby/Psych."
@@ -148,6 +152,9 @@ state. Resolve conflicts using the precedence above.
 - Candidate: draft PR #108 on `codex/relay-105-deployment-provenance`.
 - Local verification: 489 tests, five contract validators, JSON/YAML parsing,
   Python/Bash/inline-Bash/JavaScript syntax, and whitespace checks passed.
+- Provider verification: run 35768100209 passed at implementation head
+  `5737d22c05dd518d7c90e857d5460fed7305a45e`, including the consumer-owned
+  deployment-provenance fixture.
 - Live: #105 and parent #33 remain open. No production deployment or merge is
   claimed.
 
@@ -167,11 +174,11 @@ state. Resolve conflicts using the precedence above.
 
 ## Remaining evidence and next work
 
-The final continuity commit must be pushed and every exact-head PR check must be
-inspected. Keep #105 open through review and merge; afterward record the exact
-merged revision and provider evidence before closing it. A real consumer may
-then retain its own production run and receipt evidence. Keep #33 open for #106
-final reconciliation; do not migrate Akashic or Empathy under this checkpoint.
+Keep #105 open through review and merge; afterward record the exact merged
+revision and default-branch provider evidence before closing it. A real
+consumer may then retain its own production run and receipt evidence. Keep #33
+open for #106 final reconciliation; do not migrate Akashic or Empathy under
+this checkpoint.
 
 ## Resume protocol
 
