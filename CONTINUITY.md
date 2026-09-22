@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-22T03:49:53Z"
+  updated_at: "2026-09-22T03:58:10Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -72,16 +72,16 @@ state:
     verified_at: "2026-09-22T03:19:13Z"
   candidate:
     branch: codex/relay-29-supporting-view-integration
-    revision: 8106a14567c1c626a28155339d77b4e05ff5e0fc
-    pull_request: null
-    handoff_state: ready-for-review
+    revision: 9426b962c634774910a22ad4f79b99c4d7fce2a2
+    pull_request: https://github.com/egohygiene/relay/pull/103
+    handoff_state: draft-review
   live:
     status: verified
-    observed_at: "2026-09-22T03:19:13Z"
+    observed_at: "2026-09-22T03:57:47Z"
     default_branch_revision: 4fa92e187a6a980fea202c8309749a204a1ccae5
     issue_state: open
-    pull_request_state: not-applicable
-    notes: "Main matched the local base; #29 and #33 were open; #77, #79, #81, #83, #86, #88, and #90 were closed; no Relay PR was open before this branch."
+    pull_request_state: draft
+    notes: "Draft PR #103 is open from the exact candidate branch; main remains the verified base, and no merge is claimed."
   parallel_changes: []
 review:
   status: passed
@@ -152,9 +152,9 @@ to the user without predicting #29 closure.
 ## State snapshot
 
 - Base: exact live `main` at `4fa92e187a6a980fea202c8309749a204a1ccae5`.
-- Candidate implementation: `8106a14567c1c626a28155339d77b4e05ff5e0fc`
-  on `codex/relay-29-supporting-view-integration`, ready for review.
-- Live: #29 and #33 open; merged route children verified; no pre-existing open PR.
+- Candidate implementation: `9426b962c634774910a22ad4f79b99c4d7fce2a2`
+  on `codex/relay-29-supporting-view-integration`, under draft review in PR #103.
+- Live: #29 and #33 open; merged route children verified; draft PR #103 open.
 
 ## Completed and material changes
 
