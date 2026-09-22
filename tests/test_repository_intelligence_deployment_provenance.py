@@ -282,6 +282,29 @@ class RepositoryIntelligenceDeploymentProvenanceTests(unittest.TestCase):
                 )
             )
 
+    def test_symlinked_evidence_parent_is_rejected_before_outside_write(self) -> None:
+        with tempfile.TemporaryDirectory() as outside_name:
+            outside = Path(outside_name)
+            (self.workspace / "escape").symlink_to(outside, target_is_directory=True)
+            with self.assertRaisesRegex(SystemExit, "contains a symbolic link"):
+                deployment.main(
+                    self.operation_arguments(
+                        "capture-baseline",
+                        **{"baseline-path": "escape/created/baseline.json"},
+                    )
+                )
+            self.assertFalse((outside / "created").exists())
+
+    def test_site_evidence_path_is_rejected_before_site_write(self) -> None:
+        with self.assertRaisesRegex(SystemExit, "outside the composed site"):
+            deployment.main(
+                self.operation_arguments(
+                    "capture-baseline",
+                    **{"baseline-path": "dist/evidence/consumer-baseline.json"},
+                )
+            )
+        self.assertFalse((self.site / "evidence").exists())
+
     def test_checked_in_fixture_catalog_covers_required_failure_modes(self) -> None:
         fixture = json.loads(
             (

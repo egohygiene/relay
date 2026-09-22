@@ -207,20 +207,31 @@ def resolve_evidence_path(workspace: Path, value: str, site: Path, label: str) -
 
     relative = relative_path(value, label)
     lexical = workspace.joinpath(*PurePosixPath(relative).parts)
-    parent = lexical.parent
-    parent.mkdir(parents=True, exist_ok=True)
-    resolved_parent = parent.resolve(strict=True)
     try:
-        resolved_parent.relative_to(workspace)
-    except ValueError as error:
-        raise ProvenanceError(f"{label} escapes the workspace") from error
+        lexical.relative_to(site)
+    except ValueError:
+        pass
+    else:
+        raise ProvenanceError(f"{label} must remain outside the composed site")
+    current = workspace
+    for part in PurePosixPath(relative).parts[:-1]:
+        current /= part
+        if current.is_symlink():
+            raise ProvenanceError(f"{label} contains a symbolic link")
+        if current.exists():
+            if not current.is_dir():
+                raise ProvenanceError(f"{label} parent is not a directory")
+        else:
+            current.mkdir()
+        try:
+            current.resolve(strict=True).relative_to(workspace)
+        except ValueError as error:
+            raise ProvenanceError(f"{label} escapes the workspace") from error
     if lexical.is_symlink():
         raise ProvenanceError(f"{label} must not be a symbolic link")
-    try:
-        lexical.resolve(strict=False).relative_to(site)
-    except ValueError:
-        return lexical
-    raise ProvenanceError(f"{label} must remain outside the composed site")
+    if lexical.exists() and not lexical.is_file():
+        raise ProvenanceError(f"{label} must name a regular file")
+    return lexical
 
 
 def route(value: str, label: str) -> str:
