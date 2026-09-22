@@ -3,6 +3,7 @@
   "repository": "example/public-repository",
   "expected_route": "/intelligence/",
   "expected_files": [
+    "build-manifest.json",
     "explorer.js",
     "index.html",
     "provenance.json",

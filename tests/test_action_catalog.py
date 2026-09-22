@@ -35,6 +35,7 @@ class ActionCatalogTests(unittest.TestCase):
                 "actions/publish-report-snapshot",
                 "actions/repository-continuity-preflight",
                 "actions/repository-intelligence",
+                "actions/repository-intelligence-deployment-provenance",
                 "actions/repository-journal",
                 "actions/repository-labels",
                 "actions/stale-pull-requests",
@@ -188,6 +189,14 @@ class ActionCatalogTests(unittest.TestCase):
                 "https://egohygiene.github.io/contracts/repository-tree/v1/schema.json",
             "actions/repository-intelligence/schemas/repository-intelligence-dashboard.schema.json":
                 "https://egohygiene.dev/schemas/repository-intelligence-dashboard/v3.json",
+            "actions/repository-intelligence/schemas/repository-intelligence-build-manifest.schema.json":
+                "https://egohygiene.github.io/relay/contracts/repository-intelligence-build-manifest/v1/schema.json",
+            "actions/repository-intelligence-deployment-provenance/schemas/consumer-route-baseline.schema.json":
+                "https://egohygiene.github.io/relay/contracts/repository-intelligence-consumer-route-baseline/v1/schema.json",
+            "actions/repository-intelligence-deployment-provenance/schemas/composition-verification.schema.json":
+                "https://egohygiene.github.io/relay/contracts/repository-intelligence-composition-verification/v1/schema.json",
+            "actions/repository-intelligence-deployment-provenance/schemas/deployment-receipt.schema.json":
+                "https://egohygiene.github.io/relay/contracts/repository-intelligence-deployment-receipt/v1/schema.json",
             "actions/repository-intelligence/workflow-evidence/schemas/repository-intelligence-workflow-report.schema.json":
                 "https://egohygiene.github.io/relay/contracts/repository-intelligence-workflow-report/v1/schema.json",
             "actions/normalize-repository-report/schemas/repository-report-summary.schema.json":

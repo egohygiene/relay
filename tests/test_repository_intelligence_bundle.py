@@ -50,6 +50,10 @@ bundle_validator = load_module(
     "bundle_validator",
     ACTION_ROOT / "scripts/validate_repository_intelligence_bundle.py",
 )
+build_manifest = load_module(
+    "repository_intelligence_build_manifest",
+    ACTION_ROOT / "scripts/create_repository_intelligence_build_manifest.py",
+)
 
 
 def git(repository: Path, *arguments: str, environment: dict[str, str] | None = None) -> str:
@@ -102,6 +106,7 @@ class RepositoryIntelligenceBundleTests(unittest.TestCase):
         self.repository = Path(self.temporary_directory.name) / "repository"
         self.repository.mkdir()
         self.source_commit = initialize_repository(self.repository)
+        self.source_epoch = int(git(self.repository, "show", "--no-patch", "--format=%ct", "HEAD"))
         self.public_fixture = json.loads(
             (
                 FIXTURE_ROOT
@@ -165,6 +170,7 @@ class RepositoryIntelligenceBundleTests(unittest.TestCase):
             generator_source_ref=generator_ref,
             generator_source_commit=generator_commit,
             generator_immutable=generator_immutable,
+            source_epoch=self.source_epoch,
         )
 
     def build_bundle(
@@ -219,6 +225,17 @@ class RepositoryIntelligenceBundleTests(unittest.TestCase):
             ACTION_ROOT / "assets/dashboard.css",
             ACTION_ROOT / "assets/explorer.js",
             provenance,
+        )
+        build_manifest.write_json(
+            output / build_manifest.BUILD_MANIFEST_NAME,
+            build_manifest.build_manifest(
+                output_root=output,
+                repository=consumer_repository,
+                consumer_revision=self.source_commit,
+                generator_revision=generator_commit,
+                generator_version="1.1.0",
+                source_epoch=self.source_epoch,
+            ),
         )
         self.validate_bundle(
             output,

@@ -33,6 +33,46 @@ The reusable workflow:
 
 A reusable-workflow job cannot modify another job's workspace. Repositories that need to merge Intelligence into an existing site should therefore continue to use the composite action in the caller-owned build job rather than adding a second deployment authority.
 
+## Deterministic build and consumer deployment handoff
+
+Every current Repository Intelligence bundle contains
+`build-manifest.json` using
+`egohygiene.relay.repository-intelligence-build-manifest/v1`. It records the
+represented consumer revision, exact Relay generator revision, input and schema
+contract versions, source epoch, enabled routes, a sorted per-file inventory,
+and the deterministic `sha256-canonical-file-inventory-v1` bundle digest. The
+manifest excludes itself from that inventory and exposes its own SHA-256 as a
+separate action or reusable-workflow output.
+
+The manifest never records a run ID, environment, deployment URL, deployment
+conclusion, alias, final composed-site digest, or rollback point. Those values
+belong to the separate consumer-owned
+`repository-intelligence-deployment-provenance` action. Its ordered integration
+is:
+
+1. Build the consumer site and capture its unrelated route baseline.
+2. Add Repository Intelligence and consumer-owned redirect aliases.
+3. Verify manifest identity, freshness, digest, required routes, aliases, and
+   byte-for-byte preservation before uploading or deploying.
+4. Let the consumer workflow compose, upload, and deploy the one final site.
+5. Record a separate receipt with the exact manifest digest, bundle digest,
+   workflow run/attempt, environment/URL, conclusion, final site digest and
+   route inventory, aliases, and prior deployed rollback point.
+6. Preserve the receipt outside the deployed site and use `verify-receipt`
+   during audit or rollback rehearsal.
+
+The verifier rejects revision drift, digest mismatch, incompatible contracts,
+missing required routes, stale source evidence, clobbered consumer routes, and
+incomplete receipts. Diagnostics use closed labels and canonical public route
+paths; they do not serialize tokens, secrets, private payloads, or runner
+filesystem roots. The complete reference pipeline and recovery procedure are
+documented in
+[`actions/repository-intelligence-deployment-provenance/README.md`](../actions/repository-intelligence-deployment-provenance/README.md).
+
+The executable Relay fixture proves this boundary without claiming a live
+production deployment. Real consumer runs and remote-route proof remain
+consumer-side evidence and later #33 adoption checkpoints.
+
 ## Reusable workflow trust and event contract
 
 The consumer owns the event trigger and calls
@@ -92,9 +132,10 @@ repository-intelligence-site-v1-<repository-id>-<full-represented-sha>-<run-id>-
 ```
 
 The `artifact-retention-days` input controls this site artifact and is validated
-from 1 through 90 days; its default is 30. The workflow returns both
-`artifact-name` and `artifact-digest`, so a caller can identify the exact
-ordinary Actions artifact without treating it as deployment evidence.
+from 1 through 90 days; its default is 30. The workflow returns `artifact-name`,
+the transport-level `artifact-digest`, `build-manifest-sha256`, and
+`bundle-digest`. The latter two identify the deterministic payload handoff;
+none is deployment evidence by itself.
 
 Every run that reaches evidence preservation also writes the fixed,
 machine-readable `repository-intelligence-run-report.json`. The report records
@@ -122,8 +163,7 @@ before its evidence step. An artifact-service outage can likewise prevent the
 report itself from being uploaded. Re-run the same revision for transient
 infrastructure failures. A successful report proves only the run and artifact
 boundary described above; binding that artifact to an actual consumer
-deployment is owned by Relay issue
-[#105](https://github.com/egohygiene/relay/issues/105).
+deployment requires the separate consumer receipt described above.
 
 ### Failure codes and recovery
 
@@ -189,5 +229,6 @@ These integrations prove the builder and consumer-owned composition boundary. Th
 - Relay never infers Observatory semantics or substitutes missing evidence.
 - The builder never becomes a second Pages deployment owner.
 - Generated output is deterministic for the same normalized inputs and represented commit.
+- Deployment-specific metadata remains outside the deterministic Relay bundle.
 - Private work directories and producer reports are not published wholesale.
 - A partial or unavailable source remains partial or unavailable in the static output.

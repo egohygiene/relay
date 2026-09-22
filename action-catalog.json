@@ -65,6 +65,22 @@
       "consumer_ref": "egohygiene/relay/actions/repository-intelligence@v1"
     },
     {
+      "id": "repository-intelligence-deployment-provenance",
+      "path": "actions/repository-intelligence-deployment-provenance",
+      "name": "Repository Intelligence Deployment Provenance",
+      "summary": "Verify deterministic Intelligence composition and record separate consumer-owned deployment receipts without deploying.",
+      "status": "experimental",
+      "runtime": [
+        "bash",
+        "python3"
+      ],
+      "permissions": {},
+      "side_effects": [
+        "workspace-write"
+      ],
+      "consumer_ref": "egohygiene/relay/actions/repository-intelligence-deployment-provenance@v1"
+    },
+    {
       "id": "repository-journal",
       "path": "actions/repository-journal",
       "name": "Repository Journal",

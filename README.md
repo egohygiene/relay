@@ -14,6 +14,7 @@ and deployment.
 | ---------- | --------------- |
 | Artifact size and performance budgets | `egohygiene/relay/actions/artifact-budget@v1` |
 | Repository Intelligence site | `egohygiene/relay/actions/repository-intelligence@v1` |
+| Repository Intelligence deployment provenance | `egohygiene/relay/actions/repository-intelligence-deployment-provenance@v1` |
 | Validated repository journal | `egohygiene/relay/actions/repository-journal@v1` |
 | Canonical labels and pull-request metadata | `egohygiene/relay/actions/repository-labels@v1` |
 | Warning-first stale pull-request lifecycle | `egohygiene/relay/actions/stale-pull-requests@v1` |
@@ -67,12 +68,26 @@ in [`SEMANTIC_RELEASE.md`](SEMANTIC_RELEASE.md).
 - name: Build the repository site
   run: pnpm run build
 
+- name: Capture consumer routes before composition
+  uses: egohygiene/relay/actions/repository-intelligence-deployment-provenance@<full-commit-sha>
+  with:
+    operation: capture-baseline
+    consumer-revision: "${{ github.sha }}"
+
 - name: Add repository intelligence
   # egohygiene/relay repository-intelligence v1.1.0
   uses: egohygiene/relay/actions/repository-intelligence@<full-commit-sha>
   # When an earlier step materializes Observatory's commit-matched read model:
   # with:
   #   observatory-snapshot: .cache/observatory/repository-intelligence.json
+
+- name: Verify consumer composition
+  # egohygiene/relay repository-intelligence-deployment-provenance v1.6.0
+  uses: egohygiene/relay/actions/repository-intelligence-deployment-provenance@<same-full-commit-sha>
+  with:
+    operation: verify-composition
+    consumer-revision: "${{ github.sha }}"
+    relay-revision: "<same-full-commit-sha>"
 
 - name: Upload one composed Pages artifact
   uses: actions/upload-pages-artifact@<full-commit-sha>
@@ -94,6 +109,14 @@ https://repository.example/intelligence/dashboard/
 
 The action contract does not depend on a custom domain or a specific root-site
 stack.
+
+The consumer first captures its unrelated route baseline before the Intelligence
+step. After its own deployment step, it can invoke the provenance action again
+with `record-receipt` to bind the deterministic manifest to the consumer run,
+environment, URL, conclusion, aliases, final site digest, and rollback point.
+The receipt remains outside `dist/`; run-specific metadata never changes the
+Relay bundle. See the
+[complete reference pipeline](examples/workflows/repository-intelligence-deployment-provenance.md).
 
 ## Review and deploy product-owned publication sites
 

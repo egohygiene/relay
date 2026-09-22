@@ -60,6 +60,12 @@ on:
       artifact-digest:
         description: SHA-256 digest reported for the uploaded dashboard artifact.
         value: "${{ jobs.generate.outputs.artifact-digest }}"
+      build-manifest-sha256:
+        description: Tagged SHA-256 digest of the deterministic build manifest inside the site artifact.
+        value: "${{ jobs.generate.outputs.build-manifest-sha256 }}"
+      bundle-digest:
+        description: Deterministic digest of the Repository Intelligence payload inventory.
+        value: "${{ jobs.generate.outputs.bundle-digest }}"
       report-artifact-name:
         description: Name of the preserved sanitized run-report artifact.
         value: "${{ jobs.generate.outputs.report-artifact-name }}"
@@ -134,6 +140,8 @@ jobs:
     outputs:
       artifact-name: "${{ steps.finalize.outputs.artifact-name }}"
       artifact-digest: "${{ steps.site.outputs.artifact-digest }}"
+      build-manifest-sha256: "${{ steps.generation.outputs.build-manifest-sha256 }}"
+      bundle-digest: "${{ steps.generation.outputs.bundle-digest }}"
       report-artifact-name: "${{ steps.preserve.outputs.artifact-name }}"
       report-artifact-digest: "${{ steps.preserve.outputs.artifact-digest }}"
       report-manifest-sha256: "${{ steps.preserve.outputs.manifest-sha256 }}"

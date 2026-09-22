@@ -467,6 +467,8 @@ jobs:
       - name: Validate site and run-report evidence outputs
         shell: bash
         env:
+          BUILD_MANIFEST_SHA256: "${{ needs.intelligence-smoke.outputs.build-manifest-sha256 }}"
+          BUNDLE_DIGEST: "${{ needs.intelligence-smoke.outputs.bundle-digest }}"
           REPORT_ARTIFACT_DIGEST: "${{ needs.intelligence-smoke.outputs.report-artifact-digest }}"
           REPORT_ARTIFACT_NAME: "${{ needs.intelligence-smoke.outputs.report-artifact-name }}"
           REPORT_MANIFEST_SHA256: "${{ needs.intelligence-smoke.outputs.report-manifest-sha256 }}"
@@ -476,6 +478,8 @@ jobs:
           set -euo pipefail
           [[ "${SITE_ARTIFACT_NAME}" =~ ^repository-intelligence-site-v1-[1-9][0-9]*-[0-9a-f]{40}-[1-9][0-9]*-[1-9][0-9]*$ ]]
           [[ "${SITE_ARTIFACT_DIGEST}" =~ ^(sha256:)?[0-9a-f]{64}$ ]]
+          [[ "${BUILD_MANIFEST_SHA256}" =~ ^sha256:[0-9a-f]{64}$ ]]
+          [[ "${BUNDLE_DIGEST}" =~ ^sha256:[0-9a-f]{64}$ ]]
           [[ "${REPORT_ARTIFACT_NAME}" =~ ^relay-report-repository-intelligence-v1-[1-9][0-9]*-[1-9][0-9]*$ ]]
           [[ "${REPORT_ARTIFACT_DIGEST}" =~ ^(sha256:)?[0-9a-f]{64}$ ]]
           [[ "${REPORT_MANIFEST_SHA256}" =~ ^[0-9a-f]{64}$ ]]

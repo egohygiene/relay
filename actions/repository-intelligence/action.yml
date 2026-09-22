@@ -152,6 +152,15 @@ outputs:
   provenance:
     description: "Repository-relative path to deterministic generator and source provenance."
     value: "${{ inputs.output-directory }}/provenance.json"
+  build-manifest:
+    description: "Repository-relative path to the deterministic build manifest."
+    value: "${{ inputs.output-directory }}/build-manifest.json"
+  build-manifest-sha256:
+    description: "Tagged SHA-256 digest of the exact deterministic build manifest."
+    value: "${{ steps.build_manifest.outputs.manifest-sha256 }}"
+  bundle-digest:
+    description: "Tagged deterministic digest of the Repository Intelligence payload inventory."
+    value: "${{ steps.build_manifest.outputs.bundle-digest }}"
   analytics-summary:
     description: "Repository-relative path to the public repository analytics contract."
     value: "${{ inputs.work-directory }}/analytics/summary.json"
@@ -289,6 +298,11 @@ runs:
             "${source_commit}" "${INPUT_ACTIVITY_REF}" "${resolved_ref_commit}" >&2
           exit 2
         fi
+        source_epoch="$(git -C "${GITHUB_WORKSPACE}" show --no-patch --format=%ct "${source_commit}")"
+        if [[ ! "${source_epoch}" =~ ^[0-9]+$ ]]; then
+          printf 'represented source epoch is unavailable\n' >&2
+          exit 2
+        fi
 
         if [[ -n "${GITHUB_REPOSITORY:-}" \
           && -n "${INPUT_REPOSITORY}" \
@@ -415,6 +429,7 @@ runs:
         printf 'generator-ref=%s\n' "${generator_ref}" >> "${GITHUB_OUTPUT}"
         printf 'generator-commit=%s\n' "${generator_commit}" >> "${GITHUB_OUTPUT}"
         printf 'generator-immutable=%s\n' "${generator_immutable}" >> "${GITHUB_OUTPUT}"
+        printf 'source-epoch=%s\n' "${source_epoch}" >> "${GITHUB_OUTPUT}"
 
     - name: "🌳 Generate commit-scoped repository tree"
       shell: bash
@@ -561,6 +576,28 @@ runs:
           "${snapshot_arguments[@]}" \
           "${comparison_arguments[@]}"
 
+    - name: "🧾 Create deterministic build manifest"
+      id: build_manifest
+      shell: bash
+      env:
+        INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
+        RESOLVED_GENERATOR_COMMIT: "${{ steps.metadata.outputs.generator-commit }}"
+        RESOLVED_GENERATOR_VERSION: "${{ steps.metadata.outputs.generator-version }}"
+        RESOLVED_REPOSITORY: "${{ steps.metadata.outputs.repository }}"
+        RESOLVED_SOURCE_COMMIT: "${{ steps.metadata.outputs.source-commit }}"
+        RESOLVED_SOURCE_EPOCH: "${{ steps.metadata.outputs.source-epoch }}"
+      run: |
+        set -euo pipefail
+        python3 "${GITHUB_ACTION_PATH}/scripts/create_repository_intelligence_build_manifest.py" \
+          --repository-root "${GITHUB_WORKSPACE}" \
+          --output-root "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}" \
+          --repository "${RESOLVED_REPOSITORY}" \
+          --consumer-revision "${RESOLVED_SOURCE_COMMIT}" \
+          --generator-revision "${RESOLVED_GENERATOR_COMMIT}" \
+          --generator-version "${RESOLVED_GENERATOR_VERSION}" \
+          --source-epoch "${RESOLVED_SOURCE_EPOCH}" \
+          --github-output "${GITHUB_OUTPUT}"
+
     - name: "🛡️ Validate generated intelligence bundle"
       shell: bash
       env:
@@ -572,6 +609,7 @@ runs:
         RESOLVED_REPOSITORY: "${{ steps.metadata.outputs.repository }}"
         RESOLVED_REPOSITORY_VISIBILITY: "${{ steps.metadata.outputs.repository-visibility }}"
         RESOLVED_SOURCE_COMMIT: "${{ steps.metadata.outputs.source-commit }}"
+        RESOLVED_SOURCE_EPOCH: "${{ steps.metadata.outputs.source-epoch }}"
       run: |
         set -euo pipefail
         python3 "${GITHUB_ACTION_PATH}/scripts/validate_repository_intelligence_bundle.py" \
@@ -583,4 +621,5 @@ runs:
           --generator-version "${RESOLVED_GENERATOR_VERSION}" \
           --generator-source-ref "${RESOLVED_GENERATOR_REF}" \
           --generator-source-commit "${RESOLVED_GENERATOR_COMMIT}" \
-          --generator-immutable "${RESOLVED_GENERATOR_IMMUTABLE}"
+          --generator-immutable "${RESOLVED_GENERATOR_IMMUTABLE}" \
+          --source-epoch "${RESOLVED_SOURCE_EPOCH}"

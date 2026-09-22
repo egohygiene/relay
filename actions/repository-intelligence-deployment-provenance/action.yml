@@ -1,0 +1,191 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-action.json
+
+name: "🧾 Repository Intelligence Deployment Provenance"
+description: >-
+  Capture consumer-owned routes, verify a deterministic Repository Intelligence
+  build before deployment, and record or verify a separate consumer deployment
+  receipt without deploying or requesting credentials.
+
+inputs:
+  operation:
+    description: "capture-baseline, verify-composition, record-receipt, or verify-receipt."
+    required: true
+  site-directory:
+    description: "Repository-relative root of the consumer-owned composed static site."
+    required: false
+    default: "dist"
+  intelligence-directory:
+    description: "Repository-relative Repository Intelligence subtree inside site-directory."
+    required: false
+    default: "dist/intelligence"
+  evidence-directory:
+    description: "Repository-relative private workspace for baseline, verification, and receipt evidence."
+    required: false
+    default: ".relay/repository-intelligence-deployment"
+  consumer-repository:
+    description: "Consumer owner/name identity; defaults to the workflow repository."
+    required: false
+    default: ""
+  consumer-revision:
+    description: "Exact consumer revision represented by the composed site; defaults to github.sha."
+    required: false
+    default: ""
+  relay-revision:
+    description: "Exact Relay revision expected in the build manifest; defaults to a full-SHA action ref."
+    required: false
+    default: ""
+  verified-epoch:
+    description: "Explicit Unix epoch used for freshness verification; defaults to the current consumer step time."
+    required: false
+    default: ""
+  maximum-source-age-seconds:
+    description: "Maximum age of the represented consumer source at verification time."
+    required: false
+    default: "604800"
+  required-routes:
+    description: "JSON array of routes that must exist in the final composed site."
+    required: false
+    default: '["/intelligence/","/intelligence/now/","/intelligence/roadmap/","/intelligence/decisions/","/intelligence/journey/"]'
+  aliases:
+    description: "JSON array of consumer-owned redirect objects with route and target members."
+    required: false
+    default: "[]"
+  workflow-run-id:
+    description: "Consumer workflow run ID for record-receipt and verify-receipt."
+    required: false
+    default: ""
+  workflow-run-attempt:
+    description: "Consumer workflow run attempt for record-receipt and verify-receipt."
+    required: false
+    default: ""
+  deployment-environment:
+    description: "Consumer-owned deployment environment name."
+    required: false
+    default: ""
+  deployment-url:
+    description: "Credential-free public HTTPS deployment URL."
+    required: false
+    default: ""
+  deployment-conclusion:
+    description: "Consumer deployment conclusion: success, failure, or cancelled."
+    required: false
+    default: ""
+  recorded-at:
+    description: "RFC 3339 instant at which the consumer records the deployment receipt."
+    required: false
+    default: ""
+  rollback-revision:
+    description: "Exact prior consumer revision retained as the rollback point."
+    required: false
+    default: ""
+  rollback-site-digest:
+    description: "Tagged SHA-256 digest of the prior composed site."
+    required: false
+    default: ""
+  rollback-url:
+    description: "Credential-free public HTTPS URL associated with the rollback point."
+    required: false
+    default: ""
+
+outputs:
+  baseline-path:
+    description: "Repository-relative consumer route baseline path."
+    value: "${{ steps.provenance.outputs.baseline-path }}"
+  verification-path:
+    description: "Repository-relative predeployment composition verification path."
+    value: "${{ steps.provenance.outputs.verification-path }}"
+  receipt-path:
+    description: "Repository-relative consumer deployment receipt path."
+    value: "${{ steps.provenance.outputs.receipt-path }}"
+  receipt-sha256:
+    description: "Tagged SHA-256 digest of the exact deployment receipt."
+    value: "${{ steps.provenance.outputs.receipt-sha256 }}"
+  build-manifest-sha256:
+    description: "Tagged SHA-256 digest of the referenced deterministic build manifest."
+    value: "${{ steps.provenance.outputs.build-manifest-sha256 }}"
+  bundle-digest:
+    description: "Deterministic Repository Intelligence payload digest."
+    value: "${{ steps.provenance.outputs.bundle-digest }}"
+  composed-site-digest:
+    description: "Deterministic digest of the final consumer-owned composed site."
+    value: "${{ steps.provenance.outputs.composed-site-digest }}"
+  published-routes:
+    description: "Compact JSON array of published directory routes."
+    value: "${{ steps.provenance.outputs.published-routes }}"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Verify Repository Intelligence deployment provenance"
+      id: provenance
+      shell: bash
+      env:
+        INPUT_ALIASES: "${{ inputs.aliases }}"
+        INPUT_CONSUMER_REPOSITORY: "${{ inputs.consumer-repository }}"
+        INPUT_CONSUMER_REVISION: "${{ inputs.consumer-revision }}"
+        INPUT_DEPLOYMENT_CONCLUSION: "${{ inputs.deployment-conclusion }}"
+        INPUT_DEPLOYMENT_ENVIRONMENT: "${{ inputs.deployment-environment }}"
+        INPUT_DEPLOYMENT_URL: "${{ inputs.deployment-url }}"
+        INPUT_EVIDENCE_DIRECTORY: "${{ inputs.evidence-directory }}"
+        INPUT_INTELLIGENCE_DIRECTORY: "${{ inputs.intelligence-directory }}"
+        INPUT_MAXIMUM_SOURCE_AGE_SECONDS: "${{ inputs.maximum-source-age-seconds }}"
+        INPUT_OPERATION: "${{ inputs.operation }}"
+        INPUT_RECORDED_AT: "${{ inputs.recorded-at }}"
+        INPUT_RELAY_REVISION: "${{ inputs.relay-revision }}"
+        INPUT_REQUIRED_ROUTES: "${{ inputs.required-routes }}"
+        INPUT_ROLLBACK_REVISION: "${{ inputs.rollback-revision }}"
+        INPUT_ROLLBACK_SITE_DIGEST: "${{ inputs.rollback-site-digest }}"
+        INPUT_ROLLBACK_URL: "${{ inputs.rollback-url }}"
+        INPUT_SITE_DIRECTORY: "${{ inputs.site-directory }}"
+        INPUT_VERIFIED_EPOCH: "${{ inputs.verified-epoch }}"
+        INPUT_WORKFLOW_RUN_ATTEMPT: "${{ inputs.workflow-run-attempt }}"
+        INPUT_WORKFLOW_RUN_ID: "${{ inputs.workflow-run-id }}"
+        RELAY_ACTION_REF: "${{ github.action_ref }}"
+      run: |
+        set -euo pipefail
+
+        consumer_repository="${INPUT_CONSUMER_REPOSITORY:-${GITHUB_REPOSITORY:-}}"
+        consumer_revision="${INPUT_CONSUMER_REVISION:-${GITHUB_SHA:-}}"
+        relay_revision="${INPUT_RELAY_REVISION:-${RELAY_ACTION_REF:-}}"
+        verified_epoch="${INPUT_VERIFIED_EPOCH:-$(date -u +%s)}"
+        recorded_at="${INPUT_RECORDED_AT:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}"
+
+        if [[ -n "${GITHUB_REPOSITORY:-}" \
+          && -n "${INPUT_CONSUMER_REPOSITORY}" \
+          && "${GITHUB_REPOSITORY,,}" != "${INPUT_CONSUMER_REPOSITORY,,}" ]]; then
+          printf 'consumer-repository must not override the workflow repository\n' >&2
+          exit 2
+        fi
+
+        python3 -I "${GITHUB_ACTION_PATH}/scripts/repository_intelligence_deployment_provenance.py" \
+          --operation "${INPUT_OPERATION}" \
+          --workspace "${GITHUB_WORKSPACE}" \
+          --site-directory "${INPUT_SITE_DIRECTORY}" \
+          --intelligence-directory "${INPUT_INTELLIGENCE_DIRECTORY}" \
+          --baseline-path "${INPUT_EVIDENCE_DIRECTORY}/consumer-route-baseline.json" \
+          --verification-path "${INPUT_EVIDENCE_DIRECTORY}/composition-verification.json" \
+          --receipt-path "${INPUT_EVIDENCE_DIRECTORY}/deployment-receipt.json" \
+          --consumer-repository "${consumer_repository}" \
+          --consumer-revision "${consumer_revision}" \
+          --relay-revision "${relay_revision}" \
+          --verified-epoch "${verified_epoch}" \
+          --maximum-source-age-seconds "${INPUT_MAXIMUM_SOURCE_AGE_SECONDS}" \
+          --required-routes "${INPUT_REQUIRED_ROUTES}" \
+          --aliases "${INPUT_ALIASES}" \
+          --workflow-run-id "${INPUT_WORKFLOW_RUN_ID}" \
+          --workflow-run-attempt "${INPUT_WORKFLOW_RUN_ATTEMPT}" \
+          --deployment-environment "${INPUT_DEPLOYMENT_ENVIRONMENT}" \
+          --deployment-url "${INPUT_DEPLOYMENT_URL}" \
+          --deployment-conclusion "${INPUT_DEPLOYMENT_CONCLUSION}" \
+          --recorded-at "${recorded_at}" \
+          --rollback-revision "${INPUT_ROLLBACK_REVISION}" \
+          --rollback-site-digest "${INPUT_ROLLBACK_SITE_DIGEST}" \
+          --rollback-url "${INPUT_ROLLBACK_URL}" \
+          --github-output "${GITHUB_OUTPUT}"
+
+branding:
+  icon: "shield"
+  color: "purple"

@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 from datetime import datetime
 from html.parser import HTMLParser
+import importlib.util
 import json
 from pathlib import Path
 import re
@@ -15,6 +16,7 @@ from typing import Any
 from urllib.parse import quote, unquote, urlsplit
 
 ROUTED_BUNDLE_FILES = {
+    "build-manifest.json",
     "compare/index.html",
     "dashboard/index.html",
     "decisions/index.html",
@@ -35,6 +37,7 @@ ROUTED_BUNDLE_FILES = {
     "work/index.html",
 }
 LEGACY_BUNDLE_FILES = {
+    "build-manifest.json",
     "explorer.js",
     "index.html",
     "provenance.json",
@@ -49,6 +52,7 @@ ALLOWED_LOCAL_FRAGMENTS = {
     "tree-icon-symlink",
 }
 PROVENANCE_SCHEMA = "egohygiene.relay.repository-intelligence-provenance/v1"
+BUILD_MANIFEST_SCHEMA = "egohygiene.relay.repository-intelligence-build-manifest/v1"
 DASHBOARD_SCHEMA = "egohygiene.repository-intelligence-dashboard/v3"
 FULL_SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 SHELL_ROUTES = (
@@ -145,6 +149,23 @@ PROVENANCE_KEYS = {
 }
 
 
+def load_build_manifest_module() -> Any:
+    """Load the canonical manifest implementation without relying on cwd."""
+
+    path = Path(__file__).with_name("create_repository_intelligence_build_manifest.py")
+    specification = importlib.util.spec_from_file_location(
+        "relay_repository_intelligence_build_manifest", path
+    )
+    if specification is None or specification.loader is None:
+        raise RuntimeError("Repository Intelligence build-manifest module is unavailable")
+    module = importlib.util.module_from_spec(specification)
+    specification.loader.exec_module(module)
+    return module
+
+
+build_manifest_contract = load_build_manifest_module()
+
+
 class BundleValidationError(ValueError):
     """Raised when generated output is unsafe or internally inconsistent."""
 
@@ -195,6 +216,7 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--generator-source-ref", default="")
     parser.add_argument("--generator-source-commit", default="")
     parser.add_argument("--generator-immutable", required=True)
+    parser.add_argument("--source-epoch", type=int, required=True)
     return parser.parse_args()
 
 
@@ -898,6 +920,98 @@ def exact_commit_from_ref(source_ref: str) -> str | None:
     return match.group(1) if match else None
 
 
+def validate_build_manifest(
+    output_root: Path,
+    *,
+    repository: str,
+    source_commit: str,
+    generator_version: str,
+    generator_source_commit: str,
+    source_epoch: int,
+) -> dict[str, Any]:
+    """Verify the deterministic payload inventory and its immutable identities."""
+
+    manifest = load_json_object(
+        output_root / "build-manifest.json", "build-manifest.json"
+    )
+    require_exact_keys(
+        manifest,
+        {
+            "schema",
+            "schema_version",
+            "consumer",
+            "generator",
+            "contracts",
+            "source_epoch",
+            "enabled_routes",
+            "bundle",
+        },
+        "build-manifest.json",
+    )
+    if (
+        manifest.get("schema") != BUILD_MANIFEST_SCHEMA
+        or manifest.get("schema_version") != 1
+    ):
+        raise BundleValidationError("build manifest uses an unsupported contract")
+    consumer = require_object(manifest.get("consumer"), "build-manifest.consumer")
+    generator = require_object(manifest.get("generator"), "build-manifest.generator")
+    contracts = require_object(manifest.get("contracts"), "build-manifest.contracts")
+    bundle = require_object(manifest.get("bundle"), "build-manifest.bundle")
+    require_exact_keys(consumer, {"repository", "revision"}, "build-manifest.consumer")
+    require_exact_keys(
+        generator,
+        {"repository", "revision", "version"},
+        "build-manifest.generator",
+    )
+    require_exact_keys(
+        bundle,
+        {"algorithm", "digest", "file_count", "files", "total_bytes"},
+        "build-manifest.bundle",
+    )
+    if consumer != {"repository": repository, "revision": source_commit}:
+        raise BundleValidationError("build manifest consumer revision is inconsistent")
+    if generator != {
+        "repository": "egohygiene/relay",
+        "revision": generator_source_commit,
+        "version": generator_version,
+    }:
+        raise BundleValidationError("build manifest generator revision is inconsistent")
+    if manifest.get("source_epoch") != source_epoch:
+        raise BundleValidationError("build manifest source epoch is inconsistent")
+    if contracts != build_manifest_contract.CONTRACTS:
+        raise BundleValidationError("build manifest contract inventory is incompatible")
+    try:
+        expected_routes = build_manifest_contract.enabled_routes(output_root)
+    except build_manifest_contract.ManifestError as error:
+        raise BundleValidationError("build manifest route inventory is invalid") from error
+    if manifest.get("enabled_routes") != expected_routes:
+        raise BundleValidationError("build manifest enabled routes are inconsistent")
+    return manifest
+
+
+def validate_build_manifest_inventory(
+    output_root: Path, manifest: dict[str, Any]
+) -> None:
+    """Verify every payload byte after focused structural diagnostics pass."""
+
+    bundle = require_object(manifest.get("bundle"), "build-manifest.bundle")
+    try:
+        expected_files, expected_digest, expected_total = (
+            build_manifest_contract.bundle_inventory(output_root)
+        )
+    except build_manifest_contract.ManifestError as error:
+        raise BundleValidationError("build manifest payload inventory is invalid") from error
+    expected_bundle = {
+        "algorithm": "sha256-canonical-file-inventory-v1",
+        "digest": expected_digest,
+        "file_count": len(expected_files),
+        "files": expected_files,
+        "total_bytes": expected_total,
+    }
+    if bundle != expected_bundle:
+        raise BundleValidationError("build manifest bundle digest or inventory is inconsistent")
+
+
 def validate_json_contracts(
     output_root: Path,
     *,
@@ -908,7 +1022,8 @@ def validate_json_contracts(
     generator_source_ref: str,
     generator_source_commit: str,
     generator_immutable: bool,
-) -> tuple[dict[str, Any], dict[str, Any]]:
+    source_epoch: int,
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     """Validate dashboard and provenance structure, versions, and source alignment."""
 
     summary = load_json_object(output_root / "summary.json", "summary.json")
@@ -996,7 +1111,15 @@ def validate_json_contracts(
     for name, (schema, version) in EXPECTED_CONTRACTS.items():
         if contracts.get(name) != {"schema": schema, "schema_version": version}:
             raise BundleValidationError(f"provenance contract entry is invalid: {name}")
-    return summary, provenance
+    manifest = validate_build_manifest(
+        output_root,
+        repository=repository,
+        source_commit=source_commit,
+        generator_version=generator_version,
+        generator_source_commit=generator_source_commit,
+        source_epoch=source_epoch,
+    )
+    return summary, provenance, manifest
 
 
 def validate_github_reference(
@@ -1286,7 +1409,7 @@ def iter_json_items(value: Any, path: str = "$") -> list[tuple[str, str | None, 
 def validate_privacy(
     output_root: Path,
     repository_root: Path,
-    documents: tuple[dict[str, Any], dict[str, Any]],
+    documents: tuple[dict[str, Any], ...],
 ) -> None:
     """Reject identities, secrets, raw private fields, and runner-local paths."""
 
@@ -1450,6 +1573,7 @@ def validate_bundle(
     generator_source_ref: str,
     generator_source_commit: str,
     generator_immutable: bool,
+    source_epoch: int,
 ) -> None:
     """Validate the complete generated subtree."""
 
@@ -1458,8 +1582,10 @@ def validate_bundle(
         raise BundleValidationError("consumer repository must use owner/name form")
     if not FULL_SHA_PATTERN.fullmatch(source_commit):
         raise BundleValidationError("consumer source commit must be a full lowercase SHA")
-    if generator_source_commit and not FULL_SHA_PATTERN.fullmatch(generator_source_commit):
-        raise BundleValidationError("Relay source commit must be empty or a full lowercase SHA")
+    if not FULL_SHA_PATTERN.fullmatch(generator_source_commit):
+        raise BundleValidationError("Relay source commit must be an immutable full SHA")
+    if source_epoch < 0:
+        raise BundleValidationError("consumer source epoch must be non-negative")
     collect_bundle_files(output)
     documents = validate_json_contracts(
         output,
@@ -1470,11 +1596,13 @@ def validate_bundle(
         generator_source_ref=generator_source_ref,
         generator_source_commit=generator_source_commit,
         generator_immutable=generator_immutable,
+        source_epoch=source_epoch,
     )
     validate_intelligence_route(output, repository, source_commit)
     validate_routed_shell(output, repository, source_commit)
     validate_canonical_assets(output)
     validate_privacy(output, root, documents)
+    validate_build_manifest_inventory(output, documents[2])
 
 
 def main() -> int:
@@ -1494,6 +1622,7 @@ def main() -> int:
             generator_source_ref=arguments.generator_source_ref,
             generator_source_commit=arguments.generator_source_commit,
             generator_immutable=arguments.generator_immutable == "true",
+            source_epoch=arguments.source_epoch,
         )
     except BundleValidationError as error:
         raise SystemExit(f"Repository Intelligence bundle is invalid: {error}") from error

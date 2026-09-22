@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/repository-intelligence-deployment-receipt/v1/schema.json",
+  "title": "Repository Intelligence consumer deployment receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "consumer",
+    "generator",
+    "build_manifest",
+    "workflow",
+    "deployment",
+    "composition",
+    "aliases",
+    "rollback",
+    "verification"
+  ],
+  "properties": {
+    "schema": {"const": "egohygiene.relay.repository-intelligence-deployment-receipt/v1"},
+    "schema_version": {"const": 1},
+    "consumer": {"$ref": "#/$defs/identity"},
+    "generator": {"$ref": "#/$defs/identity"},
+    "build_manifest": {"$ref": "#/$defs/build_manifest"},
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id", "run_attempt"],
+      "properties": {
+        "run_id": {"type": "integer", "minimum": 1},
+        "run_attempt": {"type": "integer", "minimum": 1}
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["environment", "url", "conclusion", "recorded_at"],
+      "properties": {
+        "environment": {"type": "string", "pattern": "^[A-Za-z0-9._ -]{1,64}$"},
+        "url": {"type": "string", "format": "uri"},
+        "conclusion": {"enum": ["success", "failure", "cancelled"]},
+        "recorded_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "composition": {"$ref": "#/$defs/composition"},
+    "aliases": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/alias"}
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consumer_revision", "site_digest", "deployment_url"],
+      "properties": {
+        "consumer_revision": {"$ref": "#/$defs/revision"},
+        "site_digest": {"$ref": "#/$defs/digest"},
+        "deployment_url": {"type": "string", "format": "uri"}
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_epoch", "verified_epoch", "maximum_source_age_seconds"],
+      "properties": {
+        "source_epoch": {"type": "integer", "minimum": 0},
+        "verified_epoch": {"type": "integer", "minimum": 0},
+        "maximum_source_age_seconds": {"type": "integer", "minimum": 0}
+      }
+    }
+  },
+  "$defs": {
+    "revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "route": {"type": "string", "pattern": "^/(?:[A-Za-z0-9._-]+/)*$"},
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "revision"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "revision": {"$ref": "#/$defs/revision"}
+      }
+    },
+    "build_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "bundle_digest"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/digest"},
+        "bundle_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "preserved_route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["route", "sha256"],
+      "properties": {
+        "route": {"$ref": "#/$defs/route"},
+        "sha256": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["site_digest", "published_routes", "preserved_consumer_routes", "preserved_consumer_files"],
+      "properties": {
+        "site_digest": {"$ref": "#/$defs/digest"},
+        "published_routes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/route"}
+        },
+        "preserved_consumer_routes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/preserved_route"}
+        },
+        "preserved_consumer_files": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["file_count", "digest"],
+          "properties": {
+            "file_count": {"type": "integer", "minimum": 1},
+            "digest": {"$ref": "#/$defs/digest"}
+          }
+        }
+      }
+    },
+    "alias": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["route", "target"],
+      "properties": {
+        "route": {"$ref": "#/$defs/route"},
+        "target": {"$ref": "#/$defs/route"}
+      }
+    }
+  }
+}

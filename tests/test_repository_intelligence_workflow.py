@@ -266,6 +266,8 @@ class RepositoryIntelligenceWorkflowTests(unittest.TestCase):
         self.assertIn("needs: intelligence-smoke", body)
         self.assertIn("permissions: {}", body)
         for output in (
+            "build-manifest-sha256",
+            "bundle-digest",
             "report-artifact-digest",
             "report-artifact-name",
             "report-manifest-sha256",
