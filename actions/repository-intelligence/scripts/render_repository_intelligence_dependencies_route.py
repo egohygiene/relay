@@ -442,11 +442,7 @@ def render_page(
         if snapshot
         else summary.get("generated_at") or ""
     )
-    freshness = site.normalize_state(
-        site.require_object(snapshot.get("coverage")).get("status")
-        if snapshot
-        else "unknown"
-    )
+    freshness = site.projection_freshness(snapshot, "dependencies")
     return site.shell_document(
         route="dependencies",
         route_label="Dependencies",

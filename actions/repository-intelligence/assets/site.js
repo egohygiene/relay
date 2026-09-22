@@ -30,6 +30,7 @@
     const empty = document.querySelector("[data-no-results]");
     const resume = document.querySelector("[data-resume-link]");
     const clearResume = document.querySelector("[data-clear-resume]");
+    const contextStatus = document.querySelector("[data-context-status]");
     const extraFilters = [...document.querySelectorAll("[data-filter-extra]")];
     const journeyDateFrom = document.querySelector("[data-journey-date-from]");
     const journeyDateTo = document.querySelector("[data-journey-date-to]");
@@ -91,6 +92,36 @@
         resume.textContent = prior.commit === commit ? "Resume last view" : "Resume prior snapshot position";
     }
 
+    const filterTokens = (item, singular, plural) => (
+        item.dataset[plural] || item.dataset[singular] || ""
+    ).split(/\s+/u).filter(Boolean);
+    const filterLabel = (value) => value
+        .split(/[_-]+/u)
+        .filter(Boolean)
+        .map((word) => word.charAt(0).toLocaleUpperCase() + word.slice(1))
+        .join(" ");
+    const extendFilterOptions = (select, values) => {
+        if (!select) return;
+        const existing = new Set([...select.options].map((option) => option.value));
+        for (const value of [...new Set(values)].sort()) {
+            if (!value || value === "all" || existing.has(value)) continue;
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = filterLabel(value);
+            select.append(option);
+            existing.add(value);
+        }
+    };
+    const projectedItems = [...document.querySelectorAll("[data-filter-item]")];
+    extendFilterOptions(
+        state,
+        projectedItems.flatMap((item) => filterTokens(item, "state", "states")),
+    );
+    extendFilterOptions(
+        kind,
+        projectedItems.flatMap((item) => filterTokens(item, "kind", "kinds")),
+    );
+
     const params = new URLSearchParams(location.search);
     if (query) query.value = params.get("q") || "";
     if (state && [...state.options].some((option) => option.value === params.get("state"))) {
@@ -110,10 +141,7 @@
 
     const includesToken = (item, singular, plural, expected) => {
         if (expected === "all") return true;
-        const tokens = (item.dataset[plural] || item.dataset[singular] || "")
-            .split(/\s+/u)
-            .filter(Boolean);
-        return tokens.includes(expected);
+        return filterTokens(item, singular, plural).includes(expected);
     };
 
     const setOrDelete = (url, name, value, fallback = "") => {
@@ -157,7 +185,10 @@
     const refreshContextLinks = () => {
         for (const link of contextLinks) preserveContext(link);
     };
-    const selectContextEntity = (node, { updateUrl = true, reveal = false } = {}) => {
+    const selectContextEntity = (
+        node,
+        { updateUrl = true, reveal = false, announce = false, focus = false } = {},
+    ) => {
         const identifier = node?.dataset.entityId;
         if (!identifier) return;
         selectedEntity = identifier;
@@ -171,13 +202,32 @@
             history.replaceState(null, "", `${next.pathname}${next.search}${next.hash}`);
         }
         refreshContextLinks();
+        const label = node.querySelector("h1, h2, h3, h4, strong")?.textContent?.trim()
+            || identifier;
+        if (announce && contextStatus) {
+            contextStatus.textContent = `Restored entity context: ${label}.`;
+        }
         if (reveal) {
             let disclosure = node.closest("details");
             while (disclosure) {
                 disclosure.open = true;
                 disclosure = disclosure.parentElement?.closest("details") || null;
             }
-            requestAnimationFrame(() => node.scrollIntoView({ block: "center" }));
+        }
+        if (focus || reveal) {
+            requestAnimationFrame(() => {
+                if (node.hidden) {
+                    if (announce && contextStatus) {
+                        contextStatus.textContent = `Restored entity context is hidden by the active filters: ${label}.`;
+                    }
+                    return;
+                }
+                if (focus) {
+                    if (!node.hasAttribute("tabindex")) node.setAttribute("tabindex", "-1");
+                    node.focus({ preventScroll: true });
+                }
+                if (reveal) node.scrollIntoView({ block: "center" });
+            });
         }
     };
     for (const link of contextLinks) {
@@ -194,7 +244,14 @@
     document.addEventListener("pointerdown", selectEventEntity);
     if (selectedEntity) {
         const requested = entityNodes.find((node) => node.dataset.entityId === selectedEntity);
-        if (requested) selectContextEntity(requested, { updateUrl: false, reveal: !location.hash });
+        if (requested) {
+            selectContextEntity(requested, {
+                updateUrl: false,
+                reveal: !location.hash,
+                announce: true,
+                focus: true,
+            });
+        }
     }
 
     const evidenceWindows = [];
@@ -323,9 +380,10 @@
             for (const [name, selected] of Object.entries(selectedExtras)) {
                 setOrDelete(next, name, selected, "all");
             }
-            setOrDelete(next, "from", selectedFrom);
-            setOrDelete(next, "to", selectedTo);
+            if (journeyDateFrom) setOrDelete(next, "from", selectedFrom);
+            if (journeyDateTo) setOrDelete(next, "to", selectedTo);
             history.replaceState(null, "", `${next.pathname}${next.search}${next.hash}`);
+            refreshContextLinks();
         }
         writeResume();
         document.dispatchEvent(new CustomEvent("ri:filters-applied"));
@@ -453,7 +511,9 @@
         const identifier = location.hash.slice(1);
         const selected = document.getElementById(identifier);
         const contextEntity = selected?.closest("[data-entity-id]");
-        if (contextEntity) selectContextEntity(contextEntity);
+        if (contextEntity) {
+            selectContextEntity(contextEntity, { announce: true, focus: true });
+        }
         if (selected?.matches("[data-roadmap-quest]")) {
             markSelectedQuest(identifier);
             const evidence = selected.querySelector("[data-quest-evidence]");
@@ -624,6 +684,7 @@
             setOrDelete(next, "compare-left", compareLeft.value);
             setOrDelete(next, "compare-right", compareRight.value);
             history.replaceState(null, "", `${next.pathname}${next.search}${next.hash}`);
+            refreshContextLinks();
         }
     };
 
@@ -726,6 +787,7 @@
             setOrDelete(next, "journey-left", journeyCompareLeft.value);
             setOrDelete(next, "journey-right", journeyCompareRight.value);
             history.replaceState(null, "", `${next.pathname}${next.search}${next.hash}`);
+            refreshContextLinks();
         }
     };
 

@@ -227,8 +227,12 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
             self.assertIn(text, routed)
         self.assertIn('data-ri-route="intelligence"', root)
         self.assertIn('aria-current="page">Overview</a>', root)
+        self.assertNotIn('class="ri-command-bar"', root)
+        self.assertNotIn("data-filter-item", root)
+        self.assertIn("data-context-status", root)
         self.assertIn('data-ri-route="now"', routed)
         self.assertIn('aria-current="page">Now</a>', routed)
+        self.assertIn('class="ri-command-bar"', routed)
         self.assertNotIn("Incomplete work is blocked", routed)
         self.assertTrue((output / "dashboard/index.html").is_file())
         dashboard = (output / "dashboard/index.html").read_text(encoding="utf-8")
@@ -302,6 +306,7 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
     def test_route_context_keeps_supported_values_without_leaking_hashes_or_secrets(self) -> None:
         harness = r'''
 const fs = require("fs");
+const handlers = {};
 const links = [
   { original: "../health/", href: "" },
   { original: "../search/#search-heading", href: "" },
@@ -311,20 +316,80 @@ const links = [
   getAttribute(name) { return name === "href" ? this.original : null; },
   addEventListener() {},
 }));
-global.location = new URL("https://repo.example/intelligence/roadmap/?q=owner&entity=ri%3Aexample&access_token=secret#quest-local");
-global.history = { replaceState() {} };
+const query = {
+  value: "",
+  addEventListener(type, listener) { handlers[`query:${type}`] = listener; },
+  focus() {},
+  blur() {},
+};
+const state = {
+  value: "all",
+  options: [{ value: "all" }, { value: "active" }],
+  addEventListener() {},
+  append(option) { this.options.push(option); },
+};
+const kind = {
+  value: "all",
+  options: [{ value: "all" }, { value: "issue" }],
+  addEventListener() {},
+  append(option) { this.options.push(option); },
+};
+const contextStatus = { textContent: "" };
+let entityFocused = false;
+const entityAttributes = new Map();
+const entity = {
+  dataset: {
+    entityId: "ri:example",
+    state: "active",
+    kind: "issue",
+    search: "owner updated example entity",
+  },
+  hidden: false,
+  getAttribute() { return ""; },
+  setAttribute(name, value) { entityAttributes.set(name, value); },
+  removeAttribute(name) { entityAttributes.delete(name); },
+  hasAttribute(name) { return entityAttributes.has(name); },
+  closest() { return null; },
+  querySelector() { return { textContent: "Example entity" }; },
+  focus(options) { entityFocused = options?.preventScroll === true; },
+  scrollIntoView() {},
+};
+const projectedItems = [
+  entity,
+  { dataset: { state: "published", kind: "release", search: "published release" }, hidden: false, getAttribute() { return ""; } },
+  { dataset: { states: "open blocked", kinds: "issue pull_request", search: "open work" }, hidden: false, getAttribute() { return ""; } },
+];
+global.location = new URL(
+  "https://repo.example/intelligence/roadmap/?q=owner&state=active&kind=issue&from=2026-08-01&to=2026-08-31&entity=ri%3Aexample&freshness=fresh&compare-left=before&access_token=secret#quest-local",
+);
+global.history = {
+  replaceState(_state, _title, target) {
+    global.location = new URL(target, global.location.href);
+  },
+};
 global.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
 global.CustomEvent = class CustomEvent { constructor(type) { this.type = type; } };
-global.requestAnimationFrame = () => 0;
+const animationFrames = [];
+global.requestAnimationFrame = (callback) => { animationFrames.push(callback); return animationFrames.length; };
 global.cancelAnimationFrame = () => {};
 global.document = {
   body: { dataset: { riRepository: "example/repository", riRoute: "roadmap", riCommit: "a".repeat(40) } },
   activeElement: null,
-  querySelector() { return null; },
+  querySelector(selector) {
+    if (selector === "[data-filter-query]") return query;
+    if (selector === "[data-filter-state]") return state;
+    if (selector === "[data-filter-kind]") return kind;
+    if (selector === "[data-context-status]") return contextStatus;
+    return null;
+  },
   querySelectorAll(selector) {
-    return selector === "[data-preserve-context-links] a, [data-preserve-context]" ? links : [];
+    if (selector === "[data-preserve-context-links] a, [data-preserve-context]") return links;
+    if (selector === "[data-filter-item]") return projectedItems;
+    if (selector === "[data-entity-id]") return [entity];
+    return [];
   },
   getElementById() { return null; },
+  createElement() { return { value: "", textContent: "" }; },
   addEventListener() {},
   dispatchEvent() {},
 };
@@ -337,7 +402,19 @@ global.window = {
   scrollTo() {},
 };
 eval(fs.readFileSync(process.argv[1], "utf8"));
-process.stdout.write(JSON.stringify(links.map((link) => link.href)));
+while (animationFrames.length) animationFrames.shift()();
+query.value = "updated";
+handlers["query:input"]();
+process.stdout.write(JSON.stringify({
+  links: links.map((link) => link.href),
+  current: global.location.href,
+  stateOptions: state.options.map((option) => option.value),
+  restored: {
+    focused: entityFocused,
+    selected: entityAttributes.has("data-context-selected"),
+    status: contextStatus.textContent,
+  },
+}));
 '''
         result = subprocess.run(
             ["node", "-e", harness, str(ACTION_ROOT / "assets/site.js")],
@@ -345,16 +422,31 @@ process.stdout.write(JSON.stringify(links.map((link) => link.href)));
             capture_output=True,
             text=True,
         )
-        health, search, external = json.loads(result.stdout)
+        behavior = json.loads(result.stdout)
+        health, search, external = behavior["links"]
         self.assertEqual(
             health,
-            "https://repo.example/intelligence/health/?q=owner&entity=ri%3Aexample",
+            "https://repo.example/intelligence/health/?q=updated&state=active&kind=issue&from=2026-08-01&to=2026-08-31&entity=ri%3Aexample&freshness=fresh&compare-left=before",
         )
         self.assertEqual(
             search,
-            "https://repo.example/intelligence/search/?q=owner&entity=ri%3Aexample#search-heading",
+            "https://repo.example/intelligence/search/?q=updated&state=active&kind=issue&from=2026-08-01&to=2026-08-31&entity=ri%3Aexample&freshness=fresh&compare-left=before#search-heading",
         )
         self.assertEqual(external, "https://github.com/egohygiene/relay/issues/29")
+        current = behavior["current"]
+        self.assertIn("q=updated", current)
+        self.assertIn("from=2026-08-01", current)
+        self.assertIn("to=2026-08-31", current)
+        self.assertIn("freshness=fresh", current)
+        self.assertIn("compare-left=before", current)
+        self.assertIn("open", behavior["stateOptions"])
+        self.assertIn("published", behavior["stateOptions"])
+        self.assertTrue(behavior["restored"]["focused"])
+        self.assertTrue(behavior["restored"]["selected"])
+        self.assertEqual(
+            behavior["restored"]["status"],
+            "Restored entity context: Example entity.",
+        )
         explorer = (ACTION_ROOT / "assets/explorer.js").read_text(encoding="utf-8")
         self.assertIn("transferableContext.has(name)", explorer)
         self.assertNotIn('name !== "resume"', explorer)
@@ -395,6 +487,20 @@ process.stdout.write(JSON.stringify(links.map((link) => link.href)));
         )
         self.assertNotIn("health", validated["views"])
         self.assertNotIn("work", validated["views"])
+
+    def test_missing_route_evidence_never_inherits_current_snapshot_freshness(self) -> None:
+        self.assertEqual(
+            site_builder.projection_freshness(self.snapshot, "health"),
+            "current",
+        )
+        for route in ("dependencies", "health", "releases", "work", "search"):
+            self.snapshot["views"].pop(route, None)
+        output = self.build("dist/intelligence")
+        for route in ("dependencies", "health", "releases", "work", "search", "compare"):
+            with self.subTest(route=route):
+                rendered = (output / route / "index.html").read_text(encoding="utf-8")
+                self.assertIn('aria-label="Evidence freshness: Unknown"', rendered)
+                self.assertNotIn('aria-label="Evidence freshness: Current"', rendered)
 
     def test_supporting_renderer_orchestration_replaces_every_reserved_route(self) -> None:
         output = self.build("dist/intelligence")
@@ -579,7 +685,10 @@ process.stdout.write(JSON.stringify(links.map((link) => link.href)));
         self.assertIn("Repository-local decisions", rendered)
         self.assertIn(f'id="{old_anchor}"', rendered)
         self.assertIn(f'href="#{current_anchor}"', rendered)
-        self.assertIn(f'href="../roadmap/#{roadmap_anchor}"', rendered)
+        self.assertIn(
+            f'data-preserve-context href="../roadmap/#{roadmap_anchor}"',
+            rendered,
+        )
         self.assertIn("Decision lifecycle", rendered)
         self.assertIn("Implementation", rendered)
         self.assertIn("Open canonical ADR", rendered)
@@ -1076,7 +1185,10 @@ process.stdout.write(JSON.stringify(links.map((link) => link.href)));
         )
         self.assertEqual(hygiene["contract_version"], "1.0.0-alpha.1")
         self.assertEqual(hygiene["route_profile"], "repository")
-        self.assertRegex(hygiene["registry_sha256"], r"^[0-9a-f]{64}$")
+        self.assertEqual(
+            hygiene["registry_sha256"],
+            "95c9db34dc0b66bb090bd92f89ce16cb7f850a0bbf9a47bd3d64f7ac3d0ad7f3",
+        )
         expected = {
             "intelligence": "/intelligence/",
             **{

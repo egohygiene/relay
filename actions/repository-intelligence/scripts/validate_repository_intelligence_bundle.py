@@ -1384,7 +1384,6 @@ def validate_routed_shell(
         'aria-current="page">Overview</a>',
         'id="intelligence-heading"',
         "Choose the evidence question",
-        'data-filter-results aria-live="polite"',
     ):
         if marker not in root:
             raise BundleValidationError(

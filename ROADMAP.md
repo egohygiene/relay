@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-09-20
+updated: 2026-09-22
 governed_by:
   - architecture-roadmap
 depends_on:
@@ -33,7 +33,7 @@ repository: egohygiene/relay
 visibility: public
 publication: central
 route: /roadmap/relay/
-updated: 2026-09-20
+updated: 2026-09-22
 -->
 ## 2026-08-25 execution snapshot
 

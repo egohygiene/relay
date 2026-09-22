@@ -42,18 +42,6 @@ ROUTE_QUESTIONS = {
     "search": "Where is a normalized repository object and its canonical source?",
     "compare": "What structurally changed between two accepted snapshots?",
 }
-ROUTE_KINDS = {
-    "now": "check",
-    "roadmap": "roadmap_step",
-    "decisions": "architecture_decision",
-    "journey": "commit",
-    "dependencies": "roadmap_step",
-    "health": "check",
-    "releases": "release",
-    "work": "issue",
-    "search": "file",
-    "compare": "commit",
-}
 FULL_SHA = re.compile(r"^[0-9a-f]{40}$")
 EMAIL = re.compile(r"(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 SECRET = re.compile(r"(?i)(?:github_pat_|gh[pousr]_|(?:token|password|secret)\s*[:=])")
@@ -1049,7 +1037,7 @@ def render_roadmap_reference(
         f'<span>{escaped(label)}</span>'
     )
     if href:
-        return f'<a class="ri-link-chip" href="{escaped(href)}">{content}</a>'
+        return f'<a class="ri-link-chip" data-preserve-context href="{escaped(href)}">{content}</a>'
     return f'<span class="ri-link-chip">{content}</span>'
 
 
@@ -1076,7 +1064,7 @@ def render_roadmap_evidence_record(
         )
     ).lower()
     heading = (
-        f'<a href="{escaped(href)}">{escaped(title)} <span aria-hidden="true">↗</span></a>'
+        f'<a data-preserve-context href="{escaped(href)}">{escaped(title)} <span aria-hidden="true">↗</span></a>'
         if href
         else f"<span>{escaped(title)}</span>"
     )
@@ -1444,7 +1432,7 @@ def render_decision_reference(
         f'<small data-assertion="{escaped(assertion)}">{escaped(state_label(assertion))}</small>'
     )
     if href:
-        return f'<a class="ri-link-chip" href="{escaped(href)}">{content}</a>'
+        return f'<a class="ri-link-chip" data-preserve-context href="{escaped(href)}">{content}</a>'
     return f'<span class="ri-link-chip">{content}</span>'
 
 
@@ -1502,7 +1490,7 @@ def render_decision_evidence_record(
     href = decision_reference_href(value, decision_anchors, roadmap_anchors)
     title = value.get("title") or value.get("key") or "Untitled evidence"
     heading = (
-        f'<a href="{escaped(href)}">{escaped(title)} <span aria-hidden="true">↗</span></a>'
+        f'<a data-preserve-context href="{escaped(href)}">{escaped(title)} <span aria-hidden="true">↗</span></a>'
         if href
         else f"<span>{escaped(title)}</span>"
     )
@@ -2221,6 +2209,23 @@ def build_status(summary: dict[str, Any]) -> tuple[str, str]:
     return "unknown", "Build status partial"
 
 
+def projection_freshness(
+    snapshot: dict[str, Any] | None,
+    route: str,
+    *,
+    projected: bool | None = None,
+) -> str:
+    """Report freshness only when this route's accepted evidence is present."""
+
+    if snapshot is None:
+        return "unknown"
+    if projected is None:
+        projected = route in require_object(snapshot.get("views"))
+    if not projected:
+        return "unknown"
+    return normalize_state(require_object(snapshot.get("coverage")).get("status"))
+
+
 def navigation(current: str, prefix: str) -> str:
     overview_current = ' aria-current="page"' if current == "intelligence" else ""
     links = [
@@ -2262,6 +2267,15 @@ def shell_document(
         route,
         "Explore one commit-matched projection without replacing its canonical repository sources.",
     )
+    command_bar = ""
+    if route != "intelligence":
+        command_bar = '''<div class="ri-command-bar" data-filters>
+          <label class="ri-search"><span class="ri-visually-hidden">Search this view</span><span aria-hidden="true">⌕</span><input type="search" data-filter-query placeholder="Search this view…" autocomplete="off"></label>
+          <label><span>State</span><select data-filter-state><option value="all">All states</option><option value="accepted">Accepted</option><option value="active">Active</option><option value="blocked">Blocked</option><option value="complete">Complete</option><option value="deprecated">Deprecated</option><option value="deferred">Deferred</option><option value="failure">Failure</option><option value="planned">Planned</option><option value="proposed">Proposed</option><option value="ready">Ready</option><option value="rejected">Rejected</option><option value="superseded">Superseded</option><option value="unknown">Unknown</option></select></label>
+          <label><span>Kind</span><select data-filter-kind><option value="all">All evidence</option><option value="roadmap_step">Quest</option><option value="architecture_decision">Decision</option><option value="check">Check</option><option value="commit">Commit</option><option value="issue">Issue</option><option value="pull_request">Pull request</option><option value="release">Release</option><option value="deployment">Deployment</option><option value="file">Changed file</option></select></label>
+          <button class="ri-button ri-button--quiet" type="button" data-filter-reset>Reset</button>
+          <output data-filter-results aria-live="polite">Showing the full view</output>
+        </div>'''
     return f'''<!doctype html>
 <html lang="en">
   <head>
@@ -2274,7 +2288,7 @@ def shell_document(
   <body data-ri-route="{escaped(route)}" data-ri-repository="{escaped(repository)}" data-ri-commit="{escaped(source_commit)}">
     <a class="ri-skip" href="#main-content">Skip to view content</a>
     <header class="ri-global-header">
-      <a class="ri-brand" href="{escaped(prefix)}"><span aria-hidden="true">EH</span><strong>Repository Intelligence</strong></a>
+      <a class="ri-brand" data-preserve-context href="{escaped(prefix)}"><span aria-hidden="true">EH</span><strong>Repository Intelligence</strong></a>
       <nav aria-label="Global navigation"><a href="https://github.com/egohygiene">Ego Hygiene</a><a href="{escaped(repository_url)}">Repository source</a></nav>
     </header>
     <div class="ri-layout">
@@ -2297,16 +2311,11 @@ def shell_document(
           <a href="{escaped(commit_url)}"><span>Represented commit</span><code>{escaped(source_commit[:12])}</code></a>
           <div><span>Observed</span><strong>{escaped(format_date(observed_at))}</strong></div>
           <div><span>Collection</span>{status_pill(freshness, snapshot_label)}</div>
-          <a href="{escaped(prefix)}dashboard/"><span>Build evidence</span>{status_pill(state, build_label)}</a>
+          <a data-preserve-context href="{escaped(prefix)}dashboard/"><span>Build evidence</span>{status_pill(state, build_label)}</a>
           <a href="{escaped(prefix)}provenance.json"><span>Generator</span><strong>View provenance ↗</strong></a>
         </section>
-        <div class="ri-command-bar" data-filters>
-          <label class="ri-search"><span class="ri-visually-hidden">Search this view</span><span aria-hidden="true">⌕</span><input type="search" data-filter-query placeholder="Search this view…" autocomplete="off"></label>
-          <label><span>State</span><select data-filter-state><option value="all">All states</option><option value="accepted">Accepted</option><option value="active">Active</option><option value="blocked">Blocked</option><option value="complete">Complete</option><option value="deprecated">Deprecated</option><option value="deferred">Deferred</option><option value="failure">Failure</option><option value="planned">Planned</option><option value="proposed">Proposed</option><option value="ready">Ready</option><option value="rejected">Rejected</option><option value="superseded">Superseded</option><option value="unknown">Unknown</option></select></label>
-          <label><span>Kind</span><select data-filter-kind><option value="all">All evidence</option><option value="roadmap_step">Quest</option><option value="architecture_decision">Decision</option><option value="check">Check</option><option value="commit">Commit</option><option value="issue">Issue</option><option value="pull_request">Pull request</option><option value="release">Release</option><option value="deployment">Deployment</option><option value="file">Changed file</option></select></label>
-          <button class="ri-button ri-button--quiet" type="button" data-filter-reset>Reset</button>
-          <output data-filter-results aria-live="polite">Showing the full view</output>
-        </div>
+        <div class="ri-visually-hidden" role="status" aria-live="polite" aria-atomic="true" data-context-status></div>
+        {command_bar}
         <main id="main-content" tabindex="-1">{body}<div class="ri-no-results" data-no-results hidden>{empty_state("No matching evidence", "Clear a filter or broaden the search to continue.", "empty")}</div></main>
         <footer><span>Operational state is rendered only from <code>{escaped(SNAPSHOT_SCHEMA)}</code>.</span><a href="#main-content">Back to top ↑</a></footer>
       </div>
@@ -2324,7 +2333,7 @@ def overview_body() -> str:
     for index, (route, label) in enumerate(ROUTES, start=1):
         question = ROUTE_QUESTIONS[route]
         cards.append(
-            f'''<article class="ri-panel" data-filter-item data-state="ready" data-kind="{escaped(ROUTE_KINDS[route])}" data-search="{escaped(f"{label} {question}".casefold())}">
+            f'''<article class="ri-panel">
               <div class="ri-panel-heading"><span class="ri-panel-icon" aria-hidden="true">{index:02d}</span><div><span class="ri-eyebrow">Evidence view</span><h3>{escaped(label)}</h3></div></div>
               <p>{escaped(question)}</p>
               <a class="ri-button ri-button--quiet" data-preserve-context href="./{escaped(route)}/">Open {escaped(label)}</a>

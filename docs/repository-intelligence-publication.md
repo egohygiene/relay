@@ -35,7 +35,7 @@ A reusable-workflow job cannot modify another job's workspace. Repositories that
 
 ## Optional Observatory evidence
 
-The reusable workflow accepts two independent file-path inputs whose semantics remain owned upstream:
+The reusable workflow accepts two separate file-path inputs whose semantics remain owned upstream:
 
 - `observatory-snapshot` — the public-safe Repository Intelligence read model for the represented repository commit;
 - `observatory-comparison` — an optional structural comparison whose `after` boundary matches that snapshot and represented commit.

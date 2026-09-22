@@ -179,11 +179,7 @@ def render_page(
     observed_at = str(
         snapshot.get("observed_at") if snapshot else summary.get("generated_at") or ""
     )
-    freshness = site.normalize_state(
-        site.require_object(snapshot.get("coverage")).get("status")
-        if snapshot
-        else "unknown"
-    )
+    freshness = site.projection_freshness(snapshot, "search")
     return site.shell_document(
         route="search",
         route_label="Search",

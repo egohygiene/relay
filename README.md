@@ -155,7 +155,7 @@ side-by-side comparison. `/journey/` renders Observatory lifecycle events as
 release-bounded delivery chapters across intent, work, code, proof, and delivery
 lanes. Events retain canonical sources, explicit quest/ADR context, visible
 unclassified status, date and evidence filters, chapter comparison, and an
-optional reduced-motion-safe replay. The shell reserves stable routes for
+optional reduced-motion-safe replay. The shell exposes stable routes for
 Dependencies, Health, Releases, Work, Search, and Compare, and all six routes
 now render their accepted normalized evidence with explicit empty, partial, and
 unavailable states. Navigation carries applicable URL-backed filters, time
@@ -175,11 +175,13 @@ Supplying `observatory-snapshot` projects the commit-matched public-safe
 `/roadmap/`, `/decisions/`, `/journey/`, `/dependencies/`, `/health/`,
 `/releases/`, `/work/`, and `/search/`. A separately supplied, boundary-matched
 `observatory-comparison` projects `/compare/`.
-Omitting it remains valid and renders an explicit unavailable state; Relay does
-not infer active work from analytics. Private collection data remains in the
-configured work directory—`.cache/repository-intelligence/` by default—and
-must never be uploaded as site content. Only a bundle whose provenance is
-classified `public-safe` is eligible for public-site composition.
+Omitting `observatory-snapshot` remains valid and renders explicit unavailable
+states; Relay does not infer active work from analytics. Omitting
+`observatory-comparison` leaves only `/compare/` in its explicit partial state.
+Private collection data remains in the configured work
+directory—`.cache/repository-intelligence/` by default—and must never be
+uploaded as site content. Only a bundle whose provenance is classified
+`public-safe` is eligible for public-site composition.
 
 ## Manage stale pull requests without silent closure
 
@@ -253,6 +255,9 @@ python3 scripts/validate_actions.py
 python3 -m unittest discover --start-directory tests --pattern "test_*.py" --verbose
 python3 -m compileall -q actions scripts tests
 ```
+
+Node.js is a test-only prerequisite for browser-asset syntax and behavior
+harnesses; the action runtime remains Bash, Git, and Python 3.
 
 CI additionally checks Bash syntax, JSON parsing, workflow/action metadata, and
 release invariants on every pull request and default-branch push.
