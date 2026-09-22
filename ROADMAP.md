@@ -314,7 +314,7 @@ releases, and deployments across meaningful epochs.
 id: REL-RI-006
 status: active
 depends_on: [REL-RI-005]
-issues: [29, 33, 77, 79, 81, 83, 86, 88, 90, 102]
+issues: [29, 33, 77, 79, 81, 83, 86, 88, 90, 102, 104, 105, 106]
 -->
 #### REL-RI-006 — Complete supporting views and the intelligence dashboard
 
@@ -346,6 +346,10 @@ organization dashboard form one consistent evidence-navigation system.
 - Workflow parity #90/#91 is merged. Issue #33 still tracks representative
   consumer migration and verification of consumer-owned redirect-only aliases,
   canonical deployment evidence, and public routes.
+- Checkpoint #104 owns the artifact-workflow trust matrix, read-only fork-safe
+  execution, revision-scoped success artifacts, bounded sanitized run evidence,
+  and same-target cancellation. Deployment binding remains ordered separately
+  in #105, so this checkpoint does not complete #33 or this roadmap step.
 - Empathy and Akashic already compose immutable-pinned Repository Intelligence
   action output into consumer-owned Pages pipelines; representative migrations
   to one current hardened workflow revision and public-route verification remain

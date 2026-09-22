@@ -1,0 +1,349 @@
+{
+  "schema": "egohygiene.relay.repository-intelligence-workflow-fixtures/v1",
+  "defaults": {
+    "repository": "example/repository",
+    "repository_id": "42",
+    "represented_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "run_id": "314159",
+    "run_attempt": "2",
+    "event_name": "push",
+    "ref": "refs/heads/main",
+    "event_default_branch": "main",
+    "pull_request_head_repository": "",
+    "caller_workflow_ref": "example/repository/.github/workflows/validate.yml@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "called_workflow_ref": "egohygiene/relay/.github/workflows/repository-intelligence.yml@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "called_workflow_repository": "egohygiene/relay",
+    "called_workflow_revision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "output_directory": "dist/intelligence",
+    "work_directory": ".cache/repository-intelligence",
+    "reports_directory": ".reports",
+    "observatory_snapshot": "",
+    "observatory_comparison": "",
+    "default_branch": "",
+    "activity_since": "1 year ago",
+    "max_depth": "10",
+    "artifact_retention_days": "30",
+    "hardening_outcome": "success",
+    "preflight_outcome": "success",
+    "checkout_outcome": "success",
+    "generation_outcome": "success",
+    "provenance_outcome": "success",
+    "site_upload_outcome": "success",
+    "site_artifact_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+  },
+  "event_cases": [
+    {
+      "id": "trusted-pull-request",
+      "changes": {
+        "event_name": "pull_request",
+        "ref": "refs/pull/104/merge",
+        "pull_request_head_repository": "example/repository"
+      },
+      "expected": {
+        "event_class": "trusted-pull-request",
+        "invocation_class": "reusable-call",
+        "trust_class": "untrusted-content",
+        "authority": "contents-read-artifact-only"
+      }
+    },
+    {
+      "id": "fork-pull-request",
+      "changes": {
+        "event_name": "pull_request",
+        "ref": "refs/pull/105/merge",
+        "pull_request_head_repository": "external/fork"
+      },
+      "expected": {
+        "event_class": "fork-pull-request",
+        "invocation_class": "reusable-call",
+        "trust_class": "untrusted-content",
+        "authority": "contents-read-artifact-only"
+      }
+    },
+    {
+      "id": "default-branch-push",
+      "changes": {
+        "event_name": "push",
+        "ref": "refs/heads/main"
+      },
+      "expected": {
+        "event_class": "default-branch-push",
+        "invocation_class": "reusable-call",
+        "trust_class": "trusted-default-branch",
+        "authority": "contents-read-artifact-only"
+      }
+    },
+    {
+      "id": "reusable-call",
+      "changes": {
+        "event_name": "workflow_dispatch",
+        "ref": "refs/heads/main"
+      },
+      "expected": {
+        "event_class": "manual-rebuild",
+        "invocation_class": "reusable-call",
+        "trust_class": "untrusted-content",
+        "authority": "contents-read-artifact-only"
+      }
+    },
+    {
+      "id": "manual-rebuild",
+      "changes": {
+        "repository": "egohygiene/Relay",
+        "represented_revision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "event_name": "workflow_dispatch",
+        "caller_workflow_ref": "egohygiene/relay/.github/workflows/repository-intelligence.yml@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "expected": {
+        "event_class": "manual-rebuild",
+        "invocation_class": "direct-dispatch",
+        "trust_class": "untrusted-content",
+        "authority": "contents-read-artifact-only"
+      }
+    }
+  ],
+  "stage_cases": [
+    {
+      "id": "success",
+      "changes": {},
+      "expected": {
+        "result": "success",
+        "stage": "completed",
+        "code": "RIW-000",
+        "rule": "repository-intelligence.workflow.success"
+      }
+    },
+    {
+      "id": "runner-hardening-failure",
+      "changes": {
+        "hardening_outcome": "failure",
+        "preflight_outcome": "skipped",
+        "checkout_outcome": "skipped",
+        "generation_outcome": "skipped",
+        "provenance_outcome": "skipped",
+        "site_upload_outcome": "skipped",
+        "site_artifact_digest": ""
+      },
+      "expected": {
+        "result": "failure",
+        "stage": "runner-hardening",
+        "code": "RIW-001",
+        "rule": "repository-intelligence.workflow.runner-hardening"
+      }
+    },
+    {
+      "id": "preflight-failure",
+      "changes": {
+        "preflight_outcome": "failure",
+        "checkout_outcome": "skipped",
+        "generation_outcome": "skipped",
+        "provenance_outcome": "skipped",
+        "site_upload_outcome": "skipped",
+        "site_artifact_digest": ""
+      },
+      "expected": {
+        "result": "failure",
+        "stage": "trust-and-input-validation",
+        "code": "RIW-002",
+        "rule": "repository-intelligence.workflow.trust-and-input-validation"
+      }
+    },
+    {
+      "id": "checkout-failure",
+      "changes": {
+        "checkout_outcome": "failure",
+        "generation_outcome": "skipped",
+        "provenance_outcome": "skipped",
+        "site_upload_outcome": "skipped",
+        "site_artifact_digest": ""
+      },
+      "expected": {
+        "result": "failure",
+        "stage": "checkout",
+        "code": "RIW-003",
+        "rule": "repository-intelligence.workflow.checkout"
+      }
+    },
+    {
+      "id": "generation-failure",
+      "changes": {
+        "generation_outcome": "failure",
+        "provenance_outcome": "skipped",
+        "site_upload_outcome": "skipped",
+        "site_artifact_digest": ""
+      },
+      "expected": {
+        "result": "failure",
+        "stage": "generation",
+        "code": "RIW-004",
+        "rule": "repository-intelligence.workflow.generation"
+      }
+    },
+    {
+      "id": "provenance-failure",
+      "changes": {
+        "provenance_outcome": "failure",
+        "site_upload_outcome": "skipped",
+        "site_artifact_digest": ""
+      },
+      "expected": {
+        "result": "failure",
+        "stage": "provenance-verification",
+        "code": "RIW-005",
+        "rule": "repository-intelligence.workflow.provenance-verification"
+      }
+    },
+    {
+      "id": "site-upload-failure",
+      "changes": {
+        "site_upload_outcome": "failure",
+        "site_artifact_digest": ""
+      },
+      "expected": {
+        "result": "failure",
+        "stage": "site-artifact-upload",
+        "code": "RIW-006",
+        "rule": "repository-intelligence.workflow.site-artifact-upload"
+      }
+    }
+  ],
+  "invalid_cases": [
+    {
+      "id": "zero-retention",
+      "changes": {"artifact_retention_days": "0"},
+      "expected_code": "RIW-INPUT-RETENTION"
+    },
+    {
+      "id": "excessive-retention",
+      "changes": {"artifact_retention_days": "91"},
+      "expected_code": "RIW-INPUT-RETENTION"
+    },
+    {
+      "id": "fractional-retention",
+      "changes": {"artifact_retention_days": "1.5"},
+      "expected_code": "RIW-INPUT-RETENTION"
+    },
+    {
+      "id": "path-traversal",
+      "changes": {"output_directory": "../intelligence"},
+      "expected_code": "RIW-INPUT-OUTPUT-PATH"
+    },
+    {
+      "id": "absolute-output-path",
+      "changes": {"output_directory": "/tmp/intelligence"},
+      "expected_code": "RIW-INPUT-OUTPUT-PATH"
+    },
+    {
+      "id": "protected-output",
+      "changes": {"output_directory": ".github/intelligence"},
+      "expected_code": "RIW-INPUT-OUTPUT-PROTECTED"
+    },
+    {
+      "id": "public-private-overlap",
+      "changes": {"work_directory": "dist/intelligence/private"},
+      "expected_code": "RIW-INPUT-PATH-OVERLAP"
+    },
+    {
+      "id": "comparison-without-snapshot",
+      "changes": {"observatory_comparison": "evidence/comparison.json"},
+      "expected_code": "RIW-INPUT-COMPARISON-WITHOUT-SNAPSHOT"
+    },
+    {
+      "id": "unsupported-event",
+      "changes": {"event_name": "pull_request_target"},
+      "expected_code": "RIW-EVENT-UNSUPPORTED"
+    },
+    {
+      "id": "nondefault-push",
+      "changes": {
+        "event_name": "push",
+        "ref": "refs/heads/feature/example"
+      },
+      "expected_code": "RIW-EVENT-NONDEFAULT-PUSH"
+    },
+    {
+      "id": "malformed-pull-request",
+      "changes": {
+        "event_name": "pull_request",
+        "pull_request_head_repository": ""
+      },
+      "expected_code": "RIW-EVENT-PULL-REQUEST-IDENTITY"
+    },
+    {
+      "id": "invalid-max-depth",
+      "changes": {"max_depth": "21"},
+      "expected_code": "RIW-INPUT-MAX-DEPTH"
+    },
+    {
+      "id": "oversized-repository-id",
+      "changes": {"repository_id": "99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"},
+      "expected_code": "RIW-IDENTITY-REPOSITORY-ID"
+    },
+    {
+      "id": "output-without-site-root",
+      "changes": {"output_directory": "intelligence"},
+      "expected_code": "RIW-INPUT-OUTPUT-LAYOUT"
+    },
+    {
+      "id": "output-with-wrong-leaf",
+      "changes": {"output_directory": "dist/not-intelligence"},
+      "expected_code": "RIW-INPUT-OUTPUT-LAYOUT"
+    },
+    {
+      "id": "work-directory-inside-site-root",
+      "changes": {"work_directory": "dist/private"},
+      "expected_code": "RIW-INPUT-PRIVATE-IN-SITE"
+    },
+    {
+      "id": "reports-directory-inside-site-root",
+      "changes": {"reports_directory": "dist/reports"},
+      "expected_code": "RIW-INPUT-PRIVATE-IN-SITE"
+    },
+    {
+      "id": "wrong-called-workflow-repository",
+      "changes": {"called_workflow_repository": "external/relay"},
+      "expected_code": "RIW-IDENTITY-WORKFLOW-REPOSITORY"
+    },
+    {
+      "id": "wrong-called-workflow-ref",
+      "changes": {"called_workflow_ref": "egohygiene/relay/.github/workflows/other.yml@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+      "expected_code": "RIW-IDENTITY-WORKFLOW-REF"
+    },
+    {
+      "id": "mutable-external-called-workflow-ref",
+      "changes": {"called_workflow_ref": "egohygiene/relay/.github/workflows/repository-intelligence.yml@main"},
+      "expected_code": "RIW-IDENTITY-WORKFLOW-PIN"
+    },
+    {
+      "id": "mismatched-called-workflow-sha",
+      "changes": {"called_workflow_ref": "egohygiene/relay/.github/workflows/repository-intelligence.yml@cccccccccccccccccccccccccccccccccccccccc"},
+      "expected_code": "RIW-IDENTITY-WORKFLOW-PIN"
+    },
+    {
+      "id": "malformed-represented-revision",
+      "changes": {"represented_revision": "main"},
+      "expected_code": "RIW-IDENTITY-REVISION"
+    }
+  ],
+  "finalize_invalid_cases": [
+    {
+      "id": "invalid-success-artifact-digest",
+      "changes": {"site_artifact_digest": "not-a-sha256-digest"},
+      "expected": {
+        "result": "failure",
+        "stage": "site-artifact-upload",
+        "code": "RIW-006",
+        "rule": "repository-intelligence.workflow.site-artifact-upload"
+      }
+    }
+  ],
+  "sanitization": {
+    "sentinel": "TOP_SECRET_REPOSITORY_INTELLIGENCE_SENTINEL",
+    "changes": {
+      "caller_workflow_ref": "TOP_SECRET_REPOSITORY_INTELLIGENCE_SENTINEL",
+      "default_branch": "TOP_SECRET_REPOSITORY_INTELLIGENCE_SENTINEL",
+      "activity_since": "TOP_SECRET_REPOSITORY_INTELLIGENCE_SENTINEL",
+      "output_directory": "private/TOP_SECRET_REPOSITORY_INTELLIGENCE_SENTINEL"
+    }
+  }
+}

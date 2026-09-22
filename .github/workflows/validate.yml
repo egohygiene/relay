@@ -81,7 +81,7 @@ jobs:
           ruby -r psych -e '
             destination = ARGV.fetch(0)
             scripts = []
-            Dir["actions/*/action.yml"].sort.each do |path|
+            Dir["actions/**/action.yml"].sort.each do |path|
               document = Psych.safe_load_file(path, aliases: true)
               Array(document.dig("runs", "steps")).each_with_index do |step, index|
                 if step.is_a?(Hash) && step["shell"] == "bash" && step["run"]
@@ -141,7 +141,7 @@ jobs:
           set -euo pipefail
           ruby -e '
             require "psych"
-            paths = Dir["actions/*/action.yml", ".github/workflows/*.{yml,yaml}"].sort
+            paths = Dir["actions/**/action.yml", ".github/workflows/*.{yml,yaml}"].sort
             paths.each { |path| Psych.parse_file(path) }
             puts "Parsed #{paths.length} YAML metadata documents"
           '
@@ -449,3 +449,33 @@ jobs:
       activity-since: "1 year ago"
       max-depth: "10"
       artifact-retention-days: 1
+
+  intelligence-smoke-outputs:
+    name: Confirm Repository Intelligence artifact evidence outputs
+    needs: intelligence-smoke
+    permissions: {}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Validate site and run-report evidence outputs
+        shell: bash
+        env:
+          REPORT_ARTIFACT_DIGEST: "${{ needs.intelligence-smoke.outputs.report-artifact-digest }}"
+          REPORT_ARTIFACT_NAME: "${{ needs.intelligence-smoke.outputs.report-artifact-name }}"
+          REPORT_MANIFEST_SHA256: "${{ needs.intelligence-smoke.outputs.report-manifest-sha256 }}"
+          SITE_ARTIFACT_DIGEST: "${{ needs.intelligence-smoke.outputs.artifact-digest }}"
+          SITE_ARTIFACT_NAME: "${{ needs.intelligence-smoke.outputs.artifact-name }}"
+        run: |
+          set -euo pipefail
+          [[ "${SITE_ARTIFACT_NAME}" =~ ^repository-intelligence-site-v1-[1-9][0-9]*-[0-9a-f]{40}-[1-9][0-9]*-[1-9][0-9]*$ ]]
+          [[ "${SITE_ARTIFACT_DIGEST}" =~ ^(sha256:)?[0-9a-f]{64}$ ]]
+          [[ "${REPORT_ARTIFACT_NAME}" =~ ^relay-report-repository-intelligence-v1-[1-9][0-9]*-[1-9][0-9]*$ ]]
+          [[ "${REPORT_ARTIFACT_DIGEST}" =~ ^(sha256:)?[0-9a-f]{64}$ ]]
+          [[ "${REPORT_MANIFEST_SHA256}" =~ ^[0-9a-f]{64}$ ]]

@@ -89,6 +89,46 @@ artifact outputs before allowing the test job to pass. That smoke path proves
 that failure evidence remains uploadable without weakening the final status of
 real consumer checks.
 
+### Repository Intelligence run evidence
+
+The reusable Repository Intelligence workflow applies the same lifecycle to an
+artifact builder. It remains a `supersedable-check`: its
+`relay-intelligence-v1-${{ github.repository }}-${{ github.workflow_ref }}-${{ github.ref }}`
+group permits a newer run to cancel older work only for the same contract,
+repository, exact caller workflow path/ref identity, and target ref. Consumer
+wrappers use a distinct prefix so caller and called groups cannot cancel one
+another. It does not gain a write,
+cache, secret, or Pages surface merely because the caller is a trusted pull
+request, default-branch push, reusable call, or manual rebuild; a fork pull
+request receives the same read-only candidate-code ceiling.
+
+Successful site output is isolated by contract version, repository identity,
+full represented revision, run, and attempt in an ordinary artifact named:
+
+```text
+repository-intelligence-site-v1-<repository-id>-<full-represented-sha>-<run-id>-<attempt>
+```
+
+Its caller-configurable retention is validated from 1 through 90 days. A fixed,
+sanitized `repository-intelligence-run-report.json` is separately preserved
+through producer `repository-intelligence-v1` as:
+
+```text
+relay-report-repository-intelligence-v1-<run-id>-<attempt>
+```
+
+That report is retained for exactly 30 days on both success and actionable
+failure. It contains bounded stage, code, represented-revision, contract/tool
+version, and remediation fields rather than raw error output. The workflow
+attempts preservation and then reasserts an actionable failure, so retained
+diagnostics never convert the site build to success.
+
+The general cancellation limitation still applies. GitHub may terminate a
+superseded runner before the reporting step, and an artifact-service outage can
+prevent either artifact upload. A rerun of the same revision is the recovery
+path for those infrastructure failures; no missing report may be interpreted as
+a passing build.
+
 ## Recovery and rollback
 
 - A failed report upload means the workflow has no durable success result.

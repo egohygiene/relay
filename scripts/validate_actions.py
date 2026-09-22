@@ -116,6 +116,357 @@ def validate_action_manifest(action_path: Path, errors: list[str]) -> None:
             errors.append(f"manifest references missing file: {action_path / relative_script}")
 
 
+def validate_repository_intelligence_workflow(
+    repository_root: Path,
+    errors: list[str],
+) -> None:
+    """Keep Repository Intelligence orchestration read-only and fail-observable."""
+
+    workflow_path = repository_root / ".github/workflows/repository-intelligence.yml"
+    workflow = workflow_path.read_text(encoding="utf-8")
+    helper_path = (
+        repository_root / "actions/repository-intelligence/workflow-evidence"
+    )
+    validate_action_manifest(helper_path, errors)
+
+    references = REMOTE_USES.findall(workflow)
+    expected_internal_references = {
+        "$/actions/repository-intelligence/workflow-evidence": 2,
+        "$/actions/repository-intelligence": 1,
+        "$/actions/preserve-ci-report": 1,
+    }
+    reference_errors = {
+        "$/actions/repository-intelligence/workflow-evidence": (
+            "repository-intelligence workflow must resolve workflow evidence "
+            "helper exactly twice through $/"
+        ),
+        "$/actions/repository-intelligence": (
+            "repository-intelligence workflow must resolve generator exactly once "
+            "through $/"
+        ),
+        "$/actions/preserve-ci-report": (
+            "repository-intelligence workflow must resolve report preserver exactly "
+            "once through $/"
+        ),
+    }
+    for reference, expected_count in expected_internal_references.items():
+        if references.count(reference) != expected_count:
+            errors.append(reference_errors[reference])
+    for reference in references:
+        if reference.startswith("./"):
+            errors.append(
+                "repository-intelligence workflow must not execute caller-checkout "
+                f"actions: {reference}"
+            )
+
+    top_level = workflow.split("\njobs:\n", maxsplit=1)[0]
+    top_permissions = re.findall(
+        r"^  ([a-z-]+):\s*(read|write)\s*$",
+        top_level.split("\npermissions:\n", maxsplit=1)[-1],
+        re.MULTILINE,
+    )
+    if top_permissions != [("contents", "read")]:
+        errors.append(
+            "repository-intelligence workflow top-level permissions must be exactly "
+            "contents: read"
+        )
+    jobs = workflow_job_blocks(workflow)
+    for job_name, job in jobs.items():
+        if not re.search(
+            r"^    permissions:\s*\n      contents:\s*read\s*$",
+            job,
+            re.MULTILINE,
+        ):
+            errors.append(
+                "repository-intelligence workflow job permissions must be exactly "
+                f"contents: read: {job_name}"
+            )
+
+    if re.search(r"^\s+secrets\s*:", workflow, re.MULTILINE) or re.search(
+        r"\$\{\{\s*(?:secrets\b|github\.token\b)", workflow
+    ):
+        errors.append(
+            "repository-intelligence workflow must not declare, inherit, or read "
+            "secrets or github.token"
+        )
+    if "actions/cache" in workflow or re.search(
+        r"^\s+cache\s*:", workflow, re.MULTILINE
+    ):
+        errors.append("repository-intelligence workflow must not use a cache surface")
+    if (
+        any("pages" in reference.lower() for reference in references)
+        or re.search(r"^\s+(?:pages|id-token):", workflow, re.MULTILINE)
+    ):
+        errors.append(
+            "repository-intelligence workflow must not use Pages or OIDC authority"
+        )
+    if re.search(r"^\s+[a-z-]+:\s*write\s*$", workflow, re.MULTILINE) or re.search(
+        r"^\s*permissions:\s*write-all\s*$", workflow, re.MULTILINE
+    ):
+        errors.append("repository-intelligence workflow must not grant write permissions")
+    if re.search(r"^\s*pull_request_target:\s*$", workflow, re.MULTILINE):
+        errors.append("repository-intelligence workflow must not use pull_request_target")
+
+    expected_concurrency = (
+        'group: "relay-intelligence-v1-${{ github.repository }}-'
+        '${{ github.workflow_ref }}-${{ github.ref }}"'
+    )
+    expected_concurrency_block = (
+        r"^concurrency:\n  "
+        + re.escape(expected_concurrency)
+        + r"\n  cancel-in-progress: true\s*$"
+    )
+    if not re.search(expected_concurrency_block, top_level, re.MULTILINE):
+        errors.append(
+            "repository-intelligence concurrency must isolate v1 by repository, "
+            "caller workflow ref, and target ref"
+        )
+    if not re.search(
+        r"^concurrency:\n(?:  .*\n)*  cancel-in-progress: true\s*$",
+        top_level,
+        re.MULTILINE,
+    ):
+        errors.append(
+            "repository-intelligence concurrency must cancel only superseded "
+            "same-target runs"
+        )
+
+    generate = jobs.get("generate", "")
+    step_blocks = re.findall(
+        r"^      - (?P<body>.*?)(?=^      - |\Z)",
+        generate,
+        re.MULTILINE | re.DOTALL,
+    )
+
+    def step(identifier: str) -> str:
+        matches = [
+            block
+            for block in step_blocks
+            if re.search(rf"^        id:\s*{re.escape(identifier)}\s*$", block, re.MULTILINE)
+        ]
+        return matches[0] if len(matches) == 1 else ""
+
+    def named_step(name: str) -> str:
+        matches = [
+            block
+            for block in step_blocks
+            if re.search(rf"^name:\s*{re.escape(name)}\s*$", block, re.MULTILINE)
+        ]
+        return matches[0] if len(matches) == 1 else ""
+
+    def step_condition(block: str) -> str:
+        """Return one normalized step-level if expression."""
+
+        match = re.search(r"^        if:\s*(.*?)\s*$", block, re.MULTILINE)
+        if match is None:
+            return ""
+        condition = match.group(1)
+        if condition in {">", ">-", "|", "|-"}:
+            continuation: list[str] = []
+            for line in block[match.end() :].splitlines():
+                if not line.strip():
+                    continue
+                indentation = len(line) - len(line.lstrip(" "))
+                if indentation <= 8:
+                    break
+                continuation.append(line.strip())
+            condition = " ".join(continuation)
+        if (
+            len(condition) >= 2
+            and condition[0] == condition[-1]
+            and condition[0] in {"\"", "'"}
+        ):
+            condition = condition[1:-1]
+        return " ".join(condition.split())
+
+    def continues_after_failure(block: str) -> bool:
+        return bool(
+            re.search(
+                r"^        continue-on-error:\s*true\s*$",
+                block,
+                re.MULTILINE,
+            )
+        )
+
+    harden = step("harden")
+    preflight = step("preflight")
+    checkout = step("checkout")
+    generation = step("generation")
+    provenance = step("provenance")
+    site = step("site")
+    finalize = step("finalize")
+    preserve = step("preserve")
+    final_gate = named_step(
+        "Reassert Repository Intelligence result after evidence preservation"
+    )
+
+    def identity(block: str) -> str:
+        identifier = re.search(r"^        id:\s*([^\s]+)\s*$", block, re.MULTILINE)
+        if identifier is not None:
+            return f"id:{identifier.group(1)}"
+        name = re.search(r"^name:\s*(.*?)\s*$", block, re.MULTILINE)
+        return f"name:{name.group(1)}" if name is not None else "unknown"
+
+    expected_step_order = [
+        "id:harden",
+        "id:preflight",
+        "id:checkout",
+        "id:generation",
+        "id:provenance",
+        "id:site",
+        "id:finalize",
+        "id:preserve",
+        "name:Summarize Repository Intelligence evidence",
+        "name:Reassert Repository Intelligence result after evidence preservation",
+    ]
+    if [identity(block) for block in step_blocks] != expected_step_order:
+        errors.append(
+            "repository-intelligence workflow steps must preserve the exact "
+            "harden, preflight, checkout, generation, provenance, site upload, "
+            "finalize, preserve, summary, and final reassertion order"
+        )
+
+    if (
+        not preflight
+        or "uses: $/actions/repository-intelligence/workflow-evidence" not in preflight
+        or "operation: prepare" not in preflight
+    ):
+        errors.append(
+            "repository-intelligence preflight must use the exact workflow evidence "
+            "helper before checkout"
+        )
+    if not checkout:
+        errors.append(
+            "repository-intelligence workflow must check out exactly one caller revision"
+        )
+    else:
+        if 'ref: "${{ github.sha }}"' not in checkout:
+            errors.append(
+                "repository-intelligence checkout must use the exact represented github.sha"
+            )
+        if "persist-credentials: false" not in checkout:
+            errors.append(
+                "repository-intelligence checkout must disable persisted credentials"
+            )
+
+    expected_conditions = {
+        "preflight": "${{ steps.harden.outcome == 'success' }}",
+        "checkout": (
+            "${{ steps.harden.outcome == 'success' && "
+            "steps.preflight.outcome == 'success' }}"
+        ),
+        "generation": (
+            "${{ steps.harden.outcome == 'success' && "
+            "steps.preflight.outcome == 'success' && "
+            "steps.checkout.outcome == 'success' }}"
+        ),
+        "provenance": "${{ steps.generation.outcome == 'success' }}",
+        "site": "${{ steps.provenance.outcome == 'success' }}",
+        "finalize": "${{ always() }}",
+        "preserve": "${{ always() && steps.finalize.outcome == 'success' }}",
+    }
+    gated_steps = {
+        "preflight": preflight,
+        "checkout": checkout,
+        "generation": generation,
+        "provenance": provenance,
+        "site": site,
+        "finalize": finalize,
+        "preserve": preserve,
+    }
+    for identifier, expected_condition in expected_conditions.items():
+        block = gated_steps[identifier]
+        if not block or step_condition(block) != expected_condition:
+            errors.append(
+                "repository-intelligence workflow has an unsafe execution gate for "
+                f"{identifier}"
+            )
+
+    for identifier, block in {
+        "harden": harden,
+        **gated_steps,
+    }.items():
+        if not block or not continues_after_failure(block):
+            errors.append(
+                "repository-intelligence workflow must capture the outcome and "
+                f"continue to durable finalization after {identifier}"
+            )
+
+    if (
+        not finalize
+        or 'if: "${{ always() }}"' not in finalize
+        or "continue-on-error: true" not in finalize
+        or "uses: $/actions/repository-intelligence/workflow-evidence" not in finalize
+        or "operation: finalize" not in finalize
+    ):
+        errors.append(
+            "repository-intelligence evidence finalizer must run with always() "
+            "through the exact helper"
+        )
+    if (
+        not preserve
+        or "always() && steps.finalize.outcome == 'success'" not in preserve
+        or "continue-on-error: true" not in preserve
+        or "uses: $/actions/preserve-ci-report" not in preserve
+    ):
+        errors.append(
+            "repository-intelligence report preservation must run with always() "
+            "after successful finalization"
+        )
+    final_reassertion_guards = (
+        'FINALIZE_OUTCOME: "${{ steps.finalize.outcome }}"',
+        'PRESERVE_OUTCOME: "${{ steps.preserve.outcome }}"',
+        'WORKFLOW_OUTCOME: "${{ steps.finalize.outputs.workflow-outcome }}"',
+        'if [[ "${FINALIZE_OUTCOME}" != "success" ]]; then',
+        'if [[ "${PRESERVE_OUTCOME}" != "success" ]]; then',
+        'if [[ "${WORKFLOW_OUTCOME}" != "success" ]]; then',
+    )
+    if (
+        not final_gate
+        or step_condition(final_gate) != "${{ always() }}"
+        or "continue-on-error:" in final_gate
+        or "steps.finalize.outcome" not in final_gate
+        or "steps.preserve.outcome" not in final_gate
+        or "steps.finalize.outputs.workflow-outcome" not in final_gate
+        or any(guard not in final_gate for guard in final_reassertion_guards)
+        or final_gate.count("exit 1") < 3
+    ):
+        errors.append(
+            "repository-intelligence final result gate must run with always() and "
+            "fail closed on finalize, preserve, and workflow outcomes"
+        )
+
+    manifests = (
+        workflow_path,
+        repository_root / "actions/repository-intelligence/action.yml",
+        helper_path / "action.yml",
+    )
+    for manifest in manifests:
+        if not manifest.is_file():
+            continue
+        source = manifest.read_text(encoding="utf-8")
+        for line_number, line in enumerate(source.splitlines(), start=1):
+            if "python3" in line and "<<" in line and not re.search(
+                r"\bpython3\s+-I\s+-(?:\s|$)", line
+            ):
+                errors.append(
+                    "repository-intelligence Python heredoc must use python3 -I -: "
+                    f"{manifest}:{line_number}"
+                )
+    helper_manifest_path = helper_path / "action.yml"
+    if helper_manifest_path.is_file():
+        helper_manifest = helper_manifest_path.read_text(encoding="utf-8")
+        if not re.search(
+            r'python3\s+-I\s+"\$\{GITHUB_ACTION_PATH\}/scripts/'
+            r'repository_intelligence_workflow_evidence\.py"',
+            helper_manifest,
+        ):
+            errors.append(
+                "repository-intelligence workflow evidence helper must invoke Python "
+                "in isolated mode"
+            )
+
+
 def validate_workflow_metadata(repository_root: Path, errors: list[str]) -> None:
     """Validate reusable, CI, and release workflow publication boundaries."""
 
@@ -163,10 +514,7 @@ def validate_workflow_metadata(repository_root: Path, errors: list[str]) -> None
     reusable = (workflow_root / "repository-intelligence.yml").read_text(encoding="utf-8")
     if "workflow_call:" not in reusable:
         errors.append("repository-intelligence workflow is not callable")
-    if "uses: $/actions/repository-intelligence" not in reusable:
-        errors.append("reusable workflow must invoke the action from its exact Relay revision")
-    if "uses: ./actions/repository-intelligence" in reusable:
-        errors.append("reusable workflow must not resolve the action from the caller checkout")
+    validate_repository_intelligence_workflow(repository_root, errors)
 
     review = (workflow_root / "publication-review.yml").read_text(encoding="utf-8")
     if "workflow_call:" not in review:

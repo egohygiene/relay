@@ -10,6 +10,44 @@ out complete caller history, invokes the action from the exact called Relay
 revision through GitHub's `$/` syntax, builds the routed site, and uploads it as
 an ordinary workflow artifact.
 
+## Repository Intelligence artifact workflow
+
+`repository-intelligence.yml` is an artifact-only, read-only workflow. A
+consumer-owned wrapper may call it from a same-repository pull request, fork
+pull request, configured-default-branch push, or manual dispatch. Both pull
+request classes receive the same candidate-code ceiling: `contents: read`, no
+secrets, no cache, no write or Pages permission, and no execution of consumer
+build, test, package-manager, or installation commands. The workflow never uses
+`pull_request_target` and never uploads or deploys a Pages artifact.
+
+The caller's `github.sha` is the represented consumer revision. Relay-local
+actions resolve through `$/` from the exact called Relay revision rather than
+from the consumer checkout. For a manual consumer rebuild, the consumer owns a
+`workflow_dispatch` wrapper and the selected ref supplies that revision;
+directly dispatching Relay's workflow analyzes Relay itself.
+
+Successful output is uploaded under
+`repository-intelligence-site-v1-<repository-id>-<full-represented-sha>-<run-id>-<attempt>`.
+The caller selects 1–90 days of site retention, with 30 days by default, and
+receives `artifact-name` plus `artifact-digest`. Every run that reaches evidence
+preservation also attempts a fixed, sanitized
+`repository-intelligence-run-report.json`. Relay wraps it as
+`relay-report-repository-intelligence-v1-<run-id>-<attempt>`, retains it for a
+non-configurable 30 days, and returns `report-artifact-name`,
+`report-artifact-digest`, and `report-manifest-sha256`.
+
+An actionable failure preserves that report before the workflow reasserts the
+failure. Partial site bytes are never uploaded as a successful artifact.
+The called workflow group is
+`relay-intelligence-v1-${{ github.repository }}-${{ github.workflow_ref }}-${{ github.ref }}`;
+superseded runs cancel only for the same contract, repository, exact caller
+workflow path/ref identity, and target ref. Consumer wrappers use a distinct
+prefix to prevent caller/called self-cancellation. GitHub may cancel a runner
+before report preservation, and an artifact-service outage can prevent
+evidence upload. Neither limitation
+transfers deployment authority to Relay. See the full
+[publication and trust contract](../../docs/repository-intelligence-publication.md).
+
 ## Repository journals
 
 `repository-journal.yml` is the default no-billing surface. It collects bounded
@@ -88,8 +126,8 @@ jobs:
     uses: egohygiene/relay/.github/workflows/repository-intelligence.yml@<full-commit-sha>
 ```
 
-The workflow uploads exactly the validated generated subtree as a regular
-Actions artifact. Its provenance classifies GitHub-public repositories as
+The successful site artifact contains exactly the validated generated subtree.
+Its provenance classifies GitHub-public repositories as
 `public-safe` and all other visibility states as `internal-only`. It never
 deploys Pages and never uploads the private work directory. The caller may
 override retention, output layout, or canonical input settings, but the

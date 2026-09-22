@@ -318,7 +318,7 @@ runs:
           as_of="$(git -C "${GITHUB_WORKSPACE}" show --no-patch --format=%cI "${source_commit}")"
           timestamp_source="consumer-source-commit"
         fi
-        python3 - "${as_of}" <<'PYTHON'
+        python3 -I - "${as_of}" <<'PYTHON'
         from datetime import datetime
         import sys
 
@@ -357,7 +357,7 @@ runs:
           printf 'Repository Intelligence generator must resolve to egohygiene/relay\n' >&2
           exit 2
         fi
-        generator_version="$(python3 - "${GITHUB_ACTION_PATH}/../../release.json" <<'PYTHON'
+        generator_version="$(python3 -I - "${GITHUB_ACTION_PATH}/../../release.json" <<'PYTHON'
         import json
         from pathlib import Path
         import sys

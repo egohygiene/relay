@@ -65,7 +65,7 @@ The diagram is conceptual. [SYSTEM.md](SYSTEM.md) remains authoritative for resp
 ```text
 actions/
 ├── artifact-budget/              # bounded size evidence and budgets
-├── repository-intelligence/      # read-only collector and static renderer
+├── repository-intelligence/      # read-only collector, renderer, and internal workflow-evidence helper
 ├── repository-journal/           # evidence-bound journal adapters and renderer
 ├── repository-continuity-preflight/ # pinned offline continuity adapter
 ├── repository-labels/            # governed label and PR metadata engine
@@ -125,6 +125,15 @@ Relay accepts a snapshot only when its repository identity and represented
 commit match the generated dashboard. Missing input remains an explicit
 unavailable state, and browser-local resume state never becomes canonical
 evidence.
+The reusable artifact workflow resolves both the builder and its internal
+workflow-evidence helper from the exact called Relay revision. Before checkout,
+the helper validates the event, caller identity, bounded inputs, retention, and
+artifact namespace. After every actionable stage it renders one closed,
+allowlisted run report in an unpredictable runner-temporary directory; the
+generic report preserver binds that report to repository, revision, run, and
+retention before the workflow reasserts failure. Candidate content never
+supplies executable control-plane code, a cache, secrets, write permission, or
+Pages authority.
 The `/roadmap/` composer treats declared roadmap roots as display chapters and
 stable roadmap-step identities as durable fragments. It derives only inverse
 navigation and exit-criteria presentation from the normalized view: readiness

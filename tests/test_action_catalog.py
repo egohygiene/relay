@@ -114,6 +114,30 @@ class ActionCatalogTests(unittest.TestCase):
             action,
         )
 
+    def test_repository_intelligence_workflow_evidence_helper_is_internal(self) -> None:
+        """Package the exact-revision helper without publishing another action surface."""
+
+        helper = REPOSITORY_ROOT / "actions/repository-intelligence/workflow-evidence"
+        self.assertTrue((helper / "action.yml").is_file())
+        self.assertTrue((helper / "README.md").is_file())
+        self.assertTrue(
+            (
+                helper
+                / "scripts/repository_intelligence_workflow_evidence.py"
+            ).is_file()
+        )
+        self.assertNotIn(
+            "actions/repository-intelligence/workflow-evidence",
+            validator.discovered_action_paths(REPOSITORY_ROOT),
+        )
+        catalog = json.loads(
+            (REPOSITORY_ROOT / "action-catalog.json").read_text(encoding="utf-8")
+        )
+        self.assertNotIn(
+            "actions/repository-intelligence/workflow-evidence",
+            {entry["path"] for entry in catalog["actions"]},
+        )
+
     def test_validation_and_release_gates_are_present(self) -> None:
         validation = (REPOSITORY_ROOT / ".github/workflows/validate.yml").read_text(
             encoding="utf-8"
@@ -164,6 +188,8 @@ class ActionCatalogTests(unittest.TestCase):
                 "https://egohygiene.github.io/contracts/repository-tree/v1/schema.json",
             "actions/repository-intelligence/schemas/repository-intelligence-dashboard.schema.json":
                 "https://egohygiene.dev/schemas/repository-intelligence-dashboard/v3.json",
+            "actions/repository-intelligence/workflow-evidence/schemas/repository-intelligence-workflow-report.schema.json":
+                "https://egohygiene.github.io/relay/contracts/repository-intelligence-workflow-report/v1/schema.json",
             "actions/normalize-repository-report/schemas/repository-report-summary.schema.json":
                 "https://egohygiene.dev/schemas/repository-report-summary/v1.json",
             "actions/preserve-ci-report/schemas/ci-report-manifest.schema.json":

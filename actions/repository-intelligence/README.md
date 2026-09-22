@@ -95,6 +95,15 @@ internal, unknown-visibility, and artifact-first repositories. Use the composite
 action directly for site composition because a reusable-workflow job cannot
 modify another job's workspace.
 
+The reusable workflow additionally preserves a fixed, sanitized run report for
+success or actionable failure and then reasserts any failed outcome. That
+retention behavior belongs to workflow orchestration; invoking this composite
+action directly does not upload either a site artifact or failure evidence.
+See the
+[event, trust, artifact, and recovery contract](../../docs/repository-intelligence-publication.md#reusable-workflow-trust-and-event-contract)
+for trusted and fork pull requests, default-branch pushes, reusable calls, and
+consumer-owned manual rebuilds.
+
 ## Standalone Pages subtree
 
 A public repository without an existing site stack can still keep deployment
@@ -335,6 +344,8 @@ python3 actions/repository-intelligence/scripts/validate_repository_intelligence
 
 - Requires only Bash, Git, and Python 3 already available on GitHub-hosted runners.
 - Makes no network requests and installs no dependencies.
+- Reads no token or secret and performs no cache restore or save operation.
+- Executes no repository-owned build, test, package-manager, or installation command.
 - Writes no commits, tags, releases, deployments, or repository settings.
 - Never uploads artifacts itself when used as a composite action.
 - Pins analytics and tree contracts to one resolved Git commit.
