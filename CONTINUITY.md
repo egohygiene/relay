@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-22T03:58:10Z"
+  updated_at: "2026-09-22T04:39:11Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -72,20 +72,20 @@ state:
     verified_at: "2026-09-22T03:19:13Z"
   candidate:
     branch: codex/relay-29-supporting-view-integration
-    revision: 9426b962c634774910a22ad4f79b99c4d7fce2a2
+    revision: a19f835365b4381729ca7a07012e96d953a25097
     pull_request: https://github.com/egohygiene/relay/pull/103
-    handoff_state: draft-review
+    handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: "2026-09-22T03:57:47Z"
+    observed_at: "2026-09-22T04:39:03Z"
     default_branch_revision: 4fa92e187a6a980fea202c8309749a204a1ccae5
     issue_state: open
-    pull_request_state: draft
-    notes: "Draft PR #103 is open from the exact candidate branch; main remains the verified base, and no merge is claimed."
+    pull_request_state: ready-for-review
+    notes: "PR #103 is ready for review from the exact candidate branch; main remains the verified base, all applicable implementation-head checks passed, and no merge is claimed."
   parallel_changes: []
 review:
   status: passed
-  reviewed_at: "2026-09-22T03:46:06Z"
+  reviewed_at: "2026-09-22T04:39:11Z"
   reviewed_by: ChatGPT
   evidence:
     - command: "Inspect live Relay issues #27, #29, #33, #75, #77, #79, #81, #83, #86, #88, #90, and #101 plus open pull requests and exact main."
@@ -98,20 +98,20 @@ review:
       notes: "Verified merge revision 63d313b1ddf8669808e897853b74928505494da0 and SHA-256 95c9db34dc0b66bb090bd92f89ce16cb7f850a0bbf9a47bd3d64f7ac3d0ad7f3."
     - command: "python3 -m unittest focused Repository Intelligence site, six views, bundle, and workflow modules -v"
       outcome: passed
-      observed_at: "2026-09-22T03:46:06Z"
-      notes: "123 focused tests passed, including overview/Now separation, browser context behavior, placeholder rejection, route lock, state vocabulary, and incremental adoption."
+      observed_at: "2026-09-22T04:39:11Z"
+      notes: "124 focused tests passed, including overview/Now separation, cross-route context behavior, truthful route freshness, accessible entity restoration, placeholder rejection, route lock, state vocabulary, and incremental adoption."
     - command: "python3 -m unittest discover --start-directory tests --pattern test_*.py --verbose"
       outcome: passed
-      observed_at: "2026-09-22T03:46:06Z"
-      notes: "All 426 repository tests passed."
+      observed_at: "2026-09-22T04:39:11Z"
+      notes: "All 427 repository tests passed."
     - command: "Run five repository contract validators; compile Python; parse 61 JSON and 34 YAML documents; validate checked-in and 91 inline Bash blocks; parse both JavaScript assets; run git diff --check."
       outcome: passed
-      observed_at: "2026-09-22T03:46:06Z"
+      observed_at: "2026-09-22T04:39:11Z"
       notes: "All deterministic local validation passed; Ruby was unavailable, so YAML metadata was parsed with PyYAML 6.0.3."
     - command: "Independent read-only JavaScript, Python, documentation, and acceptance review."
       outcome: passed
-      observed_at: "2026-09-22T03:46:06Z"
-      notes: "All blocking findings were addressed; Search field attribution remains explicitly deferred to Observatory #24 and Relay #102."
+      observed_at: "2026-09-22T04:39:11Z"
+      notes: "Final code, documentation, UX, and acceptance re-reviews found no blockers; Search field attribution remains explicitly deferred to Observatory #24 and Relay #102."
   environment_limitations:
     - "The maintain-repository-continuity skill is unavailable in this session; this checkpoint was refreshed directly from the pinned local Aether template under AGENTS.md."
 privacy:
@@ -152,9 +152,9 @@ to the user without predicting #29 closure.
 ## State snapshot
 
 - Base: exact live `main` at `4fa92e187a6a980fea202c8309749a204a1ccae5`.
-- Candidate implementation: `9426b962c634774910a22ad4f79b99c4d7fce2a2`
-  on `codex/relay-29-supporting-view-integration`, under draft review in PR #103.
-- Live: #29 and #33 open; merged route children verified; draft PR #103 open.
+- Candidate implementation: `a19f835365b4381729ca7a07012e96d953a25097`
+  on `codex/relay-29-supporting-view-integration`, ready for review in PR #103.
+- Live: #29 and #33 open; merged route children verified; PR #103 ready for review.
 
 ## Completed and material changes
 
@@ -166,8 +166,8 @@ to the user without predicting #29 closure.
 
 ## Validation and review evidence
 
-- Focused Repository Intelligence suite: 123 tests passed.
-- Full repository suite: 426 tests passed; all static and contract checks passed.
+- Focused Repository Intelligence suite: 124 tests passed.
+- Full repository suite: 427 tests passed; all static and contract checks passed.
 
 ## Blockers, risks, unknowns, and deferred work
 
