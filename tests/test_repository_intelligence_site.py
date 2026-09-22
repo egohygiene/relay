@@ -16,6 +16,7 @@ import unittest
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 ACTION_ROOT = REPOSITORY_ROOT / "actions/repository-intelligence"
+ACTION_MANIFEST = ACTION_ROOT / "action.yml"
 FIXTURE = REPOSITORY_ROOT / "tests/fixtures/repository-intelligence-site/snapshot.json"
 AS_OF = datetime(2026, 8, 25, 14, tzinfo=UTC)
 GENERATOR_COMMIT = "a" * 40
@@ -82,6 +83,13 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
         self.snapshot = json.loads(FIXTURE.read_text(encoding="utf-8"))
         serialized = json.dumps(self.snapshot).replace("1" * 40, self.source_commit)
         self.snapshot = json.loads(serialized)
+        health_fixture = json.loads(
+            (
+                REPOSITORY_ROOT
+                / "tests/fixtures/repository-intelligence-health/snapshot.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.snapshot["views"]["health"] = health_fixture["views"]["health"]
 
     def build(self, relative: str, *, include_snapshot: bool = True) -> Path:
         output = self.repository / relative
@@ -144,6 +152,32 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
         if include_snapshot:
             arguments.extend(["--snapshot", str(snapshot_path)])
         subprocess.run(arguments, check=True, capture_output=True, text=True)
+        supporting_arguments = [
+            "--repository-root",
+            str(self.repository),
+            "--output-root",
+            str(output),
+            "--summary",
+            str(output / "summary.json"),
+            "--provenance",
+            str(output / "provenance.json"),
+            "--repository",
+            "example/repository",
+            "--source-commit",
+            self.source_commit,
+        ]
+        if include_snapshot:
+            supporting_arguments.extend(["--snapshot", str(snapshot_path)])
+        for script in (
+            "render_repository_intelligence_dependencies.py",
+            "render_repository_intelligence_compare.py",
+        ):
+            subprocess.run(
+                ["python3", str(ACTION_ROOT / "scripts" / script), *supporting_arguments],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
         bundle_validator.validate_bundle(
             repository_root=self.repository,
             output_root=output,
@@ -157,25 +191,52 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
         )
         return output
 
-    def test_now_is_default_and_keeps_operational_states_distinct(self) -> None:
+    def test_overview_and_now_answer_distinct_questions(self) -> None:
         output = self.build("dist/intelligence")
         root = (output / "index.html").read_text(encoding="utf-8")
         routed = (output / "now/index.html").read_text(encoding="utf-8")
-        for rendered in (root, routed):
-            self.assertIn("Where things stand", rendered)
-            self.assertIn("Current quests", rendered)
-            self.assertIn("Blockers", rendered)
-            self.assertIn("Checks that regressed", rendered)
-            self.assertIn("Decisions awaiting closure", rendered)
-            self.assertIn("The next three grounded moves", rendered)
-            self.assertIn("The shared shell is available", rendered)
-            self.assertIn("Establish the evidence contract", rendered)
-            self.assertIn("Open canonical work", rendered)
-        self.assertNotIn("Incomplete work is blocked", root)
+        self.assertIn("Choose the evidence question", root)
+        self.assertIn('id="intelligence-heading"', root)
+        self.assertIn("Inspect the analytics dashboard", root)
+        for label in (
+            "Now",
+            "Roadmap",
+            "Decisions",
+            "Journey",
+            "Dependencies",
+            "Health",
+            "Releases",
+            "Work",
+            "Search",
+            "Compare",
+        ):
+            self.assertIn(f"Open {label}", root)
+        self.assertNotIn('id="now-heading"', root)
+        self.assertNotIn("The next three grounded moves", root)
+        for text in (
+            "Where things stand",
+            "Current quests",
+            "Blockers",
+            "Checks that regressed",
+            "Decisions awaiting closure",
+            "The next three grounded moves",
+            "The shared shell is available",
+            "Establish the evidence contract",
+            "Open canonical work",
+        ):
+            self.assertIn(text, routed)
+        self.assertIn('data-ri-route="intelligence"', root)
+        self.assertIn('aria-current="page">Overview</a>', root)
+        self.assertIn('data-ri-route="now"', routed)
+        self.assertIn('aria-current="page">Now</a>', routed)
+        self.assertNotIn("Incomplete work is blocked", routed)
         self.assertTrue((output / "dashboard/index.html").is_file())
         dashboard = (output / "dashboard/index.html").read_text(encoding="utf-8")
         self.assertIn('aria-label="Repository Intelligence views"', dashboard)
         self.assertIn('href="../now/"', dashboard)
+        self.assertIn('href="../dependencies/"', dashboard)
+        self.assertIn('href="../releases/"', dashboard)
+        self.assertIn("data-preserve-context", dashboard)
 
     def test_ready_queue_is_bounded_to_three_actions(self) -> None:
         snapshot = json.loads(json.dumps(self.snapshot))
@@ -217,6 +278,12 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
         styles = (output / "site.css").read_text(encoding="utf-8")
         self.assertIn("URLSearchParams", script)
         self.assertIn("history.replaceState", script)
+        self.assertIn("data-preserve-context", rendered)
+        self.assertIn("contextLinks", script)
+        self.assertIn("transferable", script)
+        self.assertIn('next.searchParams.set("entity", identifier)', script)
+        self.assertIn('selected?.closest("[data-entity-id]")', script)
+        self.assertNotIn("target.hash = current.hash", script)
         self.assertIn("localStorage", script)
         self.assertIn("scrollY", script)
         self.assertIn("window.scrollTo", script)
@@ -231,6 +298,167 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
         self.assertIn("@media (max-width: 48rem)", styles)
         self.assertNotIn("localStorage", (output / "summary.json").read_text(encoding="utf-8"))
         self.assertNotIn("resume.v1", (output / "provenance.json").read_text(encoding="utf-8"))
+
+    def test_route_context_keeps_supported_values_without_leaking_hashes_or_secrets(self) -> None:
+        harness = r'''
+const fs = require("fs");
+const links = [
+  { original: "../health/", href: "" },
+  { original: "../search/#search-heading", href: "" },
+  { original: "https://github.com/egohygiene/relay/issues/29", href: "" },
+].map((link) => ({
+  ...link,
+  getAttribute(name) { return name === "href" ? this.original : null; },
+  addEventListener() {},
+}));
+global.location = new URL("https://repo.example/intelligence/roadmap/?q=owner&entity=ri%3Aexample&access_token=secret#quest-local");
+global.history = { replaceState() {} };
+global.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
+global.CustomEvent = class CustomEvent { constructor(type) { this.type = type; } };
+global.requestAnimationFrame = () => 0;
+global.cancelAnimationFrame = () => {};
+global.document = {
+  body: { dataset: { riRepository: "example/repository", riRoute: "roadmap", riCommit: "a".repeat(40) } },
+  activeElement: null,
+  querySelector() { return null; },
+  querySelectorAll(selector) {
+    return selector === "[data-preserve-context-links] a, [data-preserve-context]" ? links : [];
+  },
+  getElementById() { return null; },
+  addEventListener() {},
+  dispatchEvent() {},
+};
+global.window = {
+  scrollY: 0,
+  addEventListener() {},
+  matchMedia() { return { matches: false }; },
+  clearInterval() {},
+  setInterval() { return 0; },
+  scrollTo() {},
+};
+eval(fs.readFileSync(process.argv[1], "utf8"));
+process.stdout.write(JSON.stringify(links.map((link) => link.href)));
+'''
+        result = subprocess.run(
+            ["node", "-e", harness, str(ACTION_ROOT / "assets/site.js")],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        health, search, external = json.loads(result.stdout)
+        self.assertEqual(
+            health,
+            "https://repo.example/intelligence/health/?q=owner&entity=ri%3Aexample",
+        )
+        self.assertEqual(
+            search,
+            "https://repo.example/intelligence/search/?q=owner&entity=ri%3Aexample#search-heading",
+        )
+        self.assertEqual(external, "https://github.com/egohygiene/relay/issues/29")
+        explorer = (ACTION_ROOT / "assets/explorer.js").read_text(encoding="utf-8")
+        self.assertIn("transferableContext.has(name)", explorer)
+        self.assertNotIn('name !== "resume"', explorer)
+        self.assertNotIn("target.hash = current.hash", explorer)
+
+    def test_bundle_validation_rejects_an_unmaterialized_supporting_route(self) -> None:
+        output = self.build("dist/intelligence")
+        health = output / "health/index.html"
+        rendered = health.read_text(encoding="utf-8")
+        health.write_text(
+            rendered.replace('id="health-heading"', 'id="placeholder-heading"', 1),
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(
+            bundle_validator.BundleValidationError,
+            "health/ was not materialized",
+        ):
+            bundle_validator.validate_bundle(
+                repository_root=self.repository,
+                output_root=output,
+                repository="example/repository",
+                repository_visibility="public",
+                source_commit=self.source_commit,
+                generator_version="1.2.0",
+                generator_source_ref=GENERATOR_COMMIT,
+                generator_source_commit=GENERATOR_COMMIT,
+                generator_immutable=True,
+            )
+
+    def test_optional_supporting_views_can_be_absent_during_incremental_adoption(self) -> None:
+        snapshot = json.loads(json.dumps(self.snapshot))
+        del snapshot["views"]["health"]
+        del snapshot["views"]["work"]
+        validated = site_builder.validate_snapshot(
+            snapshot,
+            "example/repository",
+            self.source_commit,
+        )
+        self.assertNotIn("health", validated["views"])
+        self.assertNotIn("work", validated["views"])
+
+    def test_supporting_renderer_orchestration_replaces_every_reserved_route(self) -> None:
+        output = self.build("dist/intelligence")
+        snapshot_path = self.repository / ".cache/repository-intelligence/snapshot.json"
+        common = [
+            "--repository-root",
+            str(self.repository),
+            "--output-root",
+            str(output),
+            "--summary",
+            str(output / "summary.json"),
+            "--provenance",
+            str(output / "provenance.json"),
+            "--snapshot",
+            str(snapshot_path),
+            "--repository",
+            "example/repository",
+            "--source-commit",
+            self.source_commit,
+        ]
+        subprocess.run(
+            [
+                "python3",
+                str(ACTION_ROOT / "scripts/render_repository_intelligence_dependencies.py"),
+                *common,
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        subprocess.run(
+            [
+                "python3",
+                str(ACTION_ROOT / "scripts/render_repository_intelligence_compare.py"),
+                *common,
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        expected = {
+            "dependencies": "What depends on what?",
+            "health": "What does the current evidence say?",
+            "releases": "What has actually shipped?",
+            "work": "What work needs attention?",
+            "search": "Find a normalized repository object",
+            "compare": "What structurally changed?",
+        }
+        for route, question in expected.items():
+            with self.subTest(route=route):
+                rendered = (output / route / "index.html").read_text(encoding="utf-8")
+                self.assertIn(question, rendered)
+                self.assertNotIn("View intentionally not materialized yet", rendered)
+        bundle_validator.validate_bundle(
+            repository_root=self.repository,
+            output_root=output,
+            repository="example/repository",
+            repository_visibility="public",
+            source_commit=self.source_commit,
+            generator_version="1.2.0",
+            generator_source_ref=GENERATOR_COMMIT,
+            generator_source_commit=GENERATOR_COMMIT,
+            generator_immutable=True,
+        )
 
     def test_roadmap_renders_stable_quests_progress_and_full_evidence(self) -> None:
         output = self.build("dist/intelligence")
@@ -829,6 +1057,57 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
             lock["holon"]["package"],
             "@egohygiene/repository-intelligence@0.1.0-alpha.1",
         )
+
+    def test_hygiene_registry_lock_matches_repository_route_layout(self) -> None:
+        lock = json.loads(
+            (
+                ACTION_ROOT
+                / "contracts/repository-intelligence-siblings.v1.lock.json"
+            ).read_text(encoding="utf-8")
+        )
+        hygiene = lock["hygiene"]
+        self.assertEqual(
+            hygiene["source_commit"],
+            "63d313b1ddf8669808e897853b74928505494da0",
+        )
+        self.assertEqual(
+            hygiene["contract"],
+            "egohygiene.public-site-surface-registry/v1",
+        )
+        self.assertEqual(hygiene["contract_version"], "1.0.0-alpha.1")
+        self.assertEqual(hygiene["route_profile"], "repository")
+        self.assertRegex(hygiene["registry_sha256"], r"^[0-9a-f]{64}$")
+        expected = {
+            "intelligence": "/intelligence/",
+            **{
+                route: f"/intelligence/{route}/"
+                for route, _ in site_builder.ROUTES
+            },
+            "dashboard": "/intelligence/dashboard/",
+        }
+        self.assertEqual(hygiene["canonical_routes"], expected)
+
+    def test_action_exposes_every_routed_view_as_a_public_output(self) -> None:
+        manifest = ACTION_MANIFEST.read_text(encoding="utf-8")
+        for route in (
+            "now",
+            "roadmap",
+            "decisions",
+            "journey",
+            "dependencies",
+            "health",
+            "releases",
+            "work",
+            "search",
+            "compare",
+            "dashboard",
+        ):
+            with self.subTest(route=route):
+                self.assertIn(f"  {route}:\n", manifest)
+                self.assertIn(
+                    f'${{{{ inputs.output-directory }}}}/{route}/index.html',
+                    manifest,
+                )
 
     def test_snapshot_path_rejects_symlink_components(self) -> None:
         outside = Path(self.temporary_directory.name) / "outside.json"

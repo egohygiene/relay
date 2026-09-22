@@ -33,10 +33,16 @@ All notable changes to Relay are documented in this file. The format follows
 
 ### Changed
 
+- Repository Intelligence now distinguishes its overview from `/now/`, exposes
+  every supporting route as a public action output, carries applicable URL
+  context across views, and pins the Hygiene repository-route registry.
 - Relay dogfood releases now use `relay` as their explicit product-facing name.
 
 ### Fixed
 
+- Repository Intelligence snapshots may omit optional Health and Work queries
+  without failing the whole site, and Compare can render structural evidence
+  before the optional Search projection is adopted.
 - Deterministic repository journals now select a breadth-first bounded summary
   and report candidate truncation as partial instead of failing when live
   provider evidence exceeds the configured item or byte ceiling.

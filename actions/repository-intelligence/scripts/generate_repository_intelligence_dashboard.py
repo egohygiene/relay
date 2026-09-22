@@ -2067,12 +2067,15 @@ def render_html(
     )
     shell_navigation = ""
     if include_shell_navigation:
-        shell_navigation = f'''<nav class="experience-nav" aria-label="Repository Intelligence views">
+        shell_navigation = f'''<nav class="experience-nav" data-preserve-context-links aria-label="Repository Intelligence views">
+      <a href="{escaped(asset_prefix)}">Overview</a>
       <a href="{escaped(asset_prefix)}now/">Now</a>
       <a href="{escaped(asset_prefix)}roadmap/">Roadmap</a>
       <a href="{escaped(asset_prefix)}decisions/">Decisions</a>
       <a href="{escaped(asset_prefix)}journey/">Journey</a>
+      <a href="{escaped(asset_prefix)}dependencies/">Dependencies</a>
       <a href="{escaped(asset_prefix)}health/">Health</a>
+      <a href="{escaped(asset_prefix)}releases/">Releases</a>
       <a href="{escaped(asset_prefix)}work/">Work</a>
       <a href="{escaped(asset_prefix)}search/">Search</a>
       <a href="{escaped(asset_prefix)}compare/">Compare</a>

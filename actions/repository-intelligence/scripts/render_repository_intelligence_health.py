@@ -250,7 +250,7 @@ def render_check(record: dict[str, Any]) -> str:
         str(record.get(field) or "")
         for field in ("title", "key", "repository", "state", "assertion", "freshness")
     ).casefold()
-    return f'''<li><article class="ri-record" data-filter-item{site.source_repository_attribute(record)} data-state="{site.escaped(state)}" data-kind="check" data-filter-check-state="{site.escaped(state)}" data-filter-freshness="{site.escaped(freshness)}" data-search="{site.escaped(search_text)}">
+    return f'''<li><article class="ri-record" data-entity-id="{site.escaped(record.get("id"))}" data-filter-item{site.source_repository_attribute(record)} data-state="{site.escaped(state)}" data-kind="check" data-filter-check-state="{site.escaped(state)}" data-filter-freshness="{site.escaped(freshness)}" data-search="{site.escaped(search_text)}">
       <div class="ri-record__top"><span class="ri-eyebrow">Normalized check</span><span>{site.status_pill(state)} {site.status_pill(freshness, f"Freshness: {site.state_label(freshness)}")}</span></div>
       <h3>{site.escaped(title)}</h3>
       <p>{site.escaped(record["repository"])} · {site.escaped(record["key"])}</p>

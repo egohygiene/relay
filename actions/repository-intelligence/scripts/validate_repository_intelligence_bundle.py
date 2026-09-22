@@ -1379,14 +1379,41 @@ def validate_routed_shell(
             )
     root = (output_root / "index.html").read_text(encoding="utf-8")
     now = (output_root / "now/index.html").read_text(encoding="utf-8")
-    for label, rendered in (("index.html", root), ("now/index.html", now)):
-        for marker in (
-            'data-ri-route="now"',
-            'id="now-heading"',
-            'data-filter-results aria-live="polite"',
-        ):
-            if marker not in rendered:
-                raise BundleValidationError(f"{label} is not an operational Now entry")
+    for marker in (
+        'data-ri-route="intelligence"',
+        'aria-current="page">Overview</a>',
+        'id="intelligence-heading"',
+        "Choose the evidence question",
+        'data-filter-results aria-live="polite"',
+    ):
+        if marker not in root:
+            raise BundleValidationError(
+                "index.html is not the Repository Intelligence overview"
+            )
+    if 'id="now-heading"' in root:
+        raise BundleValidationError("index.html duplicates the operational Now view")
+    for marker in (
+        'data-ri-route="now"',
+        'aria-current="page">Now</a>',
+        'id="now-heading"',
+        'data-filter-results aria-live="polite"',
+    ):
+        if marker not in now:
+            raise BundleValidationError("now/index.html is not the operational Now view")
+    supporting_markers = {
+        "dependencies": 'id="dependencies-heading"',
+        "health": 'id="health-heading"',
+        "releases": 'id="releases-heading"',
+        "work": 'id="work-heading"',
+        "search": 'id="search-heading"',
+        "compare": 'id="compare-heading"',
+    }
+    for route, marker in supporting_markers.items():
+        rendered = (output_root / route / "index.html").read_text(encoding="utf-8")
+        if marker not in rendered or "View intentionally not materialized yet" in rendered:
+            raise BundleValidationError(
+                f"{route}/ was not materialized by its supporting-view renderer"
+            )
     dashboard = (output_root / "dashboard/index.html").read_text(encoding="utf-8")
     if 'aria-label="Repository Intelligence views"' not in dashboard:
         raise BundleValidationError("dashboard/index.html does not link into the shared views")

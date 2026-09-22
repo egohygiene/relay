@@ -30,6 +30,30 @@ ROUTES = (
     ("search", "Search"),
     ("compare", "Compare"),
 )
+ROUTE_QUESTIONS = {
+    "now": "What changed, what needs attention, and which grounded moves come next?",
+    "roadmap": "What should happen next, what is blocked, and which evidence proves progress?",
+    "decisions": "Why did the architecture change, and what authority does each decision retain?",
+    "journey": "How did intent become work, code, proof, and delivery over time?",
+    "dependencies": "What depends on what, and where can a change or blocker propagate?",
+    "health": "What do normalized checks and freshness evidence say right now?",
+    "releases": "What actually shipped, when, and with which included evidence?",
+    "work": "Which execution records and roadmap queues need attention?",
+    "search": "Where is a normalized repository object and its canonical source?",
+    "compare": "What structurally changed between two accepted snapshots?",
+}
+ROUTE_KINDS = {
+    "now": "check",
+    "roadmap": "roadmap_step",
+    "decisions": "architecture_decision",
+    "journey": "commit",
+    "dependencies": "roadmap_step",
+    "health": "check",
+    "releases": "release",
+    "work": "issue",
+    "search": "file",
+    "compare": "commit",
+}
 FULL_SHA = re.compile(r"^[0-9a-f]{40}$")
 EMAIL = re.compile(r"(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 SECRET = re.compile(r"(?i)(?:github_pat_|gh[pousr]_|(?:token|password|secret)\s*[:=])")
@@ -670,7 +694,7 @@ def validate_snapshot(
     }:
         raise SiteInputError("snapshot coverage.status uses an unsupported state")
     views = require_object(snapshot.get("views"))
-    for name in ("now", "roadmap", "decisions", "journey", "health", "work"):
+    for name in ("now", "roadmap", "decisions", "journey"):
         if not isinstance(views.get(name), dict):
             raise SiteInputError(f"snapshot views.{name} must be an object")
     required_arrays = {
@@ -678,8 +702,6 @@ def validate_snapshot(
         "roadmap": ("roots", "steps"),
         "decisions": ("decisions",),
         "journey": ("chapters", "events"),
-        "health": ("checks",),
-        "work": ("open_issues", "open_pull_requests"),
     }
     for view_name, members in required_arrays.items():
         view = views[view_name]
@@ -688,8 +710,21 @@ def validate_snapshot(
                 raise SiteInputError(
                     f"snapshot views.{view_name}.{member} must be an array"
                 )
-    if not isinstance(views["work"].get("roadmap_queues"), dict):
-        raise SiteInputError("snapshot views.work.roadmap_queues must be an object")
+    if "health" in views:
+        health = views["health"]
+        if not isinstance(health, dict):
+            raise SiteInputError("snapshot views.health must be an object")
+        if not isinstance(health.get("checks"), list):
+            raise SiteInputError("snapshot views.health.checks must be an array")
+    if "work" in views:
+        work = views["work"]
+        if not isinstance(work, dict):
+            raise SiteInputError("snapshot views.work must be an object")
+        for member in ("open_issues", "open_pull_requests"):
+            if not isinstance(work.get(member), list):
+                raise SiteInputError(f"snapshot views.work.{member} must be an array")
+        if not isinstance(work.get("roadmap_queues"), dict):
+            raise SiteInputError("snapshot views.work.roadmap_queues must be an object")
     validate_roadmap_view(require_object(views.get("roadmap")))
     validate_decisions_view(require_object(views.get("decisions")))
     validate_journey_view(require_object(views.get("journey")))
@@ -783,7 +818,7 @@ def record_card(item: Any, *, eyebrow: str = "Evidence") -> str:
     kind = state_label(value.get("kind"))
     state = normalize_state(value.get("state"))
     search = " ".join(str(value.get(key, "")) for key in ("title", "key", "kind", "state"))
-    return f'''<article class="ri-record" data-filter-item{source_repository_attribute(value)} data-state="{escaped(state)}" data-kind="{escaped(normalize_state(value.get("kind")))}" data-search="{escaped(search.lower())}">
+    return f'''<article class="ri-record" data-entity-id="{escaped(value.get("id"))}" data-filter-item{source_repository_attribute(value)} data-state="{escaped(state)}" data-kind="{escaped(normalize_state(value.get("kind")))}" data-search="{escaped(search.lower())}">
       <div class="ri-record__top"><span class="ri-eyebrow">{escaped(eyebrow)}</span>{status_pill(state)}</div>
       <h3>{escaped(title)}</h3>
       <p>{escaped(kind)} · {escaped(value.get("key") or "No identifier")}</p>
@@ -801,7 +836,7 @@ def render_recent_change(now: dict[str, Any]) -> str:
     event = require_object(events[0])
     subject = entity(event.get("subject_entity"))
     event_type = str(event.get("type") or "recorded").replace("_", " ").replace(".", " · ")
-    return f'''<article class="ri-change" data-filter-item{source_repository_attribute(subject)} data-state="{escaped(normalize_state(subject.get("state")))}" data-kind="{escaped(normalize_state(subject.get("kind")))}" data-search="{escaped((str(subject.get("title", "")) + " " + event_type).lower())}">
+    return f'''<article class="ri-change" data-entity-id="{escaped(subject.get("id"))}" data-filter-item{source_repository_attribute(subject)} data-state="{escaped(normalize_state(subject.get("state")))}" data-kind="{escaped(normalize_state(subject.get("kind")))}" data-search="{escaped((str(subject.get("title", "")) + " " + event_type).lower())}">
       <div class="ri-change__rail" aria-hidden="true"><span></span></div>
       <div><div class="ri-record__top"><span class="ri-eyebrow">{escaped(event_type)}</span>{status_pill(subject.get("state"))}</div>
       <h3>{escaped(subject.get("title") or "Recorded change")}</h3>
@@ -880,7 +915,7 @@ def render_next_actions(snapshot: dict[str, Any]) -> str:
             if dependencies
             else '<li><span class="ri-muted">No prerequisites asserted.</span></li>'
         )
-        cards.append(f'''<li class="ri-action" data-filter-item data-state="ready" data-kind="roadmap_step" data-search="{escaped((str(action_entity.get("title", "")) + " " + rationale).lower())}">
+        cards.append(f'''<li class="ri-action" data-entity-id="{escaped(action_entity.get("id"))}" data-filter-item data-state="ready" data-kind="roadmap_step" data-search="{escaped((str(action_entity.get("title", "")) + " " + rationale).lower())}">
           <div class="ri-action__number" aria-hidden="true">{index:02d}</div>
           <article><div class="ri-record__top"><span class="ri-eyebrow">Ready action</span>{status_pill("ready")}</div>
           <h3>{escaped(action_entity.get("title") or action_entity.get("key") or "Untitled action")}</h3>
@@ -1140,7 +1175,7 @@ def render_quest_step(
         for evidence_index, (relationship, value) in enumerate(evidence_records)
     )
     canonical = source_link(step_entity, "Open canonical ROADMAP.md step")
-    return f'''<li class="ri-quest" id="{escaped(anchor)}" data-filter-item data-roadmap-quest data-state="{escaped(state)}" data-states="{escaped(" ".join(states))}" data-kind="roadmap_step" data-kinds="{escaped(" ".join(kinds))}" data-search="{escaped(search)}">
+    return f'''<li class="ri-quest" id="{escaped(anchor)}" data-entity-id="{escaped(step_id)}" data-filter-item data-roadmap-quest data-state="{escaped(state)}" data-states="{escaped(" ".join(states))}" data-kind="roadmap_step" data-kinds="{escaped(" ".join(kinds))}" data-search="{escaped(search)}">
       <div class="ri-quest__node" aria-hidden="true"><span>{index + 1:02d}</span></div>
       <article class="ri-quest__card" tabindex="-1">
         <header><div><a class="ri-quest__permalink" data-quest-link href="#{escaped(anchor)}">Quest {index + 1} of {total} · {escaped(step_entity.get("key"))}</a><h3>{escaped(step_entity.get("title"))}</h3></div>{status_pill(state)}</header>
@@ -1596,7 +1631,7 @@ def render_decision_card(
         if status == "superseded" and not require_list(decision.get("superseded_by"))
         else ""
     )
-    return f'''<li class="ri-decision" id="{escaped(anchor)}" data-filter-item data-decision-record data-source-repository="{escaped(decision_entity.get("repository"))}" data-state="{escaped(status)}" data-states="{escaped(" ".join(states))}" data-kind="architecture_decision" data-kinds="{escaped(" ".join(kinds))}" data-search="{escaped(search)}" {facet_attributes} data-decision-id="{escaped(identifier)}" data-decision-title="{escaped(decision_entity.get("title"))}" data-decision-status="{escaped(state_label(status))}" data-decision-implementation="{escaped(state_label(metadata["implementation"]))}" data-decision-scope="{escaped(state_label(metadata["scope"]))}" data-decision-date-label="{escaped(date_label)}" data-decision-owner-label="{escaped(owner_label)}" data-decision-domain-label="{escaped(domain_label)}" data-decision-component-label="{escaped(component_label)}" data-decision-roadmap-label="{escaped(roadmap_label)}">
+    return f'''<li class="ri-decision" id="{escaped(anchor)}" data-entity-id="{escaped(identifier)}" data-filter-item data-decision-record data-source-repository="{escaped(decision_entity.get("repository"))}" data-state="{escaped(status)}" data-states="{escaped(" ".join(states))}" data-kind="architecture_decision" data-kinds="{escaped(" ".join(kinds))}" data-search="{escaped(search)}" {facet_attributes} data-decision-id="{escaped(identifier)}" data-decision-title="{escaped(decision_entity.get("title"))}" data-decision-status="{escaped(state_label(status))}" data-decision-implementation="{escaped(state_label(metadata["implementation"]))}" data-decision-scope="{escaped(state_label(metadata["scope"]))}" data-decision-date-label="{escaped(date_label)}" data-decision-owner-label="{escaped(owner_label)}" data-decision-domain-label="{escaped(domain_label)}" data-decision-component-label="{escaped(component_label)}" data-decision-roadmap-label="{escaped(roadmap_label)}">
       <div class="ri-decision__node" aria-hidden="true"><span>{index + 1:02d}</span></div>
       <article class="ri-decision__card" tabindex="-1">
         <header><div><a class="ri-decision__permalink" data-decision-link href="#{escaped(anchor)}">Decision {index + 1} of {total} · {escaped(decision_entity.get("key"))}</a><h3>{escaped(decision_entity.get("title"))}</h3><p>{escaped(origin)}</p></div>{status_pill(status)}</header>
@@ -1906,13 +1941,13 @@ def render_journey_context_links(
         anchor = roadmap_anchors.get(str(reference.get("id") or ""))
         if anchor:
             links.append(
-                f'<a class="ri-journey-context" data-context-kind="roadmap" href="../roadmap/#{escaped(anchor)}"><span>Quest</span>{escaped(reference.get("key") or reference.get("title"))}</a>'
+                f'<a class="ri-journey-context" data-context-kind="roadmap" data-preserve-context href="../roadmap/#{escaped(anchor)}"><span>Quest</span>{escaped(reference.get("key") or reference.get("title"))}</a>'
             )
     for reference in require_object(context.get("decisions")).values():
         anchor = decision_anchors.get(str(reference.get("id") or ""))
         if anchor:
             links.append(
-                f'<a class="ri-journey-context" data-context-kind="decision" href="../decisions/#{escaped(anchor)}"><span>ADR</span>{escaped(reference.get("key") or reference.get("title"))}</a>'
+                f'<a class="ri-journey-context" data-context-kind="decision" data-preserve-context href="../decisions/#{escaped(anchor)}"><span>ADR</span>{escaped(reference.get("key") or reference.get("title"))}</a>'
             )
     if links:
         return f'<div class="ri-journey-contexts" aria-label="Explicitly linked intent">{"".join(links)}</div>'
@@ -2021,7 +2056,7 @@ def render_journey_event(
         if actor_url
         else escaped(actor_id)
     )
-    return f'''<li class="ri-journey-event" id="{escaped(anchor)}" data-filter-item data-journey-event data-journey-event-id="{escaped(identifier)}" data-journey-event-title="{escaped(title)}" data-journey-occurred-at="{escaped(occurred_at)}" data-lane="{escaped(lane)}" data-state="{escaped(state)}" data-kind="{escaped(kind)}" data-filter-chapter="{escaped(filter_token(chapter.get("id")))}" data-filter-release="{escaped(release_token)}" data-filter-roadmap="{escaped(roadmap_tokens)}" data-filter-decision="{escaped(decision_tokens)}" data-filter-actor="{escaped(actor_token)}" data-filter-assertion="{escaped(assertion)}" data-filter-freshness="{escaped(freshness)}" data-search="{escaped(search + " " + changes_text)}" data-context-status="{("linked" if roadmap or decisions else "unclassified")}" aria-posinset="{index + 1}" aria-setsize="{total}">
+    return f'''<li class="ri-journey-event" id="{escaped(anchor)}" data-entity-id="{escaped(identifier)}" data-filter-item data-journey-event data-journey-event-id="{escaped(identifier)}" data-journey-event-title="{escaped(title)}" data-journey-occurred-at="{escaped(occurred_at)}" data-lane="{escaped(lane)}" data-state="{escaped(state)}" data-kind="{escaped(kind)}" data-filter-chapter="{escaped(filter_token(chapter.get("id")))}" data-filter-release="{escaped(release_token)}" data-filter-roadmap="{escaped(roadmap_tokens)}" data-filter-decision="{escaped(decision_tokens)}" data-filter-actor="{escaped(actor_token)}" data-filter-assertion="{escaped(assertion)}" data-filter-freshness="{escaped(freshness)}" data-search="{escaped(search + " " + changes_text)}" data-context-status="{("linked" if roadmap or decisions else "unclassified")}" aria-posinset="{index + 1}" aria-setsize="{total}">
       <div class="ri-journey-event__lane"><span>{escaped(lane_label)}</span><i aria-hidden="true">{escaped(node_symbol)}</i></div>
       <article class="ri-journey-event__card"><header><div><span class="ri-eyebrow">{escaped(journey_event_label(event))}</span><h3>{f"<a href=\"{escaped(canonical_url)}\">{escaped(title)}</a>" if canonical_url else escaped(title)}</h3><p><time datetime="{escaped(occurred_at)}">{escaped(format_date(occurred_at))}</time> · {status_pill(state)} · {escaped(subject.get("key"))}</p></div><a class="ri-journey-permalink" data-journey-link href="#{escaped(anchor)}" aria-label="Link to {escaped(title)}">#{index + 1:03d}</a></header>
       {render_journey_context_links(context, roadmap_anchors, decision_anchors)}
@@ -2187,13 +2222,18 @@ def build_status(summary: dict[str, Any]) -> tuple[str, str]:
 
 
 def navigation(current: str, prefix: str) -> str:
-    links = []
+    overview_current = ' aria-current="page"' if current == "intelligence" else ""
+    links = [
+        f'<a href="{escaped(prefix or "./")}"{overview_current}>Overview</a>'
+    ]
     for route, label in ROUTES:
         current_attribute = ' aria-current="page"' if current == route else ""
         links.append(
             f'<a href="{escaped(prefix + route + "/")}"{current_attribute}>{escaped(label)}</a>'
         )
-    links.append(f'<a href="{escaped(prefix + "dashboard/")}">Dashboard</a>')
+    links.append(
+        f'<a href="{escaped(prefix + "dashboard/")}">Dashboard</a>'
+    )
     return "".join(links)
 
 
@@ -2215,10 +2255,8 @@ def shell_document(
     commit_url = f"{repository_url}/commit/{source_commit}"
     snapshot_label = "Observatory snapshot loaded" if snapshot_available else "Snapshot unavailable"
     route_descriptions = {
-        "now": "See what changed, what needs attention, and the next grounded moves without flattening uncertainty.",
-        "roadmap": "Traverse canonical intent as a quest line, then open the evidence that makes each step true.",
-        "decisions": "Trace why the architecture changed, what each ADR authorized, and how its evidence and successors remain connected.",
-        "journey": "Move through release-bounded chapters that connect intent, work, code, proof, and delivery without inventing missing history.",
+        "intelligence": "Orient in one commit-matched Repository Intelligence projection, then move into the focused evidence view that answers the next question.",
+        **ROUTE_QUESTIONS,
     }
     route_description = route_descriptions.get(
         route,
@@ -2234,7 +2272,7 @@ def shell_document(
     <link rel="stylesheet" href="{escaped(prefix)}site.css">
   </head>
   <body data-ri-route="{escaped(route)}" data-ri-repository="{escaped(repository)}" data-ri-commit="{escaped(source_commit)}">
-    <a class="ri-skip" href="#main-content">Skip to current repository state</a>
+    <a class="ri-skip" href="#main-content">Skip to view content</a>
     <header class="ri-global-header">
       <a class="ri-brand" href="{escaped(prefix)}"><span aria-hidden="true">EH</span><strong>Repository Intelligence</strong></a>
       <nav aria-label="Global navigation"><a href="https://github.com/egohygiene">Ego Hygiene</a><a href="{escaped(repository_url)}">Repository source</a></nav>
@@ -2242,7 +2280,7 @@ def shell_document(
     <div class="ri-layout">
       <aside class="ri-sidebar" aria-label="Repository Intelligence navigation">
         <div class="ri-repository"><span class="ri-eyebrow">Repository</span><strong>{escaped(repository)}</strong><span>{status_pill(freshness)}</span></div>
-        <nav class="ri-route-nav">{navigation(route, prefix)}</nav>
+        <nav class="ri-route-nav" data-preserve-context-links>{navigation(route, prefix)}</nav>
         <div class="ri-local-resume" data-local-resume>
           <span class="ri-eyebrow">This device</span>
           <p>Resume data stays in this browser. It never becomes canonical repository evidence.</p>
@@ -2277,6 +2315,26 @@ def shell_document(
   </body>
 </html>
 '''
+
+
+def overview_body() -> str:
+    """Render the product entry point without duplicating the operational Now view."""
+
+    cards = []
+    for index, (route, label) in enumerate(ROUTES, start=1):
+        question = ROUTE_QUESTIONS[route]
+        cards.append(
+            f'''<article class="ri-panel" data-filter-item data-state="ready" data-kind="{escaped(ROUTE_KINDS[route])}" data-search="{escaped(f"{label} {question}".casefold())}">
+              <div class="ri-panel-heading"><span class="ri-panel-icon" aria-hidden="true">{index:02d}</span><div><span class="ri-eyebrow">Evidence view</span><h3>{escaped(label)}</h3></div></div>
+              <p>{escaped(question)}</p>
+              <a class="ri-button ri-button--quiet" data-preserve-context href="./{escaped(route)}/">Open {escaped(label)}</a>
+            </article>'''
+        )
+    return f'''<section class="ri-section ri-section--lead" aria-labelledby="intelligence-heading">
+      <div class="ri-section-heading"><div><span class="ri-eyebrow">Repository orientation</span><h2 id="intelligence-heading">Choose the evidence question</h2></div><p>Each route answers one bounded question from the same represented commit. Unknown and unavailable evidence stays explicit inside the selected view.</p></div>
+      <div class="ri-now-grid ri-overview-grid">{"".join(cards)}</div>
+    </section>
+    <section class="ri-section" aria-labelledby="dashboard-heading"><div class="ri-panel ri-panel--wide"><div class="ri-panel-heading"><span class="ri-panel-icon" aria-hidden="true">↗</span><div><span class="ri-eyebrow">Build evidence</span><h2 id="dashboard-heading">Inspect the analytics dashboard</h2></div></div><p>Review source-tree, activity, dependency, and generator evidence without confusing the compatibility dashboard with a canonical repository view.</p><a class="ri-button ri-button--quiet" data-preserve-context href="./dashboard/">Open Dashboard</a></div></section>'''
 
 
 def now_body(snapshot: dict[str, Any] | None) -> str:
@@ -2340,7 +2398,6 @@ def write_site(
     freshness = normalize_state(
         require_object(snapshot.get("coverage")).get("status") if snapshot else "unknown"
     )
-    current = now_body(snapshot)
     shared = {
         "repository": repository,
         "source_commit": source_commit,
@@ -2351,11 +2408,23 @@ def write_site(
     }
     atomic_write(
         output_root / "index.html",
-        shell_document(route="now", route_label="Now", body=current, prefix="", **shared),
+        shell_document(
+            route="intelligence",
+            route_label="Intelligence",
+            body=overview_body(),
+            prefix="",
+            **shared,
+        ),
     )
     atomic_write(
         output_root / "now/index.html",
-        shell_document(route="now", route_label="Now", body=current, prefix="../", **shared),
+        shell_document(
+            route="now",
+            route_label="Now",
+            body=now_body(snapshot),
+            prefix="../",
+            **shared,
+        ),
     )
     for route, label in ROUTES[1:]:
         body = (

@@ -212,7 +212,13 @@ def current_entity_index(snapshot: dict[str, Any]) -> dict[str, dict[str, Any]]:
     """Index current compact entity refs only from the accepted Search view."""
 
     views = site.require_object(snapshot.get("views"))
+    if "search" not in views:
+        return {}
     search = site.require_object(views.get("search"))
+    if not search:
+        raise CompareViewError(
+            "snapshot views.search must be an object when projected"
+        )
     records = search.get("records")
     if not isinstance(records, list):
         raise CompareViewError(
@@ -319,8 +325,10 @@ def validate_comparison(
         raise CompareViewError(
             "comparison after.snapshot_id must match the supplied Observatory snapshot"
         )
+    search_projected = "search" in site.require_object(snapshot.get("views"))
     entity_index = current_entity_index(snapshot)
-    validate_entity_delta_against_snapshot(entities, entity_index)
+    if search_projected:
+        validate_entity_delta_against_snapshot(entities, entity_index)
     return comparison, entity_index
 
 
@@ -361,7 +369,7 @@ def render_identifier_record(
     state = site.normalize_state(current.get("state")) if current else "unknown"
     kind = site.normalize_state(current.get("kind")) if current else "unknown"
     heading = f"<h4>{site.escaped(title)}</h4>" if title else ""
-    return f'''<li><article class="ri-record" data-filter-item data-state="{site.escaped(state)}" data-kind="{site.escaped(kind)}" data-search="{site.escaped(identifier.lower())}"><div class="ri-record__top"><span class="ri-eyebrow">{site.escaped(category)} {site.escaped(collection[:-1].lower())}</span><span>{site.status_pill(category.lower(), category)}</span></div>{heading}<p><code>{site.escaped(identifier)}</code></p>{current_source_link(identifier, entity_index) if current else ""}</article></li>'''
+    return f'''<li><article class="ri-record" data-entity-id="{site.escaped(identifier)}" data-filter-item data-state="{site.escaped(state)}" data-kind="{site.escaped(kind)}" data-search="{site.escaped(identifier.lower())}"><div class="ri-record__top"><span class="ri-eyebrow">{site.escaped(category)} {site.escaped(collection[:-1].lower())}</span><span>{site.status_pill(category.lower(), category)}</span></div>{heading}<p><code>{site.escaped(identifier)}</code></p>{current_source_link(identifier, entity_index) if current else ""}</article></li>'''
 
 
 def render_changed_record(
@@ -380,7 +388,7 @@ def render_changed_record(
     kind = site.normalize_state(current.get("kind")) if current else "unknown"
     heading = f"<h4>{site.escaped(title)}</h4>" if title else ""
     field_items = "".join(f"<li><code>{site.escaped(field)}</code></li>" for field in fields)
-    return f'''<li><article class="ri-record" data-filter-item data-state="{site.escaped(state)}" data-kind="{site.escaped(kind)}" data-search="{site.escaped(comparison_record_search_text(identifier, fields))}"><div class="ri-record__top"><span class="ri-eyebrow">Changed {site.escaped(collection[:-1].lower())}</span><span>{site.status_pill("changed", "Changed")}</span></div>{heading}<p><code>{site.escaped(identifier)}</code></p><details class="ri-evidence" open><summary><span><strong>Changed field paths</strong><small>{len(fields)} projected</small></span><span aria-hidden="true">+</span></summary><ul class="ri-source-list">{field_items}</ul></details>{current_source_link(identifier, entity_index) if current else ""}</article></li>'''
+    return f'''<li><article class="ri-record" data-entity-id="{site.escaped(identifier)}" data-filter-item data-state="{site.escaped(state)}" data-kind="{site.escaped(kind)}" data-search="{site.escaped(comparison_record_search_text(identifier, fields))}"><div class="ri-record__top"><span class="ri-eyebrow">Changed {site.escaped(collection[:-1].lower())}</span><span>{site.status_pill("changed", "Changed")}</span></div>{heading}<p><code>{site.escaped(identifier)}</code></p><details class="ri-evidence" open><summary><span><strong>Changed field paths</strong><small>{len(fields)} projected</small></span><span aria-hidden="true">+</span></summary><ul class="ri-source-list">{field_items}</ul></details>{current_source_link(identifier, entity_index) if current else ""}</article></li>'''
 
 
 def render_delta_group(

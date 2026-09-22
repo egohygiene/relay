@@ -11,8 +11,15 @@
     if (!repository || !route || !commit) return;
 
     const knownRoutes = new Set([
-        "now", "roadmap", "decisions", "journey", "dependencies", "health",
+        "intelligence", "now", "roadmap", "decisions", "journey", "dependencies", "health",
         "releases", "work", "search", "compare",
+    ]);
+    const transferableContext = new Set([
+        "q", "state", "kind", "from", "to", "entity",
+        "compare-left", "compare-right", "journey-left", "journey-right",
+        "relationship", "assertion", "freshness", "scope", "check-state", "readiness",
+        "implementation", "owner", "date", "domain", "component", "roadmap", "chapter",
+        "release", "decision", "actor",
     ]);
     const storageKey = `egohygiene.repository-intelligence.resume.v1:${repository}`;
     const query = document.querySelector("[data-filter-query]");
@@ -61,7 +68,9 @@
 
     const resumeHref = (value) => {
         const root = new URL(document.querySelector(".ri-brand").href);
-        const target = new URL(`${value.route}/`, root);
+        const target = value.route === "intelligence"
+            ? new URL("./", root)
+            : new URL(`${value.route}/`, root);
         if (value.q) target.searchParams.set("q", value.q);
         if (value.state && value.state !== "all") target.searchParams.set("state", value.state);
         if (value.kind && value.kind !== "all") target.searchParams.set("kind", value.kind);
@@ -111,6 +120,82 @@
         if (value && value !== fallback) url.searchParams.set(name, value);
         else url.searchParams.delete(name);
     };
+
+    const contextLinks = [
+        ...document.querySelectorAll("[data-preserve-context-links] a, [data-preserve-context]"),
+    ];
+    const contextTargets = new WeakMap(
+        contextLinks.map((link) => [link, link.getAttribute("href")]),
+    );
+    let selectedEntity = params.get("entity") || "";
+    let selectedEntityNode = null;
+    const entityNodes = [...document.querySelectorAll("[data-entity-id]")];
+    const entityFromHash = () => {
+        const selected = document.getElementById(location.hash.slice(1));
+        return selected?.closest("[data-entity-id]")?.dataset.entityId || "";
+    };
+    const preserveContext = (link) => {
+        const original = contextTargets.get(link);
+        if (!original) return;
+        const target = new URL(original, location.href);
+        const current = new URL(location.href);
+        if (target.origin !== current.origin) {
+            link.href = target.href;
+            return;
+        }
+        for (const [name, value] of current.searchParams) {
+            if (transferableContext.has(name) && !target.searchParams.has(name)) {
+                target.searchParams.append(name, value);
+            }
+        }
+        const entity = entityFromHash() || selectedEntity;
+        if (entity && !target.searchParams.has("entity")) {
+            target.searchParams.set("entity", entity);
+        }
+        link.href = target.href;
+    };
+    const refreshContextLinks = () => {
+        for (const link of contextLinks) preserveContext(link);
+    };
+    const selectContextEntity = (node, { updateUrl = true, reveal = false } = {}) => {
+        const identifier = node?.dataset.entityId;
+        if (!identifier) return;
+        selectedEntity = identifier;
+        body.dataset.contextEntity = identifier;
+        selectedEntityNode?.removeAttribute("data-context-selected");
+        node.setAttribute("data-context-selected", "");
+        selectedEntityNode = node;
+        if (updateUrl) {
+            const next = new URL(location.href);
+            next.searchParams.set("entity", identifier);
+            history.replaceState(null, "", `${next.pathname}${next.search}${next.hash}`);
+        }
+        refreshContextLinks();
+        if (reveal) {
+            let disclosure = node.closest("details");
+            while (disclosure) {
+                disclosure.open = true;
+                disclosure = disclosure.parentElement?.closest("details") || null;
+            }
+            requestAnimationFrame(() => node.scrollIntoView({ block: "center" }));
+        }
+    };
+    for (const link of contextLinks) {
+        preserveContext(link);
+        link.addEventListener("focus", () => preserveContext(link));
+        link.addEventListener("pointerdown", () => preserveContext(link));
+        link.addEventListener("click", () => preserveContext(link));
+    }
+    const selectEventEntity = (event) => {
+        const node = event.target.closest?.("[data-entity-id]");
+        if (node) selectContextEntity(node);
+    };
+    document.addEventListener("focusin", selectEventEntity);
+    document.addEventListener("pointerdown", selectEventEntity);
+    if (selectedEntity) {
+        const requested = entityNodes.find((node) => node.dataset.entityId === selectedEntity);
+        if (requested) selectContextEntity(requested, { updateUrl: false, reveal: !location.hash });
+    }
 
     const evidenceWindows = [];
 
@@ -367,6 +452,8 @@
     const applyHashSelection = () => {
         const identifier = location.hash.slice(1);
         const selected = document.getElementById(identifier);
+        const contextEntity = selected?.closest("[data-entity-id]");
+        if (contextEntity) selectContextEntity(contextEntity);
         if (selected?.matches("[data-roadmap-quest]")) {
             markSelectedQuest(identifier);
             const evidence = selected.querySelector("[data-quest-evidence]");

@@ -4,6 +4,42 @@
 (() => {
     "use strict";
 
+    const transferableContext = new Set([
+        "q", "state", "kind", "from", "to", "entity",
+        "compare-left", "compare-right", "journey-left", "journey-right",
+        "relationship", "assertion", "freshness", "scope", "check-state", "readiness",
+        "implementation", "owner", "date", "domain", "component", "roadmap", "chapter",
+        "release", "decision", "actor",
+    ]);
+    const contextLinks = [
+        ...document.querySelectorAll("[data-preserve-context-links] a, [data-preserve-context]"),
+    ];
+    const contextTargets = new WeakMap(
+        contextLinks.map((link) => [link, link.getAttribute("href")]),
+    );
+    const preserveContext = (link) => {
+        const original = contextTargets.get(link);
+        if (!original) return;
+        const target = new URL(original, location.href);
+        const current = new URL(location.href);
+        if (target.origin !== current.origin) {
+            link.href = target.href;
+            return;
+        }
+        for (const [name, value] of current.searchParams) {
+            if (transferableContext.has(name) && !target.searchParams.has(name)) {
+                target.searchParams.append(name, value);
+            }
+        }
+        link.href = target.href;
+    };
+    for (const link of contextLinks) {
+        preserveContext(link);
+        link.addEventListener("focus", () => preserveContext(link));
+        link.addEventListener("pointerdown", () => preserveContext(link));
+        link.addEventListener("click", () => preserveContext(link));
+    }
+
     const explorer = document.querySelector("[data-repository-explorer]");
     if (!explorer) {
         return;

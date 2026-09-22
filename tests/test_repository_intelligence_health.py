@@ -77,6 +77,37 @@ class RepositoryIntelligenceHealthTests(unittest.TestCase):
         self.assertNotIn("A+", rendered)
         self.assertIn("not complete Hygiene conformance", rendered)
 
+    def test_full_parent_state_vocabulary_is_preserved_without_rollup(self) -> None:
+        snapshot = self.populated()
+        states = (
+            "conformant",
+            "non_conformant",
+            "partial",
+            "drifted",
+            "stale",
+            "unknown",
+            "blocked",
+            "not_applicable",
+        )
+        template = snapshot["views"]["health"]["checks"][0]
+        checks = []
+        for index, state in enumerate(states):
+            check = copy.deepcopy(template)
+            check["id"] = f"ri:example/repository:check:state-{index}"
+            check["key"] = f"state-{index}"
+            check["title"] = f"{health.site.state_label(state)} evidence"
+            check["state"] = state
+            checks.append(check)
+        snapshot["views"]["health"]["checks"] = checks
+        snapshot["views"]["health"]["check_states"] = {
+            state: 1 for state in states
+        }
+        rendered = health.health_body(snapshot)
+        for state in states:
+            with self.subTest(state=state):
+                self.assertIn(health.site.state_label(state), rendered)
+        self.assertIn("No roll-up score", rendered)
+
     def test_shell_is_static_first_and_exposes_accessible_filter_hooks(self) -> None:
         rendered = health.render_page(
             snapshot=self.populated(),

@@ -2,6 +2,14 @@
 
 Repository Intelligence has one generation contract and two consumer integration shapes. Both preserve the same authority boundary: Relay builds and validates the `/intelligence/` subtree, while the consumer repository remains the only owner of its site composition and deployment.
 
+Relay pins Hygiene's `egohygiene.public-site-surface-registry/v1` repository
+profile for the subtree layout. The overview is `/intelligence/`; focused views
+such as Now, Dependencies, Health, Releases, Work, Search, and Compare are
+canonical at `/intelligence/<view>/`. Friendly top-level forms are redirect-only
+aliases. The consumer owns those redirects, the public origin, canonical-link
+metadata, and live-route verification; the generated artifact does not publish
+duplicate alias pages or claim deployment evidence.
+
 ## Choose the integration shape
 
 ### Existing site or Pages build: use the composite action

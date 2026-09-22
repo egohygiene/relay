@@ -314,7 +314,7 @@ releases, and deployments across meaningful epochs.
 id: REL-RI-006
 status: active
 depends_on: [REL-RI-005]
-issues: [29, 33, 77, 79, 81, 83, 86, 88, 90]
+issues: [29, 33, 77, 79, 81, 83, 86, 88, 90, 102]
 -->
 #### REL-RI-006 — Complete supporting views and the intelligence dashboard
 
@@ -326,7 +326,8 @@ organization dashboard form one consistent evidence-navigation system.
 
 **Exit criteria:**
 
-- [ ] Every supporting view preserves the shared shell and evidence vocabulary.
+- [x] Every supporting view preserves the shared shell and evidence vocabulary.
+- [ ] Search identifies the matched normalized field from accepted Observatory evidence.
 - [ ] Consumer publication refreshes deterministically through one pinned workflow.
 
 **Current evidence:**
@@ -334,9 +335,17 @@ organization dashboard form one consistent evidence-navigation system.
 - Dependencies (#77/#78), Work (#79/#80), Releases (#81/#82), Search (#83/#85),
   Compare (#86/#87), and core Health (#88/#89) are merged as bounded supporting
   views over accepted Observatory evidence.
-- Issue #90 is the current #33 child checkpoint to restore reusable-workflow
-  parity with the complete snapshot/comparison evidence boundary and lock that
-  parity with executable tests.
+- The #29 reconciliation pins Hygiene's repository route profile, separates the
+  `/intelligence/` overview from `/intelligence/now/`, preserves cross-view URL
+  context, exposes every route as an action output, and proves partial adoption
+  plus aggregate supporting-view orchestration.
+- Field-attributed Search matches remain an ordered contract follow-up in
+  Observatory #24 and Relay #102; Relay will not infer them from opaque
+  `search_text`. Observatory #5 still owns full conformance evidence; Relay #75
+  renders that accepted evidence as the separate `/hygiene/` contract matrix.
+- Workflow parity #90/#91 is merged. Issue #33 still tracks representative
+  consumer migration and verification of consumer-owned redirect-only aliases,
+  canonical deployment evidence, and public routes.
 - Empathy and Akashic already compose immutable-pinned Repository Intelligence
   action output into consumer-owned Pages pipelines; representative migrations
   to one current hardened workflow revision and public-route verification remain

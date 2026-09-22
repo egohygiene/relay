@@ -335,6 +335,19 @@ class RepositoryIntelligenceCompareTests(unittest.TestCase):
                 snapshot=snapshot,
             )
 
+    def test_comparison_remains_available_before_search_projection_adoption(self) -> None:
+        snapshot, comparison = self.populated()
+        del snapshot["views"]["search"]
+        rendered = compare.comparison_body(
+            comparison,
+            snapshot=snapshot,
+            repository="example/repository",
+            source_commit=SOURCE_COMMIT,
+        )
+        self.assertIn("What structurally changed?", rendered)
+        self.assertIn("ri:example/repository:pull-request:45", rendered)
+        self.assertNotIn("Open current canonical source", rendered)
+
     def test_shell_is_static_first_and_preserves_compare_route(self) -> None:
         snapshot, comparison = self.populated()
         rendered = compare.render_page(

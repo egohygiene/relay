@@ -168,11 +168,11 @@ def render_work_record(
     if local_roadmap and kind == "roadmap_step":
         anchor = site.stable_fragment("quest", entity.get("id"))
         roadmap_link = (
-            f'<a class="ri-button ri-button--quiet" href="../roadmap/#{site.escaped(anchor)}">'
+            f'<a class="ri-button ri-button--quiet" data-preserve-context href="../roadmap/#{site.escaped(anchor)}">'
             'View in roadmap</a>'
         )
     readiness_pill = site.status_pill(readiness, f"Readiness: {site.state_label(readiness)}") if readiness else ""
-    return f'''<article class="ri-record" data-filter-item{source_attributes} data-state="{site.escaped(state)}" data-kind="{site.escaped(kind)}"{readiness_attribute} data-search="{site.escaped(search)}">
+    return f'''<article class="ri-record" data-entity-id="{site.escaped(entity.get("id"))}" data-filter-item{source_attributes} data-state="{site.escaped(state)}" data-kind="{site.escaped(kind)}"{readiness_attribute} data-search="{site.escaped(search)}">
       <div class="ri-record__top"><span class="ri-eyebrow">{site.escaped(eyebrow)}</span><span>{site.status_pill(state)} {readiness_pill}</span></div>
       <h3>{site.escaped(title)}</h3>
       <p>{site.escaped(site.state_label(kind))} · {site.escaped(entity.get("key") or "No identifier")}</p>

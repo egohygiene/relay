@@ -1,5 +1,29 @@
 {
   "schema": "egohygiene.relay.sibling-contract-lock/v1",
+  "hygiene": {
+    "owner": "egohygiene/hygiene",
+    "source_commit": "63d313b1ddf8669808e897853b74928505494da0",
+    "contract": "egohygiene.public-site-surface-registry/v1",
+    "contract_version": "1.0.0-alpha.1",
+    "route_profile": "repository",
+    "registry_path": "catalog/public-site-surface-registry.json",
+    "registry_sha256": "95c9db34dc0b66bb090bd92f89ce16cb7f850a0bbf9a47bd3d64f7ac3d0ad7f3",
+    "canonical_routes": {
+      "intelligence": "/intelligence/",
+      "now": "/intelligence/now/",
+      "roadmap": "/intelligence/roadmap/",
+      "decisions": "/intelligence/decisions/",
+      "journey": "/intelligence/journey/",
+      "dependencies": "/intelligence/dependencies/",
+      "health": "/intelligence/health/",
+      "releases": "/intelligence/releases/",
+      "work": "/intelligence/work/",
+      "search": "/intelligence/search/",
+      "compare": "/intelligence/compare/",
+      "dashboard": "/intelligence/dashboard/"
+    },
+    "boundary": "Hygiene owns route identity and alias policy; Relay renders the repository-profile intelligence subtree while consumers own canonical origins, redirects, composition, and deployment."
+  },
   "observatory": {
     "owner": "egohygiene/observatory",
     "source_commit": "3cb3555f56b9b110e98e295c1201e8d9af641297",

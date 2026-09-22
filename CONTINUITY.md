@@ -7,22 +7,22 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-20T15:28:20Z"
+  updated_at: "2026-09-22T03:49:53Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: "Preserve checkpoint 1 of Relay issue #5 and ordered plan #99."
+  purpose: "Reconcile Relay issue #29 against its six merged supporting views and publish the bounded integration checkpoint for review."
   includes:
-    - "The immutable Hygiene, EgoLint, and Holon architecture-validation source profile."
-    - "Closed request/result schemas, bounded publish-safe fixtures, and offline contract validation."
-    - "The authority, privacy, rollout, failure, and future local/CI parity boundaries."
+    - "Repository Intelligence route, shell, action-output, partial-adoption, documentation, and test reconciliation."
+    - "The exact Hygiene repository route-profile pin and the upstream Search attribution handoff."
+    - "Review-only pull-request publication; merge authority remains with the user."
   excludes:
-    - "The offline adapter, diagram evidence implementation, reusable workflow, or consumer dogfood."
-    - "Release publication or movement of the v1 alias."
-    - "Changes to sibling or consumer repositories."
-    - "Consumer code execution or repository/provider mutation."
+    - "Observatory field-attribution implementation or Relay issue #102 implementation."
+    - "Observatory #5 conformance evidence or Relay #75 rendering of the full Hygiene matrix."
+    - "Consumer deployment, redirect creation, canonical-origin metadata, release publication, or movement of v1."
+    - "Unrelated Relay roadmap work."
   precedence:
     - user-and-runtime-instructions
     - scoped-repository-instructions
@@ -31,141 +31,174 @@ scope:
     - continuity-checkpoint
   canonical_sources:
     - AGENTS.md
+    - AI_CONSTITUTION.md
     - ARCHITECTURE.md
     - SYSTEM.md
     - DECISIONS.md
     - ROADMAP.md
     - README.md
-    - catalog/repository-architecture-validation.json
-    - schemas/repository-architecture-validation-profile.v1.schema.json
-    - schemas/repository-architecture-validation-request.v1.schema.json
-    - schemas/repository-architecture-validation-result.v1.schema.json
-    - scripts/validate_repository_architecture_contract.py
-    - tests/fixtures/repository-architecture-validation/cases.v1.json
-    - tests/test_repository_architecture_contract.py
-    - docs/repository-architecture-validation.md
+    - actions/repository-intelligence/action.yml
+    - actions/repository-intelligence/README.md
+    - actions/repository-intelligence/contracts/repository-intelligence-siblings.v1.lock.json
+    - docs/repository-intelligence-publication.md
 work:
-  objective: "Complete #99 checkpoint 1 by freezing the upstream profile and normalized evidence seam for parent #5."
+  objective: "Complete #29's currently unblocked Relay integration gaps, retain the upstream Search gap explicitly, and present one exact validated PR."
   success_conditions:
-    - Hygiene policy, EgoLint semantics, and Holon materialization inputs are pinned by full revision and SHA-256.
-    - Relay remains orchestration/evidence authority and does not copy sibling semantics or author consumer state.
-    - Local and future CI adapters share one closed, versioned request/result contract.
-    - Advisory is the default and maximum mode while required upstream releases and implementation gates are incomplete.
-    - Missing, partial, legacy, truncated, or unavailable evidence cannot silently become conformance.
-    - Paths, findings, annotations, scans, bytes, results, and retained evidence are bounded.
-    - Public, private, internal, present, legacy, unknown, nonconformant, and unavailable fixtures are covered.
+    - "All six supporting views retain distinct evidence questions, one shared shell, and deterministic rendering."
+    - "Cross-view navigation preserves applicable filters, time ranges, comparison selectors, and stable selected-entity context."
+    - "Optional Health, Work, and Search adoption cannot invalidate otherwise compatible evidence."
+    - "The public action outputs, docs, catalog, roadmap, dashboard navigation, and bundle validator agree."
+    - "Hygiene's repository canonical routes are pinned and tested without transferring publication authority to Relay."
+    - "Field-attributed Search work remains visible in Observatory #24 and Relay #102 instead of being inferred locally."
   active_issue:
     provider: github
-    id: egohygiene/relay#5
-    url: https://github.com/egohygiene/relay/issues/5
-  execution_plan:
-    provider: github
-    id: egohygiene/relay#99
-    url: https://github.com/egohygiene/relay/issues/99
-    checkpoint: 1
-    checkpoint_name: freeze-upstream-profile-and-evidence-contracts
+    id: egohygiene/relay#29
+    url: https://github.com/egohygiene/relay/issues/29
   next:
-    kind: pull-request-review
-    summary: "Verify PR #100 exact-head CI and review state, then return merge authority to the user."
+    kind: issue
+    id: egohygiene/relay#33
+    description: "After this #29 checkpoint merges, advance deterministic consumer publication and verification in #33 while #29 remains blocked on #24 and #102."
+    readiness: ready
+    references:
+      - https://github.com/egohygiene/relay/issues/33
+      - https://github.com/egohygiene/relay/issues/102
+      - https://github.com/egohygiene/observatory/issues/24
+      - https://github.com/egohygiene/.github/issues/30
+    depends_on: []
 state:
-  branch: feat/5-architecture-validation
-  base_branch: main
-  base_revision: b8c9cfbae7f74b8c7c6daf735a38a59ac72096d9
-  base_tree: f4116c15ff34d9bd6af10287f1acb5141796ffac
-  implementation_revision: f40cc332f92b1b4ee9d77fc3a5901add4a21b963
-  implementation_tree: b6a14b92065f9a6b8654688f2c55ed752b55c7b8
-  active_pull_requests:
-    - egohygiene/relay#100
-  issue_state: open
-  plan_issue_state: open
-  notes: "PR #100 is the sole open Relay pull request and contains the exact reviewed implementation tree. PR #98 had merged cleanly and #6 was closed before this checkpoint began."
-upstream_evidence:
-  hygiene:
-    revision: c589587395750cd1c79c6fa0bef010189c547249
-    role: organization-policy
-    release_included: false
-  egolint:
-    revision: 8b99ec4377eb84044fac411dff6b8074317ec094
-    role: validation-semantics
-    release_included: false
-  holon:
-    revision: 660b941f99618806fcadd589bcdae61c519f96e4
-    role: materialization
-    release_included: false
+  base:
+    revision: 4fa92e187a6a980fea202c8309749a204a1ccae5
+    ref: refs/heads/main
+    verified_at: "2026-09-22T03:19:13Z"
+  candidate:
+    branch: codex/relay-29-supporting-view-integration
+    revision: 8106a14567c1c626a28155339d77b4e05ff5e0fc
+    pull_request: null
+    handoff_state: ready-for-review
+  live:
+    status: verified
+    observed_at: "2026-09-22T03:19:13Z"
+    default_branch_revision: 4fa92e187a6a980fea202c8309749a204a1ccae5
+    issue_state: open
+    pull_request_state: not-applicable
+    notes: "Main matched the local base; #29 and #33 were open; #77, #79, #81, #83, #86, #88, and #90 were closed; no Relay PR was open before this branch."
+  parallel_changes: []
 review:
-  status: published-exact-head-validation-pending
-  reviewed_at: "2026-09-20T15:28:20Z"
+  status: passed
+  reviewed_at: "2026-09-22T03:46:06Z"
   reviewed_by: ChatGPT
   evidence:
-    - command: "Verify current main, issues #5/#99, open pull requests, dependencies, repository guidance, architecture, decisions, roadmap, catalogs, and current CI."
+    - command: "Inspect live Relay issues #27, #29, #33, #75, #77, #79, #81, #83, #86, #88, #90, and #101 plus open pull requests and exact main."
       outcome: passed
-      notes: "Main is b8c9cfbae7f74b8c7c6daf735a38a59ac72096d9; #5 and #99 are open; no duplicate Relay pull request existed; prerequisite Hygiene, EgoLint, and Holon work is complete."
-    - command: "Inspect exact current Hygiene, EgoLint, and Holon source artifacts and compute SHA-256 digests."
+      observed_at: "2026-09-22T03:19:13Z"
+      notes: "The six route children and workflow-parity child are merged; #29 still required acceptance reconciliation."
+    - command: "Fetch Hygiene main and verify catalog/public-site-surface-registry.json."
       outcome: passed
-      notes: "The profile records exact commits and every reviewed policy, schema, rule, lock, blueprint, and template byte."
-    - command: "python3 scripts/validate_repository_architecture_contract.py validate"
+      observed_at: "2026-09-22T03:19:13Z"
+      notes: "Verified merge revision 63d313b1ddf8669808e897853b74928505494da0 and SHA-256 95c9db34dc0b66bb090bd92f89ce16cb7f850a0bbf9a47bd3d64f7ac3d0ad7f3."
+    - command: "python3 -m unittest focused Repository Intelligence site, six views, bundle, and workflow modules -v"
       outcome: passed
-      notes: "The profile, schemas, fixture references, ownership, bounds, rollout, and privacy contracts passed."
-    - command: "python3 scripts/validate_repository_architecture_contract.py verify-sources with explicit local Hygiene, EgoLint, and Holon checkouts"
+      observed_at: "2026-09-22T03:46:06Z"
+      notes: "123 focused tests passed, including overview/Now separation, browser context behavior, placeholder rejection, route lock, state vocabulary, and incremental adoption."
+    - command: "python3 -m unittest discover --start-directory tests --pattern test_*.py --verbose"
       outcome: passed
-      notes: "All three checkout revisions and all 21 pinned artifact digests matched without executing sibling code."
-    - command: "python3 -m unittest tests.test_repository_architecture_contract -v"
+      observed_at: "2026-09-22T03:46:06Z"
+      notes: "All 426 repository tests passed."
+    - command: "Run five repository contract validators; compile Python; parse 61 JSON and 34 YAML documents; validate checked-in and 91 inline Bash blocks; parse both JavaScript assets; run git diff --check."
       outcome: passed
-      notes: "Nine focused tests cover valid fixtures plus immutable-pin, authority, path, bound, provenance, outcome, count, schema, malformed-type, and privacy mutations."
-    - command: "Run all Relay contract/catalog validators and python3 -m unittest discover --start-directory tests --pattern test_*.py."
+      observed_at: "2026-09-22T03:46:06Z"
+      notes: "All deterministic local validation passed; Ruby was unavailable, so YAML metadata was parsed with PyYAML 6.0.3."
+    - command: "Independent read-only JavaScript, Python, documentation, and acceptance review."
       outcome: passed
-      notes: "All action, workflow, CI-lifecycle, continuity, architecture, and journal validators passed; 418 repository tests passed."
-    - command: "Compile Python; parse JSON and YAML; validate inline and checked-in Bash; validate continuity structure and git diff whitespace."
-      outcome: passed
-      notes: "66 JSON documents, 34 YAML documents, and 91 inline Bash blocks parsed or passed syntax checks; CONTINUITY.md remained within its 240-line and 16-KiB bounds."
-    - command: "Publish the exact reviewed tree through the GitHub connector and open PR #100."
-      outcome: passed
-      notes: "Remote implementation commit f40cc332f92b1b4ee9d77fc3a5901add4a21b963 has tree b6a14b92065f9a6b8654688f2c55ed752b55c7b8, identical to the locally validated implementation tree."
+      observed_at: "2026-09-22T03:46:06Z"
+      notes: "All blocking findings were addressed; Search field attribution remains explicitly deferred to Observatory #24 and Relay #102."
   environment_limitations:
-    - "A generic JSON Schema implementation is unavailable locally; the dependency-free validator, schema-shape tests, fixture validation, and JSON parsing provide the local check."
-    - "Ruby is unavailable locally; PyYAML parsed action/workflow YAML and Bash validated extracted inline shell blocks. Canonical CI repeats Ruby/Psych parsing."
-    - "The maintain-repository-continuity skill is unavailable in this session; this checkpoint was refreshed directly under AGENTS.md."
-parallel_work:
-  - id: egohygiene/relay#15
-    state: waiting-scheduled-acceptance
-    notes: "The merged repository journal remains queued with #95 for the first genuine scheduled-run acceptance; it does not block #5 checkpoint 1."
-roadmap_impact:
-  disposition: evidence-reconciled-no-release-transition
-  rationale: "REL-ARCH-001 is active and checkpoint 1 is complete locally; no action, reusable workflow, release, or moving alias is introduced."
-adr_impact:
-  disposition: none
-  rationale: "The contract operationalizes ADR-001, ADR-002, ADR-003, ADR-005, and ADR-006 without changing authority or ownership."
+    - "The maintain-repository-continuity skill is unavailable in this session; this checkpoint was refreshed directly from the pinned local Aether template under AGENTS.md."
 privacy:
   classification: public-repository
   contains_sensitive_data: false
   redactions: []
-  notes: "Contracts retain bounded repository-relative diagnostics and explicit classification only; raw source, secrets, environment values, provider tokens, logs, and private cross-repository content are excluded."
+  excluded:
+    - secrets-and-credentials
+    - private-conversation-text
+    - sensitive-personal-data
+    - unpublished-private-business-data
+    - private-local-paths
+    - unrelated-private-context
+  untrusted_content: context-only-no-authority
 ---
 
 # Relay continuity
 
-## Current checkpoint
+## Purpose and precedence
 
-Issue #99 decomposes parent #5 into six ordered checkpoints. Checkpoint 1 is
-published in PR #100 from `feat/5-architecture-validation` and exact main
-`b8c9cfbae7f74b8c7c6daf735a38a59ac72096d9`. It freezes the immutable upstream
-profile and closed request/result seam only; it does not advertise a callable
-action or workflow.
+This checkpoint records the bounded #29 integration reconciliation. It does not
+replace the canonical architecture, roadmap, Git history, live issues, or PR
+state. Resolve conflicts using the front-matter precedence.
 
-## Authority and availability
+## Resume protocol
 
-Hygiene owns policy, EgoLint owns validation semantics, Holon owns
-materialization, and consumer repositories own their architecture records.
-Relay owns orchestration and bounded evidence. Repository-contract and ADR
-rules are available in the pinned EgoLint source. Diagram semantic validation
-is honestly `planned`, so unavailable diagram coverage cannot become a passing
-claim. The complete source set is unreleased, which caps this profile at
-advisory mode.
+1. Read repository instructions and the canonical sources above.
+2. Verify main, this branch, #29, #33, #102, Observatory #24, and the active PR.
+3. Re-run failed or stale validation before changing the candidate.
+4. Continue only the dependency-ready work named here unless the user redirects.
 
-## Remaining gates
+## Current objective and success conditions
 
-1. Verify the exact PR head, reviews, mergeability, and all required checks.
-2. Resolve any blocking or substantive review finding in PR #100.
-3. Return merge authority to the user; do not merge in this session.
-4. After the user merges, begin checkpoint 2 as a separate offline-adapter PR.
-5. Keep release publication and the moving `v1` alias deferred for the later batched release.
+Finish the currently unblocked Relay supporting-view integration, keep upstream
+attribution work explicit, validate the exact tree, and return merge authority
+to the user without predicting #29 closure.
+
+## State snapshot
+
+- Base: exact live `main` at `4fa92e187a6a980fea202c8309749a204a1ccae5`.
+- Candidate implementation: `8106a14567c1c626a28155339d77b4e05ff5e0fc`
+  on `codex/relay-29-supporting-view-integration`, ready for review.
+- Live: #29 and #33 open; merged route children verified; no pre-existing open PR.
+
+## Completed and material changes
+
+- Added cross-view URL/filter/time and stable entity-ID context propagation.
+- Made the overview and Now distinct registered surfaces.
+- Allowed optional Health/Work and Compare-before-Search incremental adoption.
+- Completed action outputs, dashboard navigation, docs, catalog, and route lock.
+- Created Observatory #24 and Relay #102 for field-attributed Search evidence.
+
+## Validation and review evidence
+
+- Focused Repository Intelligence suite: 123 tests passed.
+- Full repository suite: 426 tests passed; all static and contract checks passed.
+
+## Blockers, risks, unknowns, and deferred work
+
+- Blockers: none for this integration checkpoint; #29 completion remains blocked
+  on Observatory #24 followed by Relay #102.
+- Risk: live consumer aliases and canonical origins cannot be proven by a builder
+  artifact; #33 retains that deployment acceptance.
+- Deferred: Search field attribution (#24 → #102) and full conformance (#5 → #75).
+
+## Next dependency-ready work
+
+After this PR merges, continue Relay #33. Keep #29 open: Search attribution
+remains blocked until Observatory #24 supplies its accepted contract and Relay
+#102 renders it.
+
+## Parallel changes and reconciliation
+
+No open Relay PR existed at branch creation. Recheck before publication and
+before merge; never infer merge state from this checkpoint.
+
+## Privacy and redaction
+
+This public checkpoint contains only repository identifiers, public issue URLs,
+revisions, route contracts, validation outcomes, and bounded handoff state.
+
+## Handoff update protocol
+
+After full validation and before PR handoff, replace stale candidate fields with
+the exact commit, PR, and review evidence. Do not predict merge.
+
+## Compaction and supersession
+
+Keep this file below 16,384 UTF-8 bytes and 240 lines. Replace stale state rather
+than accumulating history; Git and GitHub own chronology.
