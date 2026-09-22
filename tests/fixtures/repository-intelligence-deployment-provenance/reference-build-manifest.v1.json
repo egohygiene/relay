@@ -1,0 +1,139 @@
+{
+  "bundle": {
+    "algorithm": "sha256-canonical-file-inventory-v1",
+    "digest": "sha256:bf0abdff44d2572f7b04bb9fc1f3a737062f32c73943a56971cb8da1c5ade6a6",
+    "file_count": 13,
+    "files": [
+      {
+        "bytes": 32,
+        "path": "compare/index.html",
+        "sha256": "sha256:c2185c29eccfe7e61b7e27fec8b645effdf7f4ee8e18ce5e4792b7a132cd5d05"
+      },
+      {
+        "bytes": 34,
+        "path": "dashboard/index.html",
+        "sha256": "sha256:e16ee37750211859ee79f4030c9fa0f7f96e4b48419f0feeae39aeae681830ca"
+      },
+      {
+        "bytes": 34,
+        "path": "decisions/index.html",
+        "sha256": "sha256:99d4d5b5b84edd8119261e2b9955e9b0af8e81486c9f27c58e5a521ad9d31592"
+      },
+      {
+        "bytes": 37,
+        "path": "dependencies/index.html",
+        "sha256": "sha256:6e0c2b54bf8f986c279416033234f004111c0fdf0d20c6159cade7dcbd4689d7"
+      },
+      {
+        "bytes": 31,
+        "path": "health/index.html",
+        "sha256": "sha256:d5d309428e27444aa0bf75b81ecf28593de124ff2779c9812c1230017ed3f141"
+      },
+      {
+        "bytes": 33,
+        "path": "index.html",
+        "sha256": "sha256:500d6b9fc7486973dbc6a200fdade8b6d578389c9270d384252fdbe2669f0bda"
+      },
+      {
+        "bytes": 32,
+        "path": "journey/index.html",
+        "sha256": "sha256:65ad8538b7d021bd2d61a8066589d310fa4ad5b6b67297c1d82e7a74229906c0"
+      },
+      {
+        "bytes": 28,
+        "path": "now/index.html",
+        "sha256": "sha256:3ef4e91c9905a705507a4a6b869a8a130827fd16c38344018eec57bebb1c0a42"
+      },
+      {
+        "bytes": 33,
+        "path": "releases/index.html",
+        "sha256": "sha256:f95d2180df0c72d0b594c49a4a68631e7f6b8d1f47521bf2660d364ffe0a5f30"
+      },
+      {
+        "bytes": 32,
+        "path": "roadmap/index.html",
+        "sha256": "sha256:6348b1b288faf0bf8880bcb14a3398f8a64026ca7565c05a927cb164b4e397a8"
+      },
+      {
+        "bytes": 31,
+        "path": "search/index.html",
+        "sha256": "sha256:3a6a5acf33e94e44328968f17bae7e7fdedb87c7c80df8426dbf960ec863a7f4"
+      },
+      {
+        "bytes": 22,
+        "path": "site.css",
+        "sha256": "sha256:f5d7ca89a428040c85c81fa853a9b97f67928ab7e76fb7b5f30e85ae8102f24d"
+      },
+      {
+        "bytes": 29,
+        "path": "work/index.html",
+        "sha256": "sha256:0db849b5d78f6cc698e91828f7ed9ed9b3b3c8017b26a624254163a144981b2f"
+      }
+    ],
+    "total_bytes": 408
+  },
+  "consumer": {
+    "repository": "example/consumer",
+    "revision": "1111111111111111111111111111111111111111"
+  },
+  "contracts": {
+    "action_inputs": {
+      "schema": "egohygiene.relay.repository-intelligence-inputs/v1",
+      "version": 1
+    },
+    "analytics": {
+      "schema": "egohygiene.repository-analytics/v1",
+      "version": 1
+    },
+    "build_manifest": {
+      "schema": "egohygiene.relay.repository-intelligence-build-manifest/v1",
+      "version": 1
+    },
+    "dashboard": {
+      "schema": "egohygiene.repository-intelligence-dashboard/v3",
+      "version": 1
+    },
+    "observatory_comparison": {
+      "schema": "egohygiene.observatory.repository-intelligence-compare/v1",
+      "version": "1.0.0-alpha.1"
+    },
+    "observatory_snapshot": {
+      "schema": "egohygiene.observatory.repository-intelligence-read-model/v1",
+      "version": 1
+    },
+    "provenance": {
+      "schema": "egohygiene.relay.repository-intelligence-provenance/v1",
+      "version": 1
+    },
+    "repository_report": {
+      "schema": "egohygiene.repository-report-summary/v1",
+      "version": 1
+    },
+    "repository_tree": {
+      "schema": "egohygiene.repository-tree/v1",
+      "version": 1
+    }
+  },
+  "enabled_routes": [
+    "/intelligence/",
+    "/intelligence/compare/",
+    "/intelligence/dashboard/",
+    "/intelligence/decisions/",
+    "/intelligence/dependencies/",
+    "/intelligence/health/",
+    "/intelligence/journey/",
+    "/intelligence/now/",
+    "/intelligence/releases/",
+    "/intelligence/roadmap/",
+    "/intelligence/search/",
+    "/intelligence/work/"
+  ],
+  "generator": {
+    "repository": "egohygiene/relay",
+    "revision": "2222222222222222222222222222222222222222",
+    "version": "1.6.0"
+  },
+  "schema": "egohygiene.relay.repository-intelligence-build-manifest/v1",
+  "schema_version": 1,
+  "source_epoch": 1800000000
+}

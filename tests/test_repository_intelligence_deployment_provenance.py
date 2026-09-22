@@ -168,6 +168,26 @@ class RepositoryIntelligenceDeploymentProvenanceTests(unittest.TestCase):
 
         evidence = json.loads(self.verification.read_text(encoding="utf-8"))
         receipt = json.loads(self.receipt.read_text(encoding="utf-8"))
+        fixture_root = (
+            REPOSITORY_ROOT
+            / "tests/fixtures/repository-intelligence-deployment-provenance"
+        )
+        self.assertEqual(
+            json.loads(manifest_before),
+            json.loads(
+                (fixture_root / "reference-build-manifest.v1.json").read_text(
+                    encoding="utf-8"
+                )
+            ),
+        )
+        self.assertEqual(
+            receipt,
+            json.loads(
+                (fixture_root / "reference-deployment-receipt.v1.json").read_text(
+                    encoding="utf-8"
+                )
+            ),
+        )
         self.assertEqual(manifest_path.read_bytes(), manifest_before)
         self.assertEqual(receipt["build_manifest"]["bundle_digest"], bundle_before)
         self.assertEqual(receipt["build_manifest"], evidence["build_manifest"])
