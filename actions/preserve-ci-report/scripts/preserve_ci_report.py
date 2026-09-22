@@ -40,6 +40,79 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def prepare_report_directory(workspace: Path, relative_directory: Path) -> Path:
+    """Create one report directory without traversing symbolic links."""
+
+    current = workspace
+    for part in relative_directory.parts:
+        current /= part
+        if current.is_symlink():
+            raise ValueError(
+                "report directory must not contain symbolic-link components"
+            )
+        try:
+            mode = current.stat(follow_symlinks=False).st_mode
+        except FileNotFoundError:
+            current.mkdir()
+            continue
+        if not stat.S_ISDIR(mode):
+            raise ValueError("report directory path components must be directories")
+
+    if current.resolve(strict=True) != current:
+        raise ValueError("report directory must be a real path inside the workspace")
+    return current
+
+
+def isolated_report_directory(source_directory: str, runner_temp: str) -> Path:
+    """Return one pre-created real directory strictly beneath runner temp."""
+
+    if not runner_temp:
+        raise ValueError("runner-temp is required with source-directory")
+    runner = Path(runner_temp)
+    if not runner.is_absolute():
+        raise ValueError("runner-temp must be an absolute path")
+    try:
+        resolved_runner = runner.resolve(strict=True)
+    except FileNotFoundError as error:
+        raise ValueError("runner-temp must be an existing directory") from error
+    if not resolved_runner.is_dir():
+        raise ValueError("runner-temp must be an existing directory")
+
+    source = Path(source_directory)
+    if (
+        not source.is_absolute()
+        or source.as_posix() != source_directory
+        or any(part in {".", ".."} for part in source.parts)
+    ):
+        raise ValueError("source-directory must be an absolute normalized path")
+    try:
+        relative = source.relative_to(resolved_runner)
+    except ValueError as error:
+        raise ValueError("source-directory must remain inside runner-temp") from error
+    if not relative.parts:
+        raise ValueError("source-directory must be a child of runner-temp")
+
+    current = resolved_runner
+    for part in relative.parts:
+        current /= part
+        if current.is_symlink():
+            raise ValueError(
+                "source-directory must not contain symbolic-link components"
+            )
+        try:
+            mode = current.stat(follow_symlinks=False).st_mode
+        except FileNotFoundError as error:
+            raise ValueError(
+                "source-directory must be an existing directory"
+            ) from error
+        if not stat.S_ISDIR(mode):
+            raise ValueError("source-directory path components must be directories")
+
+    if current.resolve(strict=True) != current:
+        raise ValueError("source-directory must be a real path inside runner-temp")
+    return current
+
+
 def scan_report(directory: Path, maximum_files: int, maximum_bytes: int) -> list[dict[str, object]]:
     """Return a deterministic bounded inventory without following links."""
 
@@ -86,10 +159,13 @@ def prepare(arguments: argparse.Namespace) -> dict[str, str]:
 
     workspace = Path.cwd().resolve()
     relative_directory = Path(".reports") / arguments.producer
-    directory = workspace / relative_directory
-    directory.mkdir(parents=True, exist_ok=True)
-    if directory.is_symlink() or directory.resolve() != directory:
-        raise ValueError("report directory must be a real path inside the workspace")
+    if arguments.source_directory:
+        directory = isolated_report_directory(
+            arguments.source_directory,
+            arguments.runner_temp,
+        )
+    else:
+        directory = prepare_report_directory(workspace, relative_directory)
 
     for metadata_name in METADATA_NAMES:
         (directory / metadata_name).unlink(missing_ok=True)
@@ -136,9 +212,17 @@ def prepare(arguments: argparse.Namespace) -> dict[str, str]:
     outputs = {
         "artifact-name": artifact_name,
         "completeness": completeness,
-        "manifest-path": (relative_directory / manifest_path.name).as_posix(),
+        "manifest-path": (
+            manifest_path.as_posix()
+            if arguments.source_directory
+            else (relative_directory / manifest_path.name).as_posix()
+        ),
         "manifest-sha256": manifest_digest,
-        "report-directory": relative_directory.as_posix(),
+        "report-directory": (
+            directory.as_posix()
+            if arguments.source_directory
+            else relative_directory.as_posix()
+        ),
     }
     if arguments.github_output:
         with Path(arguments.github_output).open("a", encoding="utf-8") as destination:
@@ -160,6 +244,8 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--retention-days", required=True)
     value.add_argument("--maximum-files", required=True)
     value.add_argument("--maximum-bytes", required=True)
+    value.add_argument("--source-directory", default="")
+    value.add_argument("--runner-temp", default="")
     value.add_argument("--github-output")
     return value
 

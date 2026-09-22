@@ -190,6 +190,175 @@ class WorkflowCatalogTests(unittest.TestCase):
         self.assertTrue(any("grants write-all permissions" in error for error in errors))
         self.assertTrue(any("workflow job lacks a timeout" in error for error in errors))
 
+    def test_repository_intelligence_exact_generator_resolution_is_enforced(self) -> None:
+        """A nested helper reference cannot satisfy the generator boundary."""
+
+        temporary, root = self.copied_repository()
+        self.addCleanup(temporary.cleanup)
+        workflow = root / ".github/workflows/repository-intelligence.yml"
+        workflow.write_text(
+            workflow.read_text(encoding="utf-8").replace(
+                "        uses: $/actions/repository-intelligence\n",
+                "        uses: $/actions/repository-intelligence/workflow-evidence\n",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        self.assertIn(
+            "repository-intelligence workflow must resolve generator exactly once "
+            "through $/",
+            validator.validate_catalog(root),
+        )
+
+    def test_repository_intelligence_python_isolation_is_enforced(self) -> None:
+        """Reject stdin Python whose imports can resolve from the caller checkout."""
+
+        temporary, root = self.copied_repository()
+        self.addCleanup(temporary.cleanup)
+        workflow = root / ".github/workflows/repository-intelligence.yml"
+        original = workflow.read_text(encoding="utf-8")
+        mutated = original.replace("python3 -I - ", "python3 - ", 1)
+        self.assertNotEqual(mutated, original)
+        workflow.write_text(mutated, encoding="utf-8")
+
+        self.assertTrue(
+            any(
+                error.startswith(
+                    "repository-intelligence Python heredoc must use python3 -I -:"
+                )
+                for error in validator.validate_catalog(root)
+            )
+        )
+
+    def test_repository_intelligence_concurrency_partition_is_enforced(self) -> None:
+        """Do not let one caller workflow cancel a different workflow's run."""
+
+        temporary, root = self.copied_repository()
+        self.addCleanup(temporary.cleanup)
+        workflow = root / ".github/workflows/repository-intelligence.yml"
+        original = workflow.read_text(encoding="utf-8")
+        mutated = original.replace(
+            "${{ github.workflow_ref }}", "${{ github.workflow }}", 1
+        )
+        self.assertNotEqual(mutated, original)
+        mutated += (
+            '\n# group: "relay-intelligence-v1-${{ github.repository }}-'
+            '${{ github.workflow_ref }}-${{ github.ref }}"\n'
+        )
+        workflow.write_text(mutated, encoding="utf-8")
+
+        self.assertIn(
+            "repository-intelligence concurrency must isolate v1 by repository, "
+            "caller workflow ref, and target ref",
+            validator.validate_catalog(root),
+        )
+
+    def test_internal_evidence_helper_manifest_is_validated(self) -> None:
+        """Validate nested helper packaging even though it is not public discovery."""
+
+        temporary, root = self.copied_repository()
+        self.addCleanup(temporary.cleanup)
+        helper_script = (
+            root
+            / "actions/repository-intelligence/workflow-evidence/scripts/"
+            "repository_intelligence_workflow_evidence.py"
+        )
+        helper_script.unlink()
+
+        self.assertIn(
+            f"manifest references missing file: {helper_script}",
+            validator.validate_catalog(root),
+        )
+
+    def test_repository_intelligence_job_write_all_is_rejected(self) -> None:
+        """Reject job-local authority expansion even with a safe workflow default."""
+
+        temporary, root = self.copied_repository()
+        self.addCleanup(temporary.cleanup)
+        workflow = root / ".github/workflows/repository-intelligence.yml"
+        original = workflow.read_text(encoding="utf-8")
+        mutated = original.replace(
+            "    permissions:\n      contents: read",
+            "    permissions: write-all",
+            1,
+        )
+        self.assertNotEqual(mutated, original)
+        workflow.write_text(mutated, encoding="utf-8")
+
+        errors = validator.validate_catalog(root)
+        self.assertTrue(
+            any("must not grant write permissions" in error for error in errors)
+        )
+        self.assertTrue(
+            any("job permissions must be exactly contents: read" in error for error in errors)
+        )
+
+    def test_repository_intelligence_github_token_reference_is_rejected(self) -> None:
+        """Treat the implicit provider token as a forbidden secret surface."""
+
+        temporary, root = self.copied_repository()
+        self.addCleanup(temporary.cleanup)
+        workflow = root / ".github/workflows/repository-intelligence.yml"
+        original = workflow.read_text(encoding="utf-8")
+        mutated = original.replace(
+            '          egress-policy: audit\n',
+            '          egress-policy: audit\n          token: "${{ github.token }}"\n',
+            1,
+        )
+        self.assertNotEqual(mutated, original)
+        workflow.write_text(mutated, encoding="utf-8")
+
+        self.assertIn(
+            "repository-intelligence workflow must not declare, inherit, or read "
+            "secrets or github.token",
+            validator.validate_catalog(root),
+        )
+
+    def test_repository_intelligence_caller_local_action_is_rejected(self) -> None:
+        """Reject every caller-checkout action path, not only known action names."""
+
+        temporary, root = self.copied_repository()
+        self.addCleanup(temporary.cleanup)
+        workflow = root / ".github/workflows/repository-intelligence.yml"
+        original = workflow.read_text(encoding="utf-8")
+        mutated = original.replace(
+            "        uses: $/actions/repository-intelligence\n",
+            "        uses: ./untrusted/generator\n",
+            1,
+        )
+        self.assertNotEqual(mutated, original)
+        workflow.write_text(mutated, encoding="utf-8")
+
+        self.assertIn(
+            "repository-intelligence workflow must not execute caller-checkout "
+            "actions: ./untrusted/generator",
+            validator.validate_catalog(root),
+        )
+
+    def test_repository_intelligence_mutable_remote_pin_is_rejected(self) -> None:
+        """Keep every external action bound to a full immutable commit."""
+
+        temporary, root = self.copied_repository()
+        self.addCleanup(temporary.cleanup)
+        workflow = root / ".github/workflows/repository-intelligence.yml"
+        original = workflow.read_text(encoding="utf-8")
+        mutated = original.replace(
+            "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "actions/checkout@main",
+            1,
+        )
+        self.assertNotEqual(mutated, original)
+        workflow.write_text(mutated, encoding="utf-8")
+
+        self.assertTrue(
+            any(
+                "remote action/workflow is not pinned to a full SHA" in error
+                and "actions/checkout@main" in error
+                for error in validator.validate_catalog(root)
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -49,7 +49,7 @@ on:
         default: "10"
         type: string
       artifact-retention-days:
-        description: Retention for the generated public dashboard artifact.
+        description: Retention from 1 through 90 days for the generated public dashboard artifact; run evidence is fixed at 30 days.
         required: false
         default: 30
         type: number
@@ -57,6 +57,18 @@ on:
       artifact-name:
         description: Name of the uploaded dashboard artifact.
         value: "${{ jobs.generate.outputs.artifact-name }}"
+      artifact-digest:
+        description: SHA-256 digest reported for the uploaded dashboard artifact.
+        value: "${{ jobs.generate.outputs.artifact-digest }}"
+      report-artifact-name:
+        description: Name of the preserved sanitized run-report artifact.
+        value: "${{ jobs.generate.outputs.report-artifact-name }}"
+      report-artifact-digest:
+        description: SHA-256 digest reported for the run-report artifact.
+        value: "${{ jobs.generate.outputs.report-artifact-digest }}"
+      report-manifest-sha256:
+        description: SHA-256 of the exact run-report manifest.
+        value: "${{ jobs.generate.outputs.report-manifest-sha256 }}"
   workflow_dispatch:
     inputs:
       output-directory:
@@ -100,7 +112,7 @@ on:
         default: "10"
         type: string
       artifact-retention-days:
-        description: Artifact retention in days.
+        description: Site artifact retention from 1 through 90 days; run evidence is fixed at 30 days.
         required: true
         default: 30
         type: number
@@ -109,7 +121,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: "relay-intelligence-${{ github.repository }}-${{ github.ref }}"
+  group: "relay-intelligence-v1-${{ github.repository }}-${{ github.workflow_ref }}-${{ github.ref }}"
   cancel-in-progress: true
 
 jobs:
@@ -117,24 +129,77 @@ jobs:
     name: Generate Repository Intelligence site artifact
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
     outputs:
-      artifact-name: "${{ steps.metadata.outputs.artifact-name }}"
+      artifact-name: "${{ steps.finalize.outputs.artifact-name }}"
+      artifact-digest: "${{ steps.site.outputs.artifact-digest }}"
+      report-artifact-name: "${{ steps.preserve.outputs.artifact-name }}"
+      report-artifact-digest: "${{ steps.preserve.outputs.artifact-digest }}"
+      report-manifest-sha256: "${{ steps.preserve.outputs.manifest-sha256 }}"
 
     steps:
       - name: Harden runner
+        id: harden
+        continue-on-error: true
         # step-security/harden-runner v2.21.0
         uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
         with:
           egress-policy: audit
 
+      - name: Validate event trust and bounded inputs
+        id: preflight
+        if: "${{ steps.harden.outcome == 'success' }}"
+        continue-on-error: true
+        uses: $/actions/repository-intelligence/workflow-evidence
+        with:
+          operation: prepare
+          repository: "${{ github.repository }}"
+          repository-id: "${{ github.repository_id }}"
+          represented-revision: "${{ github.sha }}"
+          run-id: "${{ github.run_id }}"
+          run-attempt: "${{ github.run_attempt }}"
+          event-name: "${{ github.event_name }}"
+          ref: "${{ github.ref }}"
+          event-default-branch: "${{ github.event.repository.default_branch }}"
+          pull-request-head-repository: "${{ github.event.pull_request.head.repo.full_name }}"
+          caller-workflow-ref: "${{ github.workflow_ref }}"
+          called-workflow-ref: "${{ job.workflow_ref }}"
+          called-workflow-repository: "${{ job.workflow_repository }}"
+          called-workflow-revision: "${{ job.workflow_sha }}"
+          output-directory: "${{ inputs.output-directory }}"
+          work-directory: "${{ inputs.work-directory }}"
+          reports-directory: "${{ inputs.reports-directory }}"
+          observatory-snapshot: "${{ inputs.observatory-snapshot }}"
+          observatory-comparison: "${{ inputs.observatory-comparison }}"
+          default-branch: "${{ inputs.default-branch }}"
+          activity-since: "${{ inputs.activity-since }}"
+          max-depth: "${{ inputs.max-depth }}"
+          artifact-retention-days: "${{ inputs.artifact-retention-days }}"
+
       - name: Checkout caller repository with complete history
+        id: checkout
+        if: >-
+          ${{ steps.harden.outcome == 'success' &&
+          steps.preflight.outcome == 'success' }}
+        continue-on-error: true
         # actions/checkout v7.0.1
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
+          ref: "${{ github.sha }}"
           fetch-depth: 0
           persist-credentials: false
+          clean: true
+          lfs: false
+          submodules: false
 
       - name: Generate Repository Intelligence site
+        id: generation
+        if: >-
+          ${{ steps.harden.outcome == 'success' &&
+          steps.preflight.outcome == 'success' &&
+          steps.checkout.outcome == 'success' }}
+        continue-on-error: true
         uses: $/actions/repository-intelligence
         with:
           output-directory: "${{ inputs.output-directory }}"
@@ -150,6 +215,9 @@ jobs:
           require-full-history: "true"
 
       - name: Verify reusable-workflow generator provenance
+        id: provenance
+        if: "${{ steps.generation.outcome == 'success' }}"
+        continue-on-error: true
         shell: bash
         env:
           EXPECTED_WORKFLOW_REF: "${{ job.workflow_ref }}"
@@ -158,7 +226,7 @@ jobs:
           PROVENANCE_PATH: "${{ inputs.output-directory }}/provenance.json"
         run: |
           set -euo pipefail
-          python3 - "${PROVENANCE_PATH}" <<'PYTHON'
+          python3 -I - "${PROVENANCE_PATH}" <<'PYTHON'
           import json
           import os
           from pathlib import Path
@@ -182,20 +250,111 @@ jobs:
               raise SystemExit("Reusable-workflow generator provenance is inconsistent")
           PYTHON
 
-      - name: Define artifact metadata
-        id: metadata
-        shell: bash
-        run: |
-          set -euo pipefail
-          printf 'artifact-name=repository-intelligence-%s-%s\n' \
-            "${GITHUB_RUN_ID}" "${GITHUB_RUN_ATTEMPT}" >> "${GITHUB_OUTPUT}"
-
       - name: Upload generated Repository Intelligence site artifact
+        id: site
+        if: "${{ steps.provenance.outcome == 'success' }}"
+        continue-on-error: true
         # actions/upload-artifact v7.0.1
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: "${{ steps.metadata.outputs.artifact-name }}"
+          name: "${{ steps.preflight.outputs.artifact-name }}"
           path: "${{ inputs.output-directory }}"
           if-no-files-found: error
-          retention-days: "${{ inputs.artifact-retention-days }}"
+          retention-days: "${{ steps.preflight.outputs.site-retention-days }}"
           compression-level: 9
+
+      - name: Write sanitized Repository Intelligence run report
+        id: finalize
+        if: "${{ always() }}"
+        continue-on-error: true
+        uses: $/actions/repository-intelligence/workflow-evidence
+        with:
+          operation: finalize
+          repository: "${{ github.repository }}"
+          repository-id: "${{ github.repository_id }}"
+          represented-revision: "${{ github.sha }}"
+          run-id: "${{ github.run_id }}"
+          run-attempt: "${{ github.run_attempt }}"
+          event-name: "${{ github.event_name }}"
+          ref: "${{ github.ref }}"
+          event-default-branch: "${{ github.event.repository.default_branch }}"
+          pull-request-head-repository: "${{ github.event.pull_request.head.repo.full_name }}"
+          caller-workflow-ref: "${{ github.workflow_ref }}"
+          called-workflow-ref: "${{ job.workflow_ref }}"
+          called-workflow-repository: "${{ job.workflow_repository }}"
+          called-workflow-revision: "${{ job.workflow_sha }}"
+          output-directory: "${{ inputs.output-directory }}"
+          work-directory: "${{ inputs.work-directory }}"
+          reports-directory: "${{ inputs.reports-directory }}"
+          observatory-snapshot: "${{ inputs.observatory-snapshot }}"
+          observatory-comparison: "${{ inputs.observatory-comparison }}"
+          default-branch: "${{ inputs.default-branch }}"
+          activity-since: "${{ inputs.activity-since }}"
+          max-depth: "${{ inputs.max-depth }}"
+          artifact-retention-days: "${{ inputs.artifact-retention-days }}"
+          hardening-outcome: "${{ steps.harden.outcome }}"
+          preflight-outcome: "${{ steps.preflight.outcome }}"
+          checkout-outcome: "${{ steps.checkout.outcome }}"
+          generation-outcome: "${{ steps.generation.outcome }}"
+          provenance-outcome: "${{ steps.provenance.outcome }}"
+          site-upload-outcome: "${{ steps.site.outcome }}"
+          site-artifact-digest: "${{ steps.site.outputs.artifact-digest }}"
+
+      - name: Preserve sanitized Repository Intelligence run report
+        id: preserve
+        if: "${{ always() && steps.finalize.outcome == 'success' }}"
+        continue-on-error: true
+        uses: $/actions/preserve-ci-report
+        with:
+          producer: repository-intelligence-v1
+          outcome: "${{ steps.finalize.outputs.workflow-outcome }}"
+          source-directory: "${{ steps.finalize.outputs.report-directory }}"
+          retention-days: 30
+          maximum-files: 1
+          maximum-bytes: 32768
+
+      - name: Summarize Repository Intelligence evidence
+        if: "${{ always() }}"
+        shell: bash
+        env:
+          ERROR_CODE: "${{ steps.finalize.outputs.error-code }}"
+          FAILED_STAGE: "${{ steps.finalize.outputs.failed-stage }}"
+          REPORT_ARTIFACT: "${{ steps.preserve.outputs.artifact-name }}"
+          REPORT_DIGEST: "${{ steps.preserve.outputs.artifact-digest }}"
+          SITE_ARTIFACT: "${{ steps.finalize.outputs.artifact-name }}"
+          SITE_DIGEST: "${{ steps.site.outputs.artifact-digest }}"
+          WORKFLOW_OUTCOME: "${{ steps.finalize.outputs.workflow-outcome }}"
+        run: |
+          set -euo pipefail
+          {
+            printf '## Repository Intelligence workflow evidence\n\n'
+            printf -- '- Outcome: `%s`\n' "${WORKFLOW_OUTCOME:-unavailable}"
+            printf -- '- Failed stage: `%s`\n' "${FAILED_STAGE:-none}"
+            printf -- '- Stable code: `%s`\n' "${ERROR_CODE:-RIW-INTERNAL-ERROR}"
+            printf -- '- Site artifact: `%s`\n' "${SITE_ARTIFACT:-not-uploaded}"
+            printf -- '- Site artifact digest: `%s`\n' "${SITE_DIGEST:-unavailable}"
+            printf -- '- Run-report artifact: `%s`\n' "${REPORT_ARTIFACT:-unavailable}"
+            printf -- '- Run-report artifact digest: `%s`\n' "${REPORT_DIGEST:-unavailable}"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Reassert Repository Intelligence result after evidence preservation
+        if: "${{ always() }}"
+        shell: bash
+        env:
+          FINALIZE_OUTCOME: "${{ steps.finalize.outcome }}"
+          PRESERVE_OUTCOME: "${{ steps.preserve.outcome }}"
+          WORKFLOW_OUTCOME: "${{ steps.finalize.outputs.workflow-outcome }}"
+        run: |
+          set -euo pipefail
+          if [[ "${FINALIZE_OUTCOME}" != "success" ]]; then
+            printf 'Repository Intelligence evidence finalization failed\n' >&2
+            exit 1
+          fi
+          if [[ "${PRESERVE_OUTCOME}" != "success" ]]; then
+            printf 'Repository Intelligence run-report preservation failed\n' >&2
+            exit 1
+          fi
+          if [[ "${WORKFLOW_OUTCOME}" != "success" ]]; then
+            printf 'Repository Intelligence failed; see the preserved run report\n' >&2
+            exit 1
+          fi

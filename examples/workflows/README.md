@@ -13,6 +13,18 @@ Relay v1.1.0 commit. A reviewed dependency update replaces both the full commit
 SHA and its adjacent release comment. The moving `v1` alias is useful for
 discovery but is not a production pin.
 
+Until #104 merges, that published pin demonstrates the caller's trigger and
+authority shape but predates the sanitized run-report contract described
+below. Adopt the hardened contract only from #104's exact merged revision (or a
+later immutable release containing it); do not infer the candidate revision in
+advance.
+
+The caller covers pull-request review, configured-default-branch refresh, and
+manual rebuild. Same-repository and fork pull requests receive the same
+`contents: read`, no-secret, no-cache ceiling, and Relay executes no consumer
+scripts. The push guard rejects a non-default branch even when a repository
+temporarily retains both `main` and `master`.
+
 [`stale-pull-requests.md`](stale-pull-requests.md) shows the consumer-owned
 scheduled caller. It starts with read-only advisory evidence, then documents
 the separate write authority required for warnings, resets, and optional
@@ -28,10 +40,15 @@ deterministic no-billing caller, the reviewed-manual candidate seam, and the
 separately authorized future Copilot opt-in.
 
 The Repository Intelligence reusable workflow owns checkout, generation,
-provenance verification, and ordinary artifact upload. It does not deploy
-Pages, write repository content, or receive caller secrets. A consumer that
-needs site composition should use
-the composite action in its existing build job instead.
+provenance verification, ordinary artifact upload, and one sanitized run
+report. It does not deploy Pages, write repository content, receive caller
+secrets, or use a cache. Successful site-artifact retention is caller-selected
+from 1 through 90 days. The success or actionable-failure report is retained
+for a fixed 30 days; an actionable failure is reasserted after preservation.
+Cancellation or an artifact-service outage can prevent upload, so a transient
+infrastructure failure should be rerun at the same revision. A consumer that
+needs site composition should use the composite action in its existing build
+job instead; deployment provenance remains separate work in Relay #105.
 
 ## Publication Pages lifecycle
 

@@ -6,20 +6,29 @@
 name: Repository intelligence artifact
 
 on:
+  pull_request:
+  push:
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: "repository-intelligence-${{ github.repository }}-${{ github.ref }}"
+  # Keep the caller group distinct from Relay's called-workflow group so the
+  # two layers cannot cancel one another.
+  group: "consumer-repository-intelligence-${{ github.repository }}-${{ github.workflow_ref }}-${{ github.ref }}"
   cancel-in-progress: true
 
 jobs:
   intelligence:
     name: Build reviewable repository intelligence
+    # Only the repository's configured default branch is a push target. Pull
+    # requests and manual rebuilds remain artifact-only review paths.
+    if: "${{ github.event_name != 'push' || github.ref_name == github.event.repository.default_branch }}"
     permissions:
       contents: read
+    # No caller secret is passed. Trusted and fork pull requests use the same
+    # read-only candidate-code ceiling.
     # egohygiene/relay repository-intelligence v1.1.0
     uses: egohygiene/relay/.github/workflows/repository-intelligence.yml@46cf1d66a7e66ca5a35d2c99cbaed5ccfb67573f
     with:

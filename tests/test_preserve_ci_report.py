@@ -47,6 +47,8 @@ class PreserveCIReportTests(unittest.TestCase):
             "retention_days": "30",
             "maximum_files": "100",
             "maximum_bytes": "104857600",
+            "source_directory": "",
+            "runner_temp": "",
             "github_output": None,
         }
         values.update(changes)
@@ -69,7 +71,10 @@ class PreserveCIReportTests(unittest.TestCase):
         )
         self.assertEqual(manifest["completeness"], "complete")
         self.assertEqual(manifest["outcome"], "success")
+        self.assertEqual(manifest["repository"], "example/repository")
+        self.assertEqual(manifest["represented_revision"], "1" * 40)
         self.assertEqual(manifest["run"], {"id": 42, "attempt": 2})
+        self.assertEqual(manifest["retention_days"], 30)
         self.assertEqual([item["path"] for item in manifest["files"]], ["result.json"])
         self.assertEqual(outputs["artifact-name"], "relay-report-example-check-42-2")
         self.assertRegex(outputs["manifest-sha256"], r"^[0-9a-f]{64}$")
@@ -113,6 +118,111 @@ class PreserveCIReportTests(unittest.TestCase):
         (report / "two.txt").write_text("2", encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "1-file limit"):
             preserver.prepare(self.arguments(outcome="failure", maximum_files="1"))
+
+    def test_symlinked_report_root_is_rejected_before_directory_creation(self) -> None:
+        outside_temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(outside_temporary.cleanup)
+        outside = Path(outside_temporary.name)
+        (self.root / ".reports").symlink_to(outside, target_is_directory=True)
+
+        with self.assertRaisesRegex(ValueError, "symbolic-link components"):
+            preserver.prepare(self.arguments(outcome="failure"))
+
+        self.assertFalse((outside / "example-check").exists())
+
+    def test_non_directory_report_root_is_rejected_without_replacement(self) -> None:
+        report_root = self.root / ".reports"
+        report_root.write_text("consumer-owned file\n", encoding="utf-8")
+
+        with self.assertRaisesRegex(ValueError, "path components must be directories"):
+            preserver.prepare(self.arguments(outcome="failure"))
+
+        self.assertEqual(
+            report_root.read_text(encoding="utf-8"),
+            "consumer-owned file\n",
+        )
+
+    def test_precreated_runner_temp_source_is_preserved_in_place(self) -> None:
+        runner_temp = self.root / "runner-temp"
+        source = runner_temp / "relay/repository-intelligence-v1"
+        source.mkdir(parents=True)
+        (source / "failure.json").write_text(
+            '{"status":"failure"}\n',
+            encoding="utf-8",
+        )
+
+        outputs = preserver.prepare(
+            self.arguments(
+                outcome="failure",
+                source_directory=source.as_posix(),
+                runner_temp=runner_temp.as_posix(),
+            )
+        )
+
+        manifest = json.loads(
+            (source / "relay-report-manifest.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(outputs["report-directory"], source.as_posix())
+        self.assertEqual(
+            outputs["manifest-path"],
+            (source / "relay-report-manifest.json").as_posix(),
+        )
+        self.assertEqual(manifest["files"][0]["path"], "failure.json")
+        self.assertFalse((self.root / ".reports").exists())
+
+    def test_isolated_source_outside_runner_temp_is_rejected_without_writes(self) -> None:
+        runner_temp = self.root / "runner-temp"
+        runner_temp.mkdir()
+        source = self.root / "outside-evidence"
+        source.mkdir()
+
+        with self.assertRaisesRegex(ValueError, "inside runner-temp"):
+            preserver.prepare(
+                self.arguments(
+                    outcome="failure",
+                    source_directory=source.as_posix(),
+                    runner_temp=runner_temp.as_posix(),
+                )
+            )
+
+        self.assertEqual(list(source.iterdir()), [])
+
+    def test_isolated_source_must_exist_and_is_not_created(self) -> None:
+        runner_temp = self.root / "runner-temp"
+        runner_temp.mkdir()
+        source = runner_temp / "relay/repository-intelligence-v1"
+
+        with self.assertRaisesRegex(ValueError, "existing directory"):
+            preserver.prepare(
+                self.arguments(
+                    outcome="failure",
+                    source_directory=source.as_posix(),
+                    runner_temp=runner_temp.as_posix(),
+                )
+            )
+
+        self.assertFalse(source.exists())
+
+    def test_isolated_source_rejects_symlinked_components_without_writes(self) -> None:
+        runner_temp = self.root / "runner-temp"
+        real_source = runner_temp / "real/repository-intelligence-v1"
+        real_source.mkdir(parents=True)
+        (runner_temp / "linked").symlink_to(
+            runner_temp / "real",
+            target_is_directory=True,
+        )
+        source = runner_temp / "linked/repository-intelligence-v1"
+
+        with self.assertRaisesRegex(ValueError, "symbolic-link components"):
+            preserver.prepare(
+                self.arguments(
+                    outcome="failure",
+                    source_directory=source.as_posix(),
+                    runner_temp=runner_temp.as_posix(),
+                )
+            )
+
+        self.assertEqual(list(real_source.iterdir()), [])
 
     def test_identifiers_and_retention_are_bounded(self) -> None:
         with self.assertRaisesRegex(ValueError, "kebab-case"):

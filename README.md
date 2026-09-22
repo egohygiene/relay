@@ -142,6 +142,13 @@ jobs:
     uses: egohygiene/relay/.github/workflows/repository-intelligence.yml@<full-commit-sha>
 ```
 
+The reusable workflow applies the same read-only, no-secret ceiling to trusted
+and fork pull requests, executes no consumer scripts, uses no caches, and never
+deploys Pages. It returns the successful site artifact identity and digest and
+retains a sanitized success or actionable-failure report for 30 days before
+reasserting a failure. See the complete
+[event, trust, retention, and recovery contract](docs/repository-intelligence-publication.md#reusable-workflow-trust-and-event-contract).
+
 Both entry points produce the same framework-free, visibility-aware subtree.
 The subtree root is the Repository Intelligence overview, `/now/` is the
 focused current-state view, and the previous analytics experience remains

@@ -1,0 +1,333 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/repository-intelligence-workflow-report/v1/schema.json",
+  "title": "Repository Intelligence workflow report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema",
+    "schema_version",
+    "result",
+    "stage",
+    "code",
+    "rule",
+    "repository",
+    "represented_revision",
+    "run",
+    "event",
+    "versions",
+    "artifacts",
+    "remediation",
+    "sanitization"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "https://egohygiene.github.io/relay/contracts/repository-intelligence-workflow-report/v1/schema.json"
+    },
+    "schema": {
+      "const": "egohygiene.relay.repository-intelligence-workflow-report/v1"
+    },
+    "schema_version": {"const": 1},
+    "result": {"enum": ["success", "failure"]},
+    "stage": {
+      "enum": [
+        "completed",
+        "runner-hardening",
+        "trust-and-input-validation",
+        "checkout",
+        "generation",
+        "provenance-verification",
+        "site-artifact-upload"
+      ]
+    },
+    "code": {"type": "string", "pattern": "^RIW-[0-9]{3}$"},
+    "rule": {"type": "string", "pattern": "^repository-intelligence\\.workflow\\.[a-z-]+$"},
+    "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "represented_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "attempt"],
+      "properties": {
+        "id": {"type": "integer", "minimum": 1},
+        "attempt": {"type": "integer", "minimum": 1}
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["class", "invocation", "trust", "authority"],
+      "properties": {
+        "class": {
+          "enum": [
+            "trusted-pull-request",
+            "fork-pull-request",
+            "default-branch-push",
+            "manual-rebuild",
+            "unsupported"
+          ]
+        },
+        "invocation": {"enum": ["direct-dispatch", "reusable-call"]},
+        "trust": {"enum": ["untrusted-content", "trusted-default-branch"]},
+        "authority": {"const": "contents-read-artifact-only"}
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["class"],
+            "properties": {"class": {"const": "default-branch-push"}}
+          },
+          "then": {
+            "properties": {
+              "invocation": {"const": "reusable-call"},
+              "trust": {"const": "trusted-default-branch"}
+            }
+          },
+          "else": {
+            "properties": {"trust": {"const": "untrusted-content"}}
+          }
+        },
+        {
+          "if": {
+            "required": ["class"],
+            "properties": {
+              "class": {
+                "enum": ["trusted-pull-request", "fork-pull-request"]
+              }
+            }
+          },
+          "then": {
+            "properties": {"invocation": {"const": "reusable-call"}}
+          }
+        }
+      ]
+    },
+    "versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relay",
+        "called_workflow_revision",
+        "workflow_contract",
+        "report_contract",
+        "provenance_contract",
+        "dashboard_contract"
+      ],
+      "properties": {
+        "relay": {"type": "string", "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "called_workflow_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "workflow_contract": {"const": "v1"},
+        "report_contract": {"const": "v1"},
+        "provenance_contract": {"const": "v1"},
+        "dashboard_contract": {"const": "v3"}
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["site", "run_report"],
+      "properties": {
+        "site": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "status", "digest", "retention_days"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "pattern": "^repository-intelligence-site-v1-[1-9][0-9]*-[0-9a-f]{40}-[1-9][0-9]*-[1-9][0-9]*$"
+            },
+            "status": {"enum": ["uploaded", "not-uploaded"]},
+            "digest": {
+              "oneOf": [
+                {"type": "null"},
+                {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+              ]
+            },
+            "retention_days": {
+              "oneOf": [
+                {"type": "null"},
+                {"type": "integer", "minimum": 1, "maximum": 90}
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "required": ["status"],
+                "properties": {"status": {"const": "uploaded"}}
+              },
+              "then": {
+                "properties": {
+                  "digest": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$"
+                  },
+                  "retention_days": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 90
+                  }
+                }
+              },
+              "else": {
+                "properties": {"digest": {"type": "null"}}
+              }
+            }
+          ]
+        },
+        "run_report": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "status", "retention_days"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "pattern": "^relay-report-repository-intelligence-v1-[1-9][0-9]*-[1-9][0-9]*$"
+            },
+            "status": {"const": "prepared"},
+            "retention_days": {"const": 30}
+          }
+        }
+      }
+    },
+    "remediation": {
+      "type": "string",
+      "pattern": "^https://github\\.com/egohygiene/Relay/blob/[0-9a-f]{40}/docs/repository-intelligence-publication\\.md#failure-codes-and-recovery$"
+    },
+    "sanitization": {"const": "allowlisted-metadata-only"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["stage"],
+        "properties": {"stage": {"const": "completed"}}
+      },
+      "then": {
+        "properties": {
+          "result": {"const": "success"},
+          "code": {"const": "RIW-000"},
+          "rule": {"const": "repository-intelligence.workflow.success"}
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["stage"],
+        "properties": {"stage": {"const": "runner-hardening"}}
+      },
+      "then": {
+        "properties": {
+          "result": {"const": "failure"},
+          "code": {"const": "RIW-001"},
+          "rule": {"const": "repository-intelligence.workflow.runner-hardening"}
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["stage"],
+        "properties": {"stage": {"const": "trust-and-input-validation"}}
+      },
+      "then": {
+        "properties": {
+          "result": {"const": "failure"},
+          "code": {"const": "RIW-002"},
+          "rule": {"const": "repository-intelligence.workflow.trust-and-input-validation"}
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["stage"],
+        "properties": {"stage": {"const": "checkout"}}
+      },
+      "then": {
+        "properties": {
+          "result": {"const": "failure"},
+          "code": {"const": "RIW-003"},
+          "rule": {"const": "repository-intelligence.workflow.checkout"}
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["stage"],
+        "properties": {"stage": {"const": "generation"}}
+      },
+      "then": {
+        "properties": {
+          "result": {"const": "failure"},
+          "code": {"const": "RIW-004"},
+          "rule": {"const": "repository-intelligence.workflow.generation"}
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["stage"],
+        "properties": {"stage": {"const": "provenance-verification"}}
+      },
+      "then": {
+        "properties": {
+          "result": {"const": "failure"},
+          "code": {"const": "RIW-005"},
+          "rule": {"const": "repository-intelligence.workflow.provenance-verification"}
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["stage"],
+        "properties": {"stage": {"const": "site-artifact-upload"}}
+      },
+      "then": {
+        "properties": {
+          "result": {"const": "failure"},
+          "code": {"const": "RIW-006"},
+          "rule": {"const": "repository-intelligence.workflow.site-artifact-upload"}
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["result"],
+        "properties": {"result": {"const": "success"}}
+      },
+      "then": {
+        "properties": {
+          "artifacts": {
+            "properties": {
+              "site": {
+                "properties": {"status": {"const": "uploaded"}}
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "artifacts": {
+            "properties": {
+              "site": {
+                "properties": {"status": {"const": "not-uploaded"}}
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["event"],
+        "properties": {
+          "event": {
+            "required": ["class"],
+            "properties": {"class": {"const": "unsupported"}}
+          }
+        }
+      },
+      "then": {"properties": {"result": {"const": "failure"}}}
+    }
+  ]
+}

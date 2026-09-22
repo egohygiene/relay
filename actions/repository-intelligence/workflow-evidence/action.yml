@@ -1,0 +1,239 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-action.json
+
+name: "Repository Intelligence Workflow Evidence"
+description: >-
+  Validate the reusable workflow trust boundary and write a closed, sanitized
+  run report without executing caller-controlled code.
+
+inputs:
+  operation:
+    description: "Prepare validates inputs; finalize writes the run report."
+    required: true
+  repository:
+    description: "Provider repository identity in owner/name form."
+    required: true
+  repository-id:
+    description: "Provider numeric repository identifier."
+    required: true
+  represented-revision:
+    description: "Full lowercase Git revision represented by the run."
+    required: true
+  run-id:
+    description: "Provider workflow run identifier."
+    required: true
+  run-attempt:
+    description: "Provider workflow run attempt."
+    required: true
+  event-name:
+    description: "Provider event name."
+    required: true
+  ref:
+    description: "Provider ref represented by the run."
+    required: false
+    default: ""
+  event-default-branch:
+    description: "Provider default branch from the event payload."
+    required: false
+    default: ""
+  pull-request-head-repository:
+    description: "Provider pull-request head repository identity when present."
+    required: false
+    default: ""
+  caller-workflow-ref:
+    description: "Provider caller workflow reference."
+    required: true
+  called-workflow-ref:
+    description: "Provider called workflow reference."
+    required: true
+  called-workflow-repository:
+    description: "Provider called workflow repository."
+    required: true
+  called-workflow-revision:
+    description: "Provider called workflow revision."
+    required: true
+  output-directory:
+    description: "Requested public site directory."
+    required: false
+    default: "dist/intelligence"
+  work-directory:
+    description: "Requested private work directory."
+    required: false
+    default: ".cache/repository-intelligence"
+  reports-directory:
+    description: "Requested normalized report root."
+    required: false
+    default: ".reports"
+  observatory-snapshot:
+    description: "Optional Observatory snapshot path."
+    required: false
+    default: ""
+  observatory-comparison:
+    description: "Optional Observatory comparison path."
+    required: false
+    default: ""
+  default-branch:
+    description: "Optional dashboard default-branch override."
+    required: false
+    default: ""
+  activity-since:
+    description: "Requested bounded Git history window."
+    required: false
+    default: "1 year ago"
+  max-depth:
+    description: "Requested maximum tree depth."
+    required: false
+    default: "10"
+  artifact-retention-days:
+    description: "Requested public site artifact retention."
+    required: false
+    default: "30"
+  hardening-outcome:
+    description: "Provider outcome for runner hardening."
+    required: false
+    default: "skipped"
+  preflight-outcome:
+    description: "Provider outcome for trust and input validation."
+    required: false
+    default: "skipped"
+  checkout-outcome:
+    description: "Provider outcome for checkout."
+    required: false
+    default: "skipped"
+  generation-outcome:
+    description: "Provider outcome for site generation."
+    required: false
+    default: "skipped"
+  provenance-outcome:
+    description: "Provider outcome for provenance verification."
+    required: false
+    default: "skipped"
+  site-upload-outcome:
+    description: "Provider outcome for public site artifact upload."
+    required: false
+    default: "skipped"
+  site-artifact-digest:
+    description: "Provider digest returned by the public site upload."
+    required: false
+    default: ""
+
+outputs:
+  artifact-name:
+    description: "Revision- and contract-isolated public site artifact name."
+    value: "${{ steps.evidence.outputs.artifact-name }}"
+  event-class:
+    description: "Closed event class recorded in run evidence."
+    value: "${{ steps.evidence.outputs.event-class }}"
+  invocation-class:
+    description: "Direct-dispatch or reusable-call invocation class."
+    value: "${{ steps.evidence.outputs.invocation-class }}"
+  trust-class:
+    description: "Closed content trust class."
+    value: "${{ steps.evidence.outputs.trust-class }}"
+  site-retention-days:
+    description: "Validated public site artifact retention."
+    value: "${{ steps.evidence.outputs.site-retention-days }}"
+  workflow-outcome:
+    description: "Sanitized aggregate success or failure outcome."
+    value: "${{ steps.evidence.outputs.workflow-outcome }}"
+  failed-stage:
+    description: "Stable failed stage, empty after success."
+    value: "${{ steps.evidence.outputs.failed-stage }}"
+  error-code:
+    description: "Stable RIW result code."
+    value: "${{ steps.evidence.outputs.error-code }}"
+  rule-id:
+    description: "Stable rule identifier."
+    value: "${{ steps.evidence.outputs.rule-id }}"
+  report-artifact-name:
+    description: "Expected preserved run-report artifact name."
+    value: "${{ steps.evidence.outputs.report-artifact-name }}"
+  report-directory:
+    description: "Isolated runner-temp directory containing the report."
+    value: "${{ steps.evidence.outputs.report-directory }}"
+  report-path:
+    description: "Isolated path to the sanitized run report."
+    value: "${{ steps.evidence.outputs.report-path }}"
+  report-retention-days:
+    description: "Fixed run-report retention."
+    value: "${{ steps.evidence.outputs.report-retention-days }}"
+
+branding:
+  icon: "shield"
+  color: "purple"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Prepare or finalize Repository Intelligence workflow evidence"
+      id: evidence
+      shell: bash
+      env:
+        INPUT_ACTIVITY_SINCE: "${{ inputs.activity-since }}"
+        INPUT_ARTIFACT_RETENTION_DAYS: "${{ inputs.artifact-retention-days }}"
+        INPUT_CALLED_WORKFLOW_REF: "${{ inputs.called-workflow-ref }}"
+        INPUT_CALLED_WORKFLOW_REPOSITORY: "${{ inputs.called-workflow-repository }}"
+        INPUT_CALLED_WORKFLOW_REVISION: "${{ inputs.called-workflow-revision }}"
+        INPUT_CALLER_WORKFLOW_REF: "${{ inputs.caller-workflow-ref }}"
+        INPUT_CHECKOUT_OUTCOME: "${{ inputs.checkout-outcome }}"
+        INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
+        INPUT_EVENT_DEFAULT_BRANCH: "${{ inputs.event-default-branch }}"
+        INPUT_EVENT_NAME: "${{ inputs.event-name }}"
+        INPUT_GENERATION_OUTCOME: "${{ inputs.generation-outcome }}"
+        INPUT_HARDENING_OUTCOME: "${{ inputs.hardening-outcome }}"
+        INPUT_MAX_DEPTH: "${{ inputs.max-depth }}"
+        INPUT_OBSERVATORY_COMPARISON: "${{ inputs.observatory-comparison }}"
+        INPUT_OBSERVATORY_SNAPSHOT: "${{ inputs.observatory-snapshot }}"
+        INPUT_OPERATION: "${{ inputs.operation }}"
+        INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
+        INPUT_PREFLIGHT_OUTCOME: "${{ inputs.preflight-outcome }}"
+        INPUT_PROVENANCE_OUTCOME: "${{ inputs.provenance-outcome }}"
+        INPUT_PULL_REQUEST_HEAD_REPOSITORY: "${{ inputs.pull-request-head-repository }}"
+        INPUT_REF: "${{ inputs.ref }}"
+        INPUT_REPORTS_DIRECTORY: "${{ inputs.reports-directory }}"
+        INPUT_REPOSITORY: "${{ inputs.repository }}"
+        INPUT_REPOSITORY_ID: "${{ inputs.repository-id }}"
+        INPUT_REPRESENTED_REVISION: "${{ inputs.represented-revision }}"
+        INPUT_RUN_ATTEMPT: "${{ inputs.run-attempt }}"
+        INPUT_RUN_ID: "${{ inputs.run-id }}"
+        INPUT_SITE_ARTIFACT_DIGEST: "${{ inputs.site-artifact-digest }}"
+        INPUT_SITE_UPLOAD_OUTCOME: "${{ inputs.site-upload-outcome }}"
+        INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
+      run: |
+        set -euo pipefail
+        python3 -I "${GITHUB_ACTION_PATH}/scripts/repository_intelligence_workflow_evidence.py" \
+          --operation="${INPUT_OPERATION}" \
+          --action-path="${GITHUB_ACTION_PATH}" \
+          --runner-temp="${RUNNER_TEMP}" \
+          --github-output="${GITHUB_OUTPUT}" \
+          --repository="${INPUT_REPOSITORY}" \
+          --repository-id="${INPUT_REPOSITORY_ID}" \
+          --represented-revision="${INPUT_REPRESENTED_REVISION}" \
+          --run-id="${INPUT_RUN_ID}" \
+          --run-attempt="${INPUT_RUN_ATTEMPT}" \
+          --event-name="${INPUT_EVENT_NAME}" \
+          --ref="${INPUT_REF}" \
+          --event-default-branch="${INPUT_EVENT_DEFAULT_BRANCH}" \
+          --pull-request-head-repository="${INPUT_PULL_REQUEST_HEAD_REPOSITORY}" \
+          --caller-workflow-ref="${INPUT_CALLER_WORKFLOW_REF}" \
+          --called-workflow-ref="${INPUT_CALLED_WORKFLOW_REF}" \
+          --called-workflow-repository="${INPUT_CALLED_WORKFLOW_REPOSITORY}" \
+          --called-workflow-revision="${INPUT_CALLED_WORKFLOW_REVISION}" \
+          --output-directory="${INPUT_OUTPUT_DIRECTORY}" \
+          --work-directory="${INPUT_WORK_DIRECTORY}" \
+          --reports-directory="${INPUT_REPORTS_DIRECTORY}" \
+          --observatory-snapshot="${INPUT_OBSERVATORY_SNAPSHOT}" \
+          --observatory-comparison="${INPUT_OBSERVATORY_COMPARISON}" \
+          --default-branch="${INPUT_DEFAULT_BRANCH}" \
+          --activity-since="${INPUT_ACTIVITY_SINCE}" \
+          --max-depth="${INPUT_MAX_DEPTH}" \
+          --artifact-retention-days="${INPUT_ARTIFACT_RETENTION_DAYS}" \
+          --hardening-outcome="${INPUT_HARDENING_OUTCOME}" \
+          --preflight-outcome="${INPUT_PREFLIGHT_OUTCOME}" \
+          --checkout-outcome="${INPUT_CHECKOUT_OUTCOME}" \
+          --generation-outcome="${INPUT_GENERATION_OUTCOME}" \
+          --provenance-outcome="${INPUT_PROVENANCE_OUTCOME}" \
+          --site-upload-outcome="${INPUT_SITE_UPLOAD_OUTCOME}" \
+          --site-artifact-digest="${INPUT_SITE_ARTIFACT_DIGEST}"

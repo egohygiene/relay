@@ -5,8 +5,8 @@
 
 name: "Preserve CI Report"
 description: >-
-  Validate a bounded .reports producer directory, bind it to the current run,
-  and upload success or failure evidence with explicit retention.
+  Validate a bounded producer directory, bind it to the current run, and
+  upload success or failure evidence with explicit retention.
 
 inputs:
   producer:
@@ -15,6 +15,12 @@ inputs:
   outcome:
     description: "Outcome of the check whose report is being preserved."
     required: true
+  source-directory:
+    description: >-
+      Optional absolute, pre-created evidence directory beneath RUNNER_TEMP.
+      When omitted, the legacy .reports/<producer>/ directory is used.
+    required: false
+    default: ""
   retention-days:
     description: "Artifact retention in days, from 1 through 90."
     required: false
@@ -45,7 +51,9 @@ outputs:
     description: "Complete, partial, or unavailable report evidence state."
     value: "${{ steps.prepare.outputs.completeness }}"
   manifest-path:
-    description: "Repository-relative path to the generated report manifest."
+    description: >-
+      Path to the generated report manifest; repository-relative in legacy
+      mode and absolute beneath RUNNER_TEMP for an isolated source.
     value: "${{ steps.prepare.outputs.manifest-path }}"
   manifest-sha256:
     description: "SHA-256 of the exact report manifest."
@@ -67,9 +75,10 @@ runs:
         INPUT_OUTCOME: "${{ inputs.outcome }}"
         INPUT_PRODUCER: "${{ inputs.producer }}"
         INPUT_RETENTION_DAYS: "${{ inputs.retention-days }}"
+        INPUT_SOURCE_DIRECTORY: "${{ inputs.source-directory }}"
       run: |
         set -euo pipefail
-        python3 "${GITHUB_ACTION_PATH}/scripts/preserve_ci_report.py" \
+        python3 -I "${GITHUB_ACTION_PATH}/scripts/preserve_ci_report.py" \
           --producer "${INPUT_PRODUCER}" \
           --outcome "${INPUT_OUTCOME}" \
           --repository "${GITHUB_REPOSITORY}" \
@@ -79,6 +88,8 @@ runs:
           --retention-days "${INPUT_RETENTION_DAYS}" \
           --maximum-files "${INPUT_MAXIMUM_FILES}" \
           --maximum-bytes "${INPUT_MAXIMUM_BYTES}" \
+          --source-directory "${INPUT_SOURCE_DIRECTORY}" \
+          --runner-temp "${RUNNER_TEMP}" \
           --github-output "${GITHUB_OUTPUT}"
 
     - name: "Upload bounded CI report evidence"

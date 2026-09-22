@@ -18,7 +18,7 @@ and failure semantics.
 | `semantic-release` | Reusable | `egohygiene/relay` | Verify a prepared candidate and hand off exact immutable publication | job-scoped `contents: write` | 5 minutes |
 | `publication-review` | Reusable | `egohygiene/relay` | Validate and preserve exact caller-built publication bytes | `actions: read`, `contents: read` | 10 minutes |
 | `publication-pages` | Reusable | `egohygiene/relay` | Deploy the exact read-only reviewed artifact and remotely prove it | job-scoped `pages: write` and `id-token: write` | 20 minutes |
-| `repository-intelligence` | Reusable | `egohygiene/relay` | Build, verify, and upload one bounded intelligence artifact | `contents: read` | 15 minutes |
+| `repository-intelligence` | Reusable | `egohygiene/relay` | Build and verify one bounded intelligence artifact and retain sanitized run evidence | `contents: read` | 15 minutes |
 | `repository-journal` | Reusable | `egohygiene/relay` | Render validated deterministic or reviewed-manual journal evidence without AI billing | `actions: read`, provider metadata reads | 10 minutes |
 | `repository-journal-copilot` | Reusable | `egohygiene/relay` | Generate one no-tool candidate behind explicit account preflight | read permissions plus job-scoped `copilot-requests: write` | 10 minutes |
 | `repository-journal-dogfood` | Internal | `egohygiene/relay` | Schedule and manually dispatch Relay's deterministic no-billing canary | read-only provider metadata | reusable caller |
@@ -66,6 +66,9 @@ review together.
 - Relay-local calls from a reusable workflow use `$/`, which resolves the
   implementation from the exact called Relay revision instead of the caller's
   checkout.
+- Repository Intelligence accepts no secrets, restores or saves no caches,
+  executes no consumer-owned scripts, and grants trusted and fork pull requests
+  the same candidate-code ceiling.
 - Every job that selects a runner declares a timeout.
 - Concurrency and cancellation behavior are explicit and cataloged.
 
@@ -77,7 +80,32 @@ job, so validation changes cannot silently inherit write access.
 
 Validation and artifact workflows fail closed: they publish no successful
 result when validation, provenance, output existence, or upload fails. A newer
-run on the same validation or intelligence ref cancels stale work.
+run on the same logical validation or intelligence target cancels stale work.
+
+Repository Intelligence remains artifact-only across same-repository pull
+requests, fork pull requests, default-branch pushes, reusable calls, and
+consumer-owned manual rebuilds. It has only `contents: read`, never uses
+`pull_request_target`, accepts no inherited secret, executes no consumer build
+command, and has no cache or Pages surface. The exact called Relay revision
+provides its implementation. Its
+`relay-intelligence-v1-${{ github.repository }}-${{ github.workflow_ref }}-${{ github.ref }}`
+concurrency identity includes the contract, caller repository, exact caller
+workflow path/ref identity, and target ref; consumer wrappers use a separate
+prefix, so unrelated work and the two workflow layers cannot cross-cancel.
+
+A successful run uploads
+`repository-intelligence-site-v1-<repository-id>-<full-represented-sha>-<run-id>-<attempt>`
+with caller-selected retention from 1 through 90 days and reports its artifact
+name and digest. Every run that reaches preservation also attempts the fixed,
+sanitized `repository-intelligence-run-report.json` through producer
+`repository-intelligence-v1`. That evidence artifact is named
+`relay-report-repository-intelligence-v1-<run-id>-<attempt>`, is retained for a
+fixed 30 days, and exposes its artifact name, digest, and manifest SHA-256.
+Actionable failures preserve the report before the workflow reasserts failure;
+partial site bytes are not a successful result. Cancellation may stop a runner
+before cleanup, and an artifact-service outage may prevent the report upload
+itself. Deployment provenance and authority remain consumer-owned and are
+tracked separately by Relay #105.
 
 Publication review and Pages runs never cancel in progress. The review workflow
 has no Pages or OIDC authority and stores the exact accepted artifact. The

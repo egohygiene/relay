@@ -8,6 +8,11 @@ All notable changes to Relay are documented in this file. The format follows
 
 ### Added
 
+- A hardened Repository Intelligence artifact workflow contract covering
+  trusted and fork pull requests, default-branch and manual rebuilds,
+  cache-free read-only execution, workflow-path/ref-scoped cancellation,
+  revision-scoped site artifacts, and fixed 30-day sanitized success or
+  actionable-failure evidence.
 - A proposed, advisory-first repository-architecture validation profile with
   immutable Hygiene, EgoLint, and Holon inputs; closed local/CI request and
   result contracts; bounded privacy-safe fixtures; and explicit planned or
@@ -40,6 +45,11 @@ All notable changes to Relay are documented in this file. The format follows
 
 ### Fixed
 
+- Repository Intelligence isolates checkout-context inline Python from
+  caller-controlled module shadowing before parsing timestamps or provenance.
+- CI report preservation rejects symbolic-link path components before creating
+  directories and can preserve pre-created evidence only from real directories
+  beneath the runner's temporary root.
 - Repository Intelligence snapshots may omit optional Health and Work queries
   without failing the whole site, and Compare can render structural evidence
   before the optional Search projection is adopted.
