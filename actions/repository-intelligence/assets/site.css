@@ -324,6 +324,9 @@ button, input, select { font: inherit; }
 .ri-panel-heading { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1rem; }
 .ri-panel-heading h2 { margin: 0.15rem 0 0; font-size: 1.08rem; }
 .ri-panel-icon { display: grid; width: 2.5rem; aspect-ratio: 1; place-items: center; border: 1px solid var(--ri-border-strong); border-radius: 0.75rem; color: var(--ri-accent); background: rgba(88, 230, 217, 0.08); font-weight: 900; }
+.ri-overview-grid .ri-panel { display: flex; flex-direction: column; }
+.ri-overview-grid .ri-panel > p { flex: 1; color: var(--ri-muted); }
+[data-context-selected] { outline: 2px solid var(--ri-accent); outline-offset: 0.2rem; }
 
 .ri-record-list { display: grid; gap: 0.65rem; }
 .ri-record, .ri-change { padding: 0.95rem; border: 1px solid var(--ri-border); border-radius: 0.8rem; background: rgba(8, 11, 21, 0.56); }

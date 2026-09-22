@@ -336,7 +336,7 @@ def render_relationship(
         f"{endpoint_label(source)} {readable_type} {endpoint_label(target)}"
     )
     fragment = site.stable_fragment("dependency", relationship.get("id"))
-    return f'''<li class="ri-evidence-record" id="{site.escaped(fragment)}" data-filter-item data-states="{site.escaped(" ".join(sorted(endpoint_states)))}" data-kinds="{site.escaped(" ".join(sorted(endpoint_kinds)))}" data-filter-relationship="{site.escaped(relationship_type)}" data-filter-assertion="{site.escaped(assertion)}" data-filter-freshness="{site.escaped(freshness)}" data-filter-scope="{site.escaped(scope)}" data-search="{site.escaped(search)}">
+    return f'''<li class="ri-evidence-record" id="{site.escaped(fragment)}" data-entity-id="{site.escaped(relationship.get("id"))}" data-filter-item data-states="{site.escaped(" ".join(sorted(endpoint_states)))}" data-kinds="{site.escaped(" ".join(sorted(endpoint_kinds)))}" data-filter-relationship="{site.escaped(relationship_type)}" data-filter-assertion="{site.escaped(assertion)}" data-filter-freshness="{site.escaped(freshness)}" data-filter-scope="{site.escaped(scope)}" data-search="{site.escaped(search)}">
       <div class="ri-evidence-record__top"><span class="ri-evidence-kind">{site.escaped(site.state_label(relationship_type))}</span><span>{site.status_pill(assertion, f"Assertion: {site.state_label(assertion)}")} {site.status_pill(freshness, f"Freshness: {site.state_label(freshness)}")}</span></div>
       <strong>{site.escaped(direction_label)}</strong>
       <p>Directed relationship · Confidence: {site.escaped(site.state_label(confidence))} · Scope: {site.escaped(site.state_label(scope))}</p>
@@ -442,11 +442,7 @@ def render_page(
         if snapshot
         else summary.get("generated_at") or ""
     )
-    freshness = site.normalize_state(
-        site.require_object(snapshot.get("coverage")).get("status")
-        if snapshot
-        else "unknown"
-    )
+    freshness = site.projection_freshness(snapshot, "dependencies")
     return site.shell_document(
         route="dependencies",
         route_label="Dependencies",

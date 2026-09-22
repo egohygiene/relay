@@ -251,7 +251,7 @@ def render_release(record: dict[str, Any], *, latest_release_id: str) -> str:
     title = release.get("title") or release.get("key") or release.get("id")
     latest = release.get("id") == latest_release_id
     latest_label = '<span class="ri-eyebrow">Latest projected release</span>' if latest else '<span class="ri-eyebrow">Projected release</span>'
-    return f'''<li><article class="ri-record" data-filter-item{site.source_repository_attribute(release)} data-state="{site.escaped(state)}" data-kind="release" data-search="{site.escaped(release_search_text(record))}">
+    return f'''<li><article class="ri-record" data-entity-id="{site.escaped(release.get("id"))}" data-filter-item{site.source_repository_attribute(release)} data-state="{site.escaped(state)}" data-kind="release" data-search="{site.escaped(release_search_text(record))}">
       <div class="ri-record__top">{latest_label}<span>{site.status_pill(state)}</span></div>
       <h3>{site.escaped(title)}</h3>
       <p><strong>Published:</strong> {site.escaped(site.format_date(record["published_at"]))}</p>
@@ -322,9 +322,7 @@ def render_page(
     observed_at = str(
         snapshot.get("observed_at") if snapshot else summary.get("generated_at") or ""
     )
-    freshness = site.normalize_state(
-        site.require_object(snapshot.get("coverage")).get("status") if snapshot else "unknown"
-    )
+    freshness = site.projection_freshness(snapshot, "releases")
     return site.shell_document(
         route="releases",
         route_label="Releases",

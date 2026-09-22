@@ -148,6 +148,8 @@ without a separate reviewed authorization.
 | `output-directory`          | `dist/intelligence`              | Generated HTML, CSS, JavaScript, and aggregate JSON bundle               |
 | `work-directory`            | `.cache/repository-intelligence` | Private collection workspace; do not publish wholesale                  |
 | `reports-directory`         | `.reports`                       | Optional summaries; always excluded from tree and analytics              |
+| `observatory-snapshot`      | empty                            | Optional commit-matched public-safe Repository Intelligence read model    |
+| `observatory-comparison`    | empty                            | Optional comparison whose after boundary matches the snapshot and commit |
 | `repository`                | workflow repository              | Local fallback; cannot override GitHub repository identity               |
 | `repository-visibility`     | event visibility, else `unknown` | Local-only fallback; cannot override GitHub visibility                  |
 | `default-branch`            | event default, then `main`       | Optional branch override for repository vitality                        |
@@ -166,11 +168,17 @@ without a separate reviewed authorization.
 | Output                  | Contents                                                               |
 | ----------------------- | ---------------------------------------------------------------------- |
 | `output-directory`      | Complete validated bundle                                               |
-| `index`                 | Default operational `index.html`                                        |
+| `index`                 | Repository Intelligence overview `index.html`                           |
 | `now`                   | Operational `/now/` entry                                               |
 | `roadmap`               | Scrollable `/roadmap/` quest line                                       |
 | `decisions`             | Authority-aware `/decisions/` ADR ledger                                |
 | `journey`               | Release-bounded `/journey/` semantic Git history                        |
+| `dependencies`          | Directed dependency-impact `/dependencies/` view                         |
+| `health`                | Normalized check-evidence `/health/` view                                 |
+| `releases`              | Shipped release-evidence `/releases/` view                                |
+| `work`                  | Active-work orientation `/work/` view                                     |
+| `search`                | Normalized entity `/search/` view                                         |
+| `compare`               | Structural snapshot `/compare/` view                                     |
 | `dashboard`             | Compatibility analytics `/dashboard/` entry                            |
 | `summary`               | `egohygiene.repository-intelligence-dashboard/v3` aggregate            |
 | `provenance`            | `egohygiene.relay.repository-intelligence-provenance/v1` metadata       |
@@ -225,7 +233,8 @@ dist/intelligence/
 └── explorer.js
 ```
 
-The root and `/now/` are the operational entry. `/roadmap/` renders the
+The root is the Repository Intelligence overview and `/now/` is the focused
+current-state view. `/roadmap/` renders the
 commit-matched Observatory roadmap view as a static-first quest line. Declared
 roots form chapters; stable step IDs form durable fragments; dependencies and
 blockers link in both display directions; and each native evidence drawer keeps
@@ -263,6 +272,24 @@ browser-only chapter comparison reports structural counts rather than causality
 or productivity. Automatic replay is optional, stops when filters change, and
 is disabled when the operating system requests reduced motion; the manual
 scrubber remains available.
+
+The supporting views stay intentionally focused:
+
+| Bundle route | Primary question | Accepted evidence boundary |
+| --- | --- | --- |
+| `/dependencies/` | What depends on what? | Directed normalized relationships and impact paths |
+| `/health/` | What does the current evidence say? | Core check, assertion, and freshness evidence; not full Hygiene conformance |
+| `/releases/` | What has actually shipped? | Release publication, included entities, deployments, and boundary IDs |
+| `/work/` | What work needs attention? | Open execution records and explicit roadmap readiness queues |
+| `/search/` | Where is the normalized object? | Observatory-supplied entity index and `search_text`, without local ranking |
+| `/compare/` | What structurally changed? | Separate before/after comparison artifact, never causal inference |
+
+These paths are relative to the generated subtree. When a repository-profile
+consumer mounts it at `/intelligence/`, their canonical public routes are
+`/intelligence/<route>/` under the pinned Hygiene surface registry. Top-level
+aliases are consumer-owned redirects only. The builder has no site-origin or
+deployment authority and therefore does not manufacture canonical URLs or
+duplicate alias content.
 
 `provenance.json` records the generator name/version, the requested Relay source
 ref, its resolved commit when GitHub exposes one, whether the requested ref was

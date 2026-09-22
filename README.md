@@ -82,7 +82,7 @@ in [`SEMANTIC_RELEASE.md`](SEMANTIC_RELEASE.md).
 
 Relay writes `dist/intelligence/` but never deploys it. That preserves one Pages
 owner per repository. A consumer that uploads `dist/` at its configured domain
-will make the operational entry and its routed views available at URLs such as:
+will make the product overview and its routed evidence views available at URLs such as:
 
 ```text
 https://repository.example/intelligence/
@@ -143,8 +143,9 @@ jobs:
 ```
 
 Both entry points produce the same framework-free, visibility-aware subtree.
-The root and `/now/` are equivalent operational entry points; the previous
-analytics experience remains available at `/dashboard/`. `/roadmap/` renders
+The subtree root is the Repository Intelligence overview, `/now/` is the
+focused current-state view, and the previous analytics experience remains
+available at `/dashboard/`. `/roadmap/` renders
 the normalized `ROADMAP.md` projection as a vertically scrollable quest line
 with stable step links, dependency chapters, declared progress, and expandable
 delivery evidence. `/decisions/` renders inherited and repository-local ADRs as
@@ -154,18 +155,33 @@ side-by-side comparison. `/journey/` renders Observatory lifecycle events as
 release-bounded delivery chapters across intent, work, code, proof, and delivery
 lanes. Events retain canonical sources, explicit quest/ADR context, visible
 unclassified status, date and evidence filters, chapter comparison, and an
-optional reduced-motion-safe replay. The shell reserves stable routes for
-Dependencies, Health, Releases, Work, Search, and Compare so focused follow-up
-work can fill them without changing navigation contracts.
+optional reduced-motion-safe replay. The shell exposes stable routes for
+Dependencies, Health, Releases, Work, Search, and Compare, and all six routes
+now render their accepted normalized evidence with explicit empty, partial, and
+unavailable states. Navigation carries applicable URL-backed filters, time
+ranges, and stable selected-entity context between related views without
+changing the commit-matched repository boundary.
+
+For a repository-profile site, Hygiene's pinned public-surface registry makes
+the generated paths canonical beneath `/intelligence/`: for example,
+`/intelligence/dependencies/`, `/intelligence/health/`,
+`/intelligence/releases/`, `/intelligence/work/`,
+`/intelligence/search/`, and `/intelligence/compare/`. Friendly top-level
+forms such as `/health/` and `/search/` are redirect-only aliases owned by the
+consumer's final site composition; Relay does not publish duplicate pages.
 
 Supplying `observatory-snapshot` projects the commit-matched public-safe
 `egohygiene.observatory.repository-intelligence-read-model/v1` into `/now/`,
-`/roadmap/`, `/decisions/`, and `/journey/`.
-Omitting it remains valid and renders an explicit unavailable state; Relay does
-not infer active work from analytics. Private collection data remains in the
-configured work directory—`.cache/repository-intelligence/` by default—and
-must never be uploaded as site content. Only a bundle whose provenance is
-classified `public-safe` is eligible for public-site composition.
+`/roadmap/`, `/decisions/`, `/journey/`, `/dependencies/`, `/health/`,
+`/releases/`, `/work/`, and `/search/`. A separately supplied, boundary-matched
+`observatory-comparison` projects `/compare/`.
+Omitting `observatory-snapshot` remains valid and renders explicit unavailable
+states; Relay does not infer active work from analytics. Omitting
+`observatory-comparison` leaves only `/compare/` in its explicit partial state.
+Private collection data remains in the configured work
+directory—`.cache/repository-intelligence/` by default—and must never be
+uploaded as site content. Only a bundle whose provenance is classified
+`public-safe` is eligible for public-site composition.
 
 ## Manage stale pull requests without silent closure
 
@@ -239,6 +255,9 @@ python3 scripts/validate_actions.py
 python3 -m unittest discover --start-directory tests --pattern "test_*.py" --verbose
 python3 -m compileall -q actions scripts tests
 ```
+
+Node.js is a test-only prerequisite for browser-asset syntax and behavior
+harnesses; the action runtime remains Bash, Git, and Python 3.
 
 CI additionally checks Bash syntax, JSON parsing, workflow/action metadata, and
 release invariants on every pull request and default-branch push.

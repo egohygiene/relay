@@ -134,7 +134,7 @@ def render_search_record(record: dict[str, Any]) -> str:
     kind = site.normalize_state(record.get("kind"))
     freshness = site.normalize_state(record.get("freshness"))
     title = record.get("title") or record.get("key") or record.get("id")
-    return f'''<li><article class="ri-record" data-filter-item{site.source_repository_attribute(record)} data-state="{site.escaped(state)}" data-kind="{site.escaped(kind)}" data-filter-freshness="{site.escaped(freshness)}" data-search="{site.escaped(record["search_text"])}">
+    return f'''<li><article class="ri-record" data-entity-id="{site.escaped(record.get("id"))}" data-filter-item{site.source_repository_attribute(record)} data-state="{site.escaped(state)}" data-kind="{site.escaped(kind)}" data-filter-freshness="{site.escaped(freshness)}" data-search="{site.escaped(record["search_text"])}">
       <div class="ri-record__top"><span class="ri-eyebrow">{site.escaped(site.state_label(kind))}</span><span>{site.status_pill(state)} {site.status_pill(freshness, f"Freshness: {site.state_label(freshness)}")}</span></div>
       <h3>{site.escaped(title)}</h3>
       <p>{site.escaped(record.get("repository"))} · {site.escaped(record.get("key"))}</p>
@@ -179,11 +179,7 @@ def render_page(
     observed_at = str(
         snapshot.get("observed_at") if snapshot else summary.get("generated_at") or ""
     )
-    freshness = site.normalize_state(
-        site.require_object(snapshot.get("coverage")).get("status")
-        if snapshot
-        else "unknown"
-    )
+    freshness = site.projection_freshness(snapshot, "search")
     return site.shell_document(
         route="search",
         route_label="Search",
