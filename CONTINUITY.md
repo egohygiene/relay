@@ -101,12 +101,12 @@ review:
     - command: "python3 -m unittest discover --start-directory tests --pattern test_*.py --verbose"
       outcome: passed
       observed_at: "2026-09-22T18:12:07Z"
-      notes: "All 488 unit and integration tests passed, including passing receipt generation plus revision, digest, version, route, freshness, non-clobber, alias-target, incomplete-receipt, unsafe-URL, and pre-write path-boundary rejection fixtures."
+      notes: "All 489 unit and integration tests passed, including passing receipt generation plus revision, digest, version, route, freshness, non-clobber, alias-target, incomplete-receipt, unsafe-URL, pre-write path-boundary, and read-only workflow-smoke fixtures."
     - command: "Run validate_actions.py, validate_ci_run_lifecycle.py, validate_continuity_preflight_contract.py, validate_repository_architecture_contract.py, and validate_repository_journal_runtime.py."
       outcome: passed
       observed_at: "2026-09-22T18:12:07Z"
       notes: "All catalog, lifecycle, continuity, architecture, and journal contract validators passed."
-    - command: "Compile Python; parse JSON with duplicate-key rejection and YAML metadata; validate checked-in Bash, 96 inline Bash blocks, JavaScript syntax, and git diff whitespace."
+    - command: "Compile Python; parse JSON with duplicate-key rejection and YAML metadata; validate checked-in Bash, 99 inline Bash blocks, JavaScript syntax, and git diff whitespace."
       outcome: passed
       observed_at: "2026-09-22T18:12:07Z"
       notes: "All available deterministic syntax, metadata, and whitespace checks passed."
@@ -146,7 +146,7 @@ state. Resolve conflicts using the precedence above.
 
 - Base: merged `main` revision `ecdf1d9bd8eda0d1aa2388a7caffe867968578a7`.
 - Candidate: draft PR #108 on `codex/relay-105-deployment-provenance`.
-- Local verification: 488 tests, five contract validators, JSON/YAML parsing,
+- Local verification: 489 tests, five contract validators, JSON/YAML parsing,
   Python/Bash/inline-Bash/JavaScript syntax, and whitespace checks passed.
 - Live: #105 and parent #33 remain open. No production deployment or merge is
   claimed.
