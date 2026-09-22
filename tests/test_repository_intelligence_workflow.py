@@ -266,6 +266,8 @@ class RepositoryIntelligenceWorkflowTests(unittest.TestCase):
         self.assertIn("needs: intelligence-smoke", body)
         self.assertIn("permissions: {}", body)
         for output in (
+            "build-manifest-sha256",
+            "bundle-digest",
             "report-artifact-digest",
             "report-artifact-name",
             "report-manifest-sha256",
@@ -285,6 +287,38 @@ class RepositoryIntelligenceWorkflowTests(unittest.TestCase):
         ):
             with self.subTest(pattern=expected_pattern):
                 self.assertIn(expected_pattern, body)
+
+    def test_deployment_provenance_smoke_is_fixture_only_and_read_only(self) -> None:
+        """Exercise the action wrapper without granting deployment authority."""
+
+        match = re.search(
+            r"^  intelligence-deployment-provenance-smoke:\n"
+            r"(?P<body>.*?)(?=^  [A-Za-z0-9_-]+:|\Z)",
+            self.validation,
+            re.MULTILINE | re.DOTALL,
+        )
+        self.assertIsNotNone(match)
+        body = match.group("body")
+        self.assertIn("actions: read\n      contents: read", body)
+        self.assertEqual(
+            body.count("uses: ./actions/repository-intelligence-deployment-provenance"),
+            3,
+        )
+        self.assertIn("operation: capture-baseline", body)
+        self.assertIn("operation: record-receipt", body)
+        self.assertIn("operation: verify-receipt", body)
+        self.assertIn("deployment-environment: fixture-only", body)
+        self.assertIn("repository-intelligence-deployment-provenance-fixture-", body)
+        for forbidden in (
+            "pages: write",
+            "id-token: write",
+            "contents: write",
+            "actions/deploy-pages@",
+            "secrets.",
+            "github.token",
+        ):
+            with self.subTest(forbidden=forbidden):
+                self.assertNotIn(forbidden, body)
 
     def test_documentation_preserves_direct_action_and_workflow_boundaries(self) -> None:
         """Document real consumer composition without implying Relay deployment authority."""

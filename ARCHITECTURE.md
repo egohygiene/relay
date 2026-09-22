@@ -66,6 +66,7 @@ The diagram is conceptual. [SYSTEM.md](SYSTEM.md) remains authoritative for resp
 actions/
 ├── artifact-budget/              # bounded size evidence and budgets
 ├── repository-intelligence/      # read-only collector, renderer, and internal workflow-evidence helper
+├── repository-intelligence-deployment-provenance/ # consumer composition proof and deployment receipts
 ├── repository-journal/           # evidence-bound journal adapters and renderer
 ├── repository-continuity-preflight/ # pinned offline continuity adapter
 ├── repository-labels/            # governed label and PR metadata engine
@@ -134,6 +135,15 @@ generic report preserver binds that report to repository, revision, run, and
 retention before the workflow reasserts failure. Candidate content never
 supplies executable control-plane code, a cache, secrets, write permission, or
 Pages authority.
+The deterministic Repository Intelligence build manifest travels inside the
+generated artifact and binds the represented consumer revision, exact Relay
+generator revision, contract versions, source epoch, routes, and canonical
+payload digest. Consumer workflows retain sole composition and deployment
+authority. They capture unrelated-route bytes before composition, verify the
+manifest and non-clobber boundary afterward, and write deployment-specific
+receipts outside the deployed bundle. Those receipts bind a workflow run and
+attempt, environment, public URL, conclusion, published routes, aliases, and a
+consumer-owned rollback point without changing the Relay bundle digest.
 The `/roadmap/` composer treats declared roadmap roots as display chapters and
 stable roadmap-step identities as durable fragments. It derives only inverse
 navigation and exit-criteria presentation from the normalized view: readiness

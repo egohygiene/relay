@@ -467,6 +467,8 @@ jobs:
       - name: Validate site and run-report evidence outputs
         shell: bash
         env:
+          BUILD_MANIFEST_SHA256: "${{ needs.intelligence-smoke.outputs.build-manifest-sha256 }}"
+          BUNDLE_DIGEST: "${{ needs.intelligence-smoke.outputs.bundle-digest }}"
           REPORT_ARTIFACT_DIGEST: "${{ needs.intelligence-smoke.outputs.report-artifact-digest }}"
           REPORT_ARTIFACT_NAME: "${{ needs.intelligence-smoke.outputs.report-artifact-name }}"
           REPORT_MANIFEST_SHA256: "${{ needs.intelligence-smoke.outputs.report-manifest-sha256 }}"
@@ -476,6 +478,164 @@ jobs:
           set -euo pipefail
           [[ "${SITE_ARTIFACT_NAME}" =~ ^repository-intelligence-site-v1-[1-9][0-9]*-[0-9a-f]{40}-[1-9][0-9]*-[1-9][0-9]*$ ]]
           [[ "${SITE_ARTIFACT_DIGEST}" =~ ^(sha256:)?[0-9a-f]{64}$ ]]
+          [[ "${BUILD_MANIFEST_SHA256}" =~ ^sha256:[0-9a-f]{64}$ ]]
+          [[ "${BUNDLE_DIGEST}" =~ ^sha256:[0-9a-f]{64}$ ]]
           [[ "${REPORT_ARTIFACT_NAME}" =~ ^relay-report-repository-intelligence-v1-[1-9][0-9]*-[1-9][0-9]*$ ]]
           [[ "${REPORT_ARTIFACT_DIGEST}" =~ ^(sha256:)?[0-9a-f]{64}$ ]]
           [[ "${REPORT_MANIFEST_SHA256}" =~ ^[0-9a-f]{64}$ ]]
+
+  intelligence-deployment-provenance-smoke:
+    name: Exercise consumer-owned Intelligence deployment provenance fixture
+    needs:
+      - validate
+      - intelligence-smoke
+    permissions:
+      actions: read
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Harden runner
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Checkout exact consumer fixture revision
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: "${{ github.sha }}"
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Stage unrelated consumer-owned site files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "dist/assets" "dist/docs"
+          printf '<!doctype html><title>Consumer root</title>\n' > "dist/index.html"
+          printf 'body { color: #123456; }\n' > "dist/assets/consumer.css"
+          printf '<!doctype html><title>Consumer docs</title>\n' > "dist/docs/index.html"
+
+      - name: Capture consumer files before composition
+        uses: ./actions/repository-intelligence-deployment-provenance
+        with:
+          operation: capture-baseline
+          consumer-revision: "${{ github.sha }}"
+
+      - name: Download exact Repository Intelligence bundle
+        # actions/download-artifact v8.0.0
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: "${{ needs.intelligence-smoke.outputs.artifact-name }}"
+          path: dist/intelligence
+
+      - name: Stage alias and bind deterministic fixture times
+        id: fixture_metadata
+        shell: bash
+        env:
+          CONSUMER_REPOSITORY: "${{ github.repository }}"
+          CONSUMER_REVISION: "${{ github.sha }}"
+          EXPECTED_RELAY_REVISION: "${{ github.workflow_sha }}"
+        run: |
+          set -euo pipefail
+          mkdir -p "dist/health"
+          printf '%s\n' '<meta http-equiv="refresh" content="0; url=/intelligence/health/">' \
+            > "dist/health/index.html"
+          mapfile -t manifest_values < <(
+            python3 -I - \
+              "dist/intelligence/build-manifest.json" \
+              "${CONSUMER_REPOSITORY}" \
+              "${CONSUMER_REVISION}" \
+              "${EXPECTED_RELAY_REVISION}" <<'PYTHON'
+          import json
+          from pathlib import Path
+          import sys
+
+          manifest = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          if manifest["consumer"] != {"repository": sys.argv[2], "revision": sys.argv[3]}:
+              raise SystemExit("consumer fixture identity drift")
+          if manifest["generator"]["revision"] != sys.argv[4]:
+              raise SystemExit("Relay fixture identity drift")
+          print(manifest["generator"]["revision"])
+          print(manifest["source_epoch"])
+          PYTHON
+          )
+          relay_revision="${manifest_values[0]}"
+          source_epoch="${manifest_values[1]}"
+          verified_epoch="$((source_epoch + 60))"
+          recorded_epoch="$((source_epoch + 120))"
+          recorded_at="$(date -u --date="@${recorded_epoch}" +%Y-%m-%dT%H:%M:%SZ)"
+          printf 'relay_revision=%s\n' "${relay_revision}" >> "${GITHUB_OUTPUT}"
+          printf 'verified_epoch=%s\n' "${verified_epoch}" >> "${GITHUB_OUTPUT}"
+          printf 'recorded_at=%s\n' "${recorded_at}" >> "${GITHUB_OUTPUT}"
+
+      - name: Record fixture-only consumer deployment receipt
+        id: receipt
+        uses: ./actions/repository-intelligence-deployment-provenance
+        with:
+          operation: record-receipt
+          consumer-revision: "${{ github.sha }}"
+          relay-revision: "${{ steps.fixture_metadata.outputs.relay_revision }}"
+          verified-epoch: "${{ steps.fixture_metadata.outputs.verified_epoch }}"
+          maximum-source-age-seconds: "120"
+          required-routes: '["/","/docs/","/intelligence/","/intelligence/now/"]'
+          aliases: '[{"route":"/health/","target":"/intelligence/health/"}]'
+          workflow-run-id: "${{ github.run_id }}"
+          workflow-run-attempt: "${{ github.run_attempt }}"
+          deployment-environment: fixture-only
+          deployment-url: "https://example.test/reference/"
+          deployment-conclusion: success
+          recorded-at: "${{ steps.fixture_metadata.outputs.recorded_at }}"
+          rollback-revision: ecdf1d9bd8eda0d1aa2388a7caffe867968578a7
+          rollback-site-digest: "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+          rollback-url: "https://example.test/reference/"
+
+      - name: Re-verify exact fixture receipt
+        id: verify_receipt
+        uses: ./actions/repository-intelligence-deployment-provenance
+        with:
+          operation: verify-receipt
+          consumer-revision: "${{ github.sha }}"
+          relay-revision: "${{ steps.fixture_metadata.outputs.relay_revision }}"
+          verified-epoch: "${{ steps.fixture_metadata.outputs.verified_epoch }}"
+          maximum-source-age-seconds: "120"
+          required-routes: '["/","/docs/","/intelligence/","/intelligence/now/"]'
+          aliases: '[{"route":"/health/","target":"/intelligence/health/"}]'
+          workflow-run-id: "${{ github.run_id }}"
+          workflow-run-attempt: "${{ github.run_attempt }}"
+          deployment-environment: fixture-only
+          deployment-url: "https://example.test/reference/"
+          deployment-conclusion: success
+          recorded-at: "${{ steps.fixture_metadata.outputs.recorded_at }}"
+          rollback-revision: ecdf1d9bd8eda0d1aa2388a7caffe867968578a7
+          rollback-site-digest: "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+          rollback-url: "https://example.test/reference/"
+
+      - name: Validate receipt identities
+        shell: bash
+        env:
+          BUILD_MANIFEST_SHA256: "${{ steps.receipt.outputs.build-manifest-sha256 }}"
+          BUNDLE_DIGEST: "${{ steps.receipt.outputs.bundle-digest }}"
+          EXPECTED_BUILD_MANIFEST_SHA256: "${{ needs.intelligence-smoke.outputs.build-manifest-sha256 }}"
+          EXPECTED_BUNDLE_DIGEST: "${{ needs.intelligence-smoke.outputs.bundle-digest }}"
+          RECEIPT_SHA256: "${{ steps.receipt.outputs.receipt-sha256 }}"
+          VERIFIED_RECEIPT_SHA256: "${{ steps.verify_receipt.outputs.receipt-sha256 }}"
+        run: |
+          set -euo pipefail
+          [[ "${BUILD_MANIFEST_SHA256}" == "${EXPECTED_BUILD_MANIFEST_SHA256}" ]]
+          [[ "${BUNDLE_DIGEST}" == "${EXPECTED_BUNDLE_DIGEST}" ]]
+          [[ "${RECEIPT_SHA256}" =~ ^sha256:[0-9a-f]{64}$ ]]
+          [[ "${VERIFIED_RECEIPT_SHA256}" == "${RECEIPT_SHA256}" ]]
+
+      - name: Preserve fixture-only deployment provenance
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "repository-intelligence-deployment-provenance-fixture-${{ github.run_id }}-${{ github.run_attempt }}"
+          path: .relay/repository-intelligence-deployment
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1

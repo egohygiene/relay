@@ -42,6 +42,10 @@ bundle_validator = load_module(
     "site_bundle_validator",
     ACTION_ROOT / "scripts/validate_repository_intelligence_bundle.py",
 )
+build_manifest = load_module(
+    "site_build_manifest",
+    ACTION_ROOT / "scripts/create_repository_intelligence_build_manifest.py",
+)
 
 
 def git(repository: Path, *arguments: str, environment: dict[str, str] | None = None) -> str:
@@ -80,6 +84,7 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
         self.repository = Path(self.temporary_directory.name) / "repository"
         self.repository.mkdir()
         self.source_commit = initialize_repository(self.repository)
+        self.source_epoch = int(git(self.repository, "show", "--no-patch", "--format=%ct", "HEAD"))
         self.snapshot = json.loads(FIXTURE.read_text(encoding="utf-8"))
         serialized = json.dumps(self.snapshot).replace("1" * 40, self.source_commit)
         self.snapshot = json.loads(serialized)
@@ -178,6 +183,17 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
                 capture_output=True,
                 text=True,
             )
+        build_manifest.write_json(
+            output / build_manifest.BUILD_MANIFEST_NAME,
+            build_manifest.build_manifest(
+                output_root=output,
+                repository="example/repository",
+                consumer_revision=self.source_commit,
+                generator_revision=GENERATOR_COMMIT,
+                generator_version="1.2.0",
+                source_epoch=self.source_epoch,
+            ),
+        )
         bundle_validator.validate_bundle(
             repository_root=self.repository,
             output_root=output,
@@ -188,6 +204,7 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
             generator_source_ref=GENERATOR_COMMIT,
             generator_source_commit=GENERATOR_COMMIT,
             generator_immutable=True,
+            source_epoch=self.source_epoch,
         )
         return output
 
@@ -474,6 +491,7 @@ process.stdout.write(JSON.stringify({
                 generator_source_ref=GENERATOR_COMMIT,
                 generator_source_commit=GENERATOR_COMMIT,
                 generator_immutable=True,
+                source_epoch=self.source_epoch,
             )
 
     def test_optional_supporting_views_can_be_absent_during_incremental_adoption(self) -> None:
@@ -564,6 +582,7 @@ process.stdout.write(JSON.stringify({
             generator_source_ref=GENERATOR_COMMIT,
             generator_source_commit=GENERATOR_COMMIT,
             generator_immutable=True,
+            source_epoch=self.source_epoch,
         )
 
     def test_roadmap_renders_stable_quests_progress_and_full_evidence(self) -> None:
@@ -896,6 +915,7 @@ process.stdout.write(JSON.stringify({
                 generator_source_ref=GENERATOR_COMMIT,
                 generator_source_commit=GENERATOR_COMMIT,
                 generator_immutable=True,
+                source_epoch=self.source_epoch,
             )
 
     def test_journey_links_only_full_immutable_historical_commits(self) -> None:
@@ -928,6 +948,7 @@ process.stdout.write(JSON.stringify({
                 generator_source_ref=GENERATOR_COMMIT,
                 generator_source_commit=GENERATOR_COMMIT,
                 generator_immutable=True,
+                source_epoch=self.source_epoch,
             )
 
     def test_journey_contract_rejects_order_partition_and_boundary_drift(self) -> None:
@@ -1048,6 +1069,7 @@ process.stdout.write(JSON.stringify({
                 generator_source_ref=GENERATOR_COMMIT,
                 generator_source_commit=GENERATOR_COMMIT,
                 generator_immutable=True,
+                source_epoch=self.source_epoch,
             )
 
     def test_empty_decisions_are_an_explicit_valid_state(self) -> None:
@@ -1104,6 +1126,7 @@ process.stdout.write(JSON.stringify({
                 generator_source_ref=GENERATOR_COMMIT,
                 generator_source_commit=GENERATOR_COMMIT,
                 generator_immutable=True,
+                source_epoch=self.source_epoch,
             )
 
     def test_empty_roadmap_is_an_explicit_valid_state(self) -> None:

@@ -9,6 +9,7 @@ documentation, implementation, contracts, and tests.
 | [`artifact-budget`](artifact-budget/)                         | Normalize bounded filesystem or Size Limit evidence and evaluate absolute or baseline-relative budgets | Workspace report only |
 | [`repository-continuity-preflight`](repository-continuity-preflight/) | Run pinned offline continuity validation and normalize evidence | Workspace evidence only |
 | [`repository-intelligence`](repository-intelligence/)         | Build the overview, focused evidence routes, and analytics dashboard | Workspace files only          |
+| [`repository-intelligence-deployment-provenance`](repository-intelligence-deployment-provenance/) | Verify composition and record separate consumer deployment receipts | Workspace evidence only |
 | [`repository-journal`](repository-journal/)                   | Validate bounded provider evidence and render an Aether repository journal | Network reads and workspace evidence |
 | [`repository-labels`](repository-labels/)                     | Plan and apply canonical labels and pull-request metadata   | Optional repository metadata writes |
 | [`stale-pull-requests`](stale-pull-requests/)                 | Plan and apply warning-first stale pull-request lifecycle transitions | Optional labels, comments, and closure |
@@ -28,6 +29,7 @@ paths are:
 
 ```text
 egohygiene/relay/actions/repository-intelligence
+egohygiene/relay/actions/repository-intelligence-deployment-provenance
 egohygiene/relay/actions/repository-journal
 egohygiene/relay/actions/repository-labels
 egohygiene/relay/actions/stale-pull-requests

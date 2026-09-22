@@ -8,6 +8,10 @@ All notable changes to Relay are documented in this file. The format follows
 
 ### Added
 
+- A deterministic Repository Intelligence build manifest and separate
+  consumer-owned composition and deployment provenance action with revision,
+  digest, version, freshness, route, non-clobber, rollback, and public-safety
+  verification.
 - A hardened Repository Intelligence artifact workflow contract covering
   trusted and fork pull requests, default-branch and manual rebuilds,
   cache-free read-only execution, workflow-path/ref-scoped cancellation,

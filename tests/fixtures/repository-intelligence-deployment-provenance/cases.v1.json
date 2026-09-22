@@ -1,0 +1,56 @@
+{
+  "cases": [
+    {
+      "expected": "accepted receipt leaves the build manifest and bundle digest unchanged",
+      "id": "deterministic-receipt-separation",
+      "result": "pass"
+    },
+    {
+      "expected": "build manifest consumer revision drift",
+      "id": "revision-drift",
+      "result": "reject"
+    },
+    {
+      "expected": "build manifest bundle digest mismatch",
+      "id": "digest-mismatch",
+      "result": "reject"
+    },
+    {
+      "expected": "unsupported build manifest version",
+      "id": "incompatible-version",
+      "result": "reject"
+    },
+    {
+      "expected": "composed site is missing required routes",
+      "id": "missing-route",
+      "result": "reject"
+    },
+    {
+      "expected": "build manifest is stale for this deployment",
+      "id": "stale-artifact",
+      "result": "reject"
+    },
+    {
+      "expected": "consumer-owned route was clobbered during composition",
+      "id": "non-clobber",
+      "result": "reject"
+    },
+    {
+      "expected": "consumer alias entrypoint does not reference its declared target",
+      "id": "alias-target-mismatch",
+      "result": "reject"
+    },
+    {
+      "expected": "deployment receipt is incomplete or incompatible",
+      "id": "incomplete-receipt",
+      "result": "reject"
+    },
+    {
+      "expected": "deployment URL must be credential-free",
+      "id": "unsafe-url",
+      "result": "reject"
+    }
+  ],
+  "schema": "egohygiene.relay.repository-intelligence-deployment-fixtures/v1",
+  "schema_version": 1
+}

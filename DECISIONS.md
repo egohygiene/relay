@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-09-09
+updated: 2026-09-22
 governed_by:
   - architecture-decisions
 depends_on:
@@ -46,6 +46,7 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - ADR-007: Compose Repository Intelligence from bounded sibling contracts
 - ADR-008: Separate continuity orchestration from semantic authority
 - ADR-009: Separate product release identity from artifact validation profile
+- ADR-010: Separate deterministic Repository Intelligence builds from deployment receipts
 
 ## ADR-001: Package reusable behavior outside templates
 
@@ -127,6 +128,15 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - **Decision:** Keep the profile authoritative for evidence validation and accept a separately bounded optional product-facing release name. Use that name consistently for the outer archive, annotated-tag message, Release title, notes, and identical-release resume lookup; retain the profile as the default for compatibility.
 - **Consequences:** Consumers can publish recognizable product assets without creating product-specific validation profiles. Both identifiers remain explicit, safe, and independently reviewable, and an existing immutable release cannot be resumed under a contradictory name.
 - **Reconsider when:** A versioned repository release declaration supplies an equivalent product-identity field that Relay can consume without inferring or owning consumer semantics.
+
+## ADR-010: Separate deterministic Repository Intelligence builds from deployment receipts
+
+- **Status:** Accepted for Repository Intelligence deployment provenance
+- **Date:** 2026-09-22
+- **Context:** A Relay artifact must identify exactly what was built while consumer deployment runs add environment, URL, run-attempt, composition, and rollback facts that would make the shared bundle deployment-specific.
+- **Decision:** Put a versioned deterministic build manifest inside the Relay artifact and keep consumer composition verification and deployment receipts outside it. Relay validates the handoff but never deploys, selects a provider environment, or owns a consumer rollback.
+- **Consequences:** One bundle digest can be reproduced across deployment attempts, and each consumer can retain auditable deployment provenance without transferring Pages authority or injecting deployment metadata into Relay output. Consumer workflows must preserve and publish their receipts separately from the site bundle.
+- **Reconsider when:** A deployment provider supplies an equivalent portable, public-safe, immutable attestation that preserves the same consumer-authority and deterministic-bundle boundary.
 
 ## Open decisions
 

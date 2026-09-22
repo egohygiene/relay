@@ -13,11 +13,10 @@ Relay v1.1.0 commit. A reviewed dependency update replaces both the full commit
 SHA and its adjacent release comment. The moving `v1` alias is useful for
 discovery but is not a production pin.
 
-Until #104 merges, that published pin demonstrates the caller's trigger and
-authority shape but predates the sanitized run-report contract described
-below. Adopt the hardened contract only from #104's exact merged revision (or a
-later immutable release containing it); do not infer the candidate revision in
-advance.
+That published pin demonstrates the caller's trigger and authority shape but
+predates the hardened run-report and deployment-handoff contracts. Adopt those
+contracts only from their reviewed exact merged revisions or a later immutable
+release containing them.
 
 The caller covers pull-request review, configured-default-branch refresh, and
 manual rebuild. Same-repository and fork pull requests receive the same
@@ -48,7 +47,9 @@ for a fixed 30 days; an actionable failure is reasserted after preservation.
 Cancellation or an artifact-service outage can prevent upload, so a transient
 infrastructure failure should be rerun at the same revision. A consumer that
 needs site composition should use the composite action in its existing build
-job instead; deployment provenance remains separate work in Relay #105.
+job instead. See
+[`repository-intelligence-deployment-provenance.md`](repository-intelligence-deployment-provenance.md)
+for the separate consumer-owned composition, receipt, and rollback pipeline.
 
 ## Publication Pages lifecycle
 

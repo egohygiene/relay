@@ -1,0 +1,77 @@
+{
+  "aliases": [
+    {
+      "route": "/health/",
+      "target": "/intelligence/health/"
+    }
+  ],
+  "build_manifest": {
+    "bundle_digest": "sha256:bf0abdff44d2572f7b04bb9fc1f3a737062f32c73943a56971cb8da1c5ade6a6",
+    "path": "intelligence/build-manifest.json",
+    "sha256": "sha256:5d3d8393569ade9c683e0fee4a6cad83319bae9404969e4616db11c6c032cc8b"
+  },
+  "composition": {
+    "preserved_consumer_files": {
+      "digest": "sha256:a42418c8e2bafc4804a518ef8038538a3469321d3a37b9145e68e8cf0fde7e99",
+      "file_count": 2
+    },
+    "preserved_consumer_routes": [
+      {
+        "route": "/",
+        "sha256": "sha256:b4ba19097aeedafd194f8a2287095c0f3ccbb7603d3ada4dee14292ebe607ed4"
+      },
+      {
+        "route": "/docs/",
+        "sha256": "sha256:eb8f2d96f66c00e52327213bb2bb64965832a2cf0c82b501e3ea0df1e5353162"
+      }
+    ],
+    "published_routes": [
+      "/",
+      "/docs/",
+      "/health/",
+      "/intelligence/",
+      "/intelligence/compare/",
+      "/intelligence/dashboard/",
+      "/intelligence/decisions/",
+      "/intelligence/dependencies/",
+      "/intelligence/health/",
+      "/intelligence/journey/",
+      "/intelligence/now/",
+      "/intelligence/releases/",
+      "/intelligence/roadmap/",
+      "/intelligence/search/",
+      "/intelligence/work/"
+    ],
+    "site_digest": "sha256:7696ac4da3d5ffeec227167b17ad1ff461a7fadd23aebf951e48519a1bdc97ab"
+  },
+  "consumer": {
+    "repository": "example/consumer",
+    "revision": "1111111111111111111111111111111111111111"
+  },
+  "deployment": {
+    "conclusion": "success",
+    "environment": "github-pages",
+    "recorded_at": "2027-01-15T08:01:00Z",
+    "url": "https://example.test/consumer/"
+  },
+  "generator": {
+    "repository": "egohygiene/relay",
+    "revision": "2222222222222222222222222222222222222222"
+  },
+  "rollback": {
+    "consumer_revision": "3333333333333333333333333333333333333333",
+    "deployment_url": "https://example.test/consumer/",
+    "site_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+  },
+  "schema": "egohygiene.relay.repository-intelligence-deployment-receipt/v1",
+  "schema_version": 1,
+  "verification": {
+    "maximum_source_age_seconds": 120,
+    "source_epoch": 1800000000,
+    "verified_epoch": 1800000060
+  },
+  "workflow": {
+    "run_attempt": 2,
+    "run_id": 42
+  }
+}

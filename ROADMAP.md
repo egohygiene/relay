@@ -346,10 +346,15 @@ organization dashboard form one consistent evidence-navigation system.
 - Workflow parity #90/#91 is merged. Issue #33 still tracks representative
   consumer migration and verification of consumer-owned redirect-only aliases,
   canonical deployment evidence, and public routes.
-- Checkpoint #104 owns the artifact-workflow trust matrix, read-only fork-safe
-  execution, revision-scoped success artifacts, bounded sanitized run evidence,
-  and same-target cancellation. Deployment binding remains ordered separately
-  in #105, so this checkpoint does not complete #33 or this roadmap step.
+- Checkpoint #104 is complete at Relay revision
+  `ecdf1d9bd8eda0d1aa2388a7caffe867968578a7`: it owns the artifact-workflow
+  trust matrix, read-only fork-safe execution, revision-scoped success
+  artifacts, bounded sanitized run evidence, and same-target cancellation.
+- Checkpoint #105 adds the candidate deterministic build-manifest and separate
+  consumer deployment-receipt boundary, including revision, digest, version,
+  freshness, required-route, non-clobber, recovery, and rollback evidence. It
+  remains open pending review, merge, and exact provider or reference-consumer
+  evidence, so it does not yet complete #33 or this roadmap step.
 - Empathy and Akashic already compose immutable-pinned Repository Intelligence
   action output into consumer-owned Pages pipelines; representative migrations
   to one current hardened workflow revision and public-route verification remain
