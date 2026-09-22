@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-22T07:48:49Z"
+  updated_at: "2026-09-22T07:56:23Z"
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -77,18 +77,18 @@ state:
     revision: 3556bfabbd55993a03a9a208d938e00013c9f0e0
     tree: eb5c6a053743c5e7df90e498a2c9f3fec986b7b6
     pull_request: https://github.com/egohygiene/relay/pull/107
-    handoff_state: draft-awaiting-provider-validation
+    handoff_state: provider-validation-passed-ready-for-review
   live:
     status: verified
-    observed_at: "2026-09-22T07:48:49Z"
+    observed_at: "2026-09-22T07:56:23Z"
     default_branch_revision: 4a1f86acf570b9bc5b337f7ef3fbd00d951c2e85
     issue_state: open
     pull_request_state: draft
-    notes: "PR #107 contains the exact locally reviewed implementation tree. No merge, issue closure, default-branch run, deployment, or completed #33 evidence update is claimed."
+    notes: "PR #107 contains the exact locally reviewed implementation tree; trusted-PR validation run 35701854093 passed with bound site and report artifacts. This continuity-only update still requires an exact-head recheck before the draft is marked ready. No merge, issue closure, default-branch run, deployment, or completed #33 evidence update is claimed."
   parallel_changes: []
 review:
-  status: local-passed-provider-validation-pending
-  reviewed_at: "2026-09-22T07:48:49Z"
+  status: passed-continuity-head-recheck-pending
+  reviewed_at: "2026-09-22T07:56:23Z"
   reviewed_by: ChatGPT
   evidence:
     - command: "Verify live Relay #104, #105, #106, main, open pull-request state, repository guidance, architecture, decisions, roadmap, and catalogs."
@@ -115,8 +115,12 @@ review:
       outcome: passed
       observed_at: "2026-09-22T07:48:49Z"
       notes: "Remote commit 3556bfabbd55993a03a9a208d938e00013c9f0e0 and the local implementation have identical tree eb5c6a053743c5e7df90e498a2c9f3fec986b7b6."
+    - command: "Inspect trusted-PR validation run https://github.com/egohygiene/relay/actions/runs/35701854093 and its retained Repository Intelligence artifacts."
+      outcome: passed
+      observed_at: "2026-09-22T07:56:23Z"
+      notes: "The full workflow, Repository Intelligence job, and output consumer passed. Site artifact repository-intelligence-site-v1-1321918958-46989847c47c22311f3b7e6c8b765b67c1556dd8-35701854093-1 has digest sha256:e98bf71663bea5b097e01f05f40de211f03068e1414ed821b293d3df9fda1876 and 1-day smoke retention. Report artifact relay-report-repository-intelligence-v1-35701854093-1 has digest sha256:a9e37b2681084da09e3bb6c6435ebd06345c0c57a450ae257ea0b4bb1fe7cee5 and 30-day retention; its RIW-000 report and manifest bind the PR merge revision, run, site digest, and allowlisted authority."
   environment_limitations:
-    - "GitHub PR checks and trusted-PR run artifacts are pending after the continuity update."
+    - "The continuity-only head update must repeat required PR checks before the draft is marked ready."
     - "Exact merged revision plus default-push, fork, manual, retained artifact, and completed #33 evidence are necessarily post-merge closeout work; #104 remains open."
     - "Ruby is unavailable locally; PyYAML and duplicate-key traversal parsed metadata, while canonical CI repeats parsing with Ruby/Psych."
     - "The maintain-repository-continuity skill is unavailable in this session; this checkpoint was refreshed directly from the pinned local Aether template under AGENTS.md."
@@ -148,7 +152,7 @@ history, live issues, or PR state. Resolve conflicts using the precedence above.
 - Implementation: `3556bfabbd55993a03a9a208d938e00013c9f0e0`, exact tree
   `eb5c6a053743c5e7df90e498a2c9f3fec986b7b6`, in draft PR #107.
 - Local verification: 474 tests, five contract validators, all static checks,
-  and three independent reviews passed.
+  three independent reviews, and trusted-PR run 35701854093 passed.
 - Live: #104 and parent #33 remain open. No merge or deployment is claimed.
 
 ## Material changes
@@ -167,8 +171,9 @@ history, live issues, or PR state. Resolve conflicts using the precedence above.
 
 ## Remaining evidence and next work
 
-PR #107 must pass provider checks and return to the user for merge. Keep #104
-open afterward until its exact merged revision, representative event/trust run
+PR #107 must pass its continuity-only exact-head recheck and return to the user
+for merge. Keep #104 open afterward until its exact merged revision and the
+remaining representative event/trust run
 URLs, success/failure artifact names and digests, retention, permission audit,
 negative-fixture results, and completed-evidence update to #33 are recorded.
 Only then is #105 dependency-ready; it owns build-to-deployment provenance.
