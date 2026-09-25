@@ -3,12 +3,12 @@ schema: aether.architecture-document/v1
 id: relay-roadmap
 title: Relay Roadmap
 kind: architecture-document
-version: 0.2.0
+version: 0.2.1
 status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-09-22
+updated: 2026-09-25
 governed_by:
   - architecture-roadmap
 depends_on:
@@ -33,14 +33,14 @@ repository: egohygiene/relay
 visibility: public
 publication: central
 route: /roadmap/relay/
-updated: 2026-09-22
+updated: 2026-09-25
 -->
-## 2026-08-25 execution snapshot
+## 2026-09-25 execution snapshot
 
 > This evidence-reconciled snapshot is the issue-generation and visual-roadmap handoff. The longer-horizon strategy below remains canonical context; generated HTML, JSON, progress, issue plans, and commit lists are projections.
 
 **Lifecycle:** active released product  
-**Current gate:** Reconcile the stale roadmap with shipped v1.0-v1.2 behavior, then define and prove the reusable roadmap build workflow.  
+**Current gate:** Review this roadmap reconciliation, then complete the separate three-repository publication acceptance in [#106](https://github.com/egohygiene/relay/issues/106). [#109](https://github.com/egohygiene/relay/issues/109) owns the independent checkout-directory reproduction defect.
 **North-star outcome:** Immutable, reusable CI building blocks that repositories can pin, verify, and upgrade safely.
 
 ### Visual roadmap publication
@@ -52,6 +52,12 @@ updated: 2026-09-22
 Publish the public-safe projection through egohygiene.io at /roadmap/relay/. This repository owns intent and acceptance evidence; it does not add a second site deployment.
 
 ### Quest line
+
+The original `REL-Q01`–`REL-Q05` IDs remain stable for existing links. Their
+roadmap-publication goals now overlap the delivered `/roadmap/` renderer and
+the Repository Intelligence publication track below; they are not requests to
+build a second generator. Original wider pilot criteria remain unverified and
+must be explicitly reconciled before any legacy step is declared complete.
 
 <!-- roadmap-step
 id: REL-Q01
@@ -73,8 +79,10 @@ issues: []
 
 **Current evidence:**
 
-- Releases v1.0, v1.1, and v1.2 were observed.
-- Latest audited commit 8837ab6862ab was associated with a healthy released repository.
+- Published releases `v1.0.0` through `v1.5.0` were observed on 2026-09-25.
+- Default-branch [validation run 35780510787](https://github.com/egohygiene/relay/actions/runs/35780510787)
+  passed at `9a6315978766c336566b9fa7139b800fa8789ba5`. This is recorded provider
+  evidence, not a new execution or proof of every consumer's current health.
 
 <!-- roadmap-step
 id: REL-Q02
@@ -91,12 +99,15 @@ issues: []
 
 **Exit criteria:**
 
-- [ ] Shipped v1.0-v1.2 items are marked from acceptance evidence.
+- [ ] Shipped capabilities and outstanding acceptance are reconciled from current evidence.
 - [ ] Stale or duplicated future work is removed.
 
 **Current evidence:**
 
-- ROADMAP.md was stale relative to the released product.
+- This documentation candidate corrects the stale release, renderer, and
+  consumer-publication summaries. Review/merge and tracker synchronization
+  remain distinct from #106 publication acceptance and #101 final release
+  acceptance; this edit does not mark those outcomes complete.
 
 <!-- roadmap-step
 id: REL-Q03
@@ -118,7 +129,10 @@ issues: []
 
 **Current evidence:**
 
-- Existing dist and intelligence workflows provide a precedent; no roadmap workflow was observed.
+- The `/roadmap/` renderer (#31) and reusable Intelligence artifact workflow
+  (#90/#91) are already merged. Their final publication acceptance belongs to
+  #33/#106. Canonical roadmap semantics remain upstream-owned; reconcile this
+  legacy step against those interfaces rather than authoring another workflow.
 
 <!-- roadmap-step
 id: REL-Q04
@@ -140,7 +154,10 @@ issues: []
 
 **Current evidence:**
 
-- No cross-repository roadmap workflow pilot was observed.
+- Akashic #185 and Empathy #94 record accepted public consumer proofs at the
+  hardened Relay pin; see REL-RI-006. The original three-class/private-pilot
+  scope is not established by those two canaries and is not a new #106 gate.
+  #101 and Pace #13 retain their own acceptance and rollout scopes.
 
 <!-- roadmap-step
 id: REL-Q05
@@ -162,7 +179,10 @@ issues: []
 
 **Current evidence:**
 
-- Current releases predate the proposed roadmap automation.
+- Releases through `v1.5.0` exist. The current hardened consumer pin includes
+  source-declared `v1.6.0` work, but no published `v1.6.0` release was observed.
+  #101 owns final Intelligence release acceptance; release dispatch and fleet
+  pin changes are outside this documentation checkpoint.
 
 ### Publication Pages lifecycle track
 
@@ -189,13 +209,15 @@ prove and publish the exact caller-built static bytes.
   workflow surfaces; deployment consumes only the exact reviewed artifact.
 - [x] Canonical and explicitly authorized fallback endpoints use bounded HTTPS
   verification with deterministic, versioned evidence.
-- [ ] Relay v1.3.0 is published from the accepted implementation commit.
+- [ ] Match the published Relay v1.3.0 release to this track's accepted implementation evidence.
 - [ ] Antidote and Reflector pin that release and pass real default-branch
   deployment plus rollback checks without losing native build independence.
 
 **Current evidence:**
 
 - Relay issue #38 owns the implementation and release/adoption acceptance.
+- `v1.3.0` is published; this checkpoint does not re-audit #38's complete
+  release-to-consumer evidence or change its remaining acceptance state.
 - The v1.3 implementation PR references rather than closes #38; the issue stays
   open through immutable release publication and product migrations.
 - Antidote and Reflector static-permission caller patterns are documented under
@@ -314,7 +336,7 @@ releases, and deployments across meaningful epochs.
 id: REL-RI-006
 status: active
 depends_on: [REL-RI-005]
-issues: [29, 33, 77, 79, 81, 83, 86, 88, 90, 102, 104, 105, 106]
+issues: [29, 33, 77, 79, 81, 83, 86, 88, 90, 102, 104, 105, 106, 109]
 -->
 #### REL-RI-006 — Complete supporting views and the intelligence dashboard
 
@@ -322,7 +344,8 @@ issues: [29, 33, 77, 79, 81, 83, 86, 88, 90, 102, 104, 105, 106]
 **Depends on:** `REL-RI-005`
 
 **Outcome:** Dependencies, Health, Releases, Work, Search, Compare, and the
-organization dashboard form one consistent evidence-navigation system.
+repository dashboard form one consistent evidence-navigation system.
+Organization aggregation remains with Observatory and the organization host.
 
 **Exit criteria:**
 
@@ -343,22 +366,55 @@ organization dashboard form one consistent evidence-navigation system.
   Observatory #24 and Relay #102; Relay will not infer them from opaque
   `search_text`. Observatory #5 still owns full conformance evidence; Relay #75
   renders that accepted evidence as the separate `/hygiene/` contract matrix.
-- Workflow parity #90/#91 is merged. Issue #33 still tracks representative
-  consumer migration and verification of consumer-owned redirect-only aliases,
-  canonical deployment evidence, and public routes.
+- Workflow parity #90/#91 is merged. Issue #29 is closed; field attribution
+  remains explicitly separate in Observatory #24 and Relay #102.
+- Issue #33 remains open for #106's final evidence reconciliation and current
+  canary verification. Its four preceding checkpoints are closed; migration
+  implementation is no longer the next task.
 - Checkpoint #104 is complete at Relay revision
   `ecdf1d9bd8eda0d1aa2388a7caffe867968578a7`: it owns the artifact-workflow
   trust matrix, read-only fork-safe execution, revision-scoped success
   artifacts, bounded sanitized run evidence, and same-target cancellation.
-- Checkpoint #105 adds the candidate deterministic build-manifest and separate
-  consumer deployment-receipt boundary, including revision, digest, version,
-  freshness, required-route, non-clobber, recovery, and rollback evidence. It
-  remains open pending review, merge, and exact provider or reference-consumer
-  evidence, so it does not yet complete #33 or this roadmap step.
-- Empathy and Akashic already compose immutable-pinned Repository Intelligence
-  action output into consumer-owned Pages pipelines; representative migrations
-  to one current hardened workflow revision and public-route verification remain
-  required before #33 or REL-RI-006 can be considered complete.
+- Checkpoint #105 and PR #108 are merged at
+  `9a6315978766c336566b9fa7139b800fa8789ba5`. Its
+  [closeout](https://github.com/egohygiene/relay/issues/105#issuecomment-5783676953)
+  records deterministic build manifests, separate consumer deployment receipts,
+  and provider reference-pipeline proof. Fixture proof and consumer deployment
+  proof retain distinct scopes.
+- [Akashic #185](https://github.com/egohygiene/akashic/issues/185#issuecomment-5792866221)
+  and [Empathy #94](https://github.com/egohygiene/empathy/issues/94#issuecomment-5796092734)
+  are closed with recorded consumer-owned publication, failure, preservation,
+  and rollback evidence at the same immutable Relay pin. Their recorded source
+  revisions are respectively `cdf4959d573d36d4030c4e8e939ad0ea4df3d973` and
+  `d160044e08f3377afdf14f4856bc470ddd53b769`.
+- The preceding records were reread on 2026-09-25; this documentation mission
+  did not re-run workflows, download retained deployment artifacts, or inspect
+  live route bytes. #106 must reverify its own acceptance evidence before #33
+  closes. #101 retains final integration/release acceptance; Pace #13 retains
+  fleet adoption.
+- #109 remains open: identical declared inputs can produce different bytes
+  when checkout basenames differ. Existing same-directory canary proof is not
+  proof of portable reproduction. Repair and downstream pin adoption remain
+  separate work before broad local/fleet adoption.
+
+### Bounded Intelligence completion sequence
+
+1. Review this documentation reconciliation without closing #27, #33, or #106.
+2. Complete #106's current three-repository evidence matrix and post-merge
+   verification; keep failed or unavailable criteria explicit.
+3. Repair #109 and review affected consumer upgrades before broad adoption.
+4. Select required remaining route capabilities through #101's entry criteria;
+   record any nonblocking/post-v1 disposition explicitly in the owning issues.
+5. Complete #101 integration/release acceptance, then Pace #13 adoption waves.
+
+For every route, track renderer delivery, connected normalized evidence, and
+publication verified at a recorded revision separately. Missing Observatory
+input remains unavailable; it is not evidence of a billing failure.
+The organization focus order is coordinated in
+[Pace #25](https://github.com/egohygiene/pace/issues/25); the Intelligence program
+remains in [organization #30](https://github.com/egohygiene/.github/issues/30).
+Product features and optional platform research are outside this infrastructure
+focus. These links do not transfer organization roadmap authority into Relay.
 
 ### Repository architecture validation track
 
@@ -559,9 +615,11 @@ remains an explicit manual dispatch after review.
 
 ## Phase 5: Migrate repository consumers
 
-**Status:** Empathy, Akashic, and Optiflow have existing immutable-SHA v1.0
-consumer integrations. Their migrations to one approved hardened Relay SHA and
-public-route verification remain planned, repository-specific pilot work.
+**Status:** Akashic #185 and Empathy #94 record completed hardened consumer
+proofs at Relay `9a6315978766c336566b9fa7139b800fa8789ba5`. #106 owns current
+cross-consumer reconciliation and verification before #33 closes. Optiflow and
+broader consumer upgrades remain separately scoped adoption work; their current
+acceptance was not re-audited in this checkpoint.
 
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 
@@ -590,8 +648,11 @@ Optional managed services, enterprise controls, marketplaces, and the conversati
 - **Observed:** Relay owns the reusable Repository Intelligence implementation,
   framework-free template, public contracts, reusable artifact workflow,
   complete workflow catalog, immutable-pin adoption example, privacy fixtures,
-  and validation suite. `v1.0.0` and `v1.1.0` are published; the additive
-  `v1.2.0` catalog release and consumer pin migrations remain under review.
+  and validation suite. Published releases through `v1.5.0`, closed #104/#105,
+  and recorded Akashic/Empathy acceptance were observed on 2026-09-25.
+  Source-declared `v1.6.0` is not yet an observed published release.
 - **Decided for this draft:** The repository owns the bounded concern described here and participates through versioned contracts.
 - **Proposed:** Target systems and later roadmap phases remain proposals until accepted and implemented.
-- **Open question:** Which consumer-specific constraints will surface during the three hardened pilot migrations?
+- **Open work:** #106 publication reconciliation, #109 portable reproduction,
+  #101 final integration/release acceptance, and Pace #13 fleet rollout remain
+  distinct. Historical acceptance does not prove present deployment freshness.

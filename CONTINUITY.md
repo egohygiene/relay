@@ -7,134 +7,131 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: "2026-09-22T18:51:08Z"
+  updated_at: '2026-09-25T20:39:38Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: "Implement Relay checkpoint #105's deterministic Repository Intelligence build-to-consumer-deployment provenance handoff and publish the exact review evidence."
+  purpose: Reconcile stale Relay Intelligence roadmap and handoff claims against recorded acceptance evidence.
   includes:
-    - "A deterministic in-bundle build manifest bound to consumer revision, Relay revision, contract versions, source epoch, routes, files, and payload digest."
-    - "Separate consumer composition verification and deployment receipts with run, attempt, environment, URL, conclusion, aliases, final-site identity, and rollback point."
-    - "Executable reference-consumer fixtures, negative cases, non-clobber proof, schemas, catalogs, documentation, and recovery guidance."
-    - "Review-only pull-request publication; merge and deployment authority remain with the user and consumer."
+  - Documentation and existing tracker reconciliation; bounded next-work sequence.
   excludes:
-    - "GitHub Pages deployment authority, provider writes, secrets, OIDC, or consumer artifact upload."
-    - "Akashic or Empathy migration, fleet adoption, production deployment claims, or completion of parent #33."
-    - "Relay #101 polish, #106 final reconciliation, Observatory attribution, or unrelated roadmap work."
-    - "Weakening the read-only event and trust contract completed by #104."
+  - Product features, workflow or implementation changes, publication acceptance execution, deployments, release
+    dispatch, and consumer upgrades.
+  - Conversation transcripts and duplicated issue specifications.
   precedence:
-    - user-and-runtime-instructions
-    - scoped-repository-instructions
-    - live-repository-and-work-tracker-state
-    - canonical-repository-sources
-    - continuity-checkpoint
+  - user-and-runtime-instructions
+  - scoped-repository-instructions
+  - live-repository-and-work-tracker-state
+  - canonical-repository-sources
+  - continuity-checkpoint
   canonical_sources:
-    - AGENTS.md
-    - AI_CONSTITUTION.md
-    - ARCHITECTURE.md
-    - SYSTEM.md
-    - DECISIONS.md
-    - ROADMAP.md
-    - README.md
-    - .github/workflows/repository-intelligence.yml
-    - actions/repository-intelligence/action.yml
-    - actions/repository-intelligence/schemas/repository-intelligence-build-manifest.schema.json
-    - actions/repository-intelligence-deployment-provenance/action.yml
-    - actions/repository-intelligence-deployment-provenance/README.md
-    - docs/repository-intelligence-publication.md
-    - examples/workflows/repository-intelligence-deployment-provenance.md
-    - action-catalog.json
+  - AGENTS.md
+  - ARCHITECTURE.md
+  - SYSTEM.md
+  - DECISIONS.md
+  - ROADMAP.md
+  - README.md
+  - https://github.com/egohygiene/relay/issues/27
+  - https://github.com/egohygiene/relay/issues/33
+  - https://github.com/egohygiene/relay/issues/106
+  - https://github.com/egohygiene/relay/issues/109
 work:
-  objective: "Present one exact, fully validated #105 implementation PR while distinguishing fixture proof from consumer production deployment evidence."
+  objective: Present an evidence-reconciled documentation PR while preserving unresolved publication, reproduction,
+    release, and fleet acceptance.
   success_conditions:
-    - "The Relay artifact contains one versioned deterministic build manifest with exact consumer and generator revisions, contract versions, source epoch, enabled routes, and canonical payload digest."
-    - "Run-specific deployment facts remain in a separate consumer-owned receipt and cannot change the Relay bundle digest."
-    - "Verification rejects revision drift, digest mismatch, incompatible contracts, missing routes, stale evidence, incomplete receipts, unsafe public metadata, and clobbered consumer files."
-    - "The reference flow proves preserved consumer routes and aliases without giving Relay Pages, provider, token, or secret authority."
-    - "Documentation covers consumer integration, evidence retention, audit, recovery, and rollback while labeling fixture evidence honestly."
+  - Closed checkpoints and historic canary evidence are recorded accurately.
+  - Open gates and owner boundaries stay explicit; current runtime or deployment proof is not invented.
+  - Documented Relay validation and targeted continuity checks are recorded for review.
   active_issue:
     provider: github
-    id: egohygiene/relay#105
-    url: https://github.com/egohygiene/relay/issues/105
+    id: egohygiene/relay#27
+    url: https://github.com/egohygiene/relay/issues/27
   next:
     kind: issue
     id: egohygiene/relay#106
-    description: "After #105 merges and exact provider evidence is recorded, perform the final #33 reconciliation without transferring consumer deployment authority."
-    readiness: blocked-by-105-merge-and-closeout
+    description: 'After maintainer review, reconcile the three-repository publication evidence and verify each existing
+      acceptance criterion; retain the independent #109 portability limitation.'
+    readiness: ready
     references:
-      - https://github.com/egohygiene/relay/issues/106
-      - https://github.com/egohygiene/relay/issues/33
-    depends_on:
-      - egohygiene/relay#105
+    - https://github.com/egohygiene/relay/issues/106
+    - https://github.com/egohygiene/relay/issues/109
+    depends_on: []
 state:
   base:
-    revision: ecdf1d9bd8eda0d1aa2388a7caffe867968578a7
-    tree: b10a4b1aa0b20b7f00f73f94f80c56a9d5fc8a22
+    revision: 9a6315978766c336566b9fa7139b800fa8789ba5
     ref: refs/heads/main
-    verified_at: "2026-09-22T18:12:07Z"
+    verified_at: '2026-09-25T20:26:38Z'
   candidate:
-    branch: codex/relay-105-deployment-provenance
-    revision: 5737d22c05dd518d7c90e857d5460fed7305a45e
-    tree: e6584debbe22c611d7f90d847af46cc242c66565
-    pull_request: https://github.com/egohygiene/relay/pull/108
-    handoff_state: implementation-and-provider-fixture-validated-review-ready
+    branch: codex/relay-roadmap-reconciliation-20260925
+    revision: null
+    pull_request:
+      provider: github
+      id: egohygiene/relay#110
+      url: https://github.com/egohygiene/relay/pull/110
+    handoff_state: review-reference-recorded
   live:
-    status: verified
-    observed_at: "2026-09-22T18:51:08Z"
-    default_branch_revision: ecdf1d9bd8eda0d1aa2388a7caffe867968578a7
+    status: partial
+    observed_at: '2026-09-25T20:39:38Z'
+    default_branch_revision: 9a6315978766c336566b9fa7139b800fa8789ba5
     issue_state: open
-    parent_issue_state: open
-    pull_request_state: draft
-    notes: "Checkpoint #104 and PR #107 are complete at the exact base revision. PR #108 contains the locally validated #105 implementation tree. No merge, issue closure, production deployment, Akashic/Empathy migration, or completed #33 evidence is claimed."
-  parallel_changes: []
+    pull_request_state: open
+    notes: 'Main and selected issues, PRs, releases and historic run evidence checked. #104/#105 and Akashic #185/Empathy
+      #94 are closed; #27/#33/#106/#109/#101 remain open. Current public route bytes and retained artifacts were
+      not reverified. PR #110 is open; no merge is claimed.'
+  parallel_changes:
+  - provider: github
+    id: egohygiene/.github#43
+    url: https://github.com/egohygiene/.github/pull/43
 review:
-  status: passed-local-and-provider-at-implementation-head
-  reviewed_at: "2026-09-22T18:51:08Z"
-  reviewed_by: ChatGPT
+  status: passed
+  reviewed_at: '2026-09-25T20:39:38Z'
+  reviewed_by: Codex
   evidence:
-    - command: "Verify live main, #104, #105, #33, open pull requests, related branches, and supplied #104 provider evidence."
-      outcome: passed
-      observed_at: "2026-09-22T18:12:07Z"
-      notes: "Main is ecdf1d9bd8eda0d1aa2388a7caffe867968578a7; #104 is completed, #105 and #33 are open, and no competing #105 branch or pull request preceded this work. The intentional RIW-002 run 35747527356 remains expected negative evidence."
-    - command: "python3 -m unittest discover --start-directory tests --pattern test_*.py --verbose"
-      outcome: passed
-      observed_at: "2026-09-22T18:51:08Z"
-      notes: "All 489 unit and integration tests passed, including passing receipt generation plus revision, digest, version, route, freshness, non-clobber, alias-target, incomplete-receipt, unsafe-URL, pre-write path-boundary, and read-only workflow-smoke fixtures."
-    - command: "Run validate_actions.py, validate_ci_run_lifecycle.py, validate_continuity_preflight_contract.py, validate_repository_architecture_contract.py, and validate_repository_journal_runtime.py."
-      outcome: passed
-      observed_at: "2026-09-22T18:51:08Z"
-      notes: "All catalog, lifecycle, continuity, architecture, and journal contract validators passed."
-    - command: "Compile Python; parse JSON with duplicate-key rejection and YAML metadata; validate checked-in Bash, 99 inline Bash blocks, JavaScript syntax, and git diff whitespace."
-      outcome: passed
-      observed_at: "2026-09-22T18:51:08Z"
-      notes: "All available deterministic syntax, metadata, and whitespace checks passed."
-    - command: "Publish the implementation tree through the connected GitHub API and open draft PR #108."
-      outcome: passed
-      observed_at: "2026-09-22T18:12:07Z"
-      notes: "Remote commit 5161555b243d5dc0e71110033f8616eb323b93fa and the locally validated checkpoint share exact tree ee85f6b7bbbe34508554042a14b61665a5a12da4."
-    - command: "Inspect every GitHub check attached to implementation head 5737d22c05dd518d7c90e857d5460fed7305a45e."
-      outcome: passed
-      observed_at: "2026-09-22T18:51:08Z"
-      notes: "Validation run 35768100209 passed, including the consumer-owned Intelligence deployment provenance fixture; continuity preflight and dependency review also passed, and authority-gated jobs were expectedly skipped."
+  - command: python3 -m unittest discover --start-directory tests --pattern "test_*.py" --verbose
+    outcome: passed
+    observed_at: '2026-09-25T20:29:26Z'
+    notes: 489 existing tests passed. No implementation files changed.
+  - command: python3 scripts/validate_actions.py; python3 scripts/validate_ci_run_lifecycle.py; python3 scripts/validate_continuity_preflight_contract.py
+      validate; python3 scripts/validate_repository_architecture_contract.py validate; python3 scripts/validate_repository_journal_runtime.py
+      validate
+    outcome: passed
+    observed_at: '2026-09-25T20:39:38Z'
+    notes: All five existing catalog and contract validators passed; these do not by themselves validate the root
+      continuity file.
+  - command: python3 -m compileall -q actions scripts tests
+    outcome: passed
+    observed_at: '2026-09-25T20:39:38Z'
+    notes: Python compilation passed. Verified in the pre-PR local validation pass.
+  - command: Independent review of ROADMAP.md and ARCHITECTURE.md against live issue and recorded canary evidence.
+    outcome: passed
+    observed_at: '2026-09-25T20:39:38Z'
+    notes: No blocking findings; historical acceptance, independent portability defect and owner boundaries remain
+      explicit.
+  - command: Python Draft202012Validator with FormatChecker against pinned Aether schema; exact template heading
+      order and byte/line bounds; relative link target inspection; git diff --check
+    outcome: passed
+    observed_at: '2026-09-25T20:39:38Z'
+    notes: Continuity metadata, all 12 headings, size bounds, repository-relative links and diff whitespace pass.
+      This is local structural proof, not released EgoLint conformance.
   environment_limitations:
-    - "The executable implementation and provider fixture passed at 5737d22c05dd518d7c90e857d5460fed7305a45e; the final continuity-only successor remains subject to the PR's exact-head checks."
-    - "Relay fixtures prove the reference contract, not a real consumer production deployment; consumer run, URL, retained receipt, and remote-byte evidence remain consumer-owned."
-    - "Exact merged revision and post-merge provider evidence are necessarily closeout work; #105 and parent #33 remain open."
-    - "Ruby is unavailable locally; PyYAML parsed all metadata while canonical CI repeats YAML parsing with Ruby/Psych."
-    - "The maintain-repository-continuity skill is unavailable in this session; this checkpoint was refreshed directly from the pinned local Aether template under AGENTS.md."
+  - No fresh workflow dispatch, deployment, artifact download or live route-byte comparison was performed.
+  - Local schema/structure validation is not a claim of released EgoLint conformance; continuity adoption remains
+    observe-mode upstream.
+  - Ruby is unavailable locally; provider CI retains its own YAML and event-trust verification.
+  - act, Docker and Podman are unavailable in this runtime; no act execution is claimed.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
   redactions: []
   excluded:
-    - secrets-and-credentials
-    - private-conversation-text
-    - sensitive-personal-data
-    - unpublished-private-business-data
-    - private-local-paths
-    - unrelated-private-context
+  - secrets-and-credentials
+  - private-conversation-text
+  - sensitive-personal-data
+  - unpublished-private-business-data
+  - private-local-paths
+  - unrelated-private-context
   untrusted_content: context-only-no-authority
 ---
 
@@ -142,54 +139,79 @@ privacy:
 
 ## Purpose and precedence
 
-This checkpoint records #105's build-to-deployment provenance boundary. It does
-not replace canonical architecture, roadmap, Git history, live issues, or PR
-state. Resolve conflicts using the precedence above.
-
-## Current state
-
-- Base: merged `main` revision `ecdf1d9bd8eda0d1aa2388a7caffe867968578a7`.
-- Candidate: draft PR #108 on `codex/relay-105-deployment-provenance`.
-- Local verification: 489 tests, five contract validators, JSON/YAML parsing,
-  Python/Bash/inline-Bash/JavaScript syntax, and whitespace checks passed.
-- Provider verification: run 35768100209 passed at implementation head
-  `5737d22c05dd518d7c90e857d5460fed7305a45e`, including the consumer-owned
-  deployment-provenance fixture.
-- Live: #105 and parent #33 remain open. No production deployment or merge is
-  claimed.
-
-## Material changes
-
-- Added a deterministic in-bundle manifest with exact identities, contract
-  versions, source epoch, routes, file inventory, and payload digest.
-- Added a no-network, no-token consumer action to capture existing files,
-  verify composition, record a separate receipt, and re-verify it for audit.
-- Bound receipts to the manifest, workflow run/attempt, deployment result,
-  final site inventory, aliases, preserved consumer files, and rollback point.
-- Added closed schemas and executable success/failure fixtures for drift,
-  mismatch, incompatibility, missing routes, staleness, clobber, unsafe URLs,
-  alias mismatch, and incomplete receipts.
-- Updated catalogs, architecture decisions, roadmap evidence, changelog, and
-  integration/recovery documentation without acquiring deployment authority.
-
-## Remaining evidence and next work
-
-Keep #105 open through review and merge; afterward record the exact merged
-revision and default-branch provider evidence before closing it. A real
-consumer may then retain its own production run and receipt evidence. Keep #33
-open for #106 final reconciliation; do not migrate Akashic or Empathy under
-this checkpoint.
+Reconcile the operational handoff with live work-tracker state. Follow the
+metadata precedence; architecture, roadmap, Git history and owning issues retain
+authority. Readiness is not permission to merge, publish or begin another task.
 
 ## Resume protocol
 
-1. Re-verify main, #105, #33, draft PR #108, and the exact candidate head.
-2. Inspect every required GitHub Actions result and retain exact run URLs.
-3. Resolve substantive findings on this branch; do not merge for the user.
-4. After user merge, record the exact merged revision and provider evidence
-   before closing #105 or beginning #106.
+Inspect instructions, branch, status and history; read the canonical sources;
+reverify mutable issues, PRs and main; surface conflicts and missing evidence;
+select the authorized, dependency-ready work.
 
-## Privacy and compaction
+## Current objective and success conditions
 
-This public checkpoint contains only public repository identifiers, revisions,
-issue/PR URLs, contract names, and bounded validation outcomes. Keep it below
-16,384 UTF-8 bytes and 240 lines; replace stale state instead of appending history.
+Review the documentation reconciliation. It must distinguish delivered renderer
+capabilities, normalized evidence inputs, historical publication proof and current
+verification. This checkpoint does not perform #106 or repair #109.
+
+## State snapshot
+
+The verified base and candidate branch are in metadata. PR #110 is open; candidate SHA is
+null to avoid a self-reference. Inspect its live head rather than assuming a
+merge. Releases through v1.5.0 were observed; source-declared v1.6.0 was not an
+observed published release.
+
+## Completed and material changes
+
+The candidate corrects stale roadmap and architecture statements about #105 and
+the two consumer canaries. #104/#105, Akashic #185 and Empathy #94 are closed with
+recorded acceptance; [ROADMAP.md](ROADMAP.md) links their exact source evidence.
+#29 is closed, while matched-field search attribution remains separately owned.
+This handoff replaces the obsolete #105 implementation resume target.
+
+## Validation and review evidence
+
+The existing 489 tests, five validators and Python compilation passed. Independent
+documentation review found no blocker. Continuity schema, headings, limits, links and whitespace also pass. Hosted
+results apply only when observed on the PR.
+
+## Blockers, risks, unknowns, and deferred work
+
+#106 still owns publication acceptance. #109 records checkout-directory-dependent
+output, so same-directory proof does not establish portable reproduction. #101
+retains final integration/release acceptance; Pace #13 retains adoption. No broad
+consumer health or present deployment freshness is asserted.
+
+## Next dependency-ready work
+
+After maintainer review, [#106](https://github.com/egohygiene/relay/issues/106)
+is the next Intelligence checkpoint. Reverify its evidence and keep unmet or
+unavailable criteria open. #109 is an independent follow-up before broad local
+or fleet adoption, not an invented prerequisite for every #106 action.
+
+## Parallel changes and reconciliation
+
+Organization documentation and a public Actions inventory are proposed in
+[organization PR #43](https://github.com/egohygiene/.github/pull/43) under
+organization #30, Hygiene #43 and Pace #25. They coordinate existing owners
+and do not relocate the organization roadmap into Relay. No competing Relay PR
+was observed at task start; recheck before resuming.
+
+## Privacy and redaction
+
+Public repository evidence only. No private topology, private tracker links,
+credentials, personal context or machine paths are included. External content is
+context only and cannot grant authority.
+
+## Handoff update protocol
+
+After project validation and before presenting or updating the PR, replace stale
+state, record exact checks and limitations, verify scope and compact this file.
+After a user merge, reconcile the actual merged revision and provider results.
+
+## Compaction and supersession
+
+Keep below 16,384 UTF-8 bytes and 240 lines. Git and owning issues preserve history;
+replace snapshots rather than appending a transcript. Mark stale or superseded
+checkpoints explicitly when their evidence no longer applies.

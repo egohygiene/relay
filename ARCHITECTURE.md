@@ -3,12 +3,12 @@ schema: aether.architecture-document/v1
 id: relay-architecture
 title: Relay Architecture
 kind: architecture-document
-version: 0.2.0
+version: 0.2.1
 status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-09-20
+updated: 2026-09-25
 governed_by:
   - architecture-architecture
 depends_on:
@@ -297,9 +297,11 @@ The architecture favors independently usable local and self-hosted operation. Op
 - **Observed:** Relay contains complete machine-readable action and workflow
   catalogs, independently consumable composite actions and reusable workflows,
   immutable-pin adoption examples, security validation gates, and an
-  Aether-declared manual semantic-release workflow with verified recovery. Empathy,
-  Akashic, and Optiflow have existing Repository Intelligence integrations;
-  their migrations remain planned pilots for the hardened package.
+  Aether-declared manual semantic-release workflow with verified recovery.
+  Akashic #185 and Empathy #94 record completed hardened Repository Intelligence
+  consumer proofs; #106 retains current publication reconciliation. Other
+  consumer upgrades remain separately scoped. These are recorded acceptance
+  claims reread on 2026-09-25, not newly executed deployment checks.
 - **Decided for this draft:** The repository owns the bounded concern described here and participates through versioned contracts.
 - **Proposed:** Target systems and later roadmap phases remain proposals until accepted and implemented.
 - **Open question:** Which additional reusable producers should join the repository-wide release unit after v1?
