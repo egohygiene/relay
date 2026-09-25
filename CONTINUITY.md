@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-09-25T20:42:00Z'
+  updated_at: '2026-09-25T20:39:38Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -66,47 +66,53 @@ state:
   candidate:
     branch: codex/relay-roadmap-reconciliation-20260925
     revision: null
-    pull_request: null
-    handoff_state: ready-for-review
+    pull_request:
+      provider: github
+      id: egohygiene/relay#110
+      url: https://github.com/egohygiene/relay/pull/110
+    handoff_state: review-reference-recorded
   live:
     status: partial
-    observed_at: '2026-09-25T20:35:00Z'
+    observed_at: '2026-09-25T20:39:38Z'
     default_branch_revision: 9a6315978766c336566b9fa7139b800fa8789ba5
     issue_state: open
-    pull_request_state: not-applicable
+    pull_request_state: open
     notes: 'Main and selected issues, PRs, releases and historic run evidence checked. #104/#105 and Akashic #185/Empathy
       #94 are closed; #27/#33/#106/#109/#101 remain open. Current public route bytes and retained artifacts were
-      not reverified. No candidate PR exists yet.'
-  parallel_changes: []
+      not reverified. PR #110 is open; no merge is claimed.'
+  parallel_changes:
+  - provider: github
+    id: egohygiene/.github#43
+    url: https://github.com/egohygiene/.github/pull/43
 review:
   status: passed
-  reviewed_at: '2026-09-25T20:42:00Z'
+  reviewed_at: '2026-09-25T20:39:38Z'
   reviewed_by: Codex
   evidence:
   - command: python3 -m unittest discover --start-directory tests --pattern "test_*.py" --verbose
     outcome: passed
-    observed_at: '2026-09-25T20:32:22Z'
+    observed_at: '2026-09-25T20:29:26Z'
     notes: 489 existing tests passed. No implementation files changed.
   - command: python3 scripts/validate_actions.py; python3 scripts/validate_ci_run_lifecycle.py; python3 scripts/validate_continuity_preflight_contract.py
       validate; python3 scripts/validate_repository_architecture_contract.py validate; python3 scripts/validate_repository_journal_runtime.py
       validate
     outcome: passed
-    observed_at: '2026-09-25T20:32:22Z'
+    observed_at: '2026-09-25T20:39:38Z'
     notes: All five existing catalog and contract validators passed; these do not by themselves validate the root
       continuity file.
   - command: python3 -m compileall -q actions scripts tests
     outcome: passed
-    observed_at: '2026-09-25T20:34:00Z'
-    notes: Python compilation passed.
+    observed_at: '2026-09-25T20:39:38Z'
+    notes: Python compilation passed. Verified in the pre-PR local validation pass.
   - command: Independent review of ROADMAP.md and ARCHITECTURE.md against live issue and recorded canary evidence.
     outcome: passed
-    observed_at: '2026-09-25T20:34:00Z'
+    observed_at: '2026-09-25T20:39:38Z'
     notes: No blocking findings; historical acceptance, independent portability defect and owner boundaries remain
       explicit.
   - command: Python Draft202012Validator with FormatChecker against pinned Aether schema; exact template heading
       order and byte/line bounds; relative link target inspection; git diff --check
     outcome: passed
-    observed_at: '2026-09-25T20:40:00Z'
+    observed_at: '2026-09-25T20:39:38Z'
     notes: Continuity metadata, all 12 headings, size bounds, repository-relative links and diff whitespace pass.
       This is local structural proof, not released EgoLint conformance.
   environment_limitations:
@@ -151,8 +157,8 @@ verification. This checkpoint does not perform #106 or repair #109.
 
 ## State snapshot
 
-The verified base and candidate branch are in metadata. Candidate SHA and PR are
-null during pre-PR authoring; discover their live state rather than assuming a
+The verified base and candidate branch are in metadata. PR #110 is open; candidate SHA is
+null to avoid a self-reference. Inspect its live head rather than assuming a
 merge. Releases through v1.5.0 were observed; source-declared v1.6.0 was not an
 observed published release.
 
@@ -186,8 +192,9 @@ or fleet adoption, not an invented prerequisite for every #106 action.
 
 ## Parallel changes and reconciliation
 
-Organization documentation and a public Actions inventory are being prepared
-under organization #30, Hygiene #43 and Pace #25. They coordinate existing owners
+Organization documentation and a public Actions inventory are proposed in
+[organization PR #43](https://github.com/egohygiene/.github/pull/43) under
+organization #30, Hygiene #43 and Pace #25. They coordinate existing owners
 and do not relocate the organization roadmap into Relay. No competing Relay PR
 was observed at task start; recheck before resuming.
 
