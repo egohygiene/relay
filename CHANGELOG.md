@@ -8,6 +8,10 @@ All notable changes to Relay are documented in this file. The format follows
 
 ### Added
 
+- An experimental offline architecture-validation adapter with a source-pinned
+  native EgoLint runtime, bounded read-only caller snapshots, sanitized JSON/SARIF
+  evidence and native ADR fixtures. The Hygiene/EgoLint policy-pin mismatch stays
+  explicit pending EgoLint #73; #99's diagram, workflow and acceptance gates remain.
 - An experimental native roadmap collector with exact sibling pins, source-bound
   validation, captured issue replay, privacy bounds, and a real Akashic canary.
   Output remains a publication-denied local review envelope pending Observatory

@@ -225,7 +225,7 @@ continuity result grants repository or provider write authority.
 
 ## Repository architecture validation boundary
 
-Relay owns the future execution seam and normalized evidence for repository
+Relay owns the local execution adapter and normalized evidence for repository
 architecture checks. Hygiene remains the organization-policy authority,
 EgoLint remains the validation-semantics authority, Holon remains the
 materialization authority, and the consumer repository remains the authority
@@ -234,16 +234,20 @@ for its own contracts, decisions, and diagrams.
 The proposed profile pins reviewed artifacts from all three sibling owners by
 full commit SHA and SHA-256 digest. Closed request and result schemas preserve
 adoption, visibility, coverage, provenance, truncation, and privacy states
-without copying sibling rules into Relay. Local and CI adapters must use the
-same result shape, operate offline after dependency acquisition, avoid
-consumer-code execution, and write only bounded reports and temporary data.
+without copying sibling rules into Relay. The experimental local adapter reads
+bounded Git source into a fresh temporary repository, verifies a separately
+prepared native runtime, and normalizes structured EgoLint output. It operates
+offline after dependency acquisition, avoids consumer-code execution, and writes
+only bounded reports and temporary data. Reusable CI must retain this boundary.
 
 Repository-contract and architecture-record semantics are already exposed by
 the pinned EgoLint source. Diagram semantics remain explicitly planned because
 no reviewed upstream validator owns them yet. Unreleased inputs keep the
-profile proposed and advisory-only; unavailable or partial coverage cannot be
-reported as conformance. Action and reusable-workflow entry points remain later
-checkpoints rather than an implied release surface.
+profile proposed and advisory-only. The pinned EgoLint catalog also references
+an earlier Hygiene policy revision; EgoLint #73 owns reconciliation. Relay
+preserves native diagnostics and reports partial ADR coverage even when the old
+pin validates. Unavailable or partial evidence cannot become conformance.
+Action and reusable-workflow entry points remain later checkpoints.
 
 ## Publication deployment boundary
 
