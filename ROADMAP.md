@@ -439,7 +439,7 @@ contract without moving sibling policy into Relay.
   are pinned by full revision and digest in a versioned profile.
 - [x] Closed request and result schemas preserve adoption, coverage,
   provenance, bounds, truncation, and privacy states.
-- [ ] An offline adapter normalizes pinned EgoLint evidence without executing
+- [x] An offline adapter normalizes pinned EgoLint evidence without executing
   consumer code or mutating the inspected checkout.
 - [ ] Diagram evidence is either validated by a reviewed owner or reported as
   explicitly planned or unavailable.
@@ -457,9 +457,11 @@ contract without moving sibling policy into Relay.
 - Repository-contract and architecture-record rules are present in the pinned
   EgoLint source. No reviewed diagram semantic validator was found, so Relay
   records that surface as planned instead of claiming conformance.
-- The checkpoint-2 candidate adds an offline native adapter, bounded temporary
-  Git snapshots, sanitized JSON/SARIF projections and real EgoLint fixtures.
-  Review/merge remains separate from the later workflow and acceptance gates.
+- Checkpoint 2 merged in PR #116 as `b3d27e61a86f347e0924da0c7eb56ad2f20b4e01`:
+  offline native validation, bounded snapshots and sanitized JSON/SARIF evidence.
+- The checkpoint-3 candidate adds bounded diagram discovery and closed metadata.
+  Format validation remains explicitly unavailable; EgoLint #74 tracks reviewed
+  offline backends. Review/merge remains separate from workflow and acceptance.
 - EgoLint #73 owns the reproduced ratified-policy pin mismatch. An old-policy
   native pass remains partial ADR coverage in Relay until a reviewed profile
   refresh establishes compatibility.

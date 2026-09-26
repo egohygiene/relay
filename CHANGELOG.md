@@ -8,6 +8,10 @@ All notable changes to Relay are documented in this file. The format follows
 
 ### Added
 
+- Bounded Mermaid, PlantUML and Excalidraw source discovery with closed metadata,
+  exact file/fence digests, independent failure evidence and privacy fixtures.
+  Diagram semantic validation remains unavailable pending reviewed backends in
+  EgoLint #74; discovery alone cannot establish conformance.
 - An experimental offline architecture-validation adapter with a source-pinned
   native EgoLint runtime, bounded read-only caller snapshots, sanitized JSON/SARIF
   evidence and native ADR fixtures. The Hygiene/EgoLint policy-pin mismatch stays

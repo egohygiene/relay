@@ -21,6 +21,7 @@ import tempfile
 import tomllib
 
 import validate_repository_architecture_contract as contract
+import collect_architecture_diagrams as diagrams
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -41,7 +42,8 @@ MESSAGES = {
     "MODE": ("Required enforcement is unavailable for this unreleased profile.", "Use advisory mode until the immutable release, reviewed workflow, and consumer opt-in gates are satisfied."),
     "POLICY": ("The caller policy and requested validation coverage disagree.", "Align repository identity and ADR adoption, enable the profile's ADR rules, and preserve the caller policy."),
     "COMPAT": ("The pinned EgoLint ADR catalog still references an earlier Hygiene policy revision.", "Reconcile the supported policy pins in EgoLint, then review and adopt a new Relay profile."),
-    "DIAGRAM": ("Diagram validation is unavailable in this adapter checkpoint.", "Complete Relay #99 checkpoint 3; declared diagram sources remain unavailable meanwhile."),
+    "DIAGRAM": ("Diagram semantics have no reviewed validator in this profile.", "Review the diagram inventory separately; adopt an immutable format-owned validator before claiming semantic conformance."),
+    "DISCOVERY": ("Diagram source discovery rejected an unsafe, missing, overlapping, or oversized input.", "Inspect the bounded diagram evidence diagnostic, correct the declared roots or limits, and rerun discovery."),
     "UNKNOWN": ("One or more validation surfaces have unknown adoption.", "Resolve adoption explicitly before claiming complete architecture evidence."),
     "LEGACY": ("The caller declares a legacy architecture surface.", "Preserve existing records and complete the reviewed migration before claiming conformance."),
     "REVISION": ("An immutable revision was not established for this working-tree snapshot.", "Validate an explicit full source commit when immutable evidence is required."),
@@ -284,7 +286,7 @@ def excluded(path: str) -> bool:
     return path.split("/")[0] in EXCLUDED
 
 
-def snapshot(root: Path, workspace: Path, request: dict, evidence: dict) -> None:
+def snapshot(root: Path, workspace: Path, request: dict, evidence: dict) -> list[str]:
     """Materialize bounded regular files and a fresh, inert Git index/config."""
     if safe_path(Path(git(root, "rev-parse", "--show-toplevel").decode().strip())) != root:
         fail("PATH")
@@ -372,6 +374,7 @@ def snapshot(root: Path, workspace: Path, request: dict, evidence: dict) -> None
         evidence["history_commits"] = len(commits)
         evidence["history_truncated"] = bool(shallow)
         (workspace / ".git/HEAD").write_text(revision + "\n")
+    return [name for name, _, _, _ in files]
 
 
 def relay_finding(code: str) -> dict:
@@ -593,24 +596,35 @@ def run(args: argparse.Namespace) -> dict:
             result = finish(result, [], "not-applicable")
             write_atomic(output, encoded(result))
             return result
-        args.runtime = safe_path(args.runtime)
-        if args.runtime.is_relative_to(root):
-            fail("PATH")
-        receipt = runtime_files(args.runtime, selected)
-        definitions = catalog(args.runtime)
         with tempfile.TemporaryDirectory(prefix="relay-architecture-") as temporary:
             workspace = Path(temporary) / "repository"
-            snapshot(root, workspace, request, scan)
-            inspect_policy(workspace, request, definitions, args.runtime)
-            run_report, intel, sarif = run_engine(args.runtime, workspace, request, definitions)
+            files = snapshot(root, workspace, request, scan)
+            diagram_evidence = diagrams.collect(workspace, files, request, scan["sha256"], read_file)
+            diagrams.validate(diagram_evidence, request)
+            if request["adoption"]["diagram-sources"] != "not-applicable":
+                artifacts["diagram_evidence"] = ("diagram-evidence.json", diagram_evidence)
+            receipt, definitions, run_report, intel, sarif = None, None, None, None, None
+            native_error = None
+            if any(request["adoption"][surface] != "not-applicable"
+                   for surface in ("repository-contracts", "architecture-records")):
+                try:
+                    args.runtime = safe_path(args.runtime)
+                    if args.runtime.is_relative_to(root):
+                        fail("PATH")
+                    receipt = runtime_files(args.runtime, selected)
+                    definitions = catalog(args.runtime)
+                    inspect_policy(workspace, request, definitions, args.runtime)
+                    run_report, intel, sarif = run_engine(args.runtime, workspace, request, definitions)
+                except (AdapterError, OSError, ValueError, KeyError, TypeError, StopIteration, subprocess.SubprocessError) as error:
+                    native_error = str(error) if isinstance(error, AdapterError) else "RUNTIME"
             result = result_base(request, selected, scan)
             selected_tools = {"EGOLINT_REPOSITORY_INTELLIGENCE"} if intel is not None else set()
             if request["inputs"]["repository_contracts"]:
                 selected_tools.update({"EGOLINT_PORTABILITY", "EGOLINT_REPOSITORY_CONTRACT"})
-            native = [f for f in run_report["findings"] if f["rule"]["tool_id"] in selected_tools]
+            native = [f for f in run_report["findings"] if f["rule"]["tool_id"] in selected_tools] if run_report else []
             findings = [safe_finding(f, definitions) for f in native]
             coverage = result["coverage"]
-            if request["adoption"]["repository-contracts"] in {"present", "legacy"}:
+            if run_report and request["adoption"]["repository-contracts"] in {"present", "legacy"}:
                 relevant = [f for f in native if f["rule"]["tool_id"] != "EGOLINT_REPOSITORY_INTELLIGENCE"]
                 coverage["repository-contracts"] = "failed" if any(f["severity"] in {"error", "critical"} for f in relevant) else "passed"
             if intel is not None:
@@ -621,36 +635,47 @@ def run(args: argparse.Namespace) -> dict:
                     findings.append(relay_finding("COMPAT"))
                     if coverage["architecture-records"] == "passed":
                         coverage["architecture-records"] = "partial"
+            if native_error:
+                findings.append(relay_finding(native_error))
+                if native_error == "POLICY":
+                    for surface in ("repository-contracts", "architecture-records"):
+                        if request["adoption"][surface] in {"present", "legacy"}:
+                            coverage[surface] = "failed"
             if request["adoption"]["diagram-sources"] != "not-applicable":
                 findings.append(relay_finding("DIAGRAM"))
+                if diagram_evidence["inventory_status"] == "rejected":
+                    finding = relay_finding("DISCOVERY")
+                    finding["path"] = diagram_evidence["diagnostics"][0]["path"]
+                    findings.append(finding)
             if "unknown" in request["adoption"].values():
                 findings.append(relay_finding("UNKNOWN"))
             if "legacy" in request["adoption"].values():
                 findings.append(relay_finding("LEGACY"))
             if not contract.FULL_SHA.fullmatch(request["repository"]["represented_revision"]):
                 findings.append(relay_finding("REVISION"))
-            status = ("nonconformant" if "failed" in coverage.values() else "legacy"
+            status = ("unavailable" if native_error in {"PIN", "RUNTIME", "MODE"} else "nonconformant" if "failed" in coverage.values() else "legacy"
                       if "legacy" in request["adoption"].values() else "not-applicable"
                       if all(v == "not-applicable" for v in coverage.values()) else "incomplete"
                       if any(v in {"partial", "unavailable"} for v in coverage.values())
                       or not contract.FULL_SHA.fullmatch(request["repository"]["represented_revision"]) else "conformant")
             result = finish(result, findings, status)
             retained = [f for f in result["findings"] if f["source"] == "egolint"]
-            evidence = {"schema_version": "relay.repository-architecture-validation-evidence/v1",
-                        "profile": request["profile"], "repository": result["repository"], "runtime": receipt, "scan": scan,
-                        "upstream": {"status": run_report["status"], "egolint_exit_code": run_report["egolint_exit_code"],
-                                     "completeness": run_report["completeness"], "repository_intelligence_status": intel["status"] if intel else None},
-                        "findings": retained}
-            artifacts["egolint_run"] = ("egolint-run.json", evidence)
-            validate_evidence(evidence)
-            artifacts["egolint_sarif"] = ("egolint.sarif", sanitize_sarif(sarif, retained, definitions))
-            if intel is not None:
-                artifacts["repository_intelligence"] = ("repository-intelligence.json", {
-                    "schema_version": "relay.repository-architecture-validation-intelligence-evidence/v1",
-                    "status": intel["status"], "adrs": intel["adrs"], "roadmap": intel["roadmap"],
-                    "commit_history": intel["commit_history"], "commit_history_truncated": intel["commit_history_truncated"],
-                    "summary": intel["summary"], "findings": [f for f in retained if f["id"].startswith("EGO-INTEL-")]})
-                validate_evidence(artifacts["repository_intelligence"][1])
+            if run_report is not None:
+                evidence = {"schema_version": "relay.repository-architecture-validation-evidence/v1",
+                            "profile": request["profile"], "repository": result["repository"], "runtime": receipt, "scan": scan,
+                            "upstream": {"status": run_report["status"], "egolint_exit_code": run_report["egolint_exit_code"],
+                                         "completeness": run_report["completeness"], "repository_intelligence_status": intel["status"] if intel else None},
+                            "findings": retained}
+                artifacts["egolint_run"] = ("egolint-run.json", evidence)
+                validate_evidence(evidence)
+                artifacts["egolint_sarif"] = ("egolint.sarif", sanitize_sarif(sarif, retained, definitions))
+                if intel is not None:
+                    artifacts["repository_intelligence"] = ("repository-intelligence.json", {
+                        "schema_version": "relay.repository-architecture-validation-intelligence-evidence/v1",
+                        "status": intel["status"], "adrs": intel["adrs"], "roadmap": intel["roadmap"],
+                        "commit_history": intel["commit_history"], "commit_history_truncated": intel["commit_history_truncated"],
+                        "summary": intel["summary"], "findings": [f for f in retained if f["id"].startswith("EGO-INTEL-")]})
+                    validate_evidence(artifacts["repository_intelligence"][1])
     except (AdapterError, OSError, ValueError, KeyError, TypeError, StopIteration, subprocess.SubprocessError) as error:
         code = str(error) if isinstance(error, AdapterError) else "RUNTIME"
         result = result_base(request, selected, scan)
@@ -660,7 +685,14 @@ def run(args: argparse.Namespace) -> dict:
             result["coverage"] = {s: "failed" if a in {"present", "legacy"} else "not-applicable"
                                   if a == "not-applicable" else "unavailable" for s, a in request["adoption"].items()}
         result = finish(result, [relay_finding(code)], status)
+        previous_diagrams = artifacts.get("diagram_evidence")
         artifacts = {}
+        if previous_diagrams is not None:
+            artifacts["diagram_evidence"] = previous_diagrams
+        elif request["adoption"]["diagram-sources"] != "not-applicable":
+            artifacts["diagram_evidence"] = ("diagram-evidence.json", diagrams.unavailable(request, scan["sha256"]))
+    if "diagram_evidence" in artifacts:
+        diagrams.validate(artifacts["diagram_evidence"][1], request)
     if artifacts:
         identity = digest(encoded({"result": result, "artifacts": artifacts}))[:24]
         directory = f".reports/architecture-validation/evidence-{identity}"

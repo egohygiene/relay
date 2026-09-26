@@ -241,8 +241,12 @@ offline after dependency acquisition, avoids consumer-code execution, and writes
 only bounded reports and temporary data. Reusable CI must retain this boundary.
 
 Repository-contract and architecture-record semantics are already exposed by
-the pinned EgoLint source. Diagram semantics remain explicitly planned because
-no reviewed upstream validator owns them yet. Unreleased inputs keep the
+the pinned EgoLint source. Diagram discovery consumes the same bounded snapshot
+under explicit roots and emits only source identities, digests, line ranges and
+coverage metadata. It runs independently of native validator availability and
+never evaluates includes, scripts or embedded assets. Complete source discovery
+does not establish diagram validity: semantic validation stays unavailable until
+reviewed format-owned backends are pinned under EgoLint #74. Unreleased inputs keep the
 profile proposed and advisory-only. The pinned EgoLint catalog also references
 an earlier Hygiene policy revision; EgoLint #73 owns reconciliation. Relay
 preserves native diagnostics and reports partial ADR coverage even when the old

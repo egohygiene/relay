@@ -1,0 +1,465 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/architecture-diagram-evidence/v1/schema.json",
+  "title": "Relay bounded architecture diagram source evidence v1",
+  "description": "Source metadata only; discovery completeness does not establish format-owned semantic validity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "discovery_contract",
+    "profile",
+    "repository",
+    "snapshot_sha256",
+    "adoption",
+    "roots",
+    "inventory_status",
+    "validation_status",
+    "capabilities",
+    "sources",
+    "diagnostics",
+    "bounds"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "relay.repository-architecture-diagram-evidence/v1"
+    },
+    "discovery_contract": {
+      "const": "relay.diagram-source-discovery/v1"
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "sha256"
+      ],
+      "properties": {
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "visibility",
+        "represented_revision"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+        },
+        "visibility": {
+          "enum": [
+            "public",
+            "private",
+            "internal"
+          ]
+        },
+        "represented_revision": {
+          "type": "string",
+          "pattern": "^(?:[0-9a-f]{40}|working-tree|unknown|not-applicable)$"
+        }
+      }
+    },
+    "snapshot_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "adoption": {
+      "enum": [
+        "present",
+        "legacy",
+        "unknown",
+        "not-applicable"
+      ]
+    },
+    "roots": {
+      "type": "array",
+      "maxItems": 16,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/path"
+      }
+    },
+    "inventory_status": {
+      "enum": [
+        "complete",
+        "rejected",
+        "unknown",
+        "not-applicable"
+      ]
+    },
+    "validation_status": {
+      "enum": [
+        "unavailable",
+        "not-applicable"
+      ]
+    },
+    "capabilities": {
+      "const": [
+        {
+          "format": "mermaid",
+          "status": "unavailable",
+          "validator": null,
+          "reason": "no-reviewed-validator-in-profile"
+        },
+        {
+          "format": "plantuml",
+          "status": "unavailable",
+          "validator": null,
+          "reason": "no-reviewed-validator-in-profile"
+        },
+        {
+          "format": "excalidraw",
+          "status": "unavailable",
+          "validator": null,
+          "reason": "no-reviewed-validator-in-profile"
+        }
+      ]
+    },
+    "sources": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "format",
+          "origin",
+          "start_line",
+          "end_line",
+          "bytes",
+          "sha256",
+          "validation_status",
+          "validator"
+        ],
+        "properties": {
+          "path": {
+            "$ref": "#/$defs/path"
+          },
+          "format": {
+            "enum": [
+              "mermaid",
+              "plantuml",
+              "excalidraw"
+            ]
+          },
+          "origin": {
+            "enum": [
+              "file",
+              "markdown-fence"
+            ]
+          },
+          "start_line": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "end_line": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1048576
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "validation_status": {
+            "const": "unavailable"
+          },
+          "validator": {
+            "type": "null"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "origin": {
+                  "const": "file"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "start_line": {
+                  "type": "null"
+                },
+                "end_line": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "start_line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "end_line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "format": {
+                  "enum": [
+                    "mermaid",
+                    "plantuml"
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "path"
+        ],
+        "properties": {
+          "code": {
+            "enum": [
+              "bound-exceeded",
+              "invalid-markdown-encoding",
+              "missing-root",
+              "overlapping-roots",
+              "snapshot-unavailable",
+              "unsafe-input"
+            ]
+          },
+          "path": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/path"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "bounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maximum_sources",
+        "maximum_source_file_bytes",
+        "maximum_evidence_bytes",
+        "examined_files",
+        "examined_bytes",
+        "ignored_files",
+        "observed_sources",
+        "retained_sources",
+        "truncated"
+      ],
+      "properties": {
+        "maximum_sources": {
+          "const": 256
+        },
+        "maximum_source_file_bytes": {
+          "const": 1048576
+        },
+        "maximum_evidence_bytes": {
+          "const": 1048576
+        },
+        "examined_files": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "examined_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 104857600
+        },
+        "ignored_files": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "observed_sources": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 257
+        },
+        "retained_sources": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 256
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)(?!.*\\/$)[A-Za-z0-9._/@-]+$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "inventory_status": {
+            "const": "complete"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "snapshot_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "diagnostics": {
+            "maxItems": 0
+          },
+          "bounds": {
+            "properties": {
+              "truncated": {
+                "const": false
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "sources": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "inventory_status": {
+            "const": "rejected"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "diagnostics": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "adoption": {
+            "enum": [
+              "present",
+              "legacy"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "roots": {
+            "minItems": 1
+          },
+          "inventory_status": {
+            "enum": [
+              "complete",
+              "rejected"
+            ]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "roots": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "adoption": {
+            "const": "unknown"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "inventory_status": {
+            "const": "unknown"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "adoption": {
+            "const": "not-applicable"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "inventory_status": {
+            "const": "not-applicable"
+          },
+          "validation_status": {
+            "const": "not-applicable"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "validation_status": {
+            "const": "unavailable"
+          }
+        }
+      }
+    }
+  ]
+}

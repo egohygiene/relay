@@ -3,8 +3,8 @@
 Relay issue [#5](https://github.com/egohygiene/relay/issues/5) is delivered
 through the ordered checkpoints in
 [#99](https://github.com/egohygiene/relay/issues/99). This document describes
-checkpoints 1 and 2: the versioned contract and an experimental offline local
-adapter. Action and reusable-workflow entry points remain later checkpoints.
+checkpoints 1–3: the versioned contract, an experimental offline local adapter
+and bounded diagram-source evidence. Reusable CI remains a later checkpoint.
 
 ## Responsibility boundary
 
@@ -229,6 +229,7 @@ policy text, credentials, environment values or absolute local paths.
 | `egolint-run.json` | Closed Relay projection of native run status, completeness, local runtime receipt and snapshot digest |
 | `repository-intelligence.json` | Closed Relay projection of native semantic status, adoption, inspection counts and history truncation |
 | `egolint.sarif` | SARIF 2.1.0 with native opaque rule IDs, stable EgoLint rule names, severity and source regions |
+| `diagram-evidence.json` | Bounded source inventory, exact digests/regions and explicit format-validator availability |
 
 The two evidence projections validate against
 [`architecture-validation-evidence.v1.schema.json`](../schemas/architecture-validation-evidence.v1.schema.json).
@@ -253,8 +254,11 @@ status controls validity even when advisory findings have warning severity.
 | Invalid request or unsafe output prevents a safe result | 2, fixed diagnostic on stderr |
 
 Consumers must inspect the result, not interpret exit 0 as conformance. On a
-failure before safe output, previous reports are not fresh evidence. Diagram
-coverage is unavailable whenever requested in this checkpoint.
+failure before safe output, previous reports are not fresh evidence. The
+[diagram evidence guide](repository-architecture-diagrams.md) defines the
+standalone and Markdown discovery grammar, bounds and closed sidecar. Discovery
+and native validation retain their evidence independently; requested diagram
+semantics remain unavailable until reviewed format validators are pinned.
 
 ## Known upstream policy compatibility gap
 
@@ -313,8 +317,9 @@ complete report equality across differently named checkouts.
 
 ## Next checkpoints
 
-Checkpoint 3 adds bounded diagram evidence, followed by reusable workflow
-orchestration, broader consumer fixtures and dogfood, then live acceptance and
-separate immutable release/adoption proof. This local experimental command does
+Checkpoint 4 adds reusable workflow orchestration, followed by broader consumer
+fixtures and dogfood, then live acceptance and separate immutable release/adoption
+proof. EgoLint #74 tracks reviewed diagram validators; source discovery does not
+establish diagram validity. This local experimental command does
 not make #99 or parent #5 complete. Canonical ADR collection and the Decisions
 build are tracked separately in [#115](https://github.com/egohygiene/relay/issues/115).
