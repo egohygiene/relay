@@ -50,8 +50,8 @@ The complete action and workflow inventories live in
 [`WORKFLOW_CATALOG.md`](WORKFLOW_CATALOG.md) for their human contracts.
 Workflow cancellation classes and durable report retention are defined in
 [`docs/ci-run-lifecycle.md`](docs/ci-run-lifecycle.md).
-The proposed repository-architecture validation boundary, immutable upstream
-pins, and future local/CI evidence seam are defined in
+The experimental offline architecture adapter, immutable upstream pins, and
+shared local/CI evidence contract are defined in
 [`docs/repository-architecture-validation.md`](docs/repository-architecture-validation.md).
 The complete release lifecycle and repository-class boundaries are documented
 in [`SEMANTIC_RELEASE.md`](SEMANTIC_RELEASE.md).
@@ -384,9 +384,12 @@ It defines closed request and result contracts for repository contracts,
 architecture records, and future diagram evidence while keeping Relay limited
 to orchestration and normalized evidence.
 
-Checkpoint 1 is contract-only: no action or reusable workflow is advertised.
-Unreleased upstream inputs cap the profile at advisory mode, diagram semantics
-remain explicitly planned, and unavailable coverage stays visible.
+The experimental local adapter runs the pinned native EgoLint validator in a
+bounded temporary Git snapshot and retains sanitized JSON/SARIF evidence. It
+leaves caller source unchanged. Unreleased inputs cap activation at advisory;
+the current EgoLint/Hygiene policy-pin mismatch remains explicit pending
+[EgoLint #73](https://github.com/egohygiene/egolint/issues/73).
+Diagram evidence and a reusable workflow remain later #99 checkpoints.
 
 ```bash
 python3 scripts/validate_repository_architecture_contract.py validate
@@ -394,8 +397,8 @@ python3 scripts/validate_repository_architecture_contract.py validate
 
 See
 [`docs/repository-architecture-validation.md`](docs/repository-architecture-validation.md)
-for the ownership, privacy, bounds, immutable pins, and ordered implementation
-gates.
+for runtime preparation, request examples, local commands, privacy, bounds and
+ordered implementation gates.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for structural boundaries and
 [ROADMAP.md](ROADMAP.md) for extraction and adoption sequencing.

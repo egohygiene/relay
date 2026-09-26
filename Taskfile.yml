@@ -6,6 +6,22 @@ vars:
     sh: python3 -c "import json; print(json.load(open(\"release.json\", encoding=\"utf-8\"))[\"version\"])"
 
 tasks:
+  architecture:contract:check:
+    desc: Validate the pinned architecture profile and request/result contracts offline
+    cmds:
+      - python3 scripts/validate_repository_architecture_contract.py validate
+
+  architecture:validate:
+    desc: Run the experimental offline architecture adapter from explicit caller inputs
+    requires:
+      vars: [REPOSITORY_ROOT, REQUEST, ARCHITECTURE_RUNTIME]
+    cmds:
+      - >-
+        python3 scripts/run_repository_architecture_validation.py run
+        --repository-root "{{.REPOSITORY_ROOT}}"
+        --request "{{.REQUEST}}"
+        --runtime "{{.ARCHITECTURE_RUNTIME}}"
+
   continuity:contract:check:
     desc: Validate the pinned continuity preflight profile and schemas offline
     cmds:

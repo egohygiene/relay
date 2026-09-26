@@ -1,0 +1,352 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/architecture-validation-evidence/v1/schema.json",
+  "title": "Relay architecture validation sanitized evidence v1",
+  "description": "Closed retained projections of upstream evidence; native rule semantics remain in the pinned EgoLint source.",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "profile",
+        "repository",
+        "runtime",
+        "scan",
+        "upstream",
+        "findings"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "relay.repository-architecture-validation-evidence/v1"
+        },
+        "profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "sha256"
+          ],
+          "properties": {
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "repository": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "visibility",
+            "represented_revision"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+            },
+            "visibility": {
+              "enum": [
+                "public",
+                "private",
+                "internal"
+              ]
+            },
+            "represented_revision": {
+              "type": "string",
+              "pattern": "^(?:[0-9a-f]{40}|working-tree|unknown|not-applicable)$"
+            }
+          }
+        },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "profile_sha256",
+            "egolint_sha256"
+          ],
+          "properties": {
+            "profile_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "egolint_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "scan": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "files",
+            "bytes",
+            "truncated",
+            "sha256",
+            "history_commits",
+            "history_truncated"
+          ],
+          "properties": {
+            "files": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "truncated": {
+              "const": false
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "history_commits": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 256
+            },
+            "history_truncated": {
+              "type": "boolean"
+            }
+          }
+        },
+        "upstream": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "egolint_exit_code",
+            "completeness",
+            "repository_intelligence_status"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "clean",
+                "findings"
+              ]
+            },
+            "egolint_exit_code": {
+              "type": "integer"
+            },
+            "completeness": {
+              "enum": [
+                "adapter_exit_only",
+                "partial",
+                "normalized"
+              ]
+            },
+            "repository_intelligence_status": {
+              "enum": [
+                "valid",
+                "invalid",
+                "incomplete",
+                "not_applicable",
+                null
+              ]
+            }
+          }
+        },
+        "findings": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "status",
+        "adrs",
+        "roadmap",
+        "commit_history",
+        "commit_history_truncated",
+        "summary",
+        "findings"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "relay.repository-architecture-validation-intelligence-evidence/v1"
+        },
+        "status": {
+          "enum": [
+            "valid",
+            "invalid",
+            "incomplete",
+            "not_applicable"
+          ]
+        },
+        "adrs": {
+          "enum": [
+            "present",
+            "unknown",
+            "not-applicable"
+          ]
+        },
+        "roadmap": {
+          "enum": [
+            "present",
+            "unknown",
+            "not-applicable"
+          ]
+        },
+        "commit_history": {
+          "enum": [
+            "present",
+            "unknown",
+            "not-applicable"
+          ]
+        },
+        "commit_history_truncated": {
+          "type": "boolean"
+        },
+        "summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "diagnostics",
+            "blocking_diagnostics",
+            "commits_inspected",
+            "adrs_inspected",
+            "roadmap_steps_inspected"
+          ],
+          "properties": {
+            "diagnostics": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "blocking_diagnostics": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "commits_inspected": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "adrs_inspected": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "roadmap_steps_inspected": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "findings": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "coverage": {
+      "enum": [
+        "passed",
+        "failed",
+        "partial",
+        "unavailable",
+        "not-applicable"
+      ]
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)(?!.*\\/$)[A-Za-z0-9._/@-]+$"
+    },
+    "nullablePath": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/path"
+        }
+      ]
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "severity",
+        "source",
+        "path",
+        "line",
+        "summary",
+        "remediation"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9-]+-[0-9]{3}$"
+        },
+        "severity": {
+          "enum": [
+            "info",
+            "warning",
+            "error",
+            "critical"
+          ]
+        },
+        "source": {
+          "enum": [
+            "egolint",
+            "diagram-validator",
+            "relay"
+          ]
+        },
+        "path": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/path"
+            }
+          ]
+        },
+        "line": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "integer",
+              "minimum": 1
+            }
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "remediation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      }
+    }
+  }
+}

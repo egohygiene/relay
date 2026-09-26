@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-09-25
+updated: 2026-09-26
 governed_by:
   - architecture-roadmap
 depends_on:
@@ -457,8 +457,15 @@ contract without moving sibling policy into Relay.
 - Repository-contract and architecture-record rules are present in the pinned
   EgoLint source. No reviewed diagram semantic validator was found, so Relay
   records that surface as planned instead of claiming conformance.
-- This checkpoint adds no action, reusable workflow, provider write, release,
-  or moving-alias change.
+- The checkpoint-2 candidate adds an offline native adapter, bounded temporary
+  Git snapshots, sanitized JSON/SARIF projections and real EgoLint fixtures.
+  Review/merge remains separate from the later workflow and acceptance gates.
+- EgoLint #73 owns the reproduced ratified-policy pin mismatch. An old-policy
+  native pass remains partial ADR coverage in Relay until a reviewed profile
+  refresh establishes compatibility.
+- ADR/Decisions adoption under Pace #5 is the current fleet priority. Relay
+  #115 owns canonical collection/build and Aether #91 owns continuous capture
+  guidance; roadmap rollout in Pace #31 follows the ADR campaign.
 
 ### Repository continuity preflight track
 
