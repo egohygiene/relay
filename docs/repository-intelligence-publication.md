@@ -73,6 +73,83 @@ The executable Relay fixture proves this boundary without claiming a live
 production deployment. Real consumer runs and remote-route proof remain
 consumer-side evidence and later #33 adoption checkpoints.
 
+## Portable reproduction and historical recovery
+
+Public identity comes from the action's validated `owner/name`, never the
+checkout basename or runner path. The tree uses that complete identity as its
+root label. Local invocations must declare it when `GITHUB_REPOSITORY` is absent;
+an explicit input cannot override GitHub identity or visibility. The
+[action README](../actions/repository-intelligence/README.md#portable-repository-identity)
+documents the standalone CLI and corrected root-label compatibility boundary.
+
+For reproduction, hold the consumer SHA, immutable Relay SHA, canonical identity
+and spelling, evidence bytes, source epoch/as-of, and every declared input fixed.
+Build in complete checkouts with different basenames **and** parents. Compare the
+entire relative file inventory and bytes, including summary, dashboard,
+provenance, build manifest, bundle digest, and manifest SHA-256. Confirm the tree
+root equals the declared identity and no checkout/runner path appears. Keep the
+same-workspace repeat test as an additional invariant. Run IDs, attempts, receipt
+times, deployment URLs, and environment observations remain outside that bundle;
+distinct receipts can refer to one deterministic manifest. Transport ZIP hashes,
+manifest hashes, payload digests, and composed-site digests are different evidence.
+
+A corrected generator produces a new reviewed output boundary. Historical
+rollback reconstruction must keep its original consumer/generator pins, payload
+and digest, operation ordering, and recorded environment constraints, including
+any old checkout-name requirement. Do not rewrite old receipts or claim the fix
+retroactively repaired them. Consumer adoption and an accepted new rollback point
+are separate reviewed work.
+
+**Akashic disposition (Relay #109):** Akashic maintainers own a follow-up to add
+an `AGENTS.md` pointer to their publication guide's provider scheduling and
+stage-evidence requirements. Track that follow-up under
+[#109](https://github.com/egohygiene/relay/issues/109) until a consumer-owned PR is
+reviewed. The issue records that both Akashic's then-current v1.6 generator pin
+`9a6315978766c336566b9fa7139b800fa8789ba5` and historical v1.3 rollback generator
+`55587de4ff322931d401e964f5af0716633dd675` have the basename limitation. Keep that
+qualification until a corrected generator is reviewed and adopted. This Relay
+change neither edits a consumer pin nor changes historical rollback records.
+
+## Acceptance evidence by stage
+
+Record the exact candidate head SHA/tree separately from GitHub's synthetic PR
+merge SHA. Bind each observed run/attempt, represented consumer revision,
+generator revision, artifact name/ID/digest, and inspected job/step conclusion to
+the stage it actually proves. A green overall run with required jobs skipped is
+not publication success. Report skipped, failed, cancelled, unavailable, and
+not-run stages explicitly.
+
+| Stage | Required evidence |
+| --- | --- |
+| Build | Cross-directory fixture, complete bundle and manifest equality; canonical root and path exclusion; applicable local suite and validators. |
+| Ordinary artifact upload | Exact run/attempt and retained artifact identity, successful upload conclusion, downloaded payload/manifest verification when inspected. |
+| Pages upload | Exact consumer composition, preservation checks, Pages artifact identity and upload conclusion. |
+| Deployment | Consumer-owned deployment job/step conclusion, environment and URL; neither build nor upload implies this stage. |
+| Receipt finalization | Separate receipt bound to the deterministic manifest, composition, and actual deployment result; successful retention and verification. |
+| Live verification | Observed public routes and bytes/digests at the deployed revision, with observation time. |
+
+The existing Relay validation workflow runs the portability fixture through test
+discovery. Retain its exact-head provider run link/attempt and digest evidence
+before marking that acceptance criterion complete. Local runs cannot substitute
+for provider execution; a PR handoff may explicitly leave this evidence pending
+without polling hosted CI.
+
+When changing deployment/recovery job dependencies or skip/failure/cancellation
+gates, additionally execute a read-only no-op fixture on GitHub. Exercise an
+intentionally skipped ancestor followed by a successful build and guarded
+downstream jobs, plus PR denial and unsuccessful/cancelled prerequisite denial.
+Inspect individual job/step conclusions. The fixture must have no inherited
+secrets, write permissions, protected environment, Pages artifact upload, or
+deployment. Local expression tests supplement this scheduler proof. Generator
+identity changes alone do not alter scheduling gates or need a new deployment
+workflow.
+
+For acceptance that continues after merge, use reference-only `Refs #N` wording
+in commit messages and PR bodies. Avoid automatic issue-closing keywords beside
+issue references even in negated sentences. Close an issue explicitly only after
+its recorded acceptance stages pass. #109 portability and #106 publication
+reconciliation retain their separate criteria and owner boundaries.
+
 ## Reusable workflow trust and event contract
 
 The consumer owns the event trigger and calls

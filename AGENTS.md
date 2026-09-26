@@ -14,6 +14,30 @@ Relay executes and packages reusable automation. It does not redefine sibling
 policy or schema ownership, author consumer semantic state, or inherit release,
 deployment, merge, or publication authority from a continuity checkpoint.
 
+## Repository Intelligence evidence
+
+- Derive public identity from declared canonical inputs, never checkout or
+  runner directory names. Reproducibility changes require equal complete bundles
+  from differently named checkouts at the same revisions and normalized inputs.
+- Changes to deployment/recovery dependencies or skip, failure, or cancellation
+  gates require a GitHub-executed read-only no-op scheduling fixture. Cover a
+  skipped ancestor, successful build, guarded downstream execution, PR denial,
+  and unsuccessful/cancelled prerequisite denial without secrets, write access,
+  protected environments, Pages upload, or deployment.
+- Report build, ordinary artifact upload, Pages upload, deployment, receipt, and
+  live verification separately. A green run with required jobs skipped is not
+  publication success; record exact revisions, run/attempt, artifact identity,
+  and inspected job/step conclusions. Unavailable evidence stays unavailable.
+- For checkpoints with later acceptance gates, use `Refs #N` in PR bodies and
+  commit messages. Never pair automatic closing keywords with issue references,
+  including in negated prose. Complete closure only after acceptance evidence.
+- Preserve pinned historical rollback bytes, digests, ordering, and environment
+  constraints. Corrected generator adoption and a new rollback point require
+  separate consumer review and verification.
+
+Detailed procedures belong to the [action README](actions/repository-intelligence/README.md)
+and [publication guide](docs/repository-intelligence-publication.md).
+
 <!-- BEGIN AETHER REPOSITORY-CONTINUITY -->
 <!-- aether-instruction {"contract":"aether.repository-continuity/v1","continuity_path":"CONTINUITY.md","id":"repository-continuity","skill":"maintain-repository-continuity","status":"draft","version":"1.0.0"} -->
 ## Repository continuity
