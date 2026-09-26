@@ -389,7 +389,10 @@ bounded temporary Git snapshot and retains sanitized JSON/SARIF evidence. It
 leaves caller source unchanged. Unreleased inputs cap activation at advisory;
 the current EgoLint/Hygiene policy-pin mismatch remains explicit pending
 [EgoLint #73](https://github.com/egohygiene/egolint/issues/73).
-Diagram evidence and a reusable workflow remain later #99 checkpoints.
+The [diagram collector](docs/repository-architecture-diagrams.md) inventories
+standalone and Markdown sources within explicit bounds. It reports semantic
+validation unavailable pending reviewed format validators (EgoLint #74).
+Reusable workflow orchestration remains #99 checkpoint 4.
 
 ```bash
 python3 scripts/validate_repository_architecture_contract.py validate
