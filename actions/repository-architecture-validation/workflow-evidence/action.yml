@@ -1,0 +1,123 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+name: Architecture workflow evidence (internal)
+description: Internal orchestration of the shared offline adapter and isolated sanitized workflow evidence.
+inputs:
+  operation:
+    description: "Trusted workflow operation."
+    required: false
+    default: ""
+  work-directory:
+    description: "Isolated runner-temporary workspace returned by preflight."
+    required: false
+    default: ""
+  report-directory:
+    description: "Isolated finalized report directory."
+    required: false
+    default: ""
+  stages:
+    description: "Provider step outcomes; output values are never exported as evidence."
+    required: false
+    default: "{}"
+  upload-outcome:
+    description: "Observed generic report-preservation outcome."
+    required: false
+    default: "skipped"
+  artifact-digest:
+    description: "Observed uploaded archive digest."
+    required: false
+    default: ""
+  check-id:
+    description: "Stable unique check identifier within the caller workflow; use distinct values for matrix calls."
+    required: false
+    default: "architecture"
+  mode:
+    description: "Advisory by default; required intent is retained but unavailable in the current profile."
+    required: false
+    default: "advisory"
+  repository-contract-adoption:
+    description: "Explicit present, legacy, unknown, or not-applicable repository-contract adoption."
+    required: false
+    default: "unknown"
+  repository-contracts:
+    description: "JSON array of at most 16 repository-relative contract policy paths."
+    required: false
+    default: "[]"
+  adr-adoption:
+    description: "Explicit present, legacy, unknown, or not-applicable ADR adoption."
+    required: false
+    default: "unknown"
+  adr-policy:
+    description: "Caller-owned EgoLint Repository Intelligence policy path; empty for unknown or not-applicable."
+    required: false
+    default: ""
+  diagram-adoption:
+    description: "Explicit present, legacy, unknown, or not-applicable diagram adoption."
+    required: false
+    default: "unknown"
+  diagram-roots:
+    description: "JSON array of at most 16 explicit repository-relative source files or directories."
+    required: false
+    default: "[]"
+  artifact-retention-days:
+    description: "Retention from 1 through 90 days for normalized evidence; rejected inputs use 30 days."
+    required: false
+    default: "30"
+outputs:
+  work-directory:
+    description: "Validated work-directory from the trusted operation."
+    value: "${{ steps.operation.outputs.work-directory }}"
+  native-needed:
+    description: "Validated native-needed from the trusted operation."
+    value: "${{ steps.operation.outputs.native-needed }}"
+  retention-days:
+    description: "Validated retention-days from the trusted operation."
+    value: "${{ steps.operation.outputs.retention-days }}"
+  producer:
+    description: "Validated producer from the trusted operation."
+    value: "${{ steps.operation.outputs.producer }}"
+  report-directory:
+    description: "Validated report-directory from the trusted operation."
+    value: "${{ steps.operation.outputs.report-directory }}"
+  workflow-outcome:
+    description: "Validated workflow-outcome from the trusted operation."
+    value: "${{ steps.operation.outputs.workflow-outcome }}"
+  semantic-status:
+    description: "Validated semantic-status from the trusted operation."
+    value: "${{ steps.operation.outputs.semantic-status }}"
+  validation-outcome:
+    description: "Validated validation-outcome from the trusted operation."
+    value: "${{ steps.operation.outputs.validation-outcome }}"
+  error-code:
+    description: "Validated error-code from the trusted operation."
+    value: "${{ steps.operation.outputs.error-code }}"
+runs:
+  using: composite
+  steps:
+    - name: Run trusted architecture workflow operation
+      id: operation
+      shell: bash
+      env:
+        INPUT_OPERATION: "${{ inputs.operation }}"
+        INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
+        INPUT_REPORT_DIRECTORY: "${{ inputs.report-directory }}"
+        INPUT_STAGES: "${{ inputs.stages }}"
+        INPUT_UPLOAD_OUTCOME: "${{ inputs.upload-outcome }}"
+        INPUT_ARTIFACT_DIGEST: "${{ inputs.artifact-digest }}"
+        INPUT_CHECK_ID: "${{ inputs.check-id }}"
+        INPUT_MODE: "${{ inputs.mode }}"
+        INPUT_CONTRACT_ADOPTION: "${{ inputs.repository-contract-adoption }}"
+        INPUT_CONTRACTS: "${{ inputs.repository-contracts }}"
+        INPUT_ADR_ADOPTION: "${{ inputs.adr-adoption }}"
+        INPUT_ADR_POLICY: "${{ inputs.adr-policy }}"
+        INPUT_DIAGRAM_ADOPTION: "${{ inputs.diagram-adoption }}"
+        INPUT_DIAGRAM_ROOTS: "${{ inputs.diagram-roots }}"
+        INPUT_RETENTION_DAYS: "${{ inputs.artifact-retention-days }}"
+      run: |
+        set -euo pipefail
+        architecture_python="python3.12"
+        if [[ "${INPUT_OPERATION}" == "validate" && -x "${INPUT_WORK_DIRECTORY}/venv/bin/python" ]]; then
+          architecture_python="${INPUT_WORK_DIRECTORY}/venv/bin/python"
+        fi
+        "${architecture_python}" -I "${GITHUB_ACTION_PATH}/../../../scripts/run_architecture_validation_workflow.py"

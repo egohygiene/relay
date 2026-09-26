@@ -4,7 +4,9 @@ Relay issue [#5](https://github.com/egohygiene/relay/issues/5) is delivered
 through the ordered checkpoints in
 [#99](https://github.com/egohygiene/relay/issues/99). This document describes
 checkpoints 1–3: the versioned contract, an experimental offline local adapter
-and bounded diagram-source evidence. Reusable CI remains a later checkpoint.
+and bounded diagram-source evidence. The
+[checkpoint-4 reusable workflow](repository-architecture-workflow.md) composes
+that same adapter and preserves its exact normalized evidence bytes.
 
 ## Responsibility boundary
 
@@ -133,7 +135,8 @@ The receipt binds the profile hash and locally built executable digest. Each
 run verifies that receipt and every pinned artifact. This is a trusted local
 build receipt, not a signed upstream release or an authenticity proof for a
 runtime supplied by an untrusted party. Keep the runtime and Relay code outside
-consumer control; checkpoint 4 must establish that boundary in CI.
+consumer control; the checkpoint-4 workflow uses isolated runner storage and
+resolves Relay code from the immutable called workflow revision.
 
 ## Run against a caller checkout
 
@@ -317,8 +320,8 @@ complete report equality across differently named checkouts.
 
 ## Next checkpoints
 
-Checkpoint 4 adds reusable workflow orchestration, followed by broader consumer
-fixtures and dogfood, then live acceptance and separate immutable release/adoption
+Checkpoint 4 implements reusable workflow orchestration. Broader consumer
+fixtures and dogfood follow in checkpoint 5, then live acceptance and separate immutable release/adoption
 proof. EgoLint #74 tracks reviewed diagram validators; source discovery does not
 establish diagram validity. This local experimental command does
 not make #99 or parent #5 complete. Canonical ADR collection and the Decisions

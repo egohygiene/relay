@@ -392,7 +392,13 @@ the current EgoLint/Hygiene policy-pin mismatch remains explicit pending
 The [diagram collector](docs/repository-architecture-diagrams.md) inventories
 standalone and Markdown sources within explicit bounds. It reports semantic
 validation unavailable pending reviewed format validators (EgoLint #74).
-Reusable workflow orchestration remains #99 checkpoint 4.
+The experimental reusable workflow is
+`egohygiene/relay/.github/workflows/repository-architecture-validation.yml@v1`.
+Use a reviewed full commit containing it; the discovery alias is not a release
+claim. It runs the same adapter, emits bounded annotations and a Step Summary,
+and preserves fresh success or failure reports before enforcement. See the
+[workflow contract](docs/repository-architecture-workflow.md) for caller inputs,
+permissions, failure semantics and the remaining #99 acceptance gates.
 
 ```bash
 python3 scripts/validate_repository_architecture_contract.py validate

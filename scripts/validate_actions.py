@@ -515,6 +515,9 @@ def validate_workflow_metadata(repository_root: Path, errors: list[str]) -> None
     if "workflow_call:" not in reusable:
         errors.append("repository-intelligence workflow is not callable")
     validate_repository_intelligence_workflow(repository_root, errors)
+    validate_action_manifest(
+        repository_root / "actions/repository-architecture-validation/workflow-evidence", errors
+    )
 
     review = (workflow_root / "publication-review.yml").read_text(encoding="utf-8")
     if "workflow_call:" not in review:

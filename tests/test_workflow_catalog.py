@@ -59,6 +59,8 @@ class WorkflowCatalogTests(unittest.TestCase):
                 "egohygiene/relay/.github/workflows/"
                 "continuity-preflight.yml@v1",
                 "egohygiene/relay/.github/workflows/"
+                "repository-architecture-validation.yml@v1",
+                "egohygiene/relay/.github/workflows/"
                 "label-sync-apply.yml@v1",
                 "egohygiene/relay/.github/workflows/"
                 "label-sync-plan.yml@v1",

@@ -441,7 +441,7 @@ contract without moving sibling policy into Relay.
   provenance, bounds, truncation, and privacy states.
 - [x] An offline adapter normalizes pinned EgoLint evidence without executing
   consumer code or mutating the inspected checkout.
-- [ ] Diagram evidence is either validated by a reviewed owner or reported as
+- [x] Diagram evidence is either validated by a reviewed owner or reported as
   explicitly planned or unavailable.
 - [ ] A least-privilege reusable workflow proves local/CI parity across public,
   private, legacy, missing, and nonconformant fixtures.
@@ -459,9 +459,14 @@ contract without moving sibling policy into Relay.
   records that surface as planned instead of claiming conformance.
 - Checkpoint 2 merged in PR #116 as `b3d27e61a86f347e0924da0c7eb56ad2f20b4e01`:
   offline native validation, bounded snapshots and sanitized JSON/SARIF evidence.
-- The checkpoint-3 candidate adds bounded diagram discovery and closed metadata.
+- Checkpoint 3 merged in PR #117 as `cf1413703160d4eac4ef66a10beb9415d40e42a2`,
+  adding bounded diagram discovery and closed metadata.
   Format validation remains explicitly unavailable; EgoLint #74 tracks reviewed
-  offline backends. Review/merge remains separate from workflow and acceptance.
+  offline backends.
+- The checkpoint-4 candidate composes the same adapter in a read-only reusable
+  workflow with bounded presentation, fresh-evidence receipts and #6 retention.
+  Checkpoints 5 and 6 still own broader fixtures/dogfood and live acceptance;
+  the reusable-workflow exit criterion remains unchecked until that evidence.
 - EgoLint #73 owns the reproduced ratified-policy pin mismatch. An old-policy
   native pass remains partial ADR coverage in Relay until a reviewed profile
   refresh establishes compatibility.

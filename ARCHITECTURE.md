@@ -87,6 +87,7 @@ actions/
 ├── repository-journal-dogfood.yml # scheduled/manual deterministic canary
 ├── continuity-preflight.yml      # reusable read-only continuity evidence
 ├── continuity-preflight-dogfood.yml # Relay PR caller
+├── repository-architecture-validation.yml # read-only architecture/ADR and diagram evidence
 ├── label-sync-plan.yml           # read-only label synchronization plan
 ├── label-sync-apply.yml          # reviewed label synchronization apply
 ├── pull-request-label-plan.yml   # untrusted-PR-safe metadata plan
@@ -251,7 +252,14 @@ profile proposed and advisory-only. The pinned EgoLint catalog also references
 an earlier Hygiene policy revision; EgoLint #73 owns reconciliation. Relay
 preserves native diagnostics and reports partial ADR coverage even when the old
 pin validates. Unavailable or partial evidence cannot become conformance.
-Action and reusable-workflow entry points remain later checkpoints.
+The experimental reusable workflow resolves its internal helper from the exact
+called Relay revision, checks out caller data separately from pinned sibling
+sources, and acquires locked dependencies before offline preparation/validation.
+Its fresh-evidence receipt prevents pre-existing caller reports from becoming
+current evidence. Closed run metadata and exact normalized adapter files enter
+the #6 report lifecycle before bounded presentation and enforcement. Advisory
+semantic findings remain warnings; execution and reporting failures remain
+failures. Hosted acceptance and release are separate checkpoints.
 
 ## Publication deployment boundary
 

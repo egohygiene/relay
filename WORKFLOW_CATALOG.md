@@ -228,6 +228,12 @@ than closure authority.
 
 ## Reusable caller contract
 
+The experimental `repository-architecture-validation` workflow is the #99
+checkpoint-4 composition of the local adapter. It is read-only, advisory by
+default and not yet released through the discovery alias. Its source/runtime,
+fresh-report, presentation, retention and enforcement boundaries are specified
+in [the architecture workflow contract](docs/repository-architecture-workflow.md).
+
 `artifact-budget`, `repository-intelligence`, `repository-journal`,
 `repository-journal-copilot`, `publication-review`, `publication-pages`,
 `release-artifact`, `release-prepare`, `semantic-release`, `label-sync-plan`,

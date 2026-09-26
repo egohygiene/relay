@@ -80,6 +80,18 @@ or retried runs have no repository effects; missing history, unsupported
 contracts, and unavailable validation remain explicit, while private output
 stays allowlisted.
 
+## Repository architecture validation
+
+`repository-architecture-validation.yml` composes the local architecture/ADR
+adapter and diagram inventory at an immutable Relay revision. It keeps caller
+code untrusted, prepares the pinned runtime in isolated storage, retains exact
+normalized current-run files through `preserve-ci-report`, and emits bounded
+annotations and a stage summary before final enforcement. Semantic findings
+are advisory; unavailable execution and failed reporting are failures. See the
+[caller and evidence contract](../../docs/repository-architecture-workflow.md).
+This workflow is experimental and is not yet a fleet rollout or live acceptance
+claim.
+
 ## Default branch compatibility
 
 `main` remains the preferred default branch for new Ego Hygiene repositories,

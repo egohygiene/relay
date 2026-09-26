@@ -39,7 +39,7 @@ This document identifies Relay's logical systems and responsibilities. It answer
 | Canonical roadmap collection | Experimental, publication blocked | Reads immutable roadmap evidence, invokes pinned sibling validation/normalization, and emits a local review envelope with explicit uncollected domains. Observatory #25 owns the missing publication contract. |
 | Contract metadata | Active | Owns versioned action, workflow, release, artifact, and provenance schemas and catalogs. |
 | Continuity preflight contract, local adapter, and PR workflow | Active | Pins upstream continuity owners and exposes matching offline and read-only CI evidence without modifying the inspected checkout. |
-| Repository architecture validation | Experimental local adapter | Runs pinned EgoLint checks and independent bounded diagram discovery against a temporary caller snapshot. Preserves sanitized evidence and explicit semantic-validator gaps; reusable CI and release gates remain separate. |
+| Repository architecture validation | Experimental local adapter and reusable workflow | Runs pinned EgoLint checks and independent diagram discovery; retains exact normalized evidence with read-only orchestration, bounded annotations and explicit stage failures. Hosted acceptance, semantic-validator gaps and release remain separate. |
 | Security and permission tests | Active | Rejects uncataloged workflows, mutable dependencies, broad authority, unsafe triggers, and unbounded runner jobs. |
 | Release and versioning | Active | Publishes verified immutable repository releases and a controlled moving major alias. |
 | Consumer examples | Active | Demonstrates complete caller-owned workflows with least privilege and immutable Relay pins. |

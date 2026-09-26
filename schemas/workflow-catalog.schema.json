@@ -124,7 +124,7 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "enum": ["pull_request", "push", "workflow_call", "workflow_dispatch"]
+            "enum": ["pull_request", "push", "schedule", "workflow_call", "workflow_dispatch"]
           },
           "uniqueItems": true
         },
