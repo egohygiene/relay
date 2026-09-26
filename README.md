@@ -280,6 +280,11 @@ action in the initial catalog.
 
 ## Validate locally
 
+The experimental [canonical roadmap collector](docs/repository-roadmap-collector.md)
+has a separately prepared, pinned native runtime and an explicit integration
+command. It emits local review evidence only: Observatory #25 blocks public
+partial-domain snapshots. It is not wired into the action or reusable workflow.
+
 ```bash
 python3 scripts/validate_actions.py
 python3 -m unittest discover --start-directory tests --pattern "test_*.py" --verbose

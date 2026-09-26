@@ -8,6 +8,10 @@ All notable changes to Relay are documented in this file. The format follows
 
 ### Added
 
+- An experimental native roadmap collector with exact sibling pins, source-bound
+  validation, captured issue replay, privacy bounds, and a real Akashic canary.
+  Output remains a publication-denied local review envelope pending Observatory
+  #25; action/workflow integration and full Relay #112 acceptance remain open.
 - A deterministic Repository Intelligence build manifest and separate
   consumer-owned composition and deployment provenance action with revision,
   digest, version, freshness, route, non-clobber, rollback, and public-safety

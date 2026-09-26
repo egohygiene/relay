@@ -1,0 +1,316 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/roadmap-collection-review.v1.schema.json",
+  "title": "Local roadmap collection review; publication prohibited",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "publication",
+    "diagnostics"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.relay.roadmap-collection-review/v1"
+    },
+    "publication": {
+      "const": "denied"
+    },
+    "status": {
+      "enum": [
+        "denied",
+        "invalid",
+        "blocked"
+      ]
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+    },
+    "represented_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roadmap_sha256"
+      ],
+      "properties": {
+        "roadmap_sha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "provider_sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/digest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "maximum_intent_age_days": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3650
+        },
+        "maximum_provider_age_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2678400
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lock_sha256",
+        "egolint_sha256",
+        "collector_sha256",
+        "pins"
+      ],
+      "properties": {
+        "lock_sha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "egolint_sha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "collector_sha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "pins": {
+          "type": "object"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "egolint",
+        "hygiene",
+        "observatory",
+        "diagnostics_truncated"
+      ],
+      "properties": {
+        "egolint": {
+          "enum": [
+            "valid",
+            "invalid",
+            "incomplete",
+            "not_applicable"
+          ]
+        },
+        "hygiene": {
+          "enum": [
+            "valid",
+            "invalid",
+            "not-run"
+          ]
+        },
+        "observatory": {
+          "enum": [
+            "normalized",
+            "not-run"
+          ]
+        },
+        "diagnostics_truncated": {
+          "type": "boolean"
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roadmap",
+        "issue_references",
+        "adrs",
+        "checks",
+        "releases",
+        "deployments",
+        "work_inventory",
+        "history"
+      ],
+      "properties": {
+        "roadmap": {
+          "enum": [
+            "observed",
+            "invalid"
+          ]
+        },
+        "issue_references": {
+          "enum": [
+            "partial",
+            "unavailable",
+            "stale"
+          ]
+        },
+        "adrs": {
+          "const": "uncollected"
+        },
+        "checks": {
+          "const": "uncollected"
+        },
+        "releases": {
+          "const": "uncollected"
+        },
+        "deployments": {
+          "const": "uncollected"
+        },
+        "work_inventory": {
+          "const": "uncollected"
+        },
+        "history": {
+          "const": "uncollected"
+        }
+      }
+    },
+    "references": {
+      "type": "array",
+      "maxItems": 65536,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "step",
+          "url"
+        ],
+        "properties": {
+          "step": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 256
+          }
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "maxItems": 264,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "owner",
+          "path",
+          "line",
+          "remediation"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^(?:[A-Z_]+|EGO-INTEL-[A-Z-]+-[0-9]{3})$",
+            "maxLength": 64
+          },
+          "owner": {
+            "enum": [
+              "relay",
+              "hygiene",
+              "egolint",
+              "observatory"
+            ]
+          },
+          "path": {
+            "enum": [
+              "ROADMAP.md",
+              null
+            ]
+          },
+          "line": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "remediation": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
+      }
+    },
+    "projection_candidate": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "snapshot_candidate": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "candidate_digests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "projection_sha256",
+        "snapshot_sha256"
+      ],
+      "properties": {
+        "projection_sha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "snapshot_sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/digest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "denied"
+          }
+        }
+      },
+      "then": {
+        "maxProperties": 4
+      },
+      "else": {
+        "required": [
+          "repository",
+          "represented_commit",
+          "observed_at",
+          "inputs",
+          "runtime",
+          "validation",
+          "projection_candidate",
+          "snapshot_candidate"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "blocker": "https://github.com/egohygiene/observatory/issues/25",
+  "profile": "roadmap-review-only/v1",
+  "publication": "denied",
+  "schema": "egohygiene.relay.roadmap-collector-lock/v1",
+  "sources": {
+    "egolint": {
+      "files": {
+        ".config/rules/repository-intelligence.v1.toml": "ee43fbb1be5d8a185627393fab132119fbcb12d70dd557723648f4406a7f4b84",
+        "Cargo.lock": "ecca8f57ebf40c8207ae113a7e14e4522393a8a10dc5f6576b59b6f7b48a96ab",
+        "Cargo.toml": "bc675e76bd8d2ff232edf9ac5073436353cfc58238f20c03a085d1c0452f12e2",
+        "rust-toolchain.toml": "24e1453b4e314d5d4407c1da60e7c7eac3914e7483b5098efd436cdd5978fccd",
+        "schemas/repository-intelligence-report.schema.json": "fa2d0ac0660a6ebdca23f450aa2400017835bfa6a0ae8b3ddaecf7f352155716"
+      },
+      "repository": "egohygiene/egolint",
+      "revision": "8b99ec4377eb84044fac411dff6b8074317ec094",
+      "tree": "078bf5fa369f736f779ce3f2b5a7a1f540e46804"
+    },
+    "hygiene": {
+      "files": {
+        "catalog/repository-intelligence-vocabulary.json": "e61ac19d7907b80d3e1d3e9158d34039a5da43208c309b81919105a9450f8cd7",
+        "schemas/repository-intelligence.v1.schema.json": "b1cbb66638d650d4aaa97a022c89454289fe7ccc1aff1a9153fcc3999bf225ae",
+        "tools/intelligence.py": "a1a28d8bc697265b2a49c7da7430ca465d473df62172f55c664cc37dad6138c5"
+      },
+      "repository": "egohygiene/hygiene",
+      "revision": "5e0602265b6ac5e5165b89f418e55a3fd12f8a64",
+      "tree": "39890f0540160bca75b3e60f2b3e9cbcec3d9597"
+    },
+    "hygiene_semantics": {
+      "files": {
+        "docs/ecosystem/visual-roadmap-system.md": "a7182406105abc3a2a35002ec0331e59d90e5f3c4b8538738eb43f01c9bd0c96",
+        "schemas/repository-intelligence.v1.schema.json": "7200047785c32cea8963eb78ee74a01befa85d9aab0eabcb4039507ac3c50374"
+      },
+      "repository": "egohygiene/hygiene",
+      "revision": "f598ed659a43dd759d4ede41c27f9e5daf991aa7",
+      "tree": "7d5202bccf4b23579396a37a47a7586706492d24"
+    },
+    "observatory": {
+      "files": {
+        "contracts/hygiene.repository-intelligence.v1.lock.json": "625490ef5183cf11d035716f76d554aa5ab85279ae019e9b846f1cbf8216cb4a",
+        "schemas/repository-intelligence-read-model.v1.schema.json": "065e29006c84b1d10c6c9477af9dc61dbceffc2174b65bc50659f280ef414d86",
+        "src/observatory/intelligence.py": "d7512c81c08969e02401dae9e24462acb80f8815ee6ab53014d74ec4198e8ff2"
+      },
+      "repository": "egohygiene/observatory",
+      "revision": "3cb3555f56b9b110e98e295c1201e8d9af641297",
+      "tree": "32f93ab7e94cb8cd434a1b58ac753bd8ce2802ef"
+    }
+  }
+}

@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-09-25
+updated: 2026-09-26
 governed_by:
   - architecture-architecture
 depends_on:
@@ -167,6 +167,14 @@ disposable local presentation state, while every static event remains present
 for no-script, print, and assistive-technology access.
 The tested Observatory and Holon boundaries are pinned in
 [`repository-intelligence-siblings.v1.lock.json`](actions/repository-intelligence/contracts/repository-intelligence-siblings.v1.lock.json).
+
+The experimental native roadmap collector reads exact Git objects, invokes
+source-pinned EgoLint and Hygiene validation, and normalizes through the same
+Observatory boundary. Its separate review envelope records uncollected domains
+and always denies publication. Observatory #25 owns the missing partial-domain
+read-model semantics; Relay does not alter sibling views or invent placeholder
+evidence. The [collector design](docs/repository-roadmap-collector.md) owns the
+mapping, bounded compatibility intersection, runtime preparation and replay.
 
 The snapshot publisher is isolated as a
 separate action because it requires `contents: write`; all other v1 action jobs
