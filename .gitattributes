@@ -1,0 +1,2 @@
+# Preserve exact upstream bytes, including Markdown hard breaks, in this capture.
+tests/fixtures/repository-roadmap-collector/akashic.ROADMAP.md -text whitespace=-blank-at-eol

@@ -4,6 +4,12 @@ Generate a complete static repository-intelligence dashboard without deploying
 it. The action is intentionally a **builder**, so a consumer can compose the
 result with any existing GitHub Pages, documentation, or product-site artifact.
 
+The experimental [canonical roadmap collector](../../docs/repository-roadmap-collector.md)
+can prepare local review evidence from an immutable `ROADMAP.md`. Its
+publication-denied review envelope is **not** an `observatory-snapshot` input.
+The upstream partial-domain contract and #112 acceptance must be resolved before
+#113 connects collection to this action.
+
 ## Consumer contract
 
 After a complete-history checkout, the production integration can be one step:
