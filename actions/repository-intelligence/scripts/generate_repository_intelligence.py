@@ -8,6 +8,7 @@ import html
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 from typing import TYPE_CHECKING, Any
@@ -52,6 +53,10 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--repo-root", required=True)
     parser.add_argument("--output-root", required=True)
+    parser.add_argument(
+        "--repository", default="",
+        help="Canonical owner/name; required outside GITHUB_REPOSITORY context.",
+    )
     parser.add_argument("--ref", default="HEAD")
     parser.add_argument("--max-depth", type=positive_integer, default=10)
     parser.add_argument(
@@ -59,7 +64,26 @@ def parse_args() -> argparse.Namespace:
         default=",".join(DEFAULT_EXCLUDED_PATHS),
         help="Comma-separated repository-relative paths to exclude.",
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    try:
+        args.repository = resolve_repository(args.repository, os.environ.get("GITHUB_REPOSITORY", ""))
+    except ValueError as error:
+        parser.error(str(error))
+    return args
+
+
+def resolve_repository(explicit: str, workflow: str) -> str:
+    """Resolve the logical root label without trusting incidental checkout names."""
+    if explicit and workflow and explicit.lower() != workflow.lower():
+        raise ValueError("repository must not override the GitHub workflow repository")
+    repository = workflow or explicit
+    if not repository:
+        raise ValueError("repository is required: pass --repository owner/name or set GITHUB_REPOSITORY")
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository):
+        raise ValueError("repository must use owner/name form")
+    if any(segment in {".", ".."} for segment in repository.split("/")):
+        raise ValueError("repository owner and name must not be dot segments")
+    return repository
 
 
 def normalize_excluded_paths(raw_paths: str) -> list[str]:
@@ -412,7 +436,7 @@ def main() -> None:
     revision = resolve_revision(repo_root, args.ref)
     committed_at = source_committed_at(repo_root, revision)
     tree = build_tree(
-        repository_name=repo_root.name,
+        repository_name=args.repository,
         entries=list_git_entries(repo_root, revision),
         excluded_paths=excluded_paths,
         max_depth=args.max_depth,

@@ -150,6 +150,59 @@ jobs:
 Do not use this public deployment recipe for a private or internal repository
 without a separate reviewed authorization.
 
+## Portable repository identity
+
+The source tree's root display label is the complete canonical `owner/name`,
+passed explicitly from the action's resolved repository metadata. GitHub's
+`GITHUB_REPOSITORY` wins; an explicit input may match case-insensitively but
+cannot replace that identity or its spelling. Visibility retains its separate
+event-authoritative validation. Outside GitHub, supply `repository` explicitly;
+there is no `local/<checkout-basename>` fallback.
+
+The standalone tree CLI accepts `--repository "owner/name"`, or uses
+`GITHUB_REPOSITORY` when available. Missing, malformed, dot-segment, or conflicting
+identities fail before output generation. For example, from a local consumer
+checkout without GitHub metadata:
+
+```bash
+python3 "/path/to/relay/actions/repository-intelligence/scripts/generate_repository_intelligence.py" \
+  --repo-root "." \
+  --output-root ".cache/repository-intelligence" \
+  --repository "example/consumer" \
+  --ref "<full-consumer-sha>"
+```
+
+This corrects the root `name` value in the existing
+`egohygiene.repository-tree/v1` contract; fields, relative paths, and schema
+versions are unchanged. Callers that ran the standalone script without an
+identity must now supply one. The corrected generator can legitimately change
+tree, dashboard, summary, and manifest bytes relative to older generator pins.
+It does not retroactively repair their output.
+
+Portable reproduction fixes canonical identity (including spelling), represented
+consumer commit, immutable Relay revision, evidence bytes, and all declared
+inputs, including ref, source epoch/as-of, exclusions, history window, depth,
+visibility, and default branch. Checkout basenames and parent directories are
+not inputs. Complete history must be available in both checkouts. Identical
+inputs must produce identical complete payload inventories, bytes, and manifest
+digests; same-directory repetition is a separate, weaker check.
+
+Run the cross-directory fixture with:
+
+```bash
+python3 -m unittest discover --start-directory "tests" \
+  --pattern "test_repository_intelligence_portability.py" --verbose
+```
+
+It executes the composite action's checked-in Bash bodies in two complete,
+detached checkouts under different parents, with optional evidence present and
+absent. It checks canonical root identity, every public file, provenance, tree
+exports, manifest hashes, and path exclusion. The existing same-workspace bundle
+test and separate receipt tests remain required. This local harness substitutes
+env expressions; it does not simulate GitHub scheduling or establish deployment
+success. Follow the [publication evidence procedure](../../docs/repository-intelligence-publication.md#acceptance-evidence-by-stage)
+for provider proof and consumer adoption.
+
 ## Inputs
 
 | Input                       | Default                          | Purpose                                                                 |
@@ -159,7 +212,7 @@ without a separate reviewed authorization.
 | `reports-directory`         | `.reports`                       | Optional summaries; always excluded from tree and analytics              |
 | `observatory-snapshot`      | empty                            | Optional commit-matched public-safe Repository Intelligence read model    |
 | `observatory-comparison`    | empty                            | Optional comparison whose after boundary matches the snapshot and commit |
-| `repository`                | workflow repository              | Local fallback; cannot override GitHub repository identity               |
+| `repository`                | workflow repository              | Required without `GITHUB_REPOSITORY`; cannot override GitHub identity    |
 | `repository-visibility`     | event visibility, else `unknown` | Local-only fallback; cannot override GitHub visibility                  |
 | `default-branch`            | event default, then `main`       | Optional branch override for repository vitality                        |
 | `source-commit`             | commit resolved from `activity-ref` | Explicit represented commit                                          |

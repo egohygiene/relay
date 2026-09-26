@@ -206,6 +206,16 @@ class RepositoryIntelligenceDeploymentProvenanceTests(unittest.TestCase):
         self.assertEqual(receipt["rollback"]["consumer_revision"], ROLLBACK_REVISION)
         self.assertNotIn(str(self.workspace), self.receipt.read_text(encoding="utf-8"))
 
+        retry = {"workflow-run-id": "43", "workflow-run-attempt": "3",
+                 "recorded-at": "2027-01-15T08:02:00Z"}
+        self.assertEqual(deployment.main(self.operation_arguments("record-receipt", **retry)), 0)
+        self.assertEqual(deployment.main(self.operation_arguments("verify-receipt", **retry)), 0)
+        retry_receipt = json.loads(self.receipt.read_text(encoding="utf-8"))
+        self.assertNotEqual(receipt["workflow"], retry_receipt["workflow"])
+        self.assertNotEqual(receipt["deployment"]["recorded_at"], retry_receipt["deployment"]["recorded_at"])
+        self.assertEqual(receipt["build_manifest"], retry_receipt["build_manifest"])
+        self.assertEqual(manifest_path.read_bytes(), manifest_before)
+
     def test_revision_drift_is_rejected(self) -> None:
         with self.assertRaisesRegex(SystemExit, "consumer revision drift"):
             deployment.main(

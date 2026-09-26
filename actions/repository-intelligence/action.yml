@@ -45,8 +45,8 @@ inputs:
     default: ""
   repository:
     description: >-
-      Repository in owner/name form for local contexts. It cannot override the
-      workflow repository when GitHub supplies repository metadata.
+      Repository in owner/name form; required without GITHUB_REPOSITORY.
+      It cannot override the workflow repository when GitHub supplies metadata.
     required: false
     default: ""
   repository-visibility:
@@ -312,7 +312,8 @@ runs:
         fi
         repository="${GITHUB_REPOSITORY:-${INPUT_REPOSITORY:-}}"
         if [[ -z "${repository}" ]]; then
-          repository="local/$(basename "${GITHUB_WORKSPACE}")"
+          printf 'repository is required when GITHUB_REPOSITORY is unavailable\n' >&2
+          exit 2
         fi
         if [[ ! "${repository}" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
           printf 'repository must use owner/name form: %s\n' "${repository}" >&2
@@ -440,10 +441,12 @@ runs:
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
         INPUT_REPORTS_DIRECTORY: "${{ inputs.reports-directory }}"
         INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
+        RESOLVED_REPOSITORY: "${{ steps.metadata.outputs.repository }}"
       run: |
         set -euo pipefail
         python3 "${GITHUB_ACTION_PATH}/scripts/generate_repository_intelligence.py" \
           --repo-root "${GITHUB_WORKSPACE}" \
+          --repository "${RESOLVED_REPOSITORY}" \
           --output-root "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}" \
           --ref "${INPUT_ACTIVITY_REF}" \
           --max-depth "${INPUT_MAX_DEPTH}" \

@@ -5,6 +5,22 @@ repository. Replace every placeholder with a reviewed immutable action commit,
 the consumer's canonical URL, and the rollback point from its last accepted
 deployment receipt.
 
+Before adopting a generator revision, prove identical complete bundles in
+differently named full-history checkouts with the same canonical `owner/name`,
+consumer/generator revisions, evidence bytes, and declared inputs. A corrected
+generator can change old digests; preserve historical rollback pins and their
+recorded environment constraints. Review corrected adoption and a new rollback
+point separately.
+
+Use the [publication evidence procedure](../../docs/repository-intelligence-publication.md#acceptance-evidence-by-stage)
+to distinguish build, ordinary artifact upload, Pages upload, deployment, receipt,
+and live verification. Changes to this example's job dependencies or
+skip/failure/cancellation gates need a GitHub-executed read-only no-op scheduler
+fixture, including skipped ancestors and denied PR/unsuccessful prerequisites.
+That fixture must not deploy, upload Pages artifacts, use secrets or write
+permissions, or enter a protected environment. A green run with required stages
+skipped is insufficient. Keep deferred-acceptance PRs reference-only (`Refs #N`).
+
 ```yaml
 ---
 name: Repository Intelligence Pages

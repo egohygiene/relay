@@ -296,6 +296,8 @@ class RepositoryIntelligenceBundleTests(unittest.TestCase):
             [
                 sys.executable,
                 str(tree_script),
+                "--repository",
+                "example/repository",
                 "--repo-root",
                 str(self.repository),
                 "--output-root",
@@ -307,6 +309,7 @@ class RepositoryIntelligenceBundleTests(unittest.TestCase):
                 "--excluded-paths",
                 excluded_paths,
             ],
+            env={**os.environ, "GITHUB_REPOSITORY": "example/repository"},
             check=True,
             capture_output=True,
             text=True,

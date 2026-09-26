@@ -29,6 +29,10 @@ jobs:
       contents: read
     # No caller secret is passed. Trusted and fork pull requests use the same
     # read-only candidate-code ceiling.
+    # This historical example pin predates the #109 portability correction.
+    # Adopt a reviewed corrected full SHA separately; same-directory repetition
+    # alone is not cross-directory reproduction. See the action README and
+    # docs/repository-intelligence-publication.md for the evidence stages.
     # egohygiene/relay repository-intelligence v1.1.0
     uses: egohygiene/relay/.github/workflows/repository-intelligence.yml@46cf1d66a7e66ca5a35d2c99cbaed5ccfb67573f
     with:
