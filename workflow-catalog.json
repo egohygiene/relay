@@ -1084,6 +1084,141 @@
       "inputs": [],
       "outputs": [],
       "consumer_ref": null
+    },
+    {
+      "id": "repository-architecture-validation",
+      "path": ".github/workflows/repository-architecture-validation.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Run the shared architecture adapter offline under read-only authority, then preserve bounded current-run evidence before enforcement.",
+      "audience": "reusable",
+      "status": "experimental",
+      "triggers": [
+        "workflow_call"
+      ],
+      "permissions": {
+        "contents": "read"
+      },
+      "timeout_minutes": 20,
+      "concurrency": {
+        "group": "relay-architecture-v1-${{ github.repository }}-${{ github.workflow_ref }}-${{ github.ref }}-${{ inputs.check-id }}",
+        "cancel_in_progress": true
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Advisory semantic findings remain warnings. Invalid inputs, unavailable prerequisites, required-mode requests, cancellation or failed report preservation cannot become success. Normalized failure evidence is attempted before enforcement; cancellation and artifact service outages can prevent retention."
+      },
+      "inputs": [
+        {
+          "name": "check-id",
+          "type": "string",
+          "required": false,
+          "default": "architecture",
+          "description": "Stable unique check identifier within the caller workflow; use distinct values for matrix calls."
+        },
+        {
+          "name": "mode",
+          "type": "string",
+          "required": false,
+          "default": "advisory",
+          "description": "Advisory by default; required intent is retained but unavailable in the current profile."
+        },
+        {
+          "name": "repository-contract-adoption",
+          "type": "string",
+          "required": false,
+          "default": "unknown",
+          "description": "Explicit present, legacy, unknown, or not-applicable repository-contract adoption."
+        },
+        {
+          "name": "repository-contracts",
+          "type": "string",
+          "required": false,
+          "default": "[]",
+          "description": "JSON array of at most 16 repository-relative contract policy paths."
+        },
+        {
+          "name": "adr-adoption",
+          "type": "string",
+          "required": false,
+          "default": "unknown",
+          "description": "Explicit present, legacy, unknown, or not-applicable ADR adoption."
+        },
+        {
+          "name": "adr-policy",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Caller-owned EgoLint Repository Intelligence policy path; empty for unknown or not-applicable."
+        },
+        {
+          "name": "diagram-adoption",
+          "type": "string",
+          "required": false,
+          "default": "unknown",
+          "description": "Explicit present, legacy, unknown, or not-applicable diagram adoption."
+        },
+        {
+          "name": "diagram-roots",
+          "type": "string",
+          "required": false,
+          "default": "[]",
+          "description": "JSON array of at most 16 explicit repository-relative source files or directories."
+        },
+        {
+          "name": "artifact-retention-days",
+          "type": "number",
+          "required": false,
+          "default": 30,
+          "description": "Retention from 1 through 90 days for normalized evidence; rejected inputs use 30 days."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "semantic-status",
+          "type": "string",
+          "required": true,
+          "description": "Semantic status independently of workflow execution success."
+        },
+        {
+          "name": "validation-outcome",
+          "type": "string",
+          "required": true,
+          "description": "Passed, warning, failed, or unavailable adapter result."
+        },
+        {
+          "name": "workflow-outcome",
+          "type": "string",
+          "required": true,
+          "description": "Planned execution outcome before upload; the job also fails if report preservation fails."
+        },
+        {
+          "name": "report-artifact-name",
+          "type": "string",
+          "required": true,
+          "description": "Run-bound report artifact name; inspect upload outcome before claiming retention."
+        },
+        {
+          "name": "report-artifact-digest",
+          "type": "string",
+          "required": true,
+          "description": "GitHub digest of the uploaded archive; empty when upload did not succeed."
+        },
+        {
+          "name": "report-manifest-sha256",
+          "type": "string",
+          "required": true,
+          "description": "Digest of the generic report manifest."
+        },
+        {
+          "name": "report-upload-outcome",
+          "type": "string",
+          "required": true,
+          "description": "Observed success, failure, cancelled, or skipped preservation step."
+        }
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/repository-architecture-validation.yml@v1"
     }
   ]
 }

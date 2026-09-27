@@ -1,0 +1,326 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/architecture-workflow-evidence/v1/schema.json",
+  "title": "Relay architecture workflow evidence v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "identity",
+    "check_id",
+    "mode",
+    "retention_days",
+    "stages",
+    "validation",
+    "reporting",
+    "enforcement",
+    "files",
+    "privacy"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "relay.repository-architecture-workflow-evidence/v1"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "revision",
+        "visibility",
+        "relay_revision",
+        "run_id",
+        "run_attempt",
+        "event",
+        "caller_workflow_sha256"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "maxLength": 140,
+          "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+        },
+        "revision": {
+          "type": "string",
+          "maxLength": 40,
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "visibility": {
+          "enum": [
+            "public",
+            "private",
+            "internal"
+          ]
+        },
+        "relay_revision": {
+          "type": "string",
+          "maxLength": 40,
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "run_id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 99999999999999999999
+        },
+        "run_attempt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "event": {
+          "enum": [
+            "pull_request",
+            "push",
+            "schedule",
+            "unsupported",
+            "workflow_dispatch"
+          ]
+        },
+        "caller_workflow_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "maxLength": 64
+        }
+      }
+    },
+    "check_id": {
+      "type": "string",
+      "maxLength": 48,
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "mode": {
+      "enum": [
+        "advisory",
+        "required",
+        "unknown"
+      ]
+    },
+    "retention_days": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 90
+    },
+    "stages": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "harden",
+        "preflight",
+        "checkout",
+        "hygiene",
+        "egolint",
+        "holon",
+        "acquire",
+        "build",
+        "validate"
+      ],
+      "properties": {
+        "harden": {
+          "enum": [
+            "cancelled",
+            "failure",
+            "skipped",
+            "success"
+          ]
+        },
+        "preflight": {
+          "enum": [
+            "cancelled",
+            "failure",
+            "skipped",
+            "success"
+          ]
+        },
+        "checkout": {
+          "enum": [
+            "cancelled",
+            "failure",
+            "skipped",
+            "success"
+          ]
+        },
+        "hygiene": {
+          "enum": [
+            "cancelled",
+            "failure",
+            "skipped",
+            "success"
+          ]
+        },
+        "egolint": {
+          "enum": [
+            "cancelled",
+            "failure",
+            "skipped",
+            "success"
+          ]
+        },
+        "holon": {
+          "enum": [
+            "cancelled",
+            "failure",
+            "skipped",
+            "success"
+          ]
+        },
+        "acquire": {
+          "enum": [
+            "cancelled",
+            "failure",
+            "skipped",
+            "success"
+          ]
+        },
+        "build": {
+          "enum": [
+            "cancelled",
+            "failure",
+            "skipped",
+            "success"
+          ]
+        },
+        "validate": {
+          "enum": [
+            "cancelled",
+            "failure",
+            "skipped",
+            "success"
+          ]
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence",
+        "semantic_status",
+        "outcome"
+      ],
+      "properties": {
+        "evidence": {
+          "enum": [
+            "retained",
+            "unavailable"
+          ]
+        },
+        "semantic_status": {
+          "enum": [
+            "conformant",
+            "nonconformant",
+            "legacy",
+            "incomplete",
+            "not-applicable",
+            "unavailable"
+          ]
+        },
+        "outcome": {
+          "enum": [
+            "passed",
+            "warning",
+            "failed",
+            "unavailable"
+          ]
+        }
+      }
+    },
+    "reporting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "normalization",
+        "artifact_upload"
+      ],
+      "properties": {
+        "normalization": {
+          "const": "success"
+        },
+        "artifact_upload": {
+          "const": "pending"
+        }
+      }
+    },
+    "enforcement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "planned_job_outcome",
+        "code",
+        "required_mode_available"
+      ],
+      "properties": {
+        "planned_job_outcome": {
+          "enum": [
+            "success",
+            "failure",
+            "cancelled"
+          ]
+        },
+        "code": {
+          "enum": [
+            "AW-CANCELLED",
+            "AW-EVIDENCE",
+            "AW-INPUT",
+            "AW-OK",
+            "AW-REQUIRED",
+            "AW-STAGE",
+            "AW-UNAVAILABLE"
+          ]
+        },
+        "required_mode_available": {
+          "const": false
+        }
+      }
+    },
+    "files": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "maxLength": 1024,
+            "pattern": "^\\.reports/architecture-validation/[A-Za-z0-9._/-]+$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1048576
+          },
+          "sha256": {
+            "type": "string",
+            "maxLength": 64,
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification",
+        "contains_source_content"
+      ],
+      "properties": {
+        "classification": {
+          "enum": [
+            "public-repository",
+            "private-repository",
+            "internal-repository"
+          ]
+        },
+        "contains_source_content": {
+          "const": false
+        }
+      }
+    }
+  }
+}

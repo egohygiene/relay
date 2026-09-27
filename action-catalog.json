@@ -378,6 +378,17 @@
         "security-events": "read"
       },
       "consumer_ref": "egohygiene/relay/.github/workflows/repository-journal-copilot.yml@v1"
+    },
+    {
+      "id": "repository-architecture-validation",
+      "path": ".github/workflows/repository-architecture-validation.yml",
+      "status": "experimental",
+      "permissions": {
+        "contents": "read"
+      },
+      "consumer_ref": "egohygiene/relay/.github/workflows/repository-architecture-validation.yml@v1",
+      "name": "Repository Architecture Validation",
+      "summary": "Read-only architecture and ADR checks with diagram inventory and bounded current-run reports."
     }
   ]
 }

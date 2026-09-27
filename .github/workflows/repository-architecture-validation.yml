@@ -1,0 +1,244 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Reusable repository architecture validation
+
+on:
+  workflow_call:
+    inputs:
+      check-id:
+        description: "Stable unique check identifier within the caller workflow; use distinct values for matrix calls."
+        required: false
+        type: string
+        default: "architecture"
+      mode:
+        description: "Advisory by default; required intent is retained but unavailable in the current profile."
+        required: false
+        type: string
+        default: "advisory"
+      repository-contract-adoption:
+        description: "Explicit present, legacy, unknown, or not-applicable repository-contract adoption."
+        required: false
+        type: string
+        default: "unknown"
+      repository-contracts:
+        description: "JSON array of at most 16 repository-relative contract policy paths."
+        required: false
+        type: string
+        default: "[]"
+      adr-adoption:
+        description: "Explicit present, legacy, unknown, or not-applicable ADR adoption."
+        required: false
+        type: string
+        default: "unknown"
+      adr-policy:
+        description: "Caller-owned EgoLint Repository Intelligence policy path; empty for unknown or not-applicable."
+        required: false
+        type: string
+        default: ""
+      diagram-adoption:
+        description: "Explicit present, legacy, unknown, or not-applicable diagram adoption."
+        required: false
+        type: string
+        default: "unknown"
+      diagram-roots:
+        description: "JSON array of at most 16 explicit repository-relative source files or directories."
+        required: false
+        type: string
+        default: "[]"
+      artifact-retention-days:
+        description: "Retention from 1 through 90 days for normalized evidence; rejected inputs use 30 days."
+        required: false
+        type: number
+        default: 30
+    outputs:
+      semantic-status:
+        description: "Semantic status independently of workflow execution success."
+        value: "${{ jobs.architecture.outputs.semantic-status }}"
+      validation-outcome:
+        description: "Passed, warning, failed, or unavailable adapter result."
+        value: "${{ jobs.architecture.outputs.validation-outcome }}"
+      workflow-outcome:
+        description: "Planned execution outcome before upload; the job also fails if report preservation fails."
+        value: "${{ jobs.architecture.outputs.workflow-outcome }}"
+      report-artifact-name:
+        description: "Run-bound report artifact name; inspect upload outcome before claiming retention."
+        value: "${{ jobs.architecture.outputs.report-artifact-name }}"
+      report-artifact-digest:
+        description: "GitHub digest of the uploaded archive; empty when upload did not succeed."
+        value: "${{ jobs.architecture.outputs.report-artifact-digest }}"
+      report-manifest-sha256:
+        description: "Digest of the generic report manifest."
+        value: "${{ jobs.architecture.outputs.report-manifest-sha256 }}"
+      report-upload-outcome:
+        description: "Observed success, failure, cancelled, or skipped preservation step."
+        value: "${{ jobs.architecture.outputs.report-upload-outcome }}"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "relay-architecture-v1-${{ github.repository }}-${{ github.workflow_ref }}-${{ github.ref }}-${{ inputs.check-id }}"
+  cancel-in-progress: true
+
+jobs:
+  architecture:
+    name: Validate architecture and retain bounded evidence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    env:
+      RELAY_ARCH_VISIBILITY: "${{ github.event.repository.visibility }}"
+      RELAY_ARCH_WORKFLOW_SHA: "${{ job.workflow_sha }}"
+      RELAY_ARCH_WORKFLOW_REF: "${{ job.workflow_ref }}"
+      RELAY_ARCH_WORKFLOW_REPOSITORY: "${{ job.workflow_repository }}"
+    outputs:
+      semantic-status: "${{ steps.finalize.outputs.semantic-status }}"
+      validation-outcome: "${{ steps.finalize.outputs.validation-outcome }}"
+      workflow-outcome: "${{ steps.finalize.outputs.workflow-outcome }}"
+      report-artifact-name: "${{ steps.preserve.outputs.artifact-name }}"
+      report-artifact-digest: "${{ steps.preserve.outputs.artifact-digest }}"
+      report-manifest-sha256: "${{ steps.preserve.outputs.manifest-sha256 }}"
+      report-upload-outcome: "${{ steps.preserve.outcome }}"
+
+    steps:
+      - name: Harden runner
+        id: harden
+        continue-on-error: true
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Validate caller identity and prepare isolated request
+        id: preflight
+        continue-on-error: true
+        uses: $/actions/repository-architecture-validation/workflow-evidence
+        with:
+          operation: preflight
+          check-id: "${{ inputs.check-id }}"
+          mode: "${{ inputs.mode }}"
+          repository-contract-adoption: "${{ inputs.repository-contract-adoption }}"
+          repository-contracts: "${{ inputs.repository-contracts }}"
+          adr-adoption: "${{ inputs.adr-adoption }}"
+          adr-policy: "${{ inputs.adr-policy }}"
+          diagram-adoption: "${{ inputs.diagram-adoption }}"
+          diagram-roots: "${{ inputs.diagram-roots }}"
+          artifact-retention-days: "${{ inputs.artifact-retention-days }}"
+
+      - name: Check out exact caller revision as untrusted data
+        id: checkout
+        if: "${{ steps.harden.outcome == 'success' && steps.preflight.outcome == 'success' }}"
+        continue-on-error: true
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: "${{ github.sha }}"
+          path: caller
+          fetch-depth: 0
+          persist-credentials: false
+          clean: true
+          lfs: false
+          submodules: false
+
+      - name: Acquire pinned hygiene source
+        id: hygiene
+        if: "${{ steps.harden.outcome == 'success' && steps.preflight.outcome == 'success' && steps.checkout.outcome == 'success' && steps.preflight.outputs.native-needed == 'true' }}"
+        continue-on-error: true
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: egohygiene/hygiene
+          ref: c589587395750cd1c79c6fa0bef010189c547249
+          path: relay-architecture-sources/hygiene
+          fetch-depth: 1
+          persist-credentials: false
+          lfs: false
+          submodules: false
+
+      - name: Acquire pinned egolint source
+        id: egolint
+        if: "${{ steps.harden.outcome == 'success' && steps.preflight.outcome == 'success' && steps.checkout.outcome == 'success' && steps.preflight.outputs.native-needed == 'true' }}"
+        continue-on-error: true
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: egohygiene/egolint
+          ref: 8b99ec4377eb84044fac411dff6b8074317ec094
+          path: relay-architecture-sources/egolint
+          fetch-depth: 1
+          persist-credentials: false
+          lfs: false
+          submodules: false
+
+      - name: Acquire pinned holon source
+        id: holon
+        if: "${{ steps.harden.outcome == 'success' && steps.preflight.outcome == 'success' && steps.checkout.outcome == 'success' && steps.preflight.outputs.native-needed == 'true' }}"
+        continue-on-error: true
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: egohygiene/holon
+          ref: 660b941f99618806fcadd589bcdae61c519f96e4
+          path: relay-architecture-sources/holon
+          fetch-depth: 1
+          persist-credentials: false
+          lfs: false
+          submodules: false
+
+      - name: Acquire checksum-locked dependencies in isolated storage
+        id: acquire
+        if: "${{ steps.harden.outcome == 'success' && steps.preflight.outcome == 'success' && steps.checkout.outcome == 'success' && steps.preflight.outputs.native-needed == 'true' && steps.hygiene.outcome == 'success' && steps.egolint.outcome == 'success' && steps.holon.outcome == 'success' }}"
+        continue-on-error: true
+        uses: $/actions/repository-architecture-validation/workflow-evidence
+        with:
+          operation: acquire
+          work-directory: "${{ steps.preflight.outputs.work-directory }}"
+
+      - name: Prepare verified native runtime offline
+        id: build
+        if: "${{ steps.acquire.outcome == 'success' }}"
+        continue-on-error: true
+        uses: $/actions/repository-architecture-validation/workflow-evidence
+        with:
+          operation: build
+          work-directory: "${{ steps.preflight.outputs.work-directory }}"
+
+      - name: Run shared adapter and capture only fresh normalized evidence
+        id: validate
+        if: "${{ steps.harden.outcome == 'success' && steps.preflight.outcome == 'success' && steps.checkout.outcome == 'success' }}"
+        continue-on-error: true
+        uses: $/actions/repository-architecture-validation/workflow-evidence
+        with:
+          operation: validate
+          work-directory: "${{ steps.preflight.outputs.work-directory }}"
+
+      - name: Finalize bounded success or failure report
+        id: finalize
+        if: "${{ always() }}"
+        continue-on-error: true
+        uses: $/actions/repository-architecture-validation/workflow-evidence
+        with:
+          operation: finalize
+          work-directory: "${{ steps.preflight.outputs.work-directory }}"
+          stages: "${{ toJSON(steps) }}"
+
+      - name: Preserve normalized architecture evidence
+        id: preserve
+        if: "${{ always() && steps.finalize.outcome == 'success' }}"
+        continue-on-error: true
+        uses: $/actions/preserve-ci-report
+        with:
+          producer: "${{ steps.finalize.outputs.producer }}"
+          outcome: "${{ steps.finalize.outputs.workflow-outcome }}"
+          source-directory: "${{ steps.finalize.outputs.report-directory }}"
+          retention-days: "${{ steps.finalize.outputs.retention-days }}"
+          maximum-files: 6
+          maximum-bytes: 6291456
+
+      - name: Annotate summarize and enforce after preservation
+        if: "${{ always() }}"
+        uses: $/actions/repository-architecture-validation/workflow-evidence
+        with:
+          operation: present
+          report-directory: "${{ steps.finalize.outputs.report-directory }}"
+          upload-outcome: "${{ steps.preserve.outcome }}"
+          artifact-digest: "${{ steps.preserve.outputs.artifact-digest }}"

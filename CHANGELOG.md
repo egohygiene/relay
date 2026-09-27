@@ -8,6 +8,10 @@ All notable changes to Relay are documented in this file. The format follows
 
 ### Added
 
+- An experimental read-only architecture-validation reusable workflow with
+  immutable called-code and sibling inputs, isolated dependency preparation,
+  bounded annotations/summary, fresh-evidence receipts and #6 report retention
+  before enforcement. Hosted acceptance and required mode remain separately gated.
 - Bounded Mermaid, PlantUML and Excalidraw source discovery with closed metadata,
   exact file/fence digests, independent failure evidence and privacy fixtures.
   Diagram semantic validation remains unavailable pending reviewed backends in
