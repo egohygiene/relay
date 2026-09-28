@@ -99,6 +99,11 @@ runs:
       id: operation
       shell: bash
       env:
+        # The job context is available at step scope, not in jobs.<id>.env.
+        # Resolve the called workflow identity for every operation, including recovery.
+        RELAY_ARCH_WORKFLOW_SHA: "${{ job.workflow_sha }}"
+        RELAY_ARCH_WORKFLOW_REF: "${{ job.workflow_ref }}"
+        RELAY_ARCH_WORKFLOW_REPOSITORY: "${{ job.workflow_repository }}"
         INPUT_OPERATION: "${{ inputs.operation }}"
         INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
         INPUT_REPORT_DIRECTORY: "${{ inputs.report-directory }}"

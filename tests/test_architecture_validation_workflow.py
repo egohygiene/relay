@@ -332,6 +332,42 @@ class ArchitectureWorkflowTests(ArchitectureWorkflowFixture):
 
 
 class ArchitectureWorkflowPackagingTests(unittest.TestCase):
+    def test_called_identity_uses_step_context_even_for_failure_reporting(self) -> None:
+        paths = [".github/workflows/repository-architecture-validation.yml",
+                 "actions/repository-architecture-validation/workflow-evidence/action.yml"]
+        documents = []
+        for path in paths:
+            source = (adapter.ROOT / path).read_text()
+            try:
+                import yaml
+            except ImportError:
+                documents.append(json.loads(subprocess.check_output(
+                    ["ruby", "-rjson", "-rpsych", "-e", "puts JSON.generate(Psych.safe_load(STDIN.read))"],
+                    input=source.encode())))
+            else:
+                documents.append(yaml.safe_load(source))
+        caller, helper = documents
+        job = caller["jobs"]["architecture"]
+        # Regression: GitHub rejected run 36447721265 before any job/retention
+        # could execute because job.workflow_* appeared in job-level env.
+        for scope in (caller.get("env", {}), job.get("env", {})):
+            self.assertNotRegex(json.dumps(scope), r"\bjob\s*(?:\.|\[)")
+        operation = helper["runs"]["steps"][0]
+        self.assertNotIn("if", operation)
+        expected = {
+            "RELAY_ARCH_WORKFLOW_SHA": "${{ job.workflow_sha }}",
+            "RELAY_ARCH_WORKFLOW_REF": "${{ job.workflow_ref }}",
+            "RELAY_ARCH_WORKFLOW_REPOSITORY": "${{ job.workflow_repository }}",
+        }
+        for key, expression in expected.items():
+            self.assertEqual(operation["env"][key], expression)
+        for step in job["steps"]:
+            if step.get("id") == "finalize" or step.get("with", {}).get("operation") == "present":
+                self.assertEqual(step["uses"], "$/actions/repository-architecture-validation/workflow-evidence")
+                self.assertEqual(step["if"], "${{ always() }}")
+        # No successful preflight or GITHUB_ENV write is needed to recover identity.
+        self.assertNotIn("GITHUB_ENV", operation["run"])
+
     def test_manual_dogfood_keeps_unknown_adoption_and_separate_concurrency(self) -> None:
         source = (adapter.ROOT / ".github/workflows/repository-architecture-dogfood.yml").read_text()
         try:

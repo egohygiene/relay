@@ -464,14 +464,20 @@ contract without moving sibling policy into Relay.
   Format validation remains explicitly unavailable; EgoLint #74 tracks reviewed
   offline backends.
 - Checkpoint 4 merged in PR #118 as `da172c64cbda4ae4a28434a065fbfa616c1d74c3`.
-  Its reviewed tree matches current main as verified on 2026-09-28, with no
-  intervening changes. It composes the adapter in a read-only reusable workflow
+  Its reviewed tree was verified before checkpoint 5. It composes the adapter
+  in a read-only reusable workflow
   with bounded presentation, fresh-evidence receipts and #6 retention.
-- The checkpoint-5 candidate adds a native end-to-end fixture matrix, no-skip
+- Checkpoint 5 merged in PR #119 as `ce7b9b4de823cdbfec84496398a2d89847a5d492`,
+  verified on current main on 2026-09-28 with the exact reviewed tree. It adds
+  a native end-to-end fixture matrix, no-skip
   local evidence runner, recovery/private-data checks and manual Relay dogfood.
   See the [acceptance guide](docs/repository-architecture-acceptance.md).
-  Checkpoint 6 still owns actual default-branch scheduling, annotations,
-  artifact upload and inspected logs; the local/CI exit criterion stays open.
+- Checkpoint 6 inspected default-branch run 36447721265: GitHub rejected
+  job-level `job.workflow_*` expressions before any job started, with no artifacts.
+  This candidate moves identity binding to the composite operation's step scope.
+  Review/merge and fresh default-branch advisory/required-denial execution are
+  next; annotations, actual upload, runtime permissions/provenance and sanitized
+  logs remain unverified. The local/CI exit criterion stays open.
 - EgoLint #73 owns the reproduced ratified-policy pin mismatch. An old-policy
   native pass remains partial ADR coverage in Relay until a reviewed profile
   refresh establishes compatibility.

@@ -74,6 +74,12 @@ and does not import packages from the caller checkout. Its control state,
 dependency caches, runtime and report staging are outside that checkout in
 new unpredictable runner-temporary directories.
 
+The helper binds `job.workflow_*` in its composite operation's step-level `env`.
+GitHub does not expose `job` in job-level `env`. Each operation resolves its own
+identity, so failure reporting does not depend on successful preflight or a
+prior environment-file write. The [acceptance guide](repository-architecture-acceptance.md#checkpoint-6-observation--2026-09-28)
+records the provider parsing failure that established this regression.
+
 The workflow targets `ubuntu-24.04`, Linux x86_64 and CPython 3.12. Acquisition
 uses hash-locked binary Python wheels and Rust/Cargo **1.85.1** installed by
 rustup's verified distribution mechanism into isolated storage. Cargo fetches

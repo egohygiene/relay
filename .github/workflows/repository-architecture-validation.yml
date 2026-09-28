@@ -92,9 +92,6 @@ jobs:
       contents: read
     env:
       RELAY_ARCH_VISIBILITY: "${{ github.event.repository.visibility }}"
-      RELAY_ARCH_WORKFLOW_SHA: "${{ job.workflow_sha }}"
-      RELAY_ARCH_WORKFLOW_REF: "${{ job.workflow_ref }}"
-      RELAY_ARCH_WORKFLOW_REPOSITORY: "${{ job.workflow_repository }}"
     outputs:
       semantic-status: "${{ steps.finalize.outputs.semantic-status }}"
       validation-outcome: "${{ steps.finalize.outputs.validation-outcome }}"
