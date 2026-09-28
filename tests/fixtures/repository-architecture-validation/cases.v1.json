@@ -1,12 +1,12 @@
 {
   "schema_version": "relay.repository-architecture-validation-fixtures/v1",
-  "profile_sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f",
+  "profile_sha256": "6a2354340c6e40e1e29f7a881e4e117b1f8144483b8cec0d34d370bcb895357a",
   "requests": {
     "public-present-advisory": {
       "schema_version": "relay.repository-architecture-validation-request/v1",
       "profile": {
-        "version": "1.0.0-alpha.1",
-        "sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f"
+        "version": "1.0.0-alpha.2",
+        "sha256": "6a2354340c6e40e1e29f7a881e4e117b1f8144483b8cec0d34d370bcb895357a"
       },
       "repository": {
         "id": "egohygiene/example",
@@ -42,8 +42,8 @@
     "private-legacy-required": {
       "schema_version": "relay.repository-architecture-validation-request/v1",
       "profile": {
-        "version": "1.0.0-alpha.1",
-        "sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f"
+        "version": "1.0.0-alpha.2",
+        "sha256": "6a2354340c6e40e1e29f7a881e4e117b1f8144483b8cec0d34d370bcb895357a"
       },
       "repository": {
         "id": "example/private-legacy",
@@ -79,8 +79,8 @@
     "unknown-adoption-advisory": {
       "schema_version": "relay.repository-architecture-validation-request/v1",
       "profile": {
-        "version": "1.0.0-alpha.1",
-        "sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f"
+        "version": "1.0.0-alpha.2",
+        "sha256": "6a2354340c6e40e1e29f7a881e4e117b1f8144483b8cec0d34d370bcb895357a"
       },
       "repository": {
         "id": "example/unclassified",
@@ -114,8 +114,8 @@
     "conformant-public": {
       "schema_version": "relay.repository-architecture-validation-result/v1",
       "profile": {
-        "version": "1.0.0-alpha.1",
-        "sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f"
+        "version": "1.0.0-alpha.2",
+        "sha256": "6a2354340c6e40e1e29f7a881e4e117b1f8144483b8cec0d34d370bcb895357a"
       },
       "repository": {
         "id": "egohygiene/example",
@@ -138,7 +138,7 @@
         },
         {
           "repository": "egohygiene/egolint",
-          "revision": "8b99ec4377eb84044fac411dff6b8074317ec094",
+          "revision": "933472b6322d2060c487e5a8a6f0bc5197696af0",
           "profile_source_id": "egolint-repository-validation"
         },
         {
@@ -181,8 +181,8 @@
     "legacy-private-advisory": {
       "schema_version": "relay.repository-architecture-validation-result/v1",
       "profile": {
-        "version": "1.0.0-alpha.1",
-        "sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f"
+        "version": "1.0.0-alpha.2",
+        "sha256": "6a2354340c6e40e1e29f7a881e4e117b1f8144483b8cec0d34d370bcb895357a"
       },
       "repository": {
         "id": "example/private-legacy",
@@ -205,7 +205,7 @@
         },
         {
           "repository": "egohygiene/egolint",
-          "revision": "8b99ec4377eb84044fac411dff6b8074317ec094",
+          "revision": "933472b6322d2060c487e5a8a6f0bc5197696af0",
           "profile_source_id": "egolint-repository-validation"
         },
         {
@@ -258,8 +258,8 @@
     "nonconformant-required": {
       "schema_version": "relay.repository-architecture-validation-result/v1",
       "profile": {
-        "version": "1.0.0-alpha.1",
-        "sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f"
+        "version": "1.0.0-alpha.2",
+        "sha256": "6a2354340c6e40e1e29f7a881e4e117b1f8144483b8cec0d34d370bcb895357a"
       },
       "repository": {
         "id": "example/required",
@@ -282,7 +282,7 @@
         },
         {
           "repository": "egohygiene/egolint",
-          "revision": "8b99ec4377eb84044fac411dff6b8074317ec094",
+          "revision": "933472b6322d2060c487e5a8a6f0bc5197696af0",
           "profile_source_id": "egolint-repository-validation"
         },
         {
@@ -335,8 +335,8 @@
     "unavailable-validator": {
       "schema_version": "relay.repository-architecture-validation-result/v1",
       "profile": {
-        "version": "1.0.0-alpha.1",
-        "sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f"
+        "version": "1.0.0-alpha.2",
+        "sha256": "6a2354340c6e40e1e29f7a881e4e117b1f8144483b8cec0d34d370bcb895357a"
       },
       "repository": {
         "id": "example/unavailable",
@@ -359,7 +359,7 @@
         },
         {
           "repository": "egohygiene/egolint",
-          "revision": "8b99ec4377eb84044fac411dff6b8074317ec094",
+          "revision": "933472b6322d2060c487e5a8a6f0bc5197696af0",
           "profile_source_id": "egolint-repository-validation"
         },
         {

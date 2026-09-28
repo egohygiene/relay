@@ -38,11 +38,11 @@ binds the reviewed source artifacts by full commit SHA and SHA-256 digest:
 | Source | Revision | Lifecycle |
 | --- | --- | --- |
 | `egohygiene/hygiene` | `c589587395750cd1c79c6fa0bef010189c547249` | Accepted policy, not release-included |
-| `egohygiene/egolint` | `8b99ec4377eb84044fac411dff6b8074317ec094` | Proposed validator, not release-included |
+| `egohygiene/egolint` | `933472b6322d2060c487e5a8a6f0bc5197696af0` | Proposed validator, not release-included |
 | `egohygiene/holon` | `660b941f99618806fcadd589bcdae61c519f96e4` | Accepted materializer, not release-included |
 
 Repository-contract and architecture-record validation are available through
-EgoLint rule families. Diagram discovery and evidence remain explicitly
+EgoLint rule families. Diagram semantics remain explicitly
 `planned`: none of the reviewed upstream sources owns a released diagram
 semantic validator, so Relay must not fabricate one.
 
@@ -266,20 +266,40 @@ standalone and Markdown discovery grammar, bounds and closed sidecar. Discovery
 and native validation retain their evidence independently; requested diagram
 semantics remain unavailable until reviewed format validators are pinned.
 
-## Known upstream policy compatibility gap
+## Ratified policy compatibility and migration
 
-At the pinned EgoLint commit, its ADR catalog still requires Hygiene revision
-`f598ed659a43dd759d4ede41c27f9e5daf991aa7` with proposed authority. Relay's profile
-correctly pins the ratified Hygiene revision `c589587395750cd1c79c6fa0bef010189c547249`.
-The native fixture proves that substituting the ratified policy reference
-produces `EGO-INTEL-CONTRACT-001`; the old reference can yield native `valid`.
-Relay preserves both outcomes and adds `RELAY-ARCH-COMPAT-001`, reducing an
-otherwise passed ADR surface to partial. It never rewrites the caller pin.
+Profile `1.0.0-alpha.2` adopts the verified merge of
+[EgoLint PR #75](https://github.com/egohygiene/egolint/pull/75), resolving the
+native mismatch tracked by [#73](https://github.com/egohygiene/egolint/issues/73).
+EgoLint catalog `0.1.0-alpha.2` supports both ADR contract pins at Hygiene
+`c589587395750cd1c79c6fa0bef010189c547249` with accepted authority. Roadmap and
+projection contract pins retain their independent proposed authority. EgoLint's
+package version remains `0.1.0-alpha.1`; no immutable release is claimed.
 
-[EgoLint #73](https://github.com/egohygiene/egolint/issues/73) owns reconciliation.
-After that change is reviewed, refresh Relay's immutable profile and rerun these
-fixtures before fleet conformance or required mode is claimed. Do not downgrade
-consumer policy references merely to obtain a green native result.
+Consumers must explicitly review and update both ADR entries in their EgoLint
+TOML policy and the local policy-reference JSON. The
+[upstream migration guide](https://github.com/egohygiene/egolint/blob/933472b6322d2060c487e5a8a6f0bc5197696af0/docs/repository-intelligence.md)
+defines the exact supported tuples. Old proposed pins or a policy reference to
+`f598ed659a43dd759d4ede41c27f9e5daf991aa7` produce `EGO-INTEL-CONTRACT-001` and
+failed ADR coverage. Relay never rewrites consumer policy or supplies approval.
+
+Rebuild the trusted runtime for the new profile and regenerate requests with
+its version and digest. Old requests and runtime receipts are rejected; do not
+edit a receipt to reuse an older binary. The separate experimental roadmap
+collector retains its existing lock and publication gate in this checkpoint.
+
+The native fixture now proves ratified ADR conformance when adoption is present,
+the selected checks pass, and other surfaces are explicitly not applicable.
+Declared legacy adoption stays legacy with partial coverage even for a native
+valid corpus. Unknown coverage and unavailable diagram semantics remain visible.
+The defensive catalog/profile guard still emits `RELAY-ARCH-COMPAT-001` and caps
+passed coverage at partial if their policy revisions disagree.
+
+The [local replay record](evidence/repository-architecture-ratified-policy.json)
+captures the refreshed pin, verified bytes, retained scenarios and limitations.
+Review and merge this Relay refresh before downstream adoption. Hosted
+acceptance, immutable release, required activation and fleet rollout remain
+separate gates.
 
 ## Validation
 

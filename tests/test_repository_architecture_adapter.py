@@ -292,10 +292,28 @@ class ArchitectureAdapterNativeTests(AdapterFixture):
         self.assertEqual(sarif["runs"][0]["results"][0]["properties"]["egolintRuleId"], "EGO-CONTRACT-FILE-001")
         self.assertTrue(sarif["runs"][0]["tool"]["driver"]["rules"])
 
-    def test_native_valid_adr_reports_the_upstream_policy_gap(self) -> None:
+    def test_ratified_adr_is_conformant_with_exact_upstream_provenance(self) -> None:
         self.add_adrs()
         self.commit()
+        before = adapter.git(self.root, "status", "--porcelain=v1")
         result = self.invoke()
+        self.assertEqual(self.artifact(result, "repository_intelligence")["status"], "valid")
+        self.assertEqual(result["semantic_status"], "conformant")
+        self.assertEqual(result["coverage"]["architecture-records"], "passed")
+        self.assertEqual(result["findings"], [])
+        self.assertEqual(before, adapter.git(self.root, "status", "--porcelain=v1"))
+        self.assertIn({"repository": "egohygiene/egolint",
+                       "revision": "933472b6322d2060c487e5a8a6f0bc5197696af0",
+                       "profile_source_id": "egolint-repository-validation"}, result["provenance"])
+
+    def test_catalog_drift_still_caps_native_validity_at_partial(self) -> None:
+        self.add_adrs()
+        self.commit()
+        definitions = deepcopy(adapter.catalog(self.runtime))
+        pin = next(p for p in definitions["pins"] if p["id"] == "egohygiene.architecture-decision/v1")
+        pin["source-revision"] = "f598ed659a43dd759d4ede41c27f9e5daf991aa7"
+        with mock.patch.object(adapter, "catalog", return_value=definitions):
+            result = self.invoke()
         self.assertEqual(self.artifact(result, "repository_intelligence")["status"], "valid")
         self.assertEqual(result["semantic_status"], "incomplete")
         self.assertEqual(result["coverage"]["architecture-records"], "partial")
@@ -311,16 +329,19 @@ class ArchitectureAdapterNativeTests(AdapterFixture):
         self.assertIn("EGO-INTEL-ADR-LIFECYCLE-001", [f["id"] for f in result["findings"]])
         self.assertEqual(self.artifact(result, "repository_intelligence")["status"], "invalid")
 
-    def test_ratified_policy_pin_is_rejected_by_current_upstream(self) -> None:
+    def test_old_policy_pin_is_rejected_without_rewriting_the_consumer(self) -> None:
         self.add_adrs()
         path = self.root / "docs/decisions/policy-reference.json"
         reference = json.loads(path.read_bytes())
-        reference["policy"]["source"]["revision"] = "c589587395750cd1c79c6fa0bef010189c547249"
+        reference["policy"]["source"]["revision"] = "f598ed659a43dd759d4ede41c27f9e5daf991aa7"
         path.write_text(json.dumps(reference))
         self.commit()
+        before = path.read_bytes()
         result = self.invoke()
         self.assertIn("EGO-INTEL-CONTRACT-001", [f["id"] for f in result["findings"]])
         self.assertEqual(result["semantic_status"], "nonconformant")
+        self.assertEqual(result["coverage"]["architecture-records"], "failed")
+        self.assertEqual(path.read_bytes(), before)
 
     def test_missing_index_and_duplicate_id_are_native_findings(self) -> None:
         self.add_adrs()
@@ -432,7 +453,9 @@ markers = ["PRIVATE_CANARY_CONTENT"]
         self.add_contract()
         self.commit()
         self.request["adoption"]["repository-contracts"] = "legacy"
-        self.assertEqual(self.invoke()["semantic_status"], "legacy")
+        legacy = self.invoke()
+        self.assertEqual(legacy["semantic_status"], "legacy")
+        self.assertEqual(legacy["coverage"]["repository-contracts"], "partial")
         self.request["adoption"]["repository-contracts"] = "present"
         self.request["adoption"]["diagram-sources"] = "present"
         self.request["inputs"]["diagram_roots"] = ["diagrams"]

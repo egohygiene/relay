@@ -316,6 +316,7 @@ class ArchitectureWorkflowTests(ArchitectureWorkflowFixture):
     @unittest.skipUnless(RUNTIME, "prepared native architecture runtime is explicitly required")
     def test_native_warning_is_retained_byte_compatibly_without_becoming_conformance(self) -> None:
         self.add_adrs()
+        (self.root / "docs/decisions/README.md").unlink()
         self.env.update({"GITHUB_SHA": self.commit(), "INPUT_ADR_ADOPTION": "present", "INPUT_ADR_POLICY": "policy.toml"})
         # Reuse the source-owned fixture policy path, never invent a policy in the workflow.
         self.env["INPUT_ADR_POLICY"] = self.request["inputs"]["repository_intelligence_policy"]
@@ -324,7 +325,9 @@ class ArchitectureWorkflowTests(ArchitectureWorkflowFixture):
         for name in workflow.STAGES:
             self.stages[name]["outcome"] = "success"
         report, values = self.finalize()
-        self.assertEqual(result["coverage"]["architecture-records"], "partial")
+        self.assertEqual(result["coverage"]["architecture-records"], "failed")
+        self.assertEqual(result["semantic_status"], "nonconformant")
+        self.assertIn("EGO-INTEL-ADR-INDEX-001", {item["id"] for item in result["findings"]})
         self.assertEqual(report["enforcement"]["planned_job_outcome"], "success")
         self.assertTrue(any(item["path"].endswith("egolint.sarif") for item in report["files"]))
         for item in report["files"]:

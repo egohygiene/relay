@@ -160,7 +160,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: egohygiene/egolint
-          ref: 8b99ec4377eb84044fac411dff6b8074317ec094
+          ref: 933472b6322d2060c487e5a8a6f0bc5197696af0
           path: relay-architecture-sources/egolint
           fetch-depth: 1
           persist-credentials: false

@@ -651,6 +651,10 @@ def run(args: argparse.Namespace) -> dict:
                 findings.append(relay_finding("UNKNOWN"))
             if "legacy" in request["adoption"].values():
                 findings.append(relay_finding("LEGACY"))
+                # Native validity cannot complete a consumer-declared migration.
+                for surface, adoption in request["adoption"].items():
+                    if adoption == "legacy" and coverage[surface] == "passed":
+                        coverage[surface] = "partial"
             if not contract.FULL_SHA.fullmatch(request["repository"]["represented_revision"]):
                 findings.append(relay_finding("REVISION"))
             status = ("unavailable" if native_error in {"PIN", "RUNTIME", "MODE"} else "nonconformant" if "failed" in coverage.values() else "legacy"

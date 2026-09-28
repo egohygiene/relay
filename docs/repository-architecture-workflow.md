@@ -157,8 +157,10 @@ GitHub.com job workflow identity and `$/` support are required. No Enterprise
 Server or local Actions emulator support is claimed. Local helper/adapter tests
 establish behavior without asserting GitHub scheduling, upload, or deployment.
 
-Before fleet conformance, resolve EgoLint #73 and review a refreshed immutable
-profile. Diagram semantics remain unavailable pending EgoLint #74. Broader
+The refreshed profile consumes the merged EgoLint #73 fix; consumers still need
+reviewed policy migration and fixture evidence before fleet conformance. Existing
+runtime receipts must be rebuilt against the new profile. Diagram semantics
+remain unavailable pending EgoLint #74. Broader
 consumer/recovery fixtures are documented in the
 [acceptance guide](repository-architecture-acceptance.md). Hosted acceptance,
 release publication and caller rollout remain separately tracked; implementation

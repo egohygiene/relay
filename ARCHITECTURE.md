@@ -249,10 +249,11 @@ coverage metadata. It runs independently of native validator availability and
 never evaluates includes, scripts or embedded assets. Complete source discovery
 does not establish diagram validity: semantic validation stays unavailable until
 reviewed format-owned backends are pinned under EgoLint #74. Unreleased inputs keep the
-profile proposed and advisory-only. The pinned EgoLint catalog also references
-an earlier Hygiene policy revision; EgoLint #73 owns reconciliation. Relay
-preserves native diagnostics and reports partial ADR coverage even when the old
-pin validates. Unavailable or partial evidence cannot become conformance.
+profile proposed and advisory-only. The refreshed EgoLint catalog consumes the
+ratified Hygiene ADR policy under EgoLint #73. Relay preserves native diagnostics
+and retains its catalog/profile compatibility guard. Consumer-declared legacy
+coverage stays partial even when native validation passes; unknown, unavailable
+or partial evidence cannot become conformance.
 The experimental reusable workflow resolves its internal helper from the exact
 called Relay revision, checks out caller data separately from pinned sibling
 sources, and acquires locked dependencies before offline preparation/validation.

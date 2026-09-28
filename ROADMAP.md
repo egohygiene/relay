@@ -474,13 +474,16 @@ contract without moving sibling policy into Relay.
   See the [acceptance guide](docs/repository-architecture-acceptance.md).
 - Checkpoint 6 inspected default-branch run 36447721265: GitHub rejected
   job-level `job.workflow_*` expressions before any job started, with no artifacts.
-  This candidate moves identity binding to the composite operation's step scope.
-  Review/merge and fresh default-branch advisory/required-denial execution are
-  next; annotations, actual upload, runtime permissions/provenance and sanitized
-  logs remain unverified. The local/CI exit criterion stays open.
-- EgoLint #73 owns the reproduced ratified-policy pin mismatch. An old-policy
-  native pass remains partial ADR coverage in Relay until a reviewed profile
-  refresh establishes compatibility.
+  PR #120 merged the step-scoped repair as `04bd32c8ef492418f47d6df6faee425d6888f341`.
+  Hosted advisory/required-denial acceptance is deferred to final cleanup;
+  annotations, actual upload, runtime permissions/provenance and sanitized logs
+  remain unverified. The local/CI exit criterion stays open.
+- EgoLint PR #75 merged the #73 ratified-policy fix as
+  `933472b6322d2060c487e5a8a6f0bc5197696af0`. This bounded Relay candidate refreshes
+  the immutable profile and replays native ADR fixtures. Valid ratified ADR
+  coverage may pass; old policy references fail and legacy adoption stays partial.
+  [Local evidence](docs/evidence/repository-architecture-ratified-policy.json)
+  remains separate from hosted acceptance, release and consumer rollout.
 - ADR/Decisions adoption under Pace #5 is the current fleet priority. Relay
   #115 owns canonical collection/build and Aether #91 owns continuous capture
   guidance; roadmap rollout in Pace #31 follows the ADR campaign.

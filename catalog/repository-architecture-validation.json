@@ -1,10 +1,10 @@
 {
   "$schema": "../schemas/repository-architecture-validation-profile.v1.schema.json",
   "schema_version": "relay.repository-architecture-validation-profile/v1",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "status": "proposed",
   "owner": "egohygiene/relay",
-  "updated": "2026-09-20",
+  "updated": "2026-09-28",
   "purpose": "Bind Relay architecture validation to immutable Hygiene policy, EgoLint semantics, and Holon materialization evidence without copying sibling authority.",
   "rollout": {
     "default_mode": "advisory",
@@ -86,7 +86,7 @@
       "id": "egolint-repository-validation",
       "role": "validator",
       "repository": "egohygiene/egolint",
-      "revision": "8b99ec4377eb84044fac411dff6b8074317ec094",
+      "revision": "933472b6322d2060c487e5a8a6f0bc5197696af0",
       "version": "0.1.0-alpha.1",
       "lifecycle": "proposed",
       "release_included": false,
@@ -99,7 +99,7 @@
         {
           "id": "repository-intelligence-rules",
           "path": ".config/rules/repository-intelligence.v1.toml",
-          "sha256": "ee43fbb1be5d8a185627393fab132119fbcb12d70dd557723648f4406a7f4b84"
+          "sha256": "8eff024fa6ead10ad39a73a5282c57f5983046583813f62fe0ac631d16e8e401"
         },
         {
           "id": "repository-contract-schema",
