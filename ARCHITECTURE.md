@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-09-26
+updated: 2026-09-28
 governed_by:
   - architecture-architecture
 depends_on:
@@ -88,6 +88,7 @@ actions/
 ├── continuity-preflight.yml      # reusable read-only continuity evidence
 ├── continuity-preflight-dogfood.yml # Relay PR caller
 ├── repository-architecture-validation.yml # read-only architecture/ADR and diagram evidence
+├── repository-architecture-dogfood.yml # manual Relay canary and required-mode denial
 ├── label-sync-plan.yml           # read-only label synchronization plan
 ├── label-sync-apply.yml          # reviewed label synchronization apply
 ├── pull-request-label-plan.yml   # untrusted-PR-safe metadata plan
@@ -260,6 +261,11 @@ current evidence. Closed run metadata and exact normalized adapter files enter
 the #6 report lifecycle before bounded presentation and enforcement. Advisory
 semantic findings remain warnings; execution and reporting failures remain
 failures. Hosted acceptance and release are separate checkpoints.
+The native acceptance matrix composes that same path through local #6 retention,
+including fresh retry, cancellation and private evidence. A manual Relay caller
+keeps its legacy canonical ADR adoption explicitly unknown. Neither synthetic
+provider inputs nor a local manifest establish hosted artifact delivery; the
+[acceptance guide](docs/repository-architecture-acceptance.md) separates those gates.
 
 ## Publication deployment boundary
 

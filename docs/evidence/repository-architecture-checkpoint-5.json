@@ -1,0 +1,416 @@
+{
+  "base_revision": "da172c64cbda4ae4a28434a065fbfa616c1d74c3",
+  "cases": [
+    {
+      "case": "conformant",
+      "coverage": {
+        "architecture-records": "not-applicable",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "passed"
+      },
+      "enforcement_code": "AW-OK",
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "conformant",
+      "validation_files": 3,
+      "validation_outcome": "passed",
+      "visibility": "public"
+    },
+    {
+      "case": "conformant-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 1,
+      "validation_outcome": "unavailable",
+      "visibility": "public"
+    },
+    {
+      "case": "determinism-first",
+      "coverage": {
+        "architecture-records": "not-applicable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "passed"
+      },
+      "enforcement_code": "AW-OK",
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "incomplete",
+      "validation_files": 4,
+      "validation_outcome": "warning",
+      "visibility": "public"
+    },
+    {
+      "case": "determinism-second",
+      "coverage": {
+        "architecture-records": "not-applicable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "passed"
+      },
+      "enforcement_code": "AW-OK",
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "incomplete",
+      "validation_files": 4,
+      "validation_outcome": "warning",
+      "visibility": "public"
+    },
+    {
+      "case": "early-cancelled",
+      "coverage": null,
+      "enforcement_code": "AW-CANCELLED",
+      "mode": "advisory",
+      "planned_job_outcome": "cancelled",
+      "semantic_status": "unavailable",
+      "validation_files": 0,
+      "validation_outcome": "unavailable",
+      "visibility": "public"
+    },
+    {
+      "case": "early-failure",
+      "coverage": null,
+      "enforcement_code": "AW-STAGE",
+      "mode": "advisory",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 0,
+      "validation_outcome": "unavailable",
+      "visibility": "public"
+    },
+    {
+      "case": "internal",
+      "coverage": {
+        "architecture-records": "not-applicable",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "failed"
+      },
+      "enforcement_code": "AW-OK",
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "nonconformant",
+      "validation_files": 3,
+      "validation_outcome": "warning",
+      "visibility": "internal"
+    },
+    {
+      "case": "invalid",
+      "coverage": {
+        "architecture-records": "not-applicable",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "failed"
+      },
+      "enforcement_code": "AW-OK",
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "nonconformant",
+      "validation_files": 3,
+      "validation_outcome": "warning",
+      "visibility": "public"
+    },
+    {
+      "case": "invalid-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 1,
+      "validation_outcome": "unavailable",
+      "visibility": "public"
+    },
+    {
+      "case": "legacy",
+      "coverage": {
+        "architecture-records": "partial",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "not-applicable"
+      },
+      "enforcement_code": "AW-OK",
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "legacy",
+      "validation_files": 4,
+      "validation_outcome": "warning",
+      "visibility": "public"
+    },
+    {
+      "case": "legacy-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 1,
+      "validation_outcome": "unavailable",
+      "visibility": "public"
+    },
+    {
+      "case": "malicious",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-OK",
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "incomplete",
+      "validation_files": 2,
+      "validation_outcome": "warning",
+      "visibility": "public"
+    },
+    {
+      "case": "malicious-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 2,
+      "validation_outcome": "unavailable",
+      "visibility": "public"
+    },
+    {
+      "case": "partial",
+      "coverage": {
+        "architecture-records": "not-applicable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "passed"
+      },
+      "enforcement_code": "AW-OK",
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "incomplete",
+      "validation_files": 4,
+      "validation_outcome": "warning",
+      "visibility": "public"
+    },
+    {
+      "case": "partial-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 2,
+      "validation_outcome": "unavailable",
+      "visibility": "public"
+    },
+    {
+      "case": "private",
+      "coverage": {
+        "architecture-records": "not-applicable",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "failed"
+      },
+      "enforcement_code": "AW-OK",
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "nonconformant",
+      "validation_files": 3,
+      "validation_outcome": "warning",
+      "visibility": "private"
+    },
+    {
+      "case": "retry-failed",
+      "coverage": {
+        "architecture-records": "not-applicable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-STAGE",
+      "mode": "advisory",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 2,
+      "validation_outcome": "unavailable",
+      "visibility": "public"
+    },
+    {
+      "case": "retry-recovered",
+      "coverage": {
+        "architecture-records": "not-applicable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "passed"
+      },
+      "enforcement_code": "AW-OK",
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "incomplete",
+      "validation_files": 4,
+      "validation_outcome": "warning",
+      "visibility": "public"
+    },
+    {
+      "case": "unavailable",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-STAGE",
+      "mode": "advisory",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 2,
+      "validation_outcome": "unavailable",
+      "visibility": "public"
+    },
+    {
+      "case": "unavailable-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 2,
+      "validation_outcome": "unavailable",
+      "visibility": "public"
+    },
+    {
+      "case": "unknown",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-OK",
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "incomplete",
+      "validation_files": 3,
+      "validation_outcome": "warning",
+      "visibility": "public"
+    },
+    {
+      "case": "unknown-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 1,
+      "validation_outcome": "unavailable",
+      "visibility": "public"
+    },
+    {
+      "case": "upload-outage",
+      "coverage": {
+        "architecture-records": "not-applicable",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "passed"
+      },
+      "enforcement_code": "AW-OK",
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "conformant",
+      "validation_files": 3,
+      "validation_outcome": "passed",
+      "visibility": "public"
+    }
+  ],
+  "checkpoint": "egohygiene/relay#99/5",
+  "native_matrix": {
+    "artifact_upload": "not-run",
+    "errors": 0,
+    "failures": 0,
+    "hosted_execution": "not-run",
+    "kind": "local-fixture-evidence",
+    "passed": true,
+    "profile_sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f",
+    "provider_identity": "synthetic",
+    "skipped": 0,
+    "stage_outcomes": "synthetic",
+    "tests": 12
+  },
+  "observed_date": "2026-09-28",
+  "record_type": "local-checkpoint-evidence",
+  "regression_suite": {
+    "architecture_tests_passed": 98,
+    "errors": 0,
+    "failures": 0,
+    "passed": 588,
+    "skip_reason": "Separate roadmap native runtime not prepared; no architecture skips.",
+    "skipped": 8,
+    "tests": 596
+  },
+  "relay_dogfood": {
+    "artifact_upload": "not-run",
+    "checkout_clean": true,
+    "coverage": {
+      "architecture-records": "unavailable",
+      "diagram-sources": "unavailable",
+      "repository-contracts": "unavailable"
+    },
+    "declared_adoption": {
+      "architecture-records": "unknown",
+      "diagram-sources": "present",
+      "repository-contracts": "unknown"
+    },
+    "diagram_sources": 1,
+    "hosted_execution": "not-run",
+    "kind": "local-relay-dogfood",
+    "manifest_digests_verified": true,
+    "outcome": "warning",
+    "profile_sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f",
+    "provider_identity": "synthetic",
+    "repository": "egohygiene/relay",
+    "retained_files": 4,
+    "revision": "da172c64cbda4ae4a28434a065fbfa616c1d74c3",
+    "scanned_files": 301,
+    "semantic_status": "incomplete",
+    "stage_outcomes": "synthetic"
+  },
+  "remaining_gates": [
+    "hosted-default-branch-acceptance",
+    "egohygiene/egolint#73",
+    "egohygiene/egolint#74",
+    "immutable-release",
+    "explicit-consumer-opt-in",
+    "fleet-rollout"
+  ],
+  "runtime": {
+    "cargo_fetch_locked": "passed",
+    "fresh_hash_locked_wheel_downloads": "passed",
+    "native_build_frozen_offline": "passed",
+    "python": "3.12.14",
+    "receipt": {
+      "egolint_sha256": "b5e223384e662cc3bd50a611a028955d90e1efeb1af2e2a05a33d0e033d59c75",
+      "profile_sha256": "b3bdb2b46d523793c894f5b764496fd24ddae60165d1b1ece650dfa3288f4d5f"
+    },
+    "rust": "1.85.1",
+    "rust_distribution_checksum": "passed",
+    "workflow_acquisition_helper": "not-run"
+  },
+  "scope": "Candidate implementation; exact code revision is the containing reviewed PR tree."
+}

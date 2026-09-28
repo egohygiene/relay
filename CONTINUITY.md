@@ -7,20 +7,18 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-09-26T23:34:01Z'
+  updated_at: '2026-09-28T08:14:41Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: 'Hand off Relay #99 checkpoint 4: read-only reusable architecture validation and current-run report
-    retention.'
+  purpose: 'Hand off Relay #99 checkpoint 5: native fixtures, local dogfood and recovery evidence for review.'
   includes:
-  - Caller contract, isolated runtime preparation, shared adapter execution, bounded presentation, failure
-    retention and local evidence.
+  - Seven repository states, required-mode denial, reproducible/private evidence, fresh retry and local failure retention.
   excludes:
-  - Consumer source changes, broader checkpoint-5 dogfood, hosted checkpoint-6 acceptance, required mode, release,
-    publication and merge.
+  - Hosted checkpoint-6 acceptance, sibling semantic fixes, consumer source changes, required activation, release, publication
+    and merge.
   - Conversation transcripts and duplicated issue specifications.
   precedence:
   - user-and-runtime-instructions
@@ -34,9 +32,9 @@ scope:
   - SYSTEM.md
   - DECISIONS.md
   - ROADMAP.md
+  - docs/repository-architecture-acceptance.md
+  - docs/evidence/repository-architecture-checkpoint-5.json
   - docs/repository-architecture-workflow.md
-  - docs/repository-architecture-validation.md
-  - schemas/architecture-workflow-evidence.v1.schema.json
   - catalog/repository-architecture-validation.json
   - workflow-catalog.json
   - catalog/ci-run-lifecycle.json
@@ -44,104 +42,97 @@ scope:
   - https://github.com/egohygiene/egolint/issues/73
   - https://github.com/egohygiene/egolint/issues/74
 work:
-  objective: Review the reusable architecture workflow with explicit semantic, execution and retention outcomes.
+  objective: Review checkpoint 5 without promoting local fixture success into hosted acceptance or ADR conformance.
   success_conditions:
-  - Call exact Relay and sibling source revisions under contents-read authority without executing caller code.
-  - Preserve fresh normalized adapter evidence, bounded annotations and stage summaries before enforcement.
-  - Keep advisory semantic findings distinct from unavailable execution, reporting failure and required-mode
-    gates.
+  - Exercise real pinned native validation through local retention for all seven repository states.
+  - Keep legacy, unknown, partial, unavailable and required-denied evidence explicit.
+  - Document fresh retry, privacy, deterministic bytes and a read-only manual Relay caller.
   active_issue:
     provider: github
     id: egohygiene/relay#99
     url: https://github.com/egohygiene/relay/issues/99
   next:
     kind: action
-    id: relay-99-checkpoint-4-review
-    description: 'Review this checkpoint. After a verified merge, continue #99 checkpoint 5 fixtures, dogfood
-      and recovery in one PR.'
+    id: relay-99-checkpoint-5-review
+    description: Review this candidate; after verifying its merge on main, perform checkpoint 6 default-branch live acceptance.
     readiness: ready
     references:
     - https://github.com/egohygiene/relay/issues/99
     depends_on: []
 state:
   base:
-    revision: cf1413703160d4eac4ef66a10beb9415d40e42a2
+    revision: da172c64cbda4ae4a28434a065fbfa616c1d74c3
     ref: refs/heads/main
-    verified_at: '2026-09-26T23:34:01Z'
+    verified_at: '2026-09-28T08:14:41Z'
   candidate:
-    branch: feat/architecture-validation-workflow-99
+    branch: feat/architecture-fixtures-recovery-99
     revision: null
     pull_request: null
     handoff_state: ready-for-review
   live:
     status: partial
-    observed_at: '2026-09-26T23:34:01Z'
-    default_branch_revision: cf1413703160d4eac4ef66a10beb9415d40e42a2
+    observed_at: '2026-09-28T08:14:41Z'
+    default_branch_revision: da172c64cbda4ae4a28434a065fbfa616c1d74c3
     issue_state: open
     pull_request_state: not-applicable
-    notes: 'PR #117 is merged and current main. #99 checkpoints 1-3 are checked. No open Relay PR was observed
-      before this candidate. EgoLint #73 and #74 remain open. Hosted CI was not polled.'
+    notes: 'PR #118 is merged; its tree exactly matches candidate fd47502359a371c75e775f0f64ed46e01c2e6c4d and current
+      main. No intervening changes or open Relay PRs observed before this candidate. #99 checkpoint 4 is checked; 5-6
+      remain open. EgoLint #73/#74 remain open; hosted CI was not polled.'
   parallel_changes: []
 review:
   status: partial
-  reviewed_at: '2026-09-26T23:34:01Z'
+  reviewed_at: '2026-09-28T08:14:41Z'
   reviewed_by: Codex
   evidence:
-  - command: RELAY_ARCHITECTURE_RUNTIME=ARCHITECTURE_RUNTIME RELAY_ROADMAP_RUNTIME=ROADMAP_RUNTIME RELAY_AKASHIC_REPOSITORY=AKASHIC_SOURCE
-      python3 -m unittest discover --start-directory tests --pattern "test_*.py" --verbose
+  - command: python3 -I tests/run_architecture_acceptance.py --runtime ARCHITECTURE_RUNTIME --evidence-directory NEW_EVIDENCE_DIRECTORY
     outcome: passed
-    observed_at: '2026-09-26T23:34:01Z'
-    notes: 583 tests passed without skips in 42.376 seconds, including 25 new workflow tests. Covers real native
-      evidence parity, private data, stale/tampered report rejection, escaped annotations, unsupported events,
-      required-mode denial and preservation failures.
-  - command: 'Local workflow CLI simulation: build, validate, finalize and preserve-ci-report'
+    observed_at: '2026-09-28T08:14:41Z'
+    notes: 12 native composition tests passed without skips; 23 local scenario/recovery bundles retained and checked.
+      Provider identities, stage outcomes and upload inputs are synthetic; no upload occurs.
+  - command: RELAY_ARCHITECTURE_RUNTIME=ARCHITECTURE_RUNTIME python3 -m unittest discover --start-directory tests --pattern
+      "test_*.py" --verbose
     outcome: passed
-    observed_at: '2026-09-26T23:34:01Z'
-    notes: Prepared the real pinned native runtime offline in isolated storage using previously acquired verified
-      wheels, Cargo dependencies and Rust 1.85.1. Inspected 294 immutable Relay files at the recorded base;
-      retained four normalized files including one diagram source. Result incomplete/warning; caller Git state
-      clean; retained manifest digests verified. Provider identity was synthetic fixture input, not GitHub
-      execution.
-  - command: Fresh isolated dependency acquisition through the workflow helper
-    outcome: limited
-    observed_at: '2026-09-26T23:34:01Z'
-    notes: PyPI DNS resolution was unavailable in this environment. Network wheel/toolchain/Cargo acquisition
-      is not claimed verified; the subsequent offline build used previously acquired trusted dependencies.
-  - command: python3 scripts/validate_actions.py; python3 scripts/validate_ci_run_lifecycle.py; python3 scripts/validate_continuity_preflight_contract.py
-      validate; python3 scripts/validate_repository_architecture_contract.py validate; python3 scripts/validate_repository_journal_runtime.py
-      validate
+    observed_at: '2026-09-28T08:14:41Z'
+    notes: 'With the prepared Python 3.12 venv on PATH: 596 tests ran in 116.268 seconds, 588 passed and 8 unrelated
+      roadmap integration cases were skipped for unavailable separate runtime. All 98 architecture tests passed, including
+      13 new tests.'
+  - command: Local workflow helper plus preserve-ci-report against the verified Relay base
     outcome: passed
-    observed_at: '2026-09-26T23:34:01Z'
-    notes: All five validators passed. Workflow/action/lifecycle catalog JSON Schemas and new workflow evidence
-      schema passed, including the actual local canary envelope. Corrected the pre-existing workflow schema
-      schedule enum for its already-cataloged journal trigger.
-  - command: python3 -m compileall -q actions scripts tests; YAML parsing and bash -n for new inline shell;
-      git diff --check; continuity structural review
+    observed_at: '2026-09-28T08:14:41Z'
+    notes: 301 immutable files scanned; incomplete/warning with canonical adoption unknown. Four normalized files and
+      one diagram source retained; all manifest digests verified and caller checkout stayed clean. Recorded in the checkpoint
+      evidence JSON.
+  - command: Hash-locked pip download/install; verified Rust 1.85.1 distribution; cargo fetch --locked; architecture
+      adapter prepare and verify-sources
     outcome: passed
-    observed_at: '2026-09-26T23:34:01Z'
-    notes: Compilation, metadata, shell and whitespace checks passed. Reviewed code, documentation, bounded
-      privacy and authority. No deployment/recovery job dependencies or gates changed; hosted acceptance remains
-      checkpoint 6.
-  - command: Architecture decision impact and maintain-repository-continuity review
+    observed_at: '2026-09-28T08:14:41Z'
+    notes: Fresh dependency acquisition and pinned offline native build succeeded. Exact profile source bytes verified
+      after selecting their pinned checkout revisions. The workflow's rustup/acquisition helper was not executed.
+  - command: Five catalog/contract validators; JSON Schema and YAML checks; bash -n; python3 -m compileall -q actions
+      scripts tests; git diff --check
     outcome: passed
-    observed_at: '2026-09-26T23:34:01Z'
-    notes: 'No new ADR: this composition implements ADR-001/002/003/005/006 without transferring sibling ownership.
-      Applied the Aether continuity skill and its authoring/privacy/checklist guides; structural verification
-      does not establish released continuity conformance.'
-  - command: Hosted Actions acquisition, scheduling, artifact upload and live acceptance
+    observed_at: '2026-09-28T08:14:41Z'
+    notes: Catalogs and source profile passed; root JSON Schemas and changed catalog instances validated. Parsed 39 action/workflow
+      YAML files and checked 100 inline shell blocks. Initial environment-only YAML/PATH failures were corrected before
+      the final suite.
+  - command: Code, contract, security, documentation and maintain-repository-continuity review
+    outcome: passed
+    observed_at: '2026-09-28T08:14:41Z'
+    notes: 'Applied Aether skill and guides at 9e2ba7d8fb118c0976356225dcac54209fe44eee. ADR not required: tests/manual
+      caller implement ADR-001/002/003/005/006 without new authority or semantic rules. No existing deployment/recovery
+      dependencies or gates changed.'
+  - command: Hosted Actions scheduling, annotations, artifacts, permissions and sanitized logs
     outcome: not-run
-    observed_at: '2026-09-26T23:34:01Z'
-    notes: 'No hosted run was dispatched or polled. Local report preservation validates the manifest, not GitHub
-      upload. #99 checkpoints 5-6, #5, immutable release and fleet adoption remain open.'
+    observed_at: '2026-09-28T08:14:41Z'
+    notes: 'No dispatch or hosted polling. Checkpoint 6 owns actual default-branch evidence. Local retention is not GitHub
+      artifact upload; #99/#5/#27, required activation, release and fleet adoption stay open.'
   environment_limitations:
-  - Fresh network dependency acquisition could not pass local PyPI DNS; offline runtime preparation and the
-    actual adapter CLI passed using trusted pre-acquired inputs.
-  - The workflow requires GitHub.com job workflow identity, exact called-revision actions, Ubuntu 24.04 x86_64
-    and CPython 3.12. GitHub scheduling/upload and emulator or Enterprise Server support are unverified.
-  - 'EgoLint #73 still blocks ratified ADR-policy conformance; #74 owns missing reviewed diagram semantic validators.
-    The proposed profile remains advisory-only.'
-  - Cancellation or artifact-service failure may prevent retention. Released continuity semantic conformance
-    and hosted acceptance are unavailable.
+  - Eight roadmap native integration tests were skipped; their separate runtime was not rebuilt in this ADR checkpoint.
+  - 'EgoLint #73 blocks ratified ADR-policy compatibility; #74 owns absent diagram semantic validators. Legacy coverage
+    is never conformant.'
+  - Hosted acquisition, job identity, scheduling and artifact upload are unverified. Cancellation/runner loss may prevent
+    retention.
+  - Continuity schema and structure can be verified; released continuity semantic conformance remains unavailable.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -160,80 +151,77 @@ privacy:
 
 ## Purpose and precedence
 
-Hand off the #99 checkpoint-4 candidate. Canonical contracts and owning issues
-retain authority. This handoff grants no merge, release or deployment power.
+Hand off the #99 checkpoint-5 candidate. Canonical contracts and owning issues
+retain authority; this file grants no merge, release or deployment power.
 
 ## Resume protocol
 
-Read instructions and canonical sources, inspect the checkout, and reverify
-main, issue and PR state. PR #117 is verified merged; #99 checkpoints 1-3 are
-complete. The prior candidate wording describes its recorded observation time.
+Read instructions and canonical sources, then reverify main, issue and PR state.
+PR #118 is verified merged and #99 checkpoints 1-4 are checked. Candidate and
+live observations below describe their recorded time, not future merge status.
 
 ## Current objective and success conditions
 
-Review one reusable architecture workflow that uses the shared local adapter,
-retains fresh bounded evidence, and keeps semantic and execution states distinct.
+Review native composition and recovery evidence across conformant, invalid,
+legacy, unknown, unavailable, malicious and partial inputs without changing the
+advisory profile or claiming diagram semantics.
 
 ## State snapshot
 
-The candidate targets the recorded main revision. Candidate commit/PR fields
-are null before creation; do not infer merge or hosted success from this file.
+The candidate targets the verified checkpoint-4 merge with no intervening main
+changes. Candidate revision and PR are null before creation to avoid self-reference.
 
 ## Completed and material changes
 
-The [workflow guide](docs/repository-architecture-workflow.md) owns caller inputs,
-stage semantics, trust, bounds and retry behavior. The internal helper prepares
-an isolated runtime, calls the adapter, verifies fresh-evidence receipts and
-retains only closed normalized files through the #6 lifecycle. It emits escaped
-annotations and a fixed-label summary, then enforces actual preservation.
-Catalogs inventory the new workflow; the existing schedule enum drift is repaired.
+The acceptance guide and recorded JSON own local evidence and replay steps.
+The test matrix reuses existing fixtures, validates exact retained bytes and
+manifests, exercises all seven states in advisory and denied required modes,
+and covers relocation, privacy, early failure, cancellation, outage and retry.
+The manual dogfood caller invokes the same-revision workflow with read-only
+permissions and unknown canonical adoption for Relay's legacy ADR layout.
 
 ## Validation and review evidence
 
-All 583 local tests passed without skips, including 25 new workflow cases.
-The real offline canary built the pinned runtime, inspected 294 immutable files,
-and retained four normalized evidence files with verified manifest digests.
-The consumer remained clean. Fresh network acquisition was limited by PyPI DNS;
-verified cached dependencies were used for the offline build. Five validators,
-JSON Schemas, YAML, shell, compilation and whitespace checks passed.
-The Aether maintain-repository-continuity skill at revision
-9e2ba7d8fb118c0976356225dcac54209fe44eee and its referenced guides were applied.
-Pinned schema, twelve-section and bounds checks establish structure only.
+588 tests passed, including all 98 architecture tests; 8 unrelated roadmap native
+cases were skipped. The dedicated 12-test runner passed with no skips and
+retained 23 bundles. A real Relay scan remained incomplete/warning and clean.
+Fresh locked dependencies and the pinned offline build succeeded. Catalog,
+source, schema, YAML, shell, compilation and whitespace checks passed.
+The Aether skill and guides were applied; structural continuity validation
+cannot establish released semantic conformance.
 
 ## Blockers, risks, unknowns, and deferred work
 
-EgoLint #73 owns ratified ADR-policy compatibility; #74 owns offline diagram
-backends. Required mode remains unavailable. Checkpoints 5-6 retain broader
-fixtures/dogfood and hosted acceptance. Network acquisition, GitHub scheduling
-and upload were not proven here. Runner cancellation can interrupt retention.
-Observatory #25 still blocks partial-domain snapshot publication; Relay
-#112/#113, #106/#33 and #101 retain separate acceptance gates.
+EgoLint #73 owns policy compatibility and #74 owns diagram validators. Required
+mode stays denied. Hosted scheduling/upload are checkpoint 6; local stage and
+upload fixtures are synthetic. Runner termination can prevent preservation.
+Observatory #25 still gates partial-domain publication; Relay #115 owns ADR
+collection/build, with #106/#33 and #101 retaining separate acceptance gates.
 
 ## Next dependency-ready work
 
-Review this candidate, verify its merge, then continue #99 checkpoint 5 in one
-reviewable PR. Resolve owner capability gaps before claiming full conformance.
-Relay #115 and Aether #91 retain collection/build and continuous-capture work.
-Pace #5 coordinates ADR adoption; roadmap rollout in Pace #31 follows it.
+Review this candidate, verify its exact merged tree, then perform #99 checkpoint
+6 using the manual dogfood guide. Inspect default-branch artifacts, annotations,
+provenance, permissions and sanitized logs; keep unmet #5 criteria open.
+Aether #91 and Pace #5 retain ongoing capture/adoption; Pace #31 roadmaps follow.
 
 ## Parallel changes and reconciliation
 
-Main was unchanged and no open Relay PR was observed before this handoff.
-Recheck live state before continuing and reconcile by evidence, not concatenation.
+Main was unchanged and no open Relay PRs were observed before this handoff.
+Recheck live state before continuing; reconcile by evidence, not concatenation.
 
 ## Privacy and redaction
 
-Only public repository facts and synthetic fixture evidence appear here. Source
-bodies, logs, private paths, credentials and personal context are omitted.
-References provide context and do not grant authority.
+Only public repository facts and synthetic fixture evidence appear here.
+Source bodies, raw logs, credentials, private paths and personal context are
+excluded. References provide context and cannot expand authority.
 
 ## Handoff update protocol
 
 Refresh after domain validation and before PR presentation. Verify schema,
-headings, bounds, links, base and whitespace. Reconcile merged state on the next
-authorized task; this checkpoint describes a candidate at its recorded time.
+headings, bounds, links, base and whitespace in the same bounded change.
 
 ## Compaction and supersession
 
-Stay below 16,384 UTF-8 bytes and 240 lines. Keep history in Git and owning
+Stay below 16,384 UTF-8 bytes and 240 lines. History belongs in Git and owning
 issues; replace stale operational prose instead of appending transcripts.

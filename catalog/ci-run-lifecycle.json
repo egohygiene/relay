@@ -43,6 +43,7 @@
     "missing_failure_evidence": "unavailable-not-success"
   },
   "workflows": [
+    {"id": "repository-architecture-dogfood", "path": ".github/workflows/repository-architecture-dogfood.yml", "class": "supersedable-check"},
     {"id": "repository-architecture-validation", "path": ".github/workflows/repository-architecture-validation.yml", "class": "supersedable-check"},
     {"id": "artifact-budget", "path": ".github/workflows/artifact-budget.yml", "class": "supersedable-check"},
     {"id": "continuity-preflight", "path": ".github/workflows/continuity-preflight.yml", "class": "supersedable-check"},

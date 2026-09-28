@@ -18,7 +18,7 @@ from test_repository_architecture_adapter import AdapterFixture, RUNTIME, adapte
 import run_architecture_validation_workflow as workflow
 
 
-class ArchitectureWorkflowTests(AdapterFixture):
+class ArchitectureWorkflowFixture(AdapterFixture):
     def setUp(self) -> None:
         super().setUp()
         self.root.rename(self.directory / "caller")
@@ -56,6 +56,8 @@ class ArchitectureWorkflowTests(AdapterFixture):
         self.put("diagrams/architecture.mmd", "graph TD\nA --> B\n%% PRIVATE_CANARY_DO_NOT_EXPORT\n")
         self.env.update({"GITHUB_SHA": self.commit(), "INPUT_DIAGRAM_ADOPTION": "present", "INPUT_DIAGRAM_ROOTS": '["diagrams"]'})
 
+
+class ArchitectureWorkflowTests(ArchitectureWorkflowFixture):
     def test_request_uses_exact_provider_identity_and_shared_profile(self) -> None:
         self.prepare()
         _work, state, request = workflow.load_state(self.env)
@@ -330,6 +332,30 @@ class ArchitectureWorkflowTests(AdapterFixture):
 
 
 class ArchitectureWorkflowPackagingTests(unittest.TestCase):
+    def test_manual_dogfood_keeps_unknown_adoption_and_separate_concurrency(self) -> None:
+        source = (adapter.ROOT / ".github/workflows/repository-architecture-dogfood.yml").read_text()
+        try:
+            import yaml
+        except ImportError:
+            value = json.loads(subprocess.check_output(
+                ["ruby", "-rjson", "-rpsych", "-e", "puts JSON.generate(Psych.safe_load(STDIN.read))"], input=source.encode()))
+        else:
+            value = yaml.safe_load(source)
+        triggers = value.get("on", value.get(True))  # YAML 1.1 treats the key "on" as true.
+        self.assertEqual(set(triggers), {"workflow_dispatch"})
+        self.assertFalse(triggers["workflow_dispatch"]["inputs"]["required-denial"]["default"])
+        self.assertEqual(value["permissions"], {"contents": "read"})
+        self.assertTrue(value["concurrency"]["group"].startswith("relay-architecture-dogfood-"))
+        job = value["jobs"]["architecture"]
+        self.assertEqual(job["uses"], "$/.github/workflows/repository-architecture-validation.yml")
+        self.assertEqual(job["permissions"], {"contents": "read"})
+        self.assertEqual(job["with"]["adr-adoption"], "unknown")
+        self.assertEqual(job["with"]["repository-contract-adoption"], "unknown")
+        self.assertEqual(json.loads(job["with"]["diagram-roots"]), ["ARCHITECTURE.md"])
+        self.assertEqual(job["with"]["mode"], "${{ inputs.required-denial && 'required' || 'advisory' }}")
+        self.assertNotIn("secrets", job)
+        self.assertNotIn("steps", job)
+
     def test_workflow_authority_source_pins_and_preservation_order(self) -> None:
         source = (adapter.ROOT / ".github/workflows/repository-architecture-validation.yml").read_text()
         try:

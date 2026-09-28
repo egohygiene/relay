@@ -1,0 +1,38 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Relay architecture validation dogfood
+
+on:
+  workflow_dispatch:
+    inputs:
+      required-denial:
+        description: "Exercise required-mode rejection and failure retention; this run is expected to fail."
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "relay-architecture-dogfood-${{ github.repository }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  architecture:
+    permissions:
+      contents: read
+    uses: $/.github/workflows/repository-architecture-validation.yml
+    with:
+      check-id: relay-dogfood
+      mode: "${{ inputs.required-denial && 'required' || 'advisory' }}"
+      # Relay has legacy inline DECISIONS.md and no canonical ADR policy yet.
+      # Unknown adoption preserves that gap; it must never look conformant.
+      repository-contract-adoption: unknown
+      adr-adoption: unknown
+      diagram-adoption: present
+      diagram-roots: '["ARCHITECTURE.md"]'
+      artifact-retention-days: 14

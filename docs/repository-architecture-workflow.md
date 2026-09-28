@@ -4,8 +4,9 @@ This is Relay #99 checkpoint 4. The experimental workflow is
 `.github/workflows/repository-architecture-validation.yml`. It composes the
 [existing local adapter](repository-architecture-validation.md) and
 [diagram collector](repository-architecture-diagrams.md); it adds no sibling
-validation rules. Checkpoints 5 and 6 still own broader dogfood/recovery and
-live GitHub acceptance. The current profile remains advisory-only.
+validation rules. The [checkpoint-5 acceptance suite](repository-architecture-acceptance.md)
+adds native fixtures, local recovery evidence and a manual dogfood caller;
+checkpoint 6 owns live GitHub acceptance. The current profile remains advisory-only.
 
 ## Caller contract
 
@@ -152,5 +153,7 @@ establish behavior without asserting GitHub scheduling, upload, or deployment.
 
 Before fleet conformance, resolve EgoLint #73 and review a refreshed immutable
 profile. Diagram semantics remain unavailable pending EgoLint #74. Broader
-consumer/recovery fixtures, hosted acceptance, release publication and caller
-rollout remain separately tracked; this checkpoint does not complete #99/#5.
+consumer/recovery fixtures are documented in the
+[acceptance guide](repository-architecture-acceptance.md). Hosted acceptance,
+release publication and caller rollout remain separately tracked; implementation
+does not complete #99/#5.
