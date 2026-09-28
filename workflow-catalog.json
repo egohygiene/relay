@@ -1086,6 +1086,42 @@
       "consumer_ref": null
     },
     {
+      "id": "repository-architecture-dogfood",
+      "path": ".github/workflows/repository-architecture-dogfood.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Manually exercise architecture validation against Relay without claiming canonical ADR adoption; optionally prove required-mode denial.",
+      "audience": "internal",
+      "status": "experimental",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "permissions": {
+        "contents": "read"
+      },
+      "timeout_minutes": null,
+      "concurrency": {
+        "group": "relay-architecture-dogfood-${{ github.repository }}-${{ github.ref }}",
+        "cancel_in_progress": true
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Advisory semantic gaps remain warnings. Required-mode intent, unavailable execution and failed report retention fail after bounded evidence preparation. Hosted acceptance remains separate."
+      },
+      "inputs": [
+        {
+          "name": "required-denial",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Exercise required-mode rejection and failure retention; this run is expected to fail."
+        }
+      ],
+      "outputs": [],
+      "consumer_ref": null
+    },
+    {
       "id": "repository-architecture-validation",
       "path": ".github/workflows/repository-architecture-validation.yml",
       "owner": "egohygiene/relay",

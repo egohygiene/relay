@@ -7,6 +7,9 @@ checkpoints 1–3: the versioned contract, an experimental offline local adapter
 and bounded diagram-source evidence. The
 [checkpoint-4 reusable workflow](repository-architecture-workflow.md) composes
 that same adapter and preserves its exact normalized evidence bytes.
+The [checkpoint-5 acceptance guide](repository-architecture-acceptance.md)
+provides a no-skip native fixture runner, retained local evidence and the manual
+Relay dogfood path.
 
 ## Responsibility boundary
 
@@ -320,9 +323,10 @@ complete report equality across differently named checkouts.
 
 ## Next checkpoints
 
-Checkpoint 4 implements reusable workflow orchestration. Broader consumer
-fixtures and dogfood follow in checkpoint 5, then live acceptance and separate immutable release/adoption
-proof. EgoLint #74 tracks reviewed diagram validators; source discovery does not
+Checkpoint 4 merged reusable workflow orchestration in PR #118. Checkpoint 5
+adds [native fixtures, recovery and manual dogfood](repository-architecture-acceptance.md).
+Checkpoint 6 owns live acceptance, with immutable release/adoption separate.
+EgoLint #74 tracks reviewed diagram validators; source discovery does not
 establish diagram validity. This local experimental command does
 not make #99 or parent #5 complete. Canonical ADR collection and the Decisions
 build are tracked separately in [#115](https://github.com/egohygiene/relay/issues/115).
