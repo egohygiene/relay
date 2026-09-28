@@ -1,0 +1,126 @@
+{
+  "schema_version": "relay.repository-architecture-acceptance-observation/v1",
+  "checkpoint": 6,
+  "observed_on": "2026-09-28",
+  "repository": "egohygiene/relay",
+  "default_branch": {
+    "revision": "ce7b9b4de823cdbfec84496398a2d89847a5d492",
+    "tree": "94701459887264cecff039c2344ce4fcd508fb5b"
+  },
+  "implementation_pull_requests": [
+    {
+      "number": 100,
+      "merged": true,
+      "merged_at": "2026-09-21T00:02:50Z",
+      "merge_commit_sha": "4fa92e187a6a980fea202c8309749a204a1ccae5",
+      "head_sha": "fa5f47c04359be533c2d791ad91382e9468b7214"
+    },
+    {
+      "number": 116,
+      "merged": true,
+      "merged_at": "2026-09-26T22:22:37Z",
+      "merge_commit_sha": "b3d27e61a86f347e0924da0c7eb56ad2f20b4e01",
+      "head_sha": "9aee211bd5ebf414f31912d0cd4609ca4dcdd2e8"
+    },
+    {
+      "number": 117,
+      "merged": true,
+      "merged_at": "2026-09-26T23:01:59Z",
+      "merge_commit_sha": "cf1413703160d4eac4ef66a10beb9415d40e42a2",
+      "head_sha": "1aaf80848d62c33106678ed0b182a81f2f75c7f5"
+    },
+    {
+      "number": 118,
+      "merged": true,
+      "merged_at": "2026-09-27T11:58:32Z",
+      "merge_commit_sha": "da172c64cbda4ae4a28434a065fbfa616c1d74c3",
+      "head_sha": "fd47502359a371c75e775f0f64ed46e01c2e6c4d"
+    },
+    {
+      "number": 119,
+      "merged": true,
+      "merged_at": "2026-09-28T15:59:13Z",
+      "merge_commit_sha": "ce7b9b4de823cdbfec84496398a2d89847a5d492",
+      "head_sha": "6935bbb57d252b94f8ce4870d73bb0d5c2435e33"
+    }
+  ],
+  "observation": {
+    "kind": "provider-workflow-parse-rejection",
+    "run_url": "https://github.com/egohygiene/relay/actions/runs/36447721265",
+    "run_id": 36447721265,
+    "run_attempt": 1,
+    "event": "push",
+    "status": "completed",
+    "conclusion": "failure",
+    "created_at": "2026-09-28T15:59:18Z",
+    "head_sha": "ce7b9b4de823cdbfec84496398a2d89847a5d492",
+    "workflow": ".github/workflows/repository-architecture-validation.yml",
+    "jobs": 0,
+    "artifacts": 0,
+    "annotation": {
+      "kind": "invalid-workflow-file",
+      "reason": "job context is unavailable in jobs.architecture.env",
+      "properties": [
+        {
+          "line": 95,
+          "column": 32,
+          "name": "job.workflow_sha"
+        },
+        {
+          "line": 96,
+          "column": 32,
+          "name": "job.workflow_ref"
+        },
+        {
+          "line": 97,
+          "column": 39,
+          "name": "job.workflow_repository"
+        }
+      ]
+    }
+  },
+  "verification": {
+    "workflow_parsing": "failed",
+    "runner_execution": "not-started",
+    "runtime_permissions": "unavailable",
+    "runtime_provenance": "unavailable",
+    "runtime_logs": "unavailable",
+    "step_summary": "unavailable",
+    "artifact_upload": "not-started",
+    "artifact_digest": null,
+    "normalized_evidence": "unavailable",
+    "required_denial": "not-run",
+    "advisory_dogfood": "not-run"
+  },
+  "candidate_fix": {
+    "description": "Bind called-workflow identity in the internal composite action's step env, where job context is available for every operation including failure reporting.",
+    "hosted_acceptance": "unverified-until-merged-and-executed"
+  },
+  "remaining_gates": [
+    {
+      "issue": "egohygiene/relay#99",
+      "reason": "Fresh default-branch advisory and required-denial runs, artifact inspection, provenance, runtime permissions, sanitized logs and parent acceptance reconciliation."
+    },
+    {
+      "issue": "egohygiene/egolint#73",
+      "reason": "Ratified ADR-policy compatibility and separate reviewed Relay pin refresh."
+    },
+    {
+      "issue": "egohygiene/egolint#74",
+      "reason": "Reviewed pinned offline diagram validation capabilities."
+    }
+  ],
+  "authority": {
+    "required_activation": false,
+    "release": false,
+    "publication": false,
+    "fleet_rollout": false
+  },
+  "privacy": {
+    "classification": "public-repository",
+    "source_bodies_included": false,
+    "raw_logs_included": false,
+    "credentials_included": false
+  },
+  "reference": "https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#context-availability"
+}

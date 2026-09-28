@@ -1,9 +1,10 @@
 # Architecture fixtures, dogfood, and recovery
 
-This is [#99 checkpoint 5](https://github.com/egohygiene/relay/issues/99).
-It proves local composition of the existing adapter, workflow helper and #6
-report lifecycle. It does not establish hosted scheduling, upload, release,
-required enforcement, fleet adoption or diagram semantic validity.
+This guide covers [#99 checkpoints 5 and 6](https://github.com/egohygiene/relay/issues/99).
+Checkpoint 5 proves local composition of the existing adapter, workflow helper
+and #6 report lifecycle. Checkpoint 6 inspects provider evidence and records
+remaining acceptance gaps. Local proof does not establish hosted scheduling,
+upload, release, required enforcement, fleet adoption or diagram semantic validity.
 
 ## Evidence boundary
 
@@ -121,3 +122,46 @@ reviewed offline diagram validators. Checkpoint 6 must reconcile all #5 criteria
 and leave unavailable capabilities open. Merged checkpoint PRs alone do not
 close #99, #5 or #27. Release, fleet rollout, Relay #115 collection/build and
 Observatory #25 partial-domain publication acceptance remain separate gates.
+
+## Checkpoint 6 observation — 2026-09-28
+
+All five implementation PRs (#100, #116, #117, #118 and #119) were verified
+merged and reachable from `main` at `ce7b9b4de823cdbfec84496398a2d89847a5d492`.
+Its tree exactly matches the checkpoint-5 candidate. The
+[provider observation](evidence/repository-architecture-checkpoint-6.json)
+records the exact revisions and acceptance states; it is not an adapter report.
+
+GitHub [run 36447721265, attempt 1](https://github.com/egohygiene/relay/actions/runs/36447721265)
+rejected the reusable workflow before starting any job. Its annotation identifies
+`job.workflow_sha`, `job.workflow_ref` and `job.workflow_repository` in job-level
+`env` as unavailable context. GitHub's
+[context-availability table](https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#context-availability)
+allows `job` in step-level `env`, not job-level `env`.
+
+The fix binds those three values in the internal composite action's operation
+step. That supplies the called workflow identity independently on every helper
+invocation, including finalization after failed preflight. No earlier successful
+step or `GITHUB_ENV` write is required. Identity checks, same-revision `$/`
+resolution, permissions, pins and execution/retention gates are unchanged.
+
+The run API reports `push` and `failure`, but this is a workflow parsing record,
+not an executed advisory case. The job and artifact collections are empty.
+There are no runtime logs, Step Summary, archive bytes, upload digest or runtime
+permission/provenance evidence to inspect. The provider's parser annotation is
+distinct from Relay's semantic annotations. No manual run was dispatched against
+the known-invalid base, and no hosted completion was polled.
+
+| Parent #5 acceptance | Current evidence and remaining requirement |
+| --- | --- |
+| Consume owner schemas/rules | Immutable profile and native local fixtures; hosted acquisition/execution unverified. |
+| ADR inheritance, metadata, IDs, lifecycle, index, supersession, references and overrides | Local adapter/native tests; EgoLint #73 blocks ratified-policy compatibility. Reconcile each rule with the refreshed owner profile. |
+| Diagrams and repository context | Bounded discovery and local contract checks; semantic diagram capabilities remain unavailable under EgoLint #74. |
+| Actionable annotations and durable artifacts | Local presentation/retention proved; provider rejected the workflow before either could run. |
+| Advisory and required modes | Advisory local behavior and required-intent denial proved; actual hosted cases remain pending and required activation stays gated. |
+| Legacy migration honesty | Local fixtures preserve legacy/partial coverage; Relay canonical adoption remains unknown, never conformant. |
+
+Review and merge the bounded context-scope fix, verify its tree on the default
+branch, then resume the two manual runs above. Record any further execution
+defect in a separate reviewable checkpoint. Keep checkpoint 6, #99 and #5 open
+until every criterion has inspectable evidence; a parser fix alone is not live
+acceptance. Release, publication and fleet rollout remain separate gates.
