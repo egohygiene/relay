@@ -18,7 +18,7 @@ import sys
 import unittest
 
 from test_architecture_validation_workflow import ArchitectureWorkflowFixture, workflow
-from test_repository_architecture_adapter import RUNTIME, adapter
+from test_repository_architecture_adapter import ADR, RUNTIME, adapter
 
 
 @unittest.skipUnless(RUNTIME, "prepare the pinned runtime; use tests/run_architecture_acceptance.py for a no-skip run")
@@ -31,9 +31,21 @@ class ArchitectureAcceptanceTests(ArchitectureWorkflowFixture):
             self.env.update({"INPUT_CONTRACT_ADOPTION": "present", "INPUT_CONTRACTS": '["policy/contract.toml"]'})
         if name == "invalid":
             (self.root / "README.md").unlink()
-        if name == "legacy":
+        if name in {"legacy", "conformant-adr", "invalid-adr", "old-policy-adr", "partial"}:
             self.add_adrs()
-            self.env.update({"INPUT_ADR_ADOPTION": "legacy", "INPUT_ADR_POLICY": "policy/intelligence.toml"})
+            self.env.update({"INPUT_ADR_ADOPTION": "legacy" if name == "legacy" else "present",
+                             "INPUT_ADR_POLICY": "policy/intelligence.toml"})
+        if name == "invalid-adr":
+            # A merged implementation reference cannot replace explicit approval.
+            invalid = ADR.replace("status: proposed", "status: accepted").replace(
+                "implementation_status: not_started", "implementation_status: implemented").replace(
+                "pull_request: null", "pull_request: https://github.com/egohygiene/example/pull/2")
+            self.put("docs/decisions/ADR-001-repository-records.md", invalid)
+        if name == "old-policy-adr":
+            path = self.root / "docs/decisions/policy-reference.json"
+            reference = json.loads(path.read_bytes())
+            reference["policy"]["source"]["revision"] = "f598ed659a43dd759d4ede41c27f9e5daf991aa7"
+            path.write_text(json.dumps(reference))
         if name in {"unknown", "unavailable"}:
             self.env.update({"INPUT_CONTRACT_ADOPTION": "unknown", "INPUT_ADR_ADOPTION": "unknown"})
         if name in {"partial", "unavailable", "malicious"}:
@@ -127,10 +139,21 @@ class ArchitectureAcceptanceTests(ArchitectureWorkflowFixture):
         self.assertNotIn("PRIVATE_CANARY", annotations)
         if name == "legacy":
             self.assertEqual(result["coverage"]["architecture-records"], "partial")
-            self.assertIn("RELAY-ARCH-COMPAT-001", {item["id"] for item in result["findings"]})
-        if name == "invalid":
+            self.assertEqual(self.artifact(result, "repository_intelligence")["status"], "valid")
+            self.assertIn("RELAY-ARCH-LEGACY-001", {item["id"] for item in result["findings"]})
+            self.assertNotIn("RELAY-ARCH-COMPAT-001", {item["id"] for item in result["findings"]})
+        if name in {"invalid", "invalid-adr", "old-policy-adr"}:
             self.assertIn("::warning", annotations)
             self.assertNotIn("::error", annotations)
+        if name in {"conformant-adr", "partial"}:
+            self.assertEqual(result["coverage"]["architecture-records"], "passed")
+            self.assertNotIn("RELAY-ARCH-COMPAT-001", {item["id"] for item in result["findings"]})
+        if name in {"invalid-adr", "old-policy-adr"}:
+            rule = "EGO-INTEL-ADR-LIFECYCLE-001" if name == "invalid-adr" else "EGO-INTEL-CONTRACT-001"
+            self.assertEqual(result["coverage"]["architecture-records"], "failed")
+            self.assertIn(rule, {item["id"] for item in result["findings"]})
+            sarif = self.artifact(result, "egolint_sarif")
+            self.assertIn(rule, {item["properties"]["egolintRuleId"] for item in sarif["runs"][0]["results"]})
         if name in {"partial", "unavailable"}:
             diagram = self.artifact(result, "diagram_evidence")
             self.assertEqual(diagram["inventory_status"], "complete")
@@ -151,6 +174,15 @@ class ArchitectureAcceptanceTests(ArchitectureWorkflowFixture):
 
     def test_invalid_contract(self) -> None:
         self.check_case("invalid", "nonconformant", "warning", "AW-OK")
+
+    def test_ratified_adr_conformance(self) -> None:
+        self.check_case("conformant-adr", "conformant", "passed", "AW-OK")
+
+    def test_implemented_adr_without_approval_is_invalid(self) -> None:
+        self.check_case("invalid-adr", "nonconformant", "warning", "AW-OK")
+
+    def test_old_policy_reference_is_invalid(self) -> None:
+        self.check_case("old-policy-adr", "nonconformant", "warning", "AW-OK")
 
     def test_legacy_adr_is_never_conformant(self) -> None:
         self.check_case("legacy", "legacy", "warning", "AW-OK")

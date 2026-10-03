@@ -32,18 +32,29 @@ composition of those boundaries instead of repeating each individual check.
 | --- | --- | --- | --- |
 | Conformant repository contract; other surfaces explicitly not applicable | conformant / passed | success | denied; unavailable evidence retained |
 | Invalid contract with missing required file | nonconformant / warning | success with warning annotation | denied; unavailable evidence retained |
+| Conformant ratified ADRs; other surfaces explicitly not applicable | conformant / passed | success | denied; unavailable evidence retained |
+| Implemented accepted ADR without human approval | nonconformant / warning | success with native lifecycle finding | denied; unavailable evidence retained |
+| Old ADR policy reference | nonconformant / warning | success with native contract finding | denied; unavailable evidence retained |
 | Declared legacy ADR corpus | legacy / warning; partial ADR coverage | success | denied; unavailable evidence retained |
 | Unknown adoption | incomplete / warning | success | denied; unavailable evidence retained |
 | Unavailable runtime with independent diagrams | unavailable | failure with complete diagram inventory retained | denied; unavailable evidence retained |
 | Malicious source symlink | incomplete / warning; scan rejected | success with advisory diagnostic; no native conformance | denied; unavailable evidence retained |
-| Conformant contract plus unvalidated diagrams | incomplete / warning | success; diagram semantics unavailable | denied; unavailable evidence retained |
+| Conformant contract and ratified ADRs plus unvalidated diagrams | incomplete / warning | success; diagram semantics unavailable | denied; unavailable evidence retained |
 
-The positive conformance case covers only the selected repository-contract
-surface. It never claims ADR or diagram conformance. The legacy fixture uses
-the existing native old-policy corpus solely to reproduce EgoLint #73, retains
-`RELAY-ARCH-COMPAT-001`, and must stay legacy with partial coverage. Do not adopt
-that older policy in consumers. An implemented or merged ADR still needs its
-separate human decision evidence.
+The original conformance case covers only the selected repository-contract
+surface. The refreshed suite also covers conformant ratified ADRs, an implemented
+accepted ADR without human approval, and an old policy reference. These cases
+exercise the same retention, SARIF, annotations and required-denial boundary.
+The partial/determinism/recovery case now combines valid contracts and ratified
+ADRs with unavailable diagram semantics.
+
+The legacy fixture now uses the ratified policy and must stay legacy with partial
+coverage even when native validation is valid. This constraint is independent of
+the compatibility diagnostic. An implemented or merged ADR still needs its
+separate human decision evidence. The
+[ratified-policy replay](evidence/repository-architecture-ratified-policy.json)
+records the current matrix; the checkpoint-5 record preserves its original pins
+and observations.
 
 ## Run and inspect locally
 
@@ -116,8 +127,9 @@ After checkpoint 5 is merged and its exact tree is verified on `main`, checkpoin
 5. Record acquisition, cancellation/retry and artifact-service limitations from
    actual evidence. Never infer hosted behavior from synthetic stage inputs.
 
-EgoLint [#73](https://github.com/egohygiene/egolint/issues/73) still owns ADR-policy
-compatibility, and [#74](https://github.com/egohygiene/egolint/issues/74) owns
+EgoLint [#73](https://github.com/egohygiene/egolint/issues/73) owns the reviewed
+policy fix and this separate Relay adoption checkpoint;
+[#74](https://github.com/egohygiene/egolint/issues/74) owns
 reviewed offline diagram validators. Checkpoint 6 must reconcile all #5 criteria
 and leave unavailable capabilities open. Merged checkpoint PRs alone do not
 close #99, #5 or #27. Release, fleet rollout, Relay #115 collection/build and
@@ -154,14 +166,16 @@ the known-invalid base, and no hosted completion was polled.
 | Parent #5 acceptance | Current evidence and remaining requirement |
 | --- | --- |
 | Consume owner schemas/rules | Immutable profile and native local fixtures; hosted acquisition/execution unverified. |
-| ADR inheritance, metadata, IDs, lifecycle, index, supersession, references and overrides | Local adapter/native tests; EgoLint #73 blocks ratified-policy compatibility. Reconcile each rule with the refreshed owner profile. |
+| ADR inheritance, metadata, IDs, lifecycle, index, supersession, references and overrides | Refreshed ratified-policy fixtures and preserved owner diagnostics pass locally. Review the separate Relay adoption checkpoint; complete hosted acceptance remains deferred. |
 | Diagrams and repository context | Bounded discovery and local contract checks; semantic diagram capabilities remain unavailable under EgoLint #74. |
 | Actionable annotations and durable artifacts | Local presentation/retention proved; provider rejected the workflow before either could run. |
 | Advisory and required modes | Advisory local behavior and required-intent denial proved; actual hosted cases remain pending and required activation stays gated. |
 | Legacy migration honesty | Local fixtures preserve legacy/partial coverage; Relay canonical adoption remains unknown, never conformant. |
 
-Review and merge the bounded context-scope fix, verify its tree on the default
-branch, then resume the two manual runs above. Record any further execution
+PR #120 merged the bounded context-scope fix as
+`04bd32c8ef492418f47d6df6faee425d6888f341`; its tree matches the reviewed candidate.
+Hosted acceptance is deferred to final cleanup by maintainer scheduling direction.
+When resumed, execute the two manual runs above and record any further execution
 defect in a separate reviewable checkpoint. Keep checkpoint 6, #99 and #5 open
 until every criterion has inspectable evidence; a parser fix alone is not live
 acceptance. Release, publication and fleet rollout remain separate gates.

@@ -1,0 +1,571 @@
+{
+  "base_revision": "04bd32c8ef492418f47d6df6faee425d6888f341",
+  "cases": [
+    {
+      "case": "conformant",
+      "coverage": {
+        "architecture-records": "not-applicable",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "passed"
+      },
+      "enforcement_code": "AW-OK",
+      "finding_ids": [],
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "conformant",
+      "validation_files": 3,
+      "validation_outcome": "passed"
+    },
+    {
+      "case": "conformant-adr",
+      "coverage": {
+        "architecture-records": "passed",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "not-applicable"
+      },
+      "enforcement_code": "AW-OK",
+      "finding_ids": [],
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "conformant",
+      "validation_files": 4,
+      "validation_outcome": "passed"
+    },
+    {
+      "case": "conformant-adr-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "finding_ids": [
+        "RELAY-ARCH-MODE-001"
+      ],
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 1,
+      "validation_outcome": "unavailable"
+    },
+    {
+      "case": "conformant-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "finding_ids": [
+        "RELAY-ARCH-MODE-001"
+      ],
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 1,
+      "validation_outcome": "unavailable"
+    },
+    {
+      "case": "determinism-first",
+      "coverage": {
+        "architecture-records": "passed",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "passed"
+      },
+      "enforcement_code": "AW-OK",
+      "finding_ids": [
+        "RELAY-ARCH-DIAGRAM-001"
+      ],
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "incomplete",
+      "validation_files": 5,
+      "validation_outcome": "warning"
+    },
+    {
+      "case": "determinism-second",
+      "coverage": {
+        "architecture-records": "passed",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "passed"
+      },
+      "enforcement_code": "AW-OK",
+      "finding_ids": [
+        "RELAY-ARCH-DIAGRAM-001"
+      ],
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "incomplete",
+      "validation_files": 5,
+      "validation_outcome": "warning"
+    },
+    {
+      "case": "early-cancelled",
+      "coverage": null,
+      "enforcement_code": "AW-CANCELLED",
+      "finding_ids": [],
+      "mode": "advisory",
+      "planned_job_outcome": "cancelled",
+      "semantic_status": "unavailable",
+      "validation_files": 0,
+      "validation_outcome": "unavailable"
+    },
+    {
+      "case": "early-failure",
+      "coverage": null,
+      "enforcement_code": "AW-STAGE",
+      "finding_ids": [],
+      "mode": "advisory",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 0,
+      "validation_outcome": "unavailable"
+    },
+    {
+      "case": "internal",
+      "coverage": {
+        "architecture-records": "not-applicable",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "failed"
+      },
+      "enforcement_code": "AW-OK",
+      "finding_ids": [
+        "EGO-CONTRACT-CONTEXT-001"
+      ],
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "nonconformant",
+      "validation_files": 3,
+      "validation_outcome": "warning"
+    },
+    {
+      "case": "invalid",
+      "coverage": {
+        "architecture-records": "not-applicable",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "failed"
+      },
+      "enforcement_code": "AW-OK",
+      "finding_ids": [
+        "EGO-CONTRACT-FILE-001"
+      ],
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "nonconformant",
+      "validation_files": 3,
+      "validation_outcome": "warning"
+    },
+    {
+      "case": "invalid-adr",
+      "coverage": {
+        "architecture-records": "failed",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "not-applicable"
+      },
+      "enforcement_code": "AW-OK",
+      "finding_ids": [
+        "EGO-INTEL-ADR-LIFECYCLE-001"
+      ],
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "nonconformant",
+      "validation_files": 4,
+      "validation_outcome": "warning"
+    },
+    {
+      "case": "invalid-adr-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "finding_ids": [
+        "RELAY-ARCH-MODE-001"
+      ],
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 1,
+      "validation_outcome": "unavailable"
+    },
+    {
+      "case": "invalid-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "finding_ids": [
+        "RELAY-ARCH-MODE-001"
+      ],
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 1,
+      "validation_outcome": "unavailable"
+    },
+    {
+      "case": "legacy",
+      "coverage": {
+        "architecture-records": "partial",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "not-applicable"
+      },
+      "enforcement_code": "AW-OK",
+      "finding_ids": [
+        "RELAY-ARCH-LEGACY-001"
+      ],
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "legacy",
+      "validation_files": 4,
+      "validation_outcome": "warning"
+    },
+    {
+      "case": "legacy-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "finding_ids": [
+        "RELAY-ARCH-MODE-001"
+      ],
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 1,
+      "validation_outcome": "unavailable"
+    },
+    {
+      "case": "malicious",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-OK",
+      "finding_ids": [
+        "RELAY-ARCH-PATH-001"
+      ],
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "incomplete",
+      "validation_files": 2,
+      "validation_outcome": "warning"
+    },
+    {
+      "case": "malicious-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "finding_ids": [
+        "RELAY-ARCH-MODE-001"
+      ],
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 2,
+      "validation_outcome": "unavailable"
+    },
+    {
+      "case": "old-policy-adr",
+      "coverage": {
+        "architecture-records": "failed",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "not-applicable"
+      },
+      "enforcement_code": "AW-OK",
+      "finding_ids": [
+        "EGO-INTEL-CONTRACT-001"
+      ],
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "nonconformant",
+      "validation_files": 4,
+      "validation_outcome": "warning"
+    },
+    {
+      "case": "old-policy-adr-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "finding_ids": [
+        "RELAY-ARCH-MODE-001"
+      ],
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 1,
+      "validation_outcome": "unavailable"
+    },
+    {
+      "case": "partial",
+      "coverage": {
+        "architecture-records": "passed",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "passed"
+      },
+      "enforcement_code": "AW-OK",
+      "finding_ids": [
+        "RELAY-ARCH-DIAGRAM-001"
+      ],
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "incomplete",
+      "validation_files": 5,
+      "validation_outcome": "warning"
+    },
+    {
+      "case": "partial-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "finding_ids": [
+        "RELAY-ARCH-MODE-001"
+      ],
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 2,
+      "validation_outcome": "unavailable"
+    },
+    {
+      "case": "private",
+      "coverage": {
+        "architecture-records": "not-applicable",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "failed"
+      },
+      "enforcement_code": "AW-OK",
+      "finding_ids": [
+        "EGO-CONTRACT-CONTEXT-001"
+      ],
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "nonconformant",
+      "validation_files": 3,
+      "validation_outcome": "warning"
+    },
+    {
+      "case": "retry-failed",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-STAGE",
+      "finding_ids": [
+        "RELAY-ARCH-DIAGRAM-001",
+        "RELAY-ARCH-RUNTIME-001"
+      ],
+      "mode": "advisory",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 2,
+      "validation_outcome": "unavailable"
+    },
+    {
+      "case": "retry-recovered",
+      "coverage": {
+        "architecture-records": "passed",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "passed"
+      },
+      "enforcement_code": "AW-OK",
+      "finding_ids": [
+        "RELAY-ARCH-DIAGRAM-001"
+      ],
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "incomplete",
+      "validation_files": 5,
+      "validation_outcome": "warning"
+    },
+    {
+      "case": "unavailable",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-STAGE",
+      "finding_ids": [
+        "RELAY-ARCH-DIAGRAM-001",
+        "RELAY-ARCH-RUNTIME-001",
+        "RELAY-ARCH-UNKNOWN-001"
+      ],
+      "mode": "advisory",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 2,
+      "validation_outcome": "unavailable"
+    },
+    {
+      "case": "unavailable-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "finding_ids": [
+        "RELAY-ARCH-MODE-001"
+      ],
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 2,
+      "validation_outcome": "unavailable"
+    },
+    {
+      "case": "unknown",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-OK",
+      "finding_ids": [
+        "RELAY-ARCH-UNKNOWN-001"
+      ],
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "incomplete",
+      "validation_files": 3,
+      "validation_outcome": "warning"
+    },
+    {
+      "case": "unknown-required",
+      "coverage": {
+        "architecture-records": "unavailable",
+        "diagram-sources": "unavailable",
+        "repository-contracts": "unavailable"
+      },
+      "enforcement_code": "AW-REQUIRED",
+      "finding_ids": [
+        "RELAY-ARCH-MODE-001"
+      ],
+      "mode": "required",
+      "planned_job_outcome": "failure",
+      "semantic_status": "unavailable",
+      "validation_files": 1,
+      "validation_outcome": "unavailable"
+    },
+    {
+      "case": "upload-outage",
+      "coverage": {
+        "architecture-records": "not-applicable",
+        "diagram-sources": "not-applicable",
+        "repository-contracts": "passed"
+      },
+      "enforcement_code": "AW-OK",
+      "finding_ids": [],
+      "mode": "advisory",
+      "planned_job_outcome": "success",
+      "semantic_status": "conformant",
+      "validation_files": 3,
+      "validation_outcome": "passed"
+    }
+  ],
+  "checkpoint": "egohygiene/relay#99/ratified-policy-refresh",
+  "manifest_digests_verified": true,
+  "native_matrix": {
+    "artifact_upload": "not-run",
+    "errors": 0,
+    "failures": 0,
+    "hosted_execution": "not-run",
+    "kind": "local-fixture-evidence",
+    "passed": true,
+    "profile_sha256": "6a2354340c6e40e1e29f7a881e4e117b1f8144483b8cec0d34d370bcb895357a",
+    "provider_identity": "synthetic",
+    "skipped": 0,
+    "stage_outcomes": "synthetic",
+    "tests": 15
+  },
+  "observed_date": "2026-09-28",
+  "privacy": {
+    "absolute_local_paths_included": false,
+    "credentials_included": false,
+    "raw_logs_included": false,
+    "source_bodies_included": false
+  },
+  "profile": {
+    "sha256": "6a2354340c6e40e1e29f7a881e4e117b1f8144483b8cec0d34d370bcb895357a",
+    "source_artifacts_verified": 21,
+    "version": "1.0.0-alpha.2"
+  },
+  "record_type": "local-checkpoint-evidence",
+  "regression_suite": {
+    "architecture_tests_passed": 103,
+    "errors": 0,
+    "failures": 0,
+    "passed": 593,
+    "skip_reason": "Separate roadmap native runtime not prepared; no architecture skips.",
+    "skipped": 8,
+    "tests": 601
+  },
+  "relay_dogfood": {
+    "artifact_upload": "not-run",
+    "checkout_clean": true,
+    "coverage": {
+      "architecture-records": "unavailable",
+      "diagram-sources": "unavailable",
+      "repository-contracts": "unavailable"
+    },
+    "hosted_execution": "not-run",
+    "kind": "local-relay-dogfood",
+    "manifest_digests_verified": true,
+    "outcome": "warning",
+    "profile_sha256": "6a2354340c6e40e1e29f7a881e4e117b1f8144483b8cec0d34d370bcb895357a",
+    "provider_identity": "synthetic",
+    "retained_files": 4,
+    "revision": "04bd32c8ef492418f47d6df6faee425d6888f341",
+    "scanned_files": 307,
+    "semantic_status": "incomplete",
+    "stage_outcomes": "synthetic"
+  },
+  "remaining_gates": [
+    "review-and-merge-this-relay-profile-refresh",
+    "hosted-default-branch-acceptance-deferred",
+    "egohygiene/egolint#74",
+    "immutable-release",
+    "explicit-consumer-required-opt-in",
+    "fleet-rollout",
+    "publication"
+  ],
+  "retained_bundles": 29,
+  "runtime": {
+    "fresh_dependency_acquisition": "not-run-used-previously-verified-inputs",
+    "native_build_frozen_offline": "passed",
+    "old_profile_runtime": "rejected-at-pin-verification",
+    "receipt": {
+      "egolint_sha256": "1299e344753cc40550d35c0c0e5b6a7faab5a1026190bc2e67305cdecaef5372",
+      "profile_sha256": "6a2354340c6e40e1e29f7a881e4e117b1f8144483b8cec0d34d370bcb895357a"
+    },
+    "workflow_acquisition_helper": "not-run"
+  },
+  "scope": "Candidate implementation; exact Relay code revision is the containing reviewed PR tree.",
+  "upstream": {
+    "catalog_version": "0.1.0-alpha.2",
+    "merge_revision": "933472b6322d2060c487e5a8a6f0bc5197696af0",
+    "merge_tree_matches_reviewed_head": true,
+    "package_version": "0.1.0-alpha.1",
+    "pull_request": "https://github.com/egohygiene/egolint/pull/75",
+    "release_included": false,
+    "reviewed_head": "2da9c8c27fef6df29985472323fc537787f9a231",
+    "tree": "4c9b04a27b7c9e92581ac09c02e15d20092f06bb"
+  }
+}
