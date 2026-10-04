@@ -1,0 +1,398 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/adr-collection-review.v1.schema.json",
+  "title": "ADR collection checkpoint 1 review envelope; publication denied",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "publication",
+    "diagnostics"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.relay.adr-collection-review/v1"
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "partial",
+        "invalid",
+        "unavailable",
+        "uncollected",
+        "not_applicable",
+        "denied"
+      ]
+    },
+    "publication": {
+      "const": "denied"
+    },
+    "diagnostics": {
+      "type": "array",
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "owner",
+          "path",
+          "line",
+          "remediation"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^(?:[A-Z_]+|EGO-INTEL-[A-Z-]+-[0-9]{3})$",
+            "maxLength": 64
+          },
+          "owner": {
+            "enum": [
+              "relay",
+              "hygiene",
+              "egolint",
+              "observatory"
+            ]
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240,
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[A-Za-z0-9._/-]+$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "line": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "remediation": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
+      }
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+    },
+    "represented_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adoption",
+        "policy_reference",
+        "decision_directory",
+        "index",
+        "collected_at",
+        "maximum_age_seconds",
+        "sources"
+      ],
+      "properties": {
+        "adoption": {
+          "enum": [
+            "present",
+            "legacy",
+            "unknown",
+            "not-applicable"
+          ]
+        },
+        "policy_reference": {
+          "type": "string",
+          "maxLength": 240,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[A-Za-z0-9._/-]+$"
+        },
+        "decision_directory": {
+          "type": "string",
+          "maxLength": 240,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[A-Za-z0-9._/-]+$"
+        },
+        "index": {
+          "type": "string",
+          "maxLength": 240,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[A-Za-z0-9._/-]+$"
+        },
+        "collected_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "maximum_age_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2678400
+        },
+        "sources": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "maxLength": 240,
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[A-Za-z0-9._/-]+$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lock_sha256",
+        "egolint_sha256",
+        "collector_sha256",
+        "shared_runtime_sha256",
+        "pins"
+      ],
+      "properties": {
+        "lock_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "egolint_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "collector_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "shared_runtime_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "pins": {
+          "type": "object"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "egolint",
+        "hygiene",
+        "coverage",
+        "observatory",
+        "diagnostics_truncated"
+      ],
+      "properties": {
+        "egolint": {
+          "enum": [
+            "valid",
+            "invalid",
+            "incomplete",
+            "not_applicable"
+          ]
+        },
+        "hygiene": {
+          "enum": [
+            "valid",
+            "invalid"
+          ]
+        },
+        "coverage": {
+          "enum": [
+            "valid",
+            "not-run"
+          ]
+        },
+        "observatory": {
+          "enum": [
+            "normalized",
+            "not-run"
+          ]
+        },
+        "diagnostics_truncated": {
+          "type": "boolean"
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roadmap",
+        "decisions",
+        "git",
+        "issues",
+        "pull_requests",
+        "checks",
+        "releases",
+        "deployments",
+        "history"
+      ],
+      "properties": {
+        "roadmap": {
+          "$ref": "#/$defs/claim"
+        },
+        "decisions": {
+          "$ref": "#/$defs/claim"
+        },
+        "git": {
+          "$ref": "#/$defs/claim"
+        },
+        "issues": {
+          "$ref": "#/$defs/claim"
+        },
+        "pull_requests": {
+          "$ref": "#/$defs/claim"
+        },
+        "checks": {
+          "$ref": "#/$defs/claim"
+        },
+        "releases": {
+          "$ref": "#/$defs/claim"
+        },
+        "deployments": {
+          "$ref": "#/$defs/claim"
+        },
+        "history": {
+          "$ref": "#/$defs/claim"
+        }
+      }
+    },
+    "projection_candidate": {
+      "type": "object"
+    },
+    "snapshot_candidate": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "candidate_digests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "projection_sha256",
+        "snapshot_sha256"
+      ],
+      "properties": {
+        "projection_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "snapshot_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "denied"
+          }
+        }
+      },
+      "then": {
+        "maxProperties": 4
+      },
+      "else": {
+        "required": [
+          "schema",
+          "status",
+          "publication",
+          "diagnostics",
+          "repository",
+          "represented_commit",
+          "observed_at",
+          "inputs",
+          "runtime",
+          "validation",
+          "coverage",
+          "projection_candidate",
+          "snapshot_candidate",
+          "candidate_digests"
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "collection",
+        "freshness",
+        "reason",
+        "observed_at"
+      ],
+      "properties": {
+        "collection": {
+          "enum": [
+            "uncollected",
+            "unavailable",
+            "partial",
+            "observed_empty",
+            "observed",
+            "failed",
+            "not_applicable"
+          ]
+        },
+        "freshness": {
+          "enum": [
+            "current",
+            "stale",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "observed_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

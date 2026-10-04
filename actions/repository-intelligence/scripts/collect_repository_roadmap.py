@@ -152,10 +152,10 @@ def git_blob(root: Path, revision: str, path: str, limit: int = MAX_SOURCE) -> b
     return git(root, "cat-file", "blob", record[2], limit=limit)
 
 
-def prepare(args: argparse.Namespace) -> None:
+def prepare(args: argparse.Namespace, *, lock_path: Path = LOCK_PATH) -> None:
     """Acquire trusted runtime bytes from Git objects; never consumer worktrees."""
     check_python_runtime()
-    lock = load_json(read_file(LOCK_PATH))
+    lock = load_json(read_file(lock_path))
     destination = safe_path(args.output)
     if destination.exists():
         fail("PATH")
@@ -164,7 +164,7 @@ def prepare(args: argparse.Namespace) -> None:
         runtime = Path(temporary) / "runtime"
         runtime.mkdir()
         for name, pin in lock["sources"].items():
-            source = args.hygiene if name == "hygiene_semantics" else getattr(args, name)
+            source = args.hygiene if name.startswith("hygiene_") else getattr(args, name)
             if git(source, "rev-parse", pin["revision"] + "^{tree}").decode().strip() != pin["tree"]:
                 fail("PIN")
             for path, expected in pin["files"].items():
@@ -193,7 +193,7 @@ def prepare(args: argparse.Namespace) -> None:
         build_env = environment()
         if args.cargo.is_absolute():
             build_env["PATH"] = str(args.cargo.parent) + os.pathsep + build_env["PATH"]
-        for key in ("CARGO_HOME", "RUSTUP_HOME"):
+        for key in ("CARGO_HOME", "RUSTUP_HOME", "CARGO_BUILD_JOBS"):
             if key in os.environ:
                 build_env[key] = os.environ[key]
         # rustup uses the user's installed toolchain, while compilation is offline.
@@ -210,17 +210,17 @@ def prepare(args: argparse.Namespace) -> None:
         executable = runtime / "egolint-bin"
         shutil.copyfile(binary, executable)
         executable.chmod(0o700)
-        receipt = {"lock_sha256": digest(read_file(LOCK_PATH)),
+        receipt = {"lock_sha256": digest(read_file(lock_path)),
                    "egolint_sha256": digest(read_file(executable, 128 * MAX_JSON))}
         (runtime / "runtime.json").write_bytes(json_bytes(receipt))
         runtime.rename(destination)
 
 
-def runtime_files(root: Path) -> tuple[dict, dict]:
+def runtime_files(root: Path, *, lock_path: Path = LOCK_PATH) -> tuple[dict, dict]:
     check_python_runtime()
-    lock = load_json(read_file(LOCK_PATH))
+    lock = load_json(read_file(lock_path))
     receipt = load_json(read_file(root / "runtime.json"))
-    if set(receipt) != {"lock_sha256", "egolint_sha256"} or receipt["lock_sha256"] != digest(read_file(LOCK_PATH)):
+    if set(receipt) != {"lock_sha256", "egolint_sha256"} or receipt["lock_sha256"] != digest(read_file(lock_path)):
         fail("PIN")
     for name, pin in lock["sources"].items():
         for path, expected in pin["files"].items():

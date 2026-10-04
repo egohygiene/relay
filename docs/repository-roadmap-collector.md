@@ -9,8 +9,11 @@ code, repairs canonical intent, discovers the organization, or publishes a site.
 ADR-007 and ADR-010 retain their existing ownership boundaries. The newer Aether
 #90 and organization #42 proposals do not replace Hygiene authority.
 
-**Publication is blocked by [Observatory #25](https://github.com/egohygiene/observatory/issues/25).**
-The current read model always creates every domain view. Its coverage describes
+**This historical roadmap profile remains publication-blocked.**
+[Observatory #25](https://github.com/egohygiene/observatory/issues/25) is now closed
+and alpha.2 coverage support is available. The unchanged pins below still select
+the older read model; reviewed repinning and #112/#113 acceptance remain required.
+The pinned older read model always creates every domain view. Its coverage describes
 freshness of existing records, not whether a domain was collected. Relay must
 not invent missing-domain entities or alter Observatory's views. This checkpoint
 therefore emits a closed local review envelope, never a bare action-consumable
@@ -210,8 +213,8 @@ native command above must run without skips for the collector checkpoint.
 
 The maintainer selected ADRs/Decisions as the first fleet campaign in Pace #5;
 the roadmap campaign in Pace #31 follows it. Preserve this bounded checkpoint
-for review. Before resuming roadmap publication, resolve Observatory #25, review
-the exact collector repin, and complete #112 before #113 integration. Consumer
+for review. Before resuming roadmap publication, review the exact collector
+repin to the merged Observatory #25 contract and complete #112 before #113 integration. Consumer
 deployment and canonical source repair remain separately owned.
 
 ADR not required for this checkpoint: it implements the existing ADR-007/010

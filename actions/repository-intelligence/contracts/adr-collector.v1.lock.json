@@ -1,0 +1,54 @@
+{
+  "integration_issue": "https://github.com/egohygiene/relay/issues/115",
+  "profile": "adr-review-only/v1",
+  "publication": "denied",
+  "schema": "egohygiene.relay.adr-collector-lock/v1",
+  "sources": {
+    "egolint": {
+      "files": {
+        ".config/rules/repository-intelligence-coverage-sources.v1.json": "d092a56ac69eb27bbdab60ee322e8eaa0dcd59c74a77ef4e98b7dae02b159870",
+        ".config/rules/repository-intelligence.v1.toml": "354507c42fb6bdc4666a27aeba3ac62663877f27ae8cc6813154600de9e53321",
+        "Cargo.lock": "ecca8f57ebf40c8207ae113a7e14e4522393a8a10dc5f6576b59b6f7b48a96ab",
+        "Cargo.toml": "01e56efed5704daf23de22a211882e8a7eaea267fa15fb2fe87d9fff4c0b9868",
+        "rust-toolchain.toml": "24e1453b4e314d5d4407c1da60e7c7eac3914e7483b5098efd436cdd5978fccd",
+        "schemas/intelligence-coverage-report.schema.json": "1e2742f003d780900f7b7de2d6556b07a71be623742906b79b4965aadb78eb20",
+        "schemas/repository-intelligence-report.schema.json": "fa2d0ac0660a6ebdca23f450aa2400017835bfa6a0ae8b3ddaecf7f352155716"
+      },
+      "repository": "egohygiene/egolint",
+      "revision": "2d3600f14848e28099acc34ce8043699da2b9a32",
+      "tree": "de7a3cb6d77c9f38b9388e2b38c88295059dffef"
+    },
+    "hygiene": {
+      "files": {
+        "catalog/repository-intelligence-vocabulary.json": "e61ac19d7907b80d3e1d3e9158d34039a5da43208c309b81919105a9450f8cd7",
+        "docs/ecosystem/REPOSITORY_INTELLIGENCE_COVERAGE.md": "e2889b9481d05afeb3f8e030887ccf1420827ab2ee4cfb524cdfea0a09e1e5f5",
+        "schemas/repository-intelligence.alpha2.schema.json": "7fd7b19c22b2df8c4c6b6f6e8b7c36ae9082a1c415786dc23e33090790c45cf1",
+        "tools/intelligence.py": "a46e0899fc50c8b03a51f1b1cf80c8ca8b8a7f4e6a4dfcae3fdb067f14c7a4c5"
+      },
+      "repository": "egohygiene/hygiene",
+      "revision": "639a003d5ddc4d242c2cf190eeb59a9fc522d199",
+      "tree": "212a81d3f0527dc925ab1379afacaffeebb23658"
+    },
+    "hygiene_adr": {
+      "files": {
+        "docs/decisions/MIGRATION.md": "6e89f99ccd2855a827bcbcb2bc17b38958a19ec4e010d88ecdd46fcdf76a4ea2",
+        "docs/decisions/POLICY.md": "e8b1f3c379a56d389d7689d187b2932ff3cfdf5e80acc829d244fb2527fcd361",
+        "schemas/architecture-decision-policy-reference.v1.schema.json": "fdf451cfa38ba666ec579aa75d2acbd52a56b95e73c7437565b79dfcfb689216",
+        "schemas/architecture-decision.v1.schema.json": "491eae26e498ee311bb37d5eff23a51d682eb687196c80a3df10ac1ce98e04d4"
+      },
+      "repository": "egohygiene/hygiene",
+      "revision": "c589587395750cd1c79c6fa0bef010189c547249",
+      "tree": "b1a49bd33dac766d4ad9e0d7013ac34cd3d603db"
+    },
+    "observatory": {
+      "files": {
+        "contracts/hygiene.repository-intelligence.alpha2.lock.json": "df0b55290173a574c079f12018e316d0ee68bf0bd8a1d7092793889622a9dec1",
+        "schemas/repository-intelligence-read-model.v1.schema.json": "1671c32157a1224695bc81e9c89f2c04516954f6d593f1f8483835a7556a7a53",
+        "src/observatory/intelligence.py": "d6a4b29580edad547f667f184457420b01cde6bae34198ade9c56351baacabe6"
+      },
+      "repository": "egohygiene/observatory",
+      "revision": "f411b83398dd07aa3d5e6e2c89d1e8dfff746085",
+      "tree": "bf621ef1b6c389979179e27c0f074b25d6f1565e"
+    }
+  }
+}
