@@ -152,7 +152,7 @@ def git_blob(root: Path, revision: str, path: str, limit: int = MAX_SOURCE) -> b
     return git(root, "cat-file", "blob", record[2], limit=limit)
 
 
-def prepare(args: argparse.Namespace, *, lock_path: Path = LOCK_PATH) -> None:
+def prepare(args: argparse.Namespace, *, lock_path: Path = LOCK_PATH, reproducible: bool = False) -> None:
     """Acquire trusted runtime bytes from Git objects; never consumer worktrees."""
     check_python_runtime()
     lock = load_json(read_file(lock_path))
@@ -196,6 +196,15 @@ def prepare(args: argparse.Namespace, *, lock_path: Path = LOCK_PATH) -> None:
         for key in ("CARGO_HOME", "RUSTUP_HOME", "CARGO_BUILD_JOBS"):
             if key in os.environ:
                 build_env[key] = os.environ[key]
+        if reproducible:
+            # ADR bundles bind the executable digest; private build/cache paths
+            # must not change those public bytes between fresh acquisitions.
+            remaps = [(str(build), "/relay/egolint")]
+            remaps.extend((build_env[key], "/relay/" + key.lower())
+                          for key in ("CARGO_HOME", "RUSTUP_HOME") if key in build_env)
+            build_env["RUSTFLAGS"] = " ".join("--remap-path-prefix=" + old + "=" + new for old, new in remaps)
+            build_env["CARGO_PROFILE_DEV_DEBUG"] = "0"
+            build_env["CARGO_INCREMENTAL"] = "0"
         # rustup uses the user's installed toolchain, while compilation is offline.
         with tempfile.TemporaryFile() as log:
             try:

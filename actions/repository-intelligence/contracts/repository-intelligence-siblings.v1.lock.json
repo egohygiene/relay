@@ -26,9 +26,11 @@
   },
   "observatory": {
     "owner": "egohygiene/observatory",
-    "source_commit": "3cb3555f56b9b110e98e295c1201e8d9af641297",
+    "source_commit": "f411b83398dd07aa3d5e6e2c89d1e8dfff746085",
     "contract": "egohygiene.observatory.repository-intelligence-read-model/v1",
-    "boundary": "Observatory normalizes provider evidence, applies visibility rules, and computes readiness before Relay renders the snapshot."
+    "boundary": "Observatory normalizes provider evidence, applies visibility rules, and computes readiness before Relay renders the snapshot.",
+    "contract_version": "1.0.0-alpha.2",
+    "legacy_compatibility": "Existing alpha.1 snapshots without domain claims remain accepted."
   },
   "holon": {
     "owner": "egohygiene/holon",

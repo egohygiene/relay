@@ -28,7 +28,7 @@ pending an owner-reviewed contract/pin update.
 | Hygiene projection validator/schema/vocabulary | `5e0602265b6ac5e5165b89f418e55a3fd12f8a64` | `egohygiene.repository-intelligence/v1`, `1.0.0-alpha.1`, proposed; exact Observatory input lock |
 | Hygiene roadmap source meaning selected by EgoLint | `f598ed659a43dd759d4ede41c27f9e5daf991aa7` | `hygiene.roadmap/v1alpha1`, `0.1.0`, proposed in EgoLint's catalog |
 | EgoLint semantic validator | `8b99ec4377eb84044fac411dff6b8074317ec094` | `egolint.repository-intelligence-validation/v1`, report schema version 1, catalog `0.1.0-alpha.1`; source-built, unreleased |
-| Observatory normalizer | `3cb3555f56b9b110e98e295c1201e8d9af641297` | `egohygiene.observatory.repository-intelligence-read-model/v1`, `1.0.0-alpha.1`; existing Relay renderer pin |
+| Observatory normalizer | `3cb3555f56b9b110e98e295c1201e8d9af641297` | `egohygiene.observatory.repository-intelligence-read-model/v1`, `1.0.0-alpha.1`; historical roadmap profile pin |
 
 The executable lock records artifact SHA-256 values and Git tree identities.
 The two Hygiene revisions differ in ADR rejection support; this profile collects

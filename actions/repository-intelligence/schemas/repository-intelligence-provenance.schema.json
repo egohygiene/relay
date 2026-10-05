@@ -113,9 +113,285 @@
           "const": "consumer"
         }
       }
+    },
+    "adr_collection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repository": {
+          "type": "string",
+          "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "lock_sha256",
+            "egolint_sha256",
+            "collector_sha256",
+            "shared_runtime_sha256",
+            "pins"
+          ],
+          "properties": {
+            "lock_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "egolint_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "collector_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "shared_runtime_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "pins": {
+              "type": "object"
+            }
+          }
+        },
+        "validation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "egolint",
+            "hygiene",
+            "coverage",
+            "observatory",
+            "diagnostics_truncated"
+          ],
+          "properties": {
+            "egolint": {
+              "enum": [
+                "valid",
+                "invalid",
+                "incomplete",
+                "not_applicable"
+              ]
+            },
+            "hygiene": {
+              "enum": [
+                "valid",
+                "invalid"
+              ]
+            },
+            "coverage": {
+              "enum": [
+                "valid",
+                "not-run"
+              ]
+            },
+            "observatory": {
+              "enum": [
+                "normalized",
+                "not-run"
+              ]
+            },
+            "diagnostics_truncated": {
+              "type": "boolean"
+            }
+          }
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "roadmap",
+            "decisions",
+            "git",
+            "issues",
+            "pull_requests",
+            "checks",
+            "releases",
+            "deployments",
+            "history"
+          ],
+          "properties": {
+            "roadmap": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "decisions": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "git": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "issues": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "pull_requests": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "checks": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "releases": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "deployments": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "history": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            }
+          }
+        },
+        "candidate_digests": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "projection_sha256",
+            "snapshot_sha256"
+          ],
+          "properties": {
+            "projection_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "snapshot_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "adoption": {
+          "const": "present"
+        },
+        "policy_reference": {
+          "type": "string",
+          "maxLength": 240,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[A-Za-z0-9._/-]+$"
+        },
+        "decision_directory": {
+          "type": "string",
+          "maxLength": 240,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[A-Za-z0-9._/-]+$"
+        },
+        "index": {
+          "type": "string",
+          "maxLength": 240,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[A-Za-z0-9._/-]+$"
+        },
+        "collected_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "maximum_age_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2678400
+        },
+        "sources": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "maxLength": 240,
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[A-Za-z0-9._/-]+$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        "schema": {
+          "const": "egohygiene.relay.adr-build/v1"
+        }
+      },
+      "required": [
+        "repository",
+        "observed_at",
+        "runtime",
+        "validation",
+        "coverage",
+        "candidate_digests",
+        "source_commit",
+        "adoption",
+        "policy_reference",
+        "decision_directory",
+        "index",
+        "collected_at",
+        "maximum_age_seconds",
+        "sources",
+        "schema"
+      ]
     }
   },
   "$defs": {
+    "adrCollectionClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "collection",
+        "freshness",
+        "reason",
+        "observed_at"
+      ],
+      "properties": {
+        "collection": {
+          "enum": [
+            "uncollected",
+            "unavailable",
+            "partial",
+            "observed_empty",
+            "observed",
+            "failed",
+            "not_applicable"
+          ]
+        },
+        "freshness": {
+          "enum": [
+            "current",
+            "stale",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "observed_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
     "contract": {
       "type": "object",
       "additionalProperties": false,

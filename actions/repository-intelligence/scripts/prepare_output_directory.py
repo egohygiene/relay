@@ -99,7 +99,7 @@ def validate_directory_layout(
     if reports == work or reports in work.parents:
         raise ValueError("work-directory must not be nested inside reports-directory")
     managed_work_paths = tuple(
-        work / child for child in ("activity", "analytics", "tree", "visualization")
+        work / child for child in ("activity", "analytics", "tree", "visualization", "adr")
     )
     if any(paths_overlap(reports, managed) for managed in managed_work_paths):
         raise ValueError("reports-directory must not overlap managed work paths")
@@ -107,7 +107,7 @@ def validate_directory_layout(
         label: resolve_inside_repository(root, relative, label)
         for label, relative in relative_paths.items()
     }
-    for child in ("activity", "analytics", "tree", "visualization"):
+    for child in ("activity", "analytics", "tree", "visualization", "adr"):
         resolve_inside_repository(
             root,
             relative_paths["work-directory"] / child,

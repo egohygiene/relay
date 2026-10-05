@@ -1,4 +1,4 @@
-# Canonical ADR collector — Relay #115, checkpoint 1
+# Canonical ADR collection and Decisions builds — Relay #115
 
 ## Mapping and ownership
 
@@ -44,8 +44,8 @@ The collector lock binds full Git trees and SHA-256 artifact digests. Preparatio
 reads those Git objects from separately acquired owner repositories and builds
 EgoLint with frozen offline dependencies. It reuses the existing roadmap
 collector's runtime and safe-I/O helpers with an explicit independent lock.
-The old roadmap runtime and deployed renderer pins retain their own adoption
-gates. No sibling implementation is copied into Relay.
+The old roadmap runtime retains its separate adoption gate; checkpoint 2
+repins the production renderer to the same Observatory alpha.2 revision. No sibling implementation is copied into Relay.
 
 ## Uncertainty, privacy, and publication
 
@@ -71,9 +71,9 @@ Diagnostics use fixed codes and reviewed remediation, never source prose or raw
 exceptions. A denial replaces a prior result only at a verified safe output path.
 
 Checkpoint 1 emits an **ADR review envelope**, not a production snapshot input.
-`publication: denied` is unconditional until checkpoint 2 adopts the normalized
-coverage contract in Relay's renderer/action/workflow. Upstream coverage support
-is now available; the remaining gate is Relay integration and consumer review.
+`publication: denied` remains unconditional on that review interface. Checkpoint 2's
+separate build adapter invokes fresh collection and gates the normalized candidate
+before attaching build provenance. Consumer publication review remains separate.
 The existing `--observatory-snapshot` entry point must reject this envelope.
 
 ## Replay and remaining acceptance
@@ -90,9 +90,9 @@ gaps; collection must preserve the conforming records and their actual approval
 evidence without claiming corpus conformance or publication. Identity's sources
 and its parallel implementation work remain untouched.
 
-Checkpoint 2 owns action/workflow/local parity, mutually exclusive external
-snapshot inputs, reviewed renderer repinning, build provenance, and eventual
-Identity #69 handoff. Deployment and live-route acceptance remain separate.
+Checkpoint 2 below supplies action/workflow/local parity, mutually exclusive external
+snapshot inputs, reviewed renderer repinning, and build provenance. A real conforming
+consumer corpus and the immutable Identity #69 upgrade remain acceptance work. Deployment and live-route acceptance remain separate.
 Refs #115; this bounded checkpoint does not complete all issue acceptance.
 
 ## Native commands and reproducible checks
@@ -170,3 +170,143 @@ Fixture provenance: the synthetic canonical corpus adapts EgoLint's public
 The real canary is read directly from the immutable Hygiene clone, not rewritten
 or vendored into Relay. Decision impact: this is implementation of ADR-007/010's
 existing owner and evidence boundaries; no new architectural authority is added.
+
+## Checkpoint 2: opt-in Decisions builds
+
+`collect-adrs: true` now connects a fresh native collection to the existing
+Intelligence action and reusable workflow. It reads the standard canonical paths
+above with adoption `present`. A build requires complete `observed` or
+`observed_empty` ADR coverage, current observation freshness, valid Hygiene and
+coverage checks, successful Observatory normalization, and no invalid or
+truncated EgoLint result. EgoLint's `incomplete` result remains visible because
+roadmap/history were not requested; it is never relabeled whole-repository valid.
+The local review command and its `publication: denied` envelope remain unchanged
+in purpose. The builder does not accept saved review envelopes as site inputs.
+
+The renderer accepts alpha.2 per-domain claims and keeps the established alpha.1
+external-snapshot interface. Every affected view shows its collection state;
+record freshness cannot stand in for collection completeness. Decisions retains
+its existing route, fragments, lifecycle, implementation, and supersession
+presentation. Date, owner, affected-contract facets, and declared human approval
+come from the matching public graph attributes. Canonical Markdown stays the
+source of narrative and approval authority.
+
+The ADR mode conflicts with **both** `observatory-snapshot` and
+`observatory-comparison`. There is no ADR/roadmap merge mode: the separate roadmap
+review profile still needs #112/#113 adoption. Existing builds without ADR
+collection keep their dependency-light behavior and unavailable-input states.
+
+### Action and reusable workflow
+
+After reviewing the integration PR, select its full immutable Relay revision.
+The example deliberately uses a review placeholder: replacing a historical
+consumer pin and establishing a new rollback point require consumer review.
+
+```yaml
+jobs:
+  intelligence:
+    permissions:
+      contents: read
+    uses: egohygiene/relay/.github/workflows/repository-intelligence.yml@<reviewed-full-relay-sha>
+    with:
+      collect-adrs: true
+      artifact-retention-days: 30
+```
+
+For a composed workflow, use the same `collect-adrs: "true"` input on
+`egohygiene/relay/actions/repository-intelligence@<reviewed-full-relay-sha>` after
+a complete-history checkout. It produces an ordinary static artifact; the
+consumer retains composition, aliases, deployment, and rollback authority.
+The reusable workflow retains its existing trust, upload, reporting, and failure
+gates. No Pages upload, deployment, protected environment, or write permission
+is added.
+
+With no `adr-runtime` input, the action acquires the four locked source revisions
+from three public owner repositories into a private temporary directory. On
+CPython 3.12/Linux x86_64 it installs hash-locked wheels, installs Rust 1.85.1
+through rustup, fetches Cargo's locked dependencies, then prepares the verified
+runtime and collects offline. Git, Python with venv, and rustup must already be
+available; GitHub's Ubuntu runner supplies them. Acquisition preserves configured
+proxy and CA trust. No consumer package manifest, configuration, hook, cache, or
+executable enters that runtime. Native executable builds remove private build
+paths so fresh runtime preparation can reproduce the bound executable digest.
+Temporary acquisitions are removed at completion.
+
+An independently trusted prepared runtime can be supplied as `adr-runtime` to
+the composite action for offline use. It must be outside the consumer checkout;
+the invoking Python must already have the exact collector requirements. This
+input is intentionally absent from the reusable workflow so caller repository
+content cannot select its executable runtime.
+
+### Local collection and refresh
+
+The action invokes this same native command. Run it from the reviewed Relay
+checkout with the pinned Python environment; replace the example identity,
+source directory, and revision with reviewed public consumer inputs:
+
+```bash
+python -I actions/repository-intelligence/scripts/prepare_repository_adr_build.py \
+  --runtime /trusted/adr-runtime \
+  --repository-root /sources/consumer --repository egohygiene/consumer \
+  --visibility public --source-commit <full-consumer-sha> \
+  --observed-at 2026-10-05T00:00:00Z \
+  --work-directory .cache/repository-intelligence
+```
+
+Omit `--runtime` to use the identical fresh acquisition path. Generated
+`snapshot.json` and `receipt.json` live under the private work directory's `adr/`
+child, outside tracked source; tracked destinations and symlinks are refused.
+Work roots for this mode are `.cache`, `.staging`, `build`, or `dist`, subject to
+the action's existing separate-public-output and report layout checks. Do not
+publish the work directory. A denied retry removes prior generated candidates
+at a verified safe destination. Use the review-only collector when richer
+sanitized source diagnostics are needed.
+
+The action passes that snapshot to the existing site renderers and attaches the
+receipt to `provenance.json.adr_collection` before creating the existing build
+manifest. The receipt binds immutable source hashes, observation inputs, exact
+upstream trees/artifacts, executable/collector/helper hashes, source-validation
+state, all nine domain claims, and both candidate digests. The bundle validator
+rechecks this optional closed provenance boundary. It contains no runner paths,
+current wall clock, deployment identity, or self-referential Relay commit.
+The build manifest's existing Relay revision binds the adapter and renderer.
+
+For native composition with the existing render scripts, first generate the
+normal dashboard/provenance, then attach the receipt before site rendering and
+manifest creation:
+
+```bash
+python -I actions/repository-intelligence/scripts/repository_adr_build_contract.py \
+  --provenance /sources/consumer/dist/intelligence/provenance.json \
+  --receipt /sources/consumer/.cache/repository-intelligence/adr/receipt.json \
+  --snapshot /sources/consumer/.cache/repository-intelligence/adr/snapshot.json
+```
+
+Use that same snapshot with the existing site, supporting-view, and comparison
+renderers, followed by manifest creation and bundle validation, as ordered in
+`action.yml`. Tests execute those exact Bash bodies and compare the entire
+bundle across different checkouts and independently prepared runtimes.
+Rendering errors remain in the existing generation failure stage; acquisition,
+collection, source-validation, normalization, and provenance denials print only
+bounded stage codes. No failed generation reaches the workflow's site upload.
+
+### Acceptance and Identity #69 handoff
+
+Run `python3 -I scripts/run_repository_adr_acceptance.py` for fresh acquisition,
+offline runtime replay, the real immutable Hygiene canary, and owner-native ADR
+build tests. The normal validation workflow runs this read-only acceptance path.
+The complete suite with the documented ADR, roadmap, and architecture runtimes
+also retains the old external-snapshot and no-snapshot regression cases.
+
+Identity #69 should first review its standard-path corpus with the review CLI,
+resolve source-policy and migration findings in Identity, then pin this reviewed
+Relay integration and opt in. Refresh by selecting a new consumer commit and an
+explicit observation instant locally, or rerunning the pinned workflow against
+the intended commit (its default observation is the represented commit time).
+Validate the ordinary artifact before composing it into the existing site;
+preserve unrelated routes and the historical rollback point. Record artifact
+upload, Pages upload, deployment, receipt, and live-route checks separately.
+The Hygiene canary's 12 canonical records still have legacy/missing-policy source
+gaps and therefore cannot pass the production build. No consumer source or
+historical ADR is repaired by this integration, and #115 remains open for the
+real conforming-consumer acceptance and immutable upgrade handoff.

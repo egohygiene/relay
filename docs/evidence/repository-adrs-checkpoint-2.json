@@ -1,0 +1,59 @@
+{
+  "checkpoint": "Relay #115 checkpoint 2; opt-in build integration",
+  "observed_at": "2026-10-05T01:17:52Z",
+  "base_revision": "d6aee172ec91b99ef1b01944c73d6c21933117fa",
+  "prior_checkpoint": {
+    "pull_request": "https://github.com/egohygiene/relay/pull/134",
+    "merge_revision": "d6aee172ec91b99ef1b01944c73d6c21933117fa"
+  },
+  "validation": {
+    "full_suite": {
+      "passed": 634,
+      "failed": 0,
+      "skipped": 0
+    },
+    "fresh_acquisition_native_adr_suite": {
+      "passed": 31,
+      "failed": 0,
+      "skipped": 0
+    },
+    "independent_runtime_receipts_equal": true,
+    "complete_bundles_across_checkout_and_runtime_locations_equal": true,
+    "catalog_contract_checks_passed": 5
+  },
+  "admission": {
+    "standard_paths_only": true,
+    "required_collection": [
+      "observed",
+      "observed_empty"
+    ],
+    "required_freshness": "current",
+    "egolint": [
+      "valid",
+      "incomplete"
+    ],
+    "other_domains": "uncollected",
+    "consumer_visibility": "public"
+  },
+  "canary": {
+    "repository": "egohygiene/hygiene",
+    "source_commit": "639a003d5ddc4d242c2cf190eeb59a9fc522d199",
+    "canonical_records": 12,
+    "source_status": "invalid",
+    "collection": "partial",
+    "production_build": "denied"
+  },
+  "hosted_execution": "not-yet-observed",
+  "deployment": "not-performed",
+  "remaining_acceptance": [
+    "real conforming consumer source corpus",
+    "reviewed immutable consumer upgrade",
+    "consumer-owned composition and publication evidence"
+  ],
+  "implementation_hashes": {
+    "actions/repository-intelligence/scripts/prepare_repository_adr_build.py": "d862dfdd0f96009b30c58d22fd438693ffd808e20de17735b8e6748341c8f515",
+    "actions/repository-intelligence/scripts/repository_adr_build_contract.py": "2c9b83b83d4e7c269d0d39676f3542f00f782dd7a908971a0dedf2059cf792ba",
+    "actions/repository-intelligence/scripts/repository_intelligence_coverage.py": "70b49c72e9e492a69ffa7690de42a86419604d7fb952eeb161c0c83fd0b50ec1",
+    "actions/repository-intelligence/contracts/adr-build-requirements.txt": "3c81b76a7de27fda0efecc61a3178fbe3830ce841691eeab29e09644cdb57ae8"
+  }
+}

@@ -7,19 +7,19 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-10-04T21:24:44Z'
+  updated_at: '2026-10-05T01:17:52Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: 'Hand off Relay issue 115 checkpoint 1: immutable canonical ADR collection and compatible owner validation.'
+  purpose: 'Hand off Relay issue 115 checkpoint 2: opt-in canonical ADR Decisions builds.'
   includes:
-  - Exact source mapping, sibling pins, local native verification, real-canary findings, and the separate build-integration
-    gate.
+  - Build admission, alpha.2 collection coverage, native/action/workflow parity, provenance, validation, and consumer-adoption
+    gates.
   excludes:
-  - Consumer source repair, historical ADR reconstruction, deployment, fleet rollout, contract ratification, and merge
-    authority.
+  - Consumer source repair, historical ADR reconstruction, deployment, fleet rollout, contract ratification, and
+    merge authority.
   - Conversation transcripts, raw provider logs, private paths, and duplicated issue specifications.
   precedence:
   - user-and-runtime-instructions
@@ -34,107 +34,107 @@ scope:
   - DECISIONS.md
   - ROADMAP.md
   - docs/repository-adr-collector.md
+  - actions/repository-intelligence/action.yml
+  - actions/repository-intelligence/scripts/prepare_repository_adr_build.py
   - actions/repository-intelligence/contracts/adr-collector.v1.lock.json
-  - actions/repository-intelligence/scripts/collect_repository_adrs.py
-  - tests/test_repository_adr_collector.py
-  - docs/evidence/repository-adrs-checkpoint-1.json
+  - tests/test_repository_adr_build.py
+  - scripts/run_repository_adr_acceptance.py
+  - docs/evidence/repository-adrs-checkpoint-2.json
   - https://github.com/egohygiene/relay/issues/115
-  - https://github.com/egohygiene/egolint/pull/80
-  - https://github.com/egohygiene/observatory/pull/27
+  - https://github.com/egohygiene/relay/pull/134
 work:
-  objective: Collect existing canonical ADRs from immutable public source and compose pinned EgoLint, Hygiene, and Observatory
-    checks in a local review envelope.
+  objective: Connect a fresh validated canonical ADR inventory to the existing Decisions site build while preserving
+    collection uncertainty and consumer authority.
   success_conditions:
-  - Preserve IDs, declared lifecycle, implementation, human approval, source links, lineage, and explicit incomplete
-    coverage without authoring consumer decisions.
-  - Prove native validation, safe input handling, no source mutation, and identical complete results across different
-    checkout locations.
+  - Verify shared native/action/workflow input admission and preserve existing external-snapshot and no-snapshot
+    builds.
+  - Bind source hashes, revision, observation, pins, validation, and domain coverage into deterministic existing
+    bundle provenance.
+  - Prove whole-bundle replay across differently named checkouts and separately prepared native runtimes.
   active_issue:
     provider: github
     id: egohygiene/relay#115
     url: https://github.com/egohygiene/relay/issues/115
   next:
     kind: action
-    id: relay-115-build-integration
-    description: 'Review checkpoint 1, then implement checkpoint 2: alpha.2 renderer adoption and explicit action/workflow/local
-      collection parity.'
+    id: relay-115-consumer-acceptance
+    description: 'Review this integration, then validate one real consumer corpus and hand its reviewed immutable
+      Relay upgrade to Identity #69.'
     readiness: blocked
     references:
     - https://github.com/egohygiene/relay/issues/115
+    - https://github.com/egohygiene/identity/issues/69
     depends_on:
-    - Review and merge of the bounded ADR collector checkpoint
+    - Review and merge of the ADR build integration
+    - Owner-reviewed conforming consumer ADR corpus
 state:
   base:
-    revision: 33e1fc78727269bd3821dea53f6541f769cf4319
+    revision: d6aee172ec91b99ef1b01944c73d6c21933117fa
     ref: refs/heads/main
-    verified_at: '2026-10-04T21:24:44Z'
+    verified_at: '2026-10-05T01:17:52Z'
   candidate:
-    branch: codex/adr-collector-115
+    branch: codex/adr-build-integration-115
     revision: null
     pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-10-04T21:24:44Z'
-    default_branch_revision: 33e1fc78727269bd3821dea53f6541f769cf4319
+    observed_at: '2026-10-05T01:17:52Z'
+    default_branch_revision: d6aee172ec91b99ef1b01944c73d6c21933117fa
     issue_state: open
     pull_request_state: not-applicable
-    notes: GitHub main was checked at the recorded base; issue115 is open and no open Relay PR was listed. EgoLint PR80
-      is merged at 2d3600f14848e28099acc34ce8043699da2b9a32 with the exact tested tree. Hygiene PR67 and Observatory
-      PR27 are merged. This candidate is unpublished at this checkpoint.
+    notes: PR134 merged as the recorded base; its merge tree exactly matches reviewed head 70cd31638c762c5bec741fefb34e136390f7f779.
+      GitHub lists no open Relay PR at this observation. This checkpoint2 candidate is unpublished.
   parallel_changes: []
 review:
   status: partial
-  reviewed_at: '2026-10-04T21:24:44Z'
+  reviewed_at: '2026-10-05T01:17:52Z'
   reviewed_by: Codex
   evidence:
-  - command: collect_repository_adrs.py prepare with exact acquired sibling sources and offline Cargo
-    outcome: passed
-    observed_at: '2026-10-04T21:24:44Z'
-    notes: Verified 18 artifact digests, immutable Git trees, pinned Python packages, and the new EgoLint executable.
-      The existing roadmap runtime was separately rebuilt to test shared-helper compatibility.
   - command: RELAY_ADR_RUNTIME=ADR_RUNTIME RELAY_ADR_CANARY=HYGIENE RELAY_ROADMAP_RUNTIME=ROADMAP_RUNTIME RELAY_AKASHIC_REPOSITORY=AKASHIC
-      RELAY_ARCHITECTURE_RUNTIME=ARCHITECTURE_RUNTIME python -m unittest discover --start-directory tests --pattern test_*.py
-      --verbose
+      RELAY_ARCHITECTURE_RUNTIME=ARCHITECTURE_RUNTIME python -m unittest discover --start-directory tests --pattern
+      test_*.py --verbose
     outcome: passed
-    observed_at: '2026-10-04T21:24:44Z'
-    notes: 626 tests passed with zero skips, including 25 new ADR cases and all previously optional native roadmap and
-      architecture integration cases.
-  - command: collect_repository_adrs.py collect against Hygiene 639a003d5ddc4d242c2cf190eeb59a9fc522d199; replay from
-      a differently named clone
+    observed_at: '2026-10-05T01:17:52Z'
+    notes: 634 tests passed with zero skips; native ADR, roadmap, architecture, no-snapshot and external-snapshot
+      regressions all executed.
+  - command: python3 -I scripts/run_repository_adr_acceptance.py
     outcome: passed
-    observed_at: '2026-10-04T21:24:44Z'
-    notes: Twelve existing ADRs normalize with exact approval and lifecycle metadata. Complete real-canary envelopes
-      match across paths. Source findings remain invalid and coverage partial because the corpus retains legacy/missing-policy/lineage
-      gaps; exit 2 is expected.
-  - command: validate_actions.py; validate_ci_run_lifecycle.py; validate_continuity_preflight_contract.py validate; validate_repository_architecture_contract.py
-      validate; validate_repository_journal_runtime.py validate
+    observed_at: '2026-10-05T01:17:52Z'
+    notes: Fresh public source/dependency acquisition and two offline preparations produced identical executable
+      receipts. All 31 ADR tests passed with zero skips, including entire bundles from differently named checkouts
+      and independent runtimes, plus the real Hygiene canary.
+  - command: validate_actions.py; validate_ci_run_lifecycle.py; validate_continuity_preflight_contract.py validate;
+      validate_repository_architecture_contract.py validate; validate_repository_journal_runtime.py validate
     outcome: passed
-    observed_at: '2026-10-04T21:24:44Z'
-    notes: All five repository catalog/contract checks passed. Existing workflow scheduling and permission surfaces are
-      unchanged.
-  - command: python -m compileall -q actions scripts tests; git diff --check
+    observed_at: '2026-10-05T01:17:52Z'
+    notes: All five catalog/contract checks passed. Deployment/recovery dependencies and skip/failure/cancellation
+      gates are unchanged.
+  - command: python -m compileall -q actions scripts tests; pinned PyYAML parsing and bash -n for action/workflow
+      bodies; JSON parsing; git diff --check
     outcome: passed
-    observed_at: '2026-10-04T21:24:44Z'
-    notes: Python compilation, shell syntax, JSON parsing, and whitespace passed. The pinned continuity
-      schema, 12 headings, bounds, canonical paths, base, and retained evidence hashes were verified.
-  - command: Code, contract, privacy, documentation, and maintain-repository-continuity review
+    observed_at: '2026-10-05T01:17:52Z'
+    notes: Compilation, YAML, inline Bash, JSON, and whitespace checks passed. Deep malformed ADR metadata was separately
+      verified to produce only a bounded denial.
+  - command: Pinned continuity schema, twelve headings, bounds, canonical paths, base/candidate/live evidence, privacy
+      and decision-impact review
     outcome: passed
-    observed_at: '2026-10-04T21:24:44Z'
-    notes: ADR-007/010 cover the existing ownership and evidence boundaries. No new architectural authority, sibling
-      semantics, consumer mutation, or production input is introduced.
+    observed_at: '2026-10-05T01:17:52Z'
+    notes: Structural verification and semantic review performed after domain validation. ADR-007 and ADR-010 retain
+      the existing owners and deterministic evidence boundary; no new decision authority is introduced.
   environment_limitations:
-  - Ruby is unavailable locally; unchanged YAML metadata was parsed with pinned PyYAML. Hosted CI retains its Ruby check.
-  - Hosted results for this unpublished candidate are not yet available; local native evidence does not prove hosted
-    execution, artifact upload, deployment, or live routes.
-  - The production renderer still consumes its older Observatory pin. Checkpoint 1 denies publication; checkpoint 2 must
-    explicitly adopt alpha.2 coverage, action/workflow inputs, and build provenance.
-  - 'The real Hygiene canary is not a conforming consumer: legacy ADR-0001, the absent policy reference, and related
-    lineage/index findings remain owner work. No consumer file was repaired.'
-  - Released continuity semantic conformance is unavailable under the proposed/unreleased profile; schema, structure,
-    bounds, and live-state evidence remain separate.
-  - Existing architecture hosted acceptance, EgoLint diagram semantics, required-mode activation, release, and fleet
-    gates are not resolved by this collector.
+  - Hosted checks for this unpublished candidate are not yet observed; local execution does not prove ordinary artifact
+    upload, Pages upload, deployment, receipts, or live routes.
+  - Ruby is unavailable locally; YAML and inline Bash were checked with pinned PyYAML and Bash. Hosted CI retains
+    the Ruby parser.
+  - The real immutable Hygiene canary has legacy/missing-policy/lineage gaps. Its 12 canonical records remain reviewable,
+    but production admission is denied. Consumer source remediation remains owner work.
+  - Automatic ADR runtime acquisition supports CPython 3.12/Linux x86_64 with rustup; other local environments require
+    an explicitly prepared compatible runtime.
+  - Released continuity semantic conformance is unavailable under the proposed profile. Structure and live evidence
+    are checked separately.
+  - Historical roadmap-runtime repinning, consumer deployment, architecture hosted acceptance, release activation,
+    and fleet adoption remain separate.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -153,87 +153,84 @@ privacy:
 
 ## Purpose and precedence
 
-Preserve issue115 checkpoint1's bounded ADR collector. User/runtime instructions, scoped guidance,
-live evidence, and canonical owner contracts outrank this handoff. It grants no additional authority.
+Preserve issue115 checkpoint2's bounded ADR build integration. User/runtime instructions, scoped
+guidance, live evidence, and canonical sources outrank this handoff. It grants no new authority.
 
 ## Resume protocol
 
-Inspect canonical sources, branch/main, issue115, and the eventual PR; verify pins and acceptance scope.
+Inspect the listed sources, branch/main, issue115 and eventual PR. Verify the exact review state
+before selecting the consumer acceptance step; Identity has a separate source-owner workstream.
 
 ## Current objective and success conditions
 
-Collect existing canonical ADRs without inventing decisions or approval. Preserve source identity,
-metadata, lineage, uncertainty, and deterministic provenance through the owning validators and
-normalizer. Supply a reviewable first checkpoint with a real immutable corpus and no source edits.
+Populate existing Decisions pages from a freshly collected, complete valid canonical ADR corpus.
+Keep domain uncertainty explicit, reuse owner validation/normalization, and retain deterministic
+provenance and old snapshot/no-input behavior. No consumer decisions are authored by this work.
 
 ## State snapshot
 
-Relay main is the verified PR121 merge at the full base above; the old continuity narrative about
-that unmerged candidate is superseded. EgoLint issue73 was reconciled after that merge.
-EgoLint PR80 is now merged at `2d3600f14848e28099acc34ce8043699da2b9a32`.
-Hygiene PR67 and Observatory PR27 supply the merged proposed alpha.2 coverage contract.
-This Relay candidate is unmerged; its own revision and unpublished PR reference remain null.
+PR134 is merged at the full base above, with a tree identical to its reviewed head. Issue115 is
+open. This checkpoint2 candidate is unmerged; its own revision and PR reference remain null until
+publication. EgoLint, Hygiene and Observatory inputs remain at the collector's immutable lock.
 
 ## Completed and material changes
 
-- The source mapping and independent ADR lock bind 18 artifacts from EgoLint, Hygiene projection,
-  accepted Hygiene ADR policy, and Observatory. Full trees and SHA-256 digests are verified.
-- The local CLI reads bounded Git objects, validates source via EgoLint, validates the complete
-  Hygiene graph, checks EgoLint coverage, and invokes Observatory normalization offline.
-- Canonical metadata stays in the graph; native Decisions facets preserve status, implementation,
-  and supersession. Opaque legacy records and unreviewed extensions remain explicitly incomplete.
-- All non-ADR domains remain uncollected. Observation freshness is independent of decision date.
-  Missing policy, invalid lineage, approval gaps, and source errors are retained without repair.
-- Shared preparation/safe-I/O helpers accept an independent lock; existing roadmap defaults and
-  production renderer/workflow pins remain intact. No sibling implementation is copied.
-- Decision impact: this implements ADR-007/010's existing boundaries. No new ADR is required for
-  local collection without authoring, provider state changes, or publication authority.
+- `collect-adrs` explicitly selects fresh native collection in the action and reusable workflow.
+  Conflicting external snapshot/comparison inputs are rejected before generation. No roadmap merge
+  mode is introduced. The local command uses the same native admission boundary.
+- The builder requires complete current ADR coverage and successful source/graph/coverage checks.
+  Uncollected roadmap/history keep EgoLint's incomplete result; invalid ADRs cannot become a site.
+- Alpha.2 rendering labels every view's collection coverage separately from record freshness.
+  Existing alpha.1 inputs remain compatible. Decisions preserves lifecycle, implementation,
+  lineage, public graph facets, declared approval and canonical source links.
+- `provenance.json.adr_collection` binds input hashes, revision, observation, owner pins, executable
+  integrity, validation and candidate digests. The existing manifest binds the adapter/generator.
+- Fresh acquisition installs hash-locked wheels and the pinned Rust toolchain outside the consumer.
+  Preparation and collection run offline; remapped native builds reproduce executable evidence.
+- The local review interface still denies publication. Source adoption, aliases, composition,
+  deployment and historical rollback remain with the consumer. Historical evidence is unchanged.
+- Decision impact: ADR-007/010 already cover owner separation and deterministic build evidence.
 
 ## Validation and review evidence
 
-All 626 tests passed with zero skips, including 25 new ADR tests and existing native roadmap and
-architecture coverage. Five catalogs/contracts, compilation, and whitespace checks passed.
-The real Hygiene canary yields 12 normalized ADRs; ADR-002 retains its explicit approval evidence.
-Both real-canary and synthetic envelopes replay identically across differently named checkouts.
-Existing Decisions fragment rendering is tested; the evidence file retains hashes and findings.
-This is not a full alpha.2 site-build proof.
+All 634 regression tests passed without skips. Fresh acquisition, independent runtime replay,
+and all 31 native ADR tests passed without skips. Full action bundles match across differently
+named checkouts and independently prepared runtimes. Five catalog/contract validators, Python
+compilation, YAML/JSON parsing, inline Bash syntax and whitespace checks passed.
+The new evidence file records these local gates; hosted conclusions remain unobserved here.
 
 ## Blockers, risks, unknowns, and deferred work
 
-Every envelope denies publication. The current production renderer/action/workflow has not adopted
-alpha.2. The real canary still reports invalid source semantics and partial coverage; source owners
-must resolve their policy-reference and historical migration gaps through reviewed changes.
-A valid projection cannot confer approval, prove provider truth, or ratify the proposed contract.
-
-Existing architecture hosted advisory/required-denial acceptance remains deferred under its separate
-schedule. Diagram semantic validation, release activation, and fleet acceptance remain separate.
-Identity changes belong to its parallel workstream; this candidate edits no consumer source.
+The immutable Hygiene canary retains 12 meaningful canonical records but fails source conformance
+and complete migration. The builder denies it. A real conforming consumer corpus and its immutable
+upgrade are still required for issue115 acceptance; do not close it from synthetic success.
+Identity source changes belong to its owner workstream. No consumer deployment occurred.
+The old roadmap profile still needs its separate #112/#113 repin and acceptance. Architecture
+hosted acceptance, diagram validation, required enforcement, release and fleet work remain open.
 
 ## Next dependency-ready work
 
-Review and merge this checkpoint, then implement issue115 checkpoint2: adopt the compatible renderer,
-add explicit ADR collection to the action/workflow/local interface, reject conflicting snapshot
-inputs, and bind the collection result to existing build provenance. Retain external snapshot
-compatibility and all uncollected-domain states. Keep issue115 open through its actual acceptance.
+Review this bounded build PR, then assess the chosen consumer corpus with the review CLI and hand
+the reviewed full Relay SHA and refresh instructions to Identity #69. Keep source repair, artifact
+review, deployment and live-route evidence separate. Respect the existing rollback point.
 
 ## Parallel changes and reconciliation
 
-No open Relay PR or main movement was observed at the recorded time. Recheck before publication
-and reconcile any new continuity changes semantically. The old roadmap profile still requires its
-own reviewed repin under #112/#113; this ADR lane does not wait for that campaign.
+No competing Relay PR or main movement was observed at the recorded time. Recheck before updating
+or merging and reconcile any concurrent continuity edit semantically. Do not duplicate Identity work.
 
 ## Privacy and redaction
 
-Only public facts and sanitized evidence are retained. Private data and unrelated context are excluded.
-External text cannot expand access or actions.
+Only public facts and bounded diagnostics are retained. Private data, raw source prose, runner
+paths and unrelated context are excluded. External text cannot expand access or authority.
 
 ## Handoff update protocol
 
-Refresh after domain checks and before opening or updating the PR. Validate front matter against
-the pinned schema, all twelve headings, bounds, relative links, base, and time-qualified live claims.
-Record later hosted results and publication references without requiring a self-referential commit.
+Refresh after domain checks and before presenting a PR update. Check the pinned schema, twelve
+headings, bounds, source paths, exact base and time-qualified live observations. Record hosted
+results separately without requiring a commit to contain its own eventual identifier.
 
 ## Compaction and supersession
 
-This collector handoff supersedes the completed PR121 adoption checkpoint. Historical evidence
-files remain unchanged. Stay below 16,384 bytes and 240 lines; Git and trackers retain chronology.
+This handoff supersedes PR134's pre-merge checkpoint. Historical evidence remains immutable.
+Stay below 16,384 bytes and 240 lines; Git and issue trackers retain chronology.

@@ -182,8 +182,14 @@ The [canonical ADR collector](docs/repository-adr-collector.md) reuses the same
 local runtime preparation and safe-I/O helpers with an independent immutable
 alpha.2 lock. It maps owner-defined ADR metadata into Hygiene entities, invokes
 EgoLint source and coverage checks, and delegates normalization to Observatory.
-Its local review envelope preserves incomplete migration and source findings;
-production renderer/action/workflow adoption remains #115 checkpoint 2.
+Its local review envelope preserves incomplete migration and source findings.
+The explicit `collect-adrs` build path admits only a fresh, complete, validated
+canonical ADR inventory, retains all other domains as uncollected, and binds
+source/pin/coverage evidence into the existing deterministic provenance. The
+same native adapter serves local and action execution; the reusable workflow
+acquires trusted runtime inputs separately from consumer source. Existing
+alpha.1 external snapshots remain supported. Consumer source adoption and
+publication acceptance remain separate gates under #115 and Identity #69.
 
 The snapshot publisher is isolated as a
 separate action because it requires `contents: write`; all other v1 action jobs

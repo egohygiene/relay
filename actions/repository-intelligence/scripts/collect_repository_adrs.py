@@ -285,7 +285,9 @@ def normalize(runtime: Path, projection: dict) -> tuple[dict | None, dict]:
     return snapshot, {"hygiene": "valid", "coverage": "valid", "observatory": "normalized"}
 
 
-def collect(args: argparse.Namespace) -> dict:
+def collect(args: argparse.Namespace, *, on_stage=None) -> dict:
+    stage = on_stage or (lambda _name: None)
+    stage("collection")
     if args.visibility != "public":
         base.fail("VISIBILITY")
     if not base.REPOSITORY.fullmatch(args.repository) or not base.SHA.fullmatch(args.source_commit):
@@ -329,6 +331,7 @@ def collect(args: argparse.Namespace) -> dict:
                      "freshness": freshness, "reason": "incomplete" if partial else "complete",
                      "observed_at": args.collected_at}
             status = "partial" if partial else "ready"
+    stage("source-validation")
     report = source_validate(args, files, commit, available)
     catalog = tomllib.loads(base.read_file(args.runtime / "egolint/.config/rules/repository-intelligence.v1.toml").decode())
     rules = {r["id"]: r["remediation"] for r in catalog["rules"]}
@@ -340,6 +343,7 @@ def collect(args: argparse.Namespace) -> dict:
         finding = diagnostic(item["rule_id"], "egolint", path, location.get("line") if path else None)
         finding["remediation"] = rules[item["rule_id"]]
         diagnostics.append(finding)
+    stage("normalization")
     projection = project(args, files, records, claim)
     snapshot, validation = normalize(args.runtime, projection)
     if report["status"] == "invalid" or validation["hygiene"] == "invalid":
@@ -409,7 +413,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     try:
         if args.command == "prepare":
-            base.prepare(args, lock_path=LOCK_PATH)
+            base.prepare(args, lock_path=LOCK_PATH, reproducible=True)
             return 0
         result = collect(args)
         write_result(args.output, result, args.repository_root)

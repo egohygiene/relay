@@ -59,9 +59,9 @@
       "name": "Repository Intelligence",
       "summary": "Build a deterministic routed intelligence site with operational, roadmap, decision, journey, dependencies, health, releases, work, search, comparison, and analytics views.",
       "status": "beta",
-      "runtime": ["bash", "git", "python3"],
+      "runtime": ["bash", "git", "python3", "cargo", "rustup"],
       "permissions": {"contents": "read"},
-      "side_effects": ["workspace-write"],
+      "side_effects": ["network-read", "workspace-write"],
       "consumer_ref": "egohygiene/relay/actions/repository-intelligence@v1"
     },
     {

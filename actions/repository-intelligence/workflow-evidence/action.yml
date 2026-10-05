@@ -66,6 +66,10 @@ inputs:
     description: "Requested normalized report root."
     required: false
     default: ".reports"
+  collect-adrs:
+    description: "Opt in to canonical public ADR collection."
+    required: false
+    default: "false"
   observatory-snapshot:
     description: "Optional Observatory snapshot path."
     required: false
@@ -178,6 +182,7 @@ runs:
         INPUT_CALLED_WORKFLOW_REVISION: "${{ inputs.called-workflow-revision }}"
         INPUT_CALLER_WORKFLOW_REF: "${{ inputs.caller-workflow-ref }}"
         INPUT_CHECKOUT_OUTCOME: "${{ inputs.checkout-outcome }}"
+        INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
         INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
         INPUT_EVENT_DEFAULT_BRANCH: "${{ inputs.event-default-branch }}"
         INPUT_EVENT_NAME: "${{ inputs.event-name }}"
@@ -224,6 +229,7 @@ runs:
           --output-directory="${INPUT_OUTPUT_DIRECTORY}" \
           --work-directory="${INPUT_WORK_DIRECTORY}" \
           --reports-directory="${INPUT_REPORTS_DIRECTORY}" \
+          --collect-adrs="${INPUT_COLLECT_ADRS}" \
           --observatory-snapshot="${INPUT_OBSERVATORY_SNAPSHOT}" \
           --observatory-comparison="${INPUT_OBSERVATORY_COMPARISON}" \
           --default-branch="${INPUT_DEFAULT_BRANCH}" \

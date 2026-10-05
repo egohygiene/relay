@@ -1041,7 +1041,19 @@ def validate_json_contracts(
     if summary_repository.get("source_commit") != source_commit:
         raise BundleValidationError("summary source commit does not match the consumer")
 
-    require_exact_keys(provenance, PROVENANCE_KEYS, "provenance.json")
+    optional = {"adr_collection"} if "adr_collection" in provenance else set()
+    require_exact_keys(provenance, PROVENANCE_KEYS | optional, "provenance.json")
+    if optional:
+        spec = importlib.util.spec_from_file_location(
+            "relay_adr_build_contract", Path(__file__).with_name("repository_adr_build_contract.py"))
+        adapter = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(adapter)
+        try:
+            adapter.validate(provenance["adr_collection"], repository, source_commit)
+            if repository_visibility != "public":
+                raise ValueError("ADR provenance requires public consumer source")
+        except (ValueError, KeyError, TypeError) as error:
+            raise BundleValidationError("ADR collection provenance is incompatible") from error
     if provenance.get("schema") != PROVENANCE_SCHEMA or provenance.get("schema_version") != 1:
         raise BundleValidationError("provenance.json uses an unsupported contract")
     generator = require_object(provenance.get("generator"), "provenance.generator")
