@@ -226,7 +226,8 @@ from three public owner repositories into a private temporary directory. On
 CPython 3.12/Linux x86_64 it installs hash-locked wheels, installs Rust 1.85.1
 through rustup, fetches Cargo's locked dependencies, then prepares the verified
 runtime and collects offline. Git, Python with venv, and rustup must already be
-available; GitHub's Ubuntu runner supplies them. Acquisition preserves configured
+available; the reusable workflow and native acceptance job pin Ubuntu 24.04
+to retain the CPython 3.12 wheel ABI. Acquisition preserves configured
 proxy and CA trust. No consumer package manifest, configuration, hook, cache, or
 executable enters that runtime. Native executable builds remove private build
 paths so fresh runtime preparation can reproduce the bound executable digest.

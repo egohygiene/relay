@@ -23,7 +23,8 @@ concurrency:
 jobs:
   validate:
     name: Validate catalog, contracts, implementations, and metadata
-    runs-on: ubuntu-latest
+    # ADR wheel hashes target CPython 3.12 / Linux x86_64.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
 
     steps:

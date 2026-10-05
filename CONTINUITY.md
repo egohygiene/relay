@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-10-05T01:17:52Z'
+  updated_at: '2026-10-05T01:22:25Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -18,8 +18,8 @@ scope:
   - Build admission, alpha.2 collection coverage, native/action/workflow parity, provenance, validation, and consumer-adoption
     gates.
   excludes:
-  - Consumer source repair, historical ADR reconstruction, deployment, fleet rollout, contract ratification, and
-    merge authority.
+  - Consumer source repair, historical ADR reconstruction, deployment, fleet rollout, contract ratification, and merge
+    authority.
   - Conversation transcripts, raw provider logs, private paths, and duplicated issue specifications.
   precedence:
   - user-and-runtime-instructions
@@ -46,10 +46,9 @@ work:
   objective: Connect a fresh validated canonical ADR inventory to the existing Decisions site build while preserving
     collection uncertainty and consumer authority.
   success_conditions:
-  - Verify shared native/action/workflow input admission and preserve existing external-snapshot and no-snapshot
-    builds.
-  - Bind source hashes, revision, observation, pins, validation, and domain coverage into deterministic existing
-    bundle provenance.
+  - Verify shared native/action/workflow input admission and preserve existing external-snapshot and no-snapshot builds.
+  - Bind source hashes, revision, observation, pins, validation, and domain coverage into deterministic existing bundle
+    provenance.
   - Prove whole-bundle replay across differently named checkouts and separately prepared native runtimes.
   active_issue:
     provider: github
@@ -58,8 +57,8 @@ work:
   next:
     kind: action
     id: relay-115-consumer-acceptance
-    description: 'Review this integration, then validate one real consumer corpus and hand its reviewed immutable
-      Relay upgrade to Identity #69.'
+    description: 'Review this integration, then validate one real consumer corpus and hand its reviewed immutable Relay
+      upgrade to Identity #69.'
     readiness: blocked
     references:
     - https://github.com/egohygiene/relay/issues/115
@@ -75,43 +74,47 @@ state:
   candidate:
     branch: codex/adr-build-integration-115
     revision: null
-    pull_request: null
-    handoff_state: ready-for-review
+    pull_request:
+      provider: github
+      id: egohygiene/relay#135
+      url: https://github.com/egohygiene/relay/pull/135
+    handoff_state: review-reference-recorded
   live:
     status: verified
-    observed_at: '2026-10-05T01:17:52Z'
+    observed_at: '2026-10-05T01:22:25Z'
     default_branch_revision: d6aee172ec91b99ef1b01944c73d6c21933117fa
     issue_state: open
-    pull_request_state: not-applicable
-    notes: PR134 merged as the recorded base; its merge tree exactly matches reviewed head 70cd31638c762c5bec741fefb34e136390f7f779.
-      GitHub lists no open Relay PR at this observation. This checkpoint2 candidate is unpublished.
+    pull_request_state: open
+    notes: PR135 was open at head 77e216c4c7718c95096c55e0a73cc02f1d5f80dd; its hosted main validation job, including
+      fresh native ADR acquisition/replay, passed. A runner-platform follow-up pins Ubuntu 24.04 for the Python wheel
+      ABI; checks for that final candidate remain pending. PR134 remains merged at the recorded base.
   parallel_changes: []
 review:
   status: partial
-  reviewed_at: '2026-10-05T01:17:52Z'
+  reviewed_at: '2026-10-05T01:22:25Z'
   reviewed_by: Codex
   evidence:
   - command: RELAY_ADR_RUNTIME=ADR_RUNTIME RELAY_ADR_CANARY=HYGIENE RELAY_ROADMAP_RUNTIME=ROADMAP_RUNTIME RELAY_AKASHIC_REPOSITORY=AKASHIC
-      RELAY_ARCHITECTURE_RUNTIME=ARCHITECTURE_RUNTIME python -m unittest discover --start-directory tests --pattern
-      test_*.py --verbose
+      RELAY_ARCHITECTURE_RUNTIME=ARCHITECTURE_RUNTIME python -m unittest discover --start-directory tests --pattern test_*.py
+      --verbose
     outcome: passed
     observed_at: '2026-10-05T01:17:52Z'
-    notes: 634 tests passed with zero skips; native ADR, roadmap, architecture, no-snapshot and external-snapshot
-      regressions all executed.
+    notes: 634 tests passed with zero skips; native ADR, roadmap, architecture, no-snapshot and external-snapshot regressions
+      all executed. After the runner pin, 125 focused workflow tests also passed without skips.
   - command: python3 -I scripts/run_repository_adr_acceptance.py
     outcome: passed
     observed_at: '2026-10-05T01:17:52Z'
-    notes: Fresh public source/dependency acquisition and two offline preparations produced identical executable
-      receipts. All 31 ADR tests passed with zero skips, including entire bundles from differently named checkouts
-      and independent runtimes, plus the real Hygiene canary.
-  - command: validate_actions.py; validate_ci_run_lifecycle.py; validate_continuity_preflight_contract.py validate;
-      validate_repository_architecture_contract.py validate; validate_repository_journal_runtime.py validate
+    notes: Fresh public source/dependency acquisition and two offline preparations produced identical executable receipts.
+      All 31 ADR tests passed with zero skips, including entire bundles from differently named checkouts and independent
+      runtimes, plus the real Hygiene canary.
+  - command: validate_actions.py; validate_ci_run_lifecycle.py; validate_continuity_preflight_contract.py validate; validate_repository_architecture_contract.py
+      validate; validate_repository_journal_runtime.py validate
     outcome: passed
     observed_at: '2026-10-05T01:17:52Z'
-    notes: All five catalog/contract checks passed. Deployment/recovery dependencies and skip/failure/cancellation
-      gates are unchanged.
-  - command: python -m compileall -q actions scripts tests; pinned PyYAML parsing and bash -n for action/workflow
-      bodies; JSON parsing; git diff --check
+    notes: All five catalog/contract checks passed. Deployment/recovery dependencies and skip/failure/cancellation gates
+      are unchanged.
+  - command: python -m compileall -q actions scripts tests; pinned PyYAML parsing and bash -n for action/workflow bodies;
+      JSON parsing; git diff --check
     outcome: passed
     observed_at: '2026-10-05T01:17:52Z'
     notes: Compilation, YAML, inline Bash, JSON, and whitespace checks passed. Deep malformed ADR metadata was separately
@@ -123,18 +126,18 @@ review:
     notes: Structural verification and semantic review performed after domain validation. ADR-007 and ADR-010 retain
       the existing owners and deterministic evidence boundary; no new decision authority is introduced.
   environment_limitations:
-  - Hosted checks for this unpublished candidate are not yet observed; local execution does not prove ordinary artifact
-    upload, Pages upload, deployment, receipts, or live routes.
-  - Ruby is unavailable locally; YAML and inline Bash were checked with pinned PyYAML and Bash. Hosted CI retains
-    the Ruby parser.
+  - Hosted validation passed for the preceding PR135 head; hosted checks for the final Ubuntu 24.04 runner pin are pending.
+    No consumer deployment or live-route evidence is claimed.
+  - Ruby is unavailable locally; hosted validation passed its Ruby parser on the preceding head. The runner-platform
+    follow-up is also checked with pinned PyYAML.
   - The real immutable Hygiene canary has legacy/missing-policy/lineage gaps. Its 12 canonical records remain reviewable,
     but production admission is denied. Consumer source remediation remains owner work.
   - Automatic ADR runtime acquisition supports CPython 3.12/Linux x86_64 with rustup; other local environments require
     an explicitly prepared compatible runtime.
-  - Released continuity semantic conformance is unavailable under the proposed profile. Structure and live evidence
-    are checked separately.
-  - Historical roadmap-runtime repinning, consumer deployment, architecture hosted acceptance, release activation,
-    and fleet adoption remain separate.
+  - Released continuity semantic conformance is unavailable under the proposed profile. Structure and live evidence are
+    checked separately.
+  - Historical roadmap-runtime repinning, consumer deployment, architecture hosted acceptance, release activation, and
+    fleet adoption remain separate.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -170,8 +173,7 @@ provenance and old snapshot/no-input behavior. No consumer decisions are authore
 ## State snapshot
 
 PR134 is merged at the full base above, with a tree identical to its reviewed head. Issue115 is
-open. This checkpoint2 candidate is unmerged; its own revision and PR reference remain null until
-publication. EgoLint, Hygiene and Observatory inputs remain at the collector's immutable lock.
+open. PR135 is open and unmerged; this follow-up leaves its own eventual revision null. EgoLint, Hygiene and Observatory inputs remain at the collector's immutable lock.
 
 ## Completed and material changes
 
@@ -186,6 +188,7 @@ publication. EgoLint, Hygiene and Observatory inputs remain at the collector's i
 - `provenance.json.adr_collection` binds input hashes, revision, observation, owner pins, executable
   integrity, validation and candidate digests. The existing manifest binds the adapter/generator.
 - Fresh acquisition installs hash-locked wheels and the pinned Rust toolchain outside the consumer.
+  The reusable builder and native CI job pin Ubuntu 24.04 for the CPython 3.12 wheel ABI.
   Preparation and collection run offline; remapped native builds reproduce executable evidence.
 - The local review interface still denies publication. Source adoption, aliases, composition,
   deployment and historical rollback remain with the consumer. Historical evidence is unchanged.
@@ -197,7 +200,7 @@ All 634 regression tests passed without skips. Fresh acquisition, independent ru
 and all 31 native ADR tests passed without skips. Full action bundles match across differently
 named checkouts and independently prepared runtimes. Five catalog/contract validators, Python
 compilation, YAML/JSON parsing, inline Bash syntax and whitespace checks passed.
-The new evidence file records these local gates; hosted conclusions remain unobserved here.
+Hosted native validation passed at the preceding PR135 head; the final runner pin awaits hosted checks.
 
 ## Blockers, risks, unknowns, and deferred work
 
@@ -216,7 +219,7 @@ review, deployment and live-route evidence separate. Respect the existing rollba
 
 ## Parallel changes and reconciliation
 
-No competing Relay PR or main movement was observed at the recorded time. Recheck before updating
+No competing Relay PR or main movement was observed; PR135 owns this candidate. Recheck before updating
 or merging and reconcile any concurrent continuity edit semantically. Do not duplicate Identity work.
 
 ## Privacy and redaction
@@ -232,5 +235,4 @@ results separately without requiring a commit to contain its own eventual identi
 
 ## Compaction and supersession
 
-This handoff supersedes PR134's pre-merge checkpoint. Historical evidence remains immutable.
-Stay below 16,384 bytes and 240 lines; Git and issue trackers retain chronology.
+This supersedes PR134's checkpoint; historical evidence stays immutable. Retain the 240-line/16,384-byte bounds.
