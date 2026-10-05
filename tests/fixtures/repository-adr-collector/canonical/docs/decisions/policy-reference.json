@@ -1,0 +1,17 @@
+{
+  "schema": "egohygiene.architecture-decision-policy-reference/v1",
+  "repository": "egohygiene/relay",
+  "policy": {
+    "contract": "egohygiene.architecture-decision/v1",
+    "version": "1.1.0",
+    "source": {
+      "repository": "egohygiene/hygiene",
+      "revision": "c589587395750cd1c79c6fa0bef010189c547249",
+      "path": "docs/decisions/POLICY.md"
+    }
+  },
+  "decision_directory": "docs/decisions",
+  "index": "docs/decisions/README.md",
+  "extensions": [],
+  "exceptions": []
+}

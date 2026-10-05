@@ -173,10 +173,17 @@ The tested Observatory and Holon boundaries are pinned in
 The experimental native roadmap collector reads exact Git objects, invokes
 source-pinned EgoLint and Hygiene validation, and normalizes through the same
 Observatory boundary. Its separate review envelope records uncollected domains
-and always denies publication. Observatory #25 owns the missing partial-domain
-read-model semantics; Relay does not alter sibling views or invent placeholder
-evidence. The [collector design](docs/repository-roadmap-collector.md) owns the
+and always denies publication. Observatory #25 has supplied the upstream partial-domain
+semantics; this existing roadmap profile still requires a reviewed repin. Relay
+does not alter sibling views or invent placeholder evidence. The [collector design](docs/repository-roadmap-collector.md) owns the
 mapping, bounded compatibility intersection, runtime preparation and replay.
+
+The [canonical ADR collector](docs/repository-adr-collector.md) reuses the same
+local runtime preparation and safe-I/O helpers with an independent immutable
+alpha.2 lock. It maps owner-defined ADR metadata into Hygiene entities, invokes
+EgoLint source and coverage checks, and delegates normalization to Observatory.
+Its local review envelope preserves incomplete migration and source findings;
+production renderer/action/workflow adoption remains #115 checkpoint 2.
 
 The snapshot publisher is isolated as a
 separate action because it requires `contents: write`; all other v1 action jobs

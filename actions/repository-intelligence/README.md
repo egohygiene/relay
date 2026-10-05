@@ -7,8 +7,13 @@ result with any existing GitHub Pages, documentation, or product-site artifact.
 The experimental [canonical roadmap collector](../../docs/repository-roadmap-collector.md)
 can prepare local review evidence from an immutable `ROADMAP.md`. Its
 publication-denied review envelope is **not** an `observatory-snapshot` input.
-The upstream partial-domain contract and #112 acceptance must be resolved before
-#113 connects collection to this action.
+The compatible upstream coverage contract is now available; the existing roadmap
+profile still needs reviewed repinning and #112 acceptance before #113 integration.
+
+The [canonical ADR collector](../../docs/repository-adr-collector.md) implements
+#115 checkpoint 1: immutable canonical records, owner validation, and alpha.2
+normalization with explicit domain coverage. Its separate review envelope is also
+publication-denied. Checkpoint 2 owns the action/workflow and renderer adoption.
 
 ## Consumer contract
 
