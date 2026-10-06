@@ -1,0 +1,628 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/issue-title-plan.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "mode",
+    "mutation",
+    "repository",
+    "kind",
+    "observed_at",
+    "finished_at",
+    "coverage",
+    "excluded_pull_requests",
+    "status",
+    "diagnostics",
+    "rows",
+    "summary",
+    "provenance"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.relay.issue-title-plan/v1"
+    },
+    "mode": {
+      "const": "observe"
+    },
+    "mutation": {
+      "const": "forbidden"
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "id",
+        "visibility"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+        },
+        "id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "visibility": {
+          "const": "public"
+        }
+      }
+    },
+    "kind": {
+      "enum": [
+        "synthetic",
+        "github-public"
+      ]
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "finished_at": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "issues",
+        "labels"
+      ],
+      "properties": {
+        "issues": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "pages",
+            "error"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "complete",
+                "partial",
+                "unavailable"
+              ]
+            },
+            "pages": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "number",
+                  "records",
+                  "sha256"
+                ],
+                "properties": {
+                  "number": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "records": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              },
+              "maxItems": 20
+            },
+            "error": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z_0-9]{0,79}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "pages",
+            "error"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "complete",
+                "partial",
+                "unavailable"
+              ]
+            },
+            "pages": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "number",
+                  "records",
+                  "sha256"
+                ],
+                "properties": {
+                  "number": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "records": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              },
+              "maxItems": 20
+            },
+            "error": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z_0-9]{0,79}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "excluded_pull_requests": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2000
+    },
+    "status": {
+      "enum": [
+        "complete",
+        "partial",
+        "unavailable"
+      ]
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "maxItems": 10
+    },
+    "rows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "number",
+          "url",
+          "updated_at",
+          "current",
+          "validation",
+          "review",
+          "proposal",
+          "status",
+          "reasons"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+          },
+          "current": {
+            "$ref": "#/$defs/state"
+          },
+          "validation": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/report"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "review": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "number",
+                  "type",
+                  "subject"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "number": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "type": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "subject": {
+                    "type": "string",
+                    "maxLength": 1024
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "proposal": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "snapshot",
+                  "required_label",
+                  "provider_label",
+                  "format_validation",
+                  "validation",
+                  "formatter_sha256"
+                ],
+                "properties": {
+                  "snapshot": {
+                    "$ref": "#/$defs/state"
+                  },
+                  "required_label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "provider_label": {
+                    "enum": [
+                      "present",
+                      "missing",
+                      "unavailable"
+                    ]
+                  },
+                  "format_validation": {
+                    "$ref": "#/$defs/report"
+                  },
+                  "validation": {
+                    "$ref": "#/$defs/report"
+                  },
+                  "formatter_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "unchanged",
+              "proposed",
+              "needs-review",
+              "needs-classification",
+              "blocked",
+              "unavailable"
+            ]
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "maxItems": 10
+          }
+        }
+      },
+      "maxItems": 2000
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unchanged",
+        "proposed",
+        "needs-review",
+        "needs-classification",
+        "blocked",
+        "unavailable"
+      ],
+      "properties": {
+        "unchanged": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "proposed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "needs-review": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "needs-classification": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "blocked": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "unavailable": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lock_sha256",
+        "adapter_sha256",
+        "shared_runtime_sha256",
+        "snapshot_sha256",
+        "reviews_sha256",
+        "selection",
+        "runtime"
+      ],
+      "properties": {
+        "lock_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "adapter_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "shared_runtime_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "snapshot_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reviews_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "selection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "egolint",
+            "contract"
+          ],
+          "properties": {
+            "egolint": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "repository",
+                "revision",
+                "tree"
+              ],
+              "properties": {
+                "repository": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "revision": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "tree": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                }
+              }
+            },
+            "contract": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "contract_id",
+                "contract_version",
+                "repository",
+                "revision",
+                "authority",
+                "source_digests"
+              ],
+              "properties": {
+                "contract_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "contract_version": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "repository": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "revision": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "authority": {
+                  "const": "candidate"
+                },
+                "source_digests": {
+                  "type": "object",
+                  "minProperties": 5,
+                  "maxProperties": 5,
+                  "additionalProperties": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "runtime": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "lock_sha256",
+                "egolint_sha256"
+              ],
+              "properties": {
+                "lock_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "egolint_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "complete",
+        "title",
+        "labels"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "maxItems": 100,
+          "uniqueItems": true
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "type",
+        "message",
+        "report_sha256"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "conformant",
+            "nonconformant",
+            "needs-classification",
+            "conflict",
+            "unsupported-type",
+            "unavailable"
+          ]
+        },
+        "type": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "report_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "schema": "egohygiene.relay.issue-title-snapshot/v1",
+  "kind": "synthetic",
+  "repository": {
+    "name": "egohygiene/aether",
+    "id": 1,
+    "visibility": "public"
+  },
+  "observed_at": "2026-10-06T17:00:00Z",
+  "finished_at": "2026-10-06T17:00:00Z",
+  "coverage": {
+    "issues": {
+      "status": "complete",
+      "pages": [
+        {
+          "number": 1,
+          "records": 6,
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "error": null
+    },
+    "labels": {
+      "status": "complete",
+      "pages": [
+        {
+          "number": 1,
+          "records": 4,
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "error": null
+    }
+  },
+  "issues": [
+    {
+      "id": 101,
+      "number": 1,
+      "url": "https://github.com/egohygiene/aether/issues/1",
+      "updated_at": "2026-10-06T17:00:00Z",
+      "title": "✨ [feature] Already conformant",
+      "labels": [
+        "type:feature"
+      ],
+      "complete": true
+    },
+    {
+      "id": 102,
+      "number": 2,
+      "url": "https://github.com/egohygiene/aether/issues/2",
+      "updated_at": "2026-10-06T17:00:00Z",
+      "title": "🧭 [Old format] [CHK-07] Keep MiXeD case — café",
+      "labels": [
+        "type:feature",
+        "area:automation"
+      ],
+      "complete": true
+    },
+    {
+      "id": 103,
+      "number": 3,
+      "url": "https://github.com/egohygiene/aether/issues/3",
+      "updated_at": "2026-10-06T17:00:00Z",
+      "title": "No primary type",
+      "labels": [],
+      "complete": true
+    },
+    {
+      "id": 104,
+      "number": 4,
+      "url": "https://github.com/egohygiene/aether/issues/4",
+      "updated_at": "2026-10-06T17:00:00Z",
+      "title": "Unknown type",
+      "labels": [
+        "type:future"
+      ],
+      "complete": true
+    },
+    {
+      "id": 105,
+      "number": 5,
+      "url": "https://github.com/egohygiene/aether/issues/5",
+      "updated_at": "2026-10-06T17:00:00Z",
+      "title": "Two types",
+      "labels": [
+        "type:feature",
+        "type:bug"
+      ],
+      "complete": true
+    },
+    {
+      "id": 106,
+      "number": 6,
+      "url": "https://github.com/egohygiene/aether/issues/6",
+      "updated_at": "2026-10-06T17:00:00Z",
+      "title": "Legacy subject awaiting review",
+      "labels": [
+        "type:feature"
+      ],
+      "complete": true
+    }
+  ],
+  "labels": [
+    {
+      "name": "area:automation",
+      "color": "808080",
+      "description": "Synthetic fixture label"
+    },
+    {
+      "name": "type:bug",
+      "color": "808080",
+      "description": "Synthetic fixture label"
+    },
+    {
+      "name": "type:feature",
+      "color": "808080",
+      "description": "Synthetic fixture label"
+    },
+    {
+      "name": "type:future",
+      "color": "808080",
+      "description": "Synthetic fixture label"
+    }
+  ],
+  "excluded_pull_requests": 0
+}
