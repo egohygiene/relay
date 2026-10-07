@@ -1,0 +1,175 @@
+{
+  "checkpoint": "relay-133-aether-pilot",
+  "checks": {
+    "byte_identical_replay_json_and_markdown": "passed",
+    "continuity_schema_headings_and_bounds": "passed",
+    "current_issue_identity_titles_and_labels_preserved": "passed",
+    "guide_relative_links": "passed",
+    "inputs_unchanged": "passed",
+    "missing_classification_and_provider_labels_remain_blocked": "passed",
+    "previously_tested_source_digests": "unchanged",
+    "schema_validation": "snapshot, reviews and plan validated by preview CLI",
+    "three_native_formatted_titles_conformant": "passed",
+    "three_preview_invocations": "passed"
+  },
+  "command_path_note": "Interpreter, runtime, and temporary output locations are normalized; retained repository-relative input/output paths identify the actual artifacts.",
+  "commands": [
+    {
+      "command": "python3 scripts/preview_issue_titles.py preview --repository \"egohygiene/aether\" --snapshot \"docs/evidence/issue-title-preview/aether-snapshot-2026-10-06.json\" --runtime \"PREPARED_RUNTIME\" --output-dir \"NEW_UNREVIEWED_DIRECTORY\"",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/preview_issue_titles.py preview --repository \"egohygiene/aether\" --snapshot \"docs/evidence/issue-title-preview/aether-snapshot-2026-10-06.json\" --runtime \"PREPARED_RUNTIME\" --reviews \"docs/evidence/issue-title-preview/aether-reviews-2026-10-07.json\" --output-dir \"docs/evidence/issue-title-preview/aether-pilot-2026-10-07\"",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/preview_issue_titles.py preview --repository \"egohygiene/aether\" --snapshot \"docs/evidence/issue-title-preview/aether-snapshot-2026-10-06.json\" --runtime \"PREPARED_RUNTIME\" --reviews \"docs/evidence/issue-title-preview/aether-reviews-2026-10-07.json\" --output-dir \"DISTINCT_NEW_REPLAY_DIRECTORY\"",
+      "exit_code": 0
+    }
+  ],
+  "evaluated_parent": "849df776ed218802f28017bf21c622b54cf8dfd2",
+  "input_file_sha256": {
+    "catalog/issue-title-preview.v1.lock.json": "ba4df41a0a19eb314ebfad4231efcb682d09adcca30307c32a1359b2cdf46ccd",
+    "docs/evidence/issue-title-preview/aether-reviews-2026-10-07.json": "9a88a4256085762fa89b8ba098a5cbb0f33b3eb0637d99be78619656fd239261",
+    "docs/evidence/issue-title-preview/aether-snapshot-2026-10-06.json": "bb2198f37cc45437528a2e8aede017223e28669ded1ab9da5e4a68d98ea31dbc",
+    "scripts/preview_issue_titles.py": "fb39a92dab27330455a3573dfe6e2acedd7cc75ec9db42b07a184756f9193805"
+  },
+  "issue_title_label_state_or_relationship_writes": 0,
+  "limits": [
+    "Public REST reads are sequential, not atomic.",
+    "Only issues 63, 92 and 94 received explicit type/subject review; other issues remain unclassified.",
+    "The three selected issue records matched their captured identity/title/labels/update fields when reread for review; this does not refresh the full snapshot or provider label inventory.",
+    "No type labels exist in the captured inventory; all three title candidates remain blocked for application.",
+    "Contract authority remains candidate and adoption observe; no release or enforcement claim.",
+    "Local preparation depends on the trusted Cargo cache/toolchain; this pilot does not prove cross-platform reproducibility.",
+    "Hosted Actions, broad linting and broader audits remain deferred."
+  ],
+  "next": "Maintainer review of PR136; separately plan apply/recovery and governed label adoption before any title writes.",
+  "output_file_sha256": {
+    "docs/evidence/issue-title-preview/aether-pilot-2026-10-07/plan.json": "e77cd8dde9aae1259a781fec63b32d2fa54c185ec7489d9e20d20f85ee8778e1",
+    "docs/evidence/issue-title-preview/aether-pilot-2026-10-07/preview.md": "e3d1e1ddc6e534c19481bef85a994a47ade48fd6085eab08e27a47e7826fb1c9"
+  },
+  "remote_workflow_dispatches": 0,
+  "reviewed_at": "2026-10-07T02:46:23Z",
+  "reviewed_inputs": {
+    "mode": "explicit-agent-review-for-preview",
+    "path": "docs/evidence/issue-title-preview/aether-reviews-2026-10-07.json",
+    "records": [
+      {
+        "body_sha256": "89e2bc0bf676e72edb0346f98a486d4737aadba7b6d59727b9c25da815bf6cff",
+        "decision": "Preview-only candidate; not owner approval to apply or classify.",
+        "id": 5303662554,
+        "matched_captured_fields": [
+          "id",
+          "number",
+          "title",
+          "updated_at",
+          "labels"
+        ],
+        "number": 63,
+        "provider_updated_at": "2026-09-28T21:25:40Z",
+        "rationale": "The issue defines a distribution contract and system boundaries. Retain spec(distribution): verbatim as subject text; no prefix interpretation is required.",
+        "reviewer": "Codex",
+        "subject": "spec(distribution): extend release declarations with distribution targets, package coordinates, and publisher bindings",
+        "type": "architecture",
+        "url": "https://github.com/egohygiene/aether/issues/63"
+      },
+      {
+        "body_sha256": "c4012ffb73f64265562044f6133a4701cfa6faeabf136047461a01d9a1a7cc40",
+        "decision": "Preview-only candidate; not owner approval to apply or classify.",
+        "id": 5619761275,
+        "matched_captured_fields": [
+          "id",
+          "number",
+          "title",
+          "updated_at",
+          "labels"
+        ],
+        "number": 92,
+        "provider_updated_at": "2026-09-28T19:04:35Z",
+        "rationale": "The issue defines the portable execution specification and instruction/skill boundary. Explicitly remove only the leading compass decoration; preserve all subject wording and case.",
+        "reviewer": "Codex",
+        "subject": "Specify bounded issue checkpoints and resumable agent execution",
+        "type": "architecture",
+        "url": "https://github.com/egohygiene/aether/issues/92"
+      },
+      {
+        "body_sha256": "be1ad0c73a95b59946fa5fefad555226bf035a2d350c85dc293dd0169a0cb30f",
+        "decision": "Preview-only candidate; not owner approval to apply or classify.",
+        "id": 5621390000,
+        "matched_captured_fields": [
+          "id",
+          "number",
+          "title",
+          "updated_at",
+          "labels"
+        ],
+        "number": 94,
+        "provider_updated_at": "2026-09-28T21:19:34Z",
+        "rationale": "The issue produces an ADR for the release preparation engine and authority boundary. Explicitly remove only the leading compass decoration; retain [Release checkpoint 1] exactly. Native relationships remain untouched.",
+        "reviewer": "Codex",
+        "subject": "[Release checkpoint 1] Decide the shared preparation engine and authority boundary",
+        "type": "architecture",
+        "url": "https://github.com/egohygiene/aether/issues/94"
+      }
+    ]
+  },
+  "reviewed_run": {
+    "diagnostics": [],
+    "exit_code": 0,
+    "status": "complete",
+    "summary": {
+      "blocked": 3,
+      "needs-classification": 25,
+      "needs-review": 0,
+      "proposed": 0,
+      "unavailable": 0,
+      "unchanged": 0
+    }
+  },
+  "scope": "Offline preview of the retained public-provider capture; no current full-backlog recapture.",
+  "snapshot": {
+    "coverage": {
+      "issues": {
+        "error": null,
+        "pages": [
+          {
+            "number": 1,
+            "records": 29,
+            "sha256": "2e401625b2230062ef84312e229b88c903fe132e18130a3520ec6c7257b373d3"
+          }
+        ],
+        "status": "complete"
+      },
+      "labels": {
+        "error": null,
+        "pages": [
+          {
+            "number": 1,
+            "records": 41,
+            "sha256": "98b710de9e8dfbf772285a88e70d4b0f4a499fde99220065d206a629381defa2"
+          }
+        ],
+        "status": "complete"
+      }
+    },
+    "excluded_pull_requests": 1,
+    "finished_at": "2026-10-06T17:25:42Z",
+    "issues": 28,
+    "labels": 41,
+    "observed_at": "2026-10-06T17:25:23Z",
+    "path": "docs/evidence/issue-title-preview/aether-snapshot-2026-10-06.json"
+  },
+  "unreviewed_run": {
+    "exit_code": 0,
+    "plan_sha256": "2b793137362b930f0fa40490b8c4a3275d8c128bbeefdd59f358fdc8ce1efc40",
+    "summary": {
+      "blocked": 0,
+      "needs-classification": 28,
+      "needs-review": 0,
+      "proposed": 0,
+      "unavailable": 0,
+      "unchanged": 0
+    }
+  }
+}
