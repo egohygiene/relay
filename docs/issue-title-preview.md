@@ -30,14 +30,16 @@ availability, and current issue classification remain separate findings.
   41 labels; each endpoint returned a terminal page below 100 records.
 - This is a completed page traversal, not an atomic provider snapshot or a
   completed pilot preview. No reviewed live proposals or pilot plan are retained yet.
-- Before the pause, source-pinned runtime preparation succeeded, Python compilation
-  passed, and the focused test output showed passing boundary cases and the native
-  classification/checkpoint-preservation case. The multi-page collection test failed.
-  The final test summary was not retained; no overall pass is claimed.
+- [Focused local validation](evidence/issue-title-preview/local-validation-2026-10-07.json):
+  all 24 tests passed with no skips, including 11 real Egolint integration tests.
+  All three JSON schemas passed schema validation. The pagination fixture failure
+  was caused by substring matching `page=1` inside `per_page=100`; exact query parsing
+  fixes the fixture. Production adapter behavior is unchanged.
 - Workspace maintenance removed the unpushed checkout. Source and tests were restored
   from the recorded patches; schemas and lock were regenerated with the surviving
   generator and pinned runtime sources. The public snapshot survived unchanged.
-  Restored source has not been rerun through the test suite.
+  Restored source has now passed the focused suite. Broad repository tests and
+  linting remain deferred; these results do not establish live pilot acceptance.
 
 ## Resume commands
 
@@ -74,13 +76,15 @@ Exit 0 does not mean every issue conforms or is approved to change.
 
 ## Remaining before acceptance
 
-1. Diagnose the multi-page fixture failure and complete focused validation. The
-   fixture's `"page=1" in path` condition may also match `per_page=100`; verify this.
-2. Review recovered source and schemas, including malformed provider data, bounds,
-   runtime failure reporting, deterministic replay, and output preservation.
-3. Generate and inspect the Aether preview; add reviewed per-issue inputs only where
+1. Generate and inspect the Aether preview; add reviewed per-issue inputs only where
    classification and wording have actually been reviewed.
-4. Finish the usage guide and record exact local results and remaining limitations.
+2. Finish the usage guide and reconcile the remaining issue133 acceptance evidence.
+
+The pagination fix and focused verification are complete. Tests cover current/proposed
+separation, preserved identifiers and labels, missing/unknown/conflicting classification,
+incomplete collection, stale/missing runtime evidence, unchanged inputs, and repeatable
+CLI output across distinct output locations. This is bounded local evidence, not a
+broader audit or proof of portability across platforms/toolchains.
 
 Actions, broad linting, and broader audits are deferred. The later apply/recovery
 checkpoint still needs an approved plan, current-state comparison, conflict

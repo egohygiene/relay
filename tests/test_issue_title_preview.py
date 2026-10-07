@@ -11,6 +11,7 @@ import sys
 import tempfile
 import unittest
 from unittest.mock import patch
+from urllib.parse import parse_qs, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts/preview_issue_titles.py"
@@ -115,7 +116,8 @@ class Boundaries(unittest.TestCase):
                 return {"full_name": REPOSITORY, "id": 1, "private": False}
             if "/labels?" in path:
                 return []
-            return first if "page=1" in path else [provider_issue(101)]
+            page = parse_qs(urlsplit(path).query)["page"]
+            return first if page == ["1"] else [provider_issue(101)]
 
         value = preview.collect(REPOSITORY, get=get, now=lambda: STAMP)
         self.assertEqual(len(value["issues"]), 100)
@@ -124,6 +126,9 @@ class Boundaries(unittest.TestCase):
         self.assertEqual(len(value["coverage"]["issues"]["pages"]), 2)
         self.assertEqual(len(calls), 4)
         self.assertTrue(all(path.startswith(f"/repos/{REPOSITORY}") for path in calls))
+        self.assertEqual([parse_qs(urlsplit(path).query)["page"]
+                          for path in calls if "/issues?" in path], [["1"], ["2"]])
+        self.assertEqual([row["number"] for row in value["issues"]], [*range(1, 100), 101])
 
     def test_failed_later_page_keeps_earlier_evidence_partial(self):
         def get(path):
