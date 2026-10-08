@@ -1,0 +1,497 @@
+{
+  "coverage": {
+    "issues": {
+      "error": null,
+      "pages": [
+        {
+          "number": 1,
+          "records": 29,
+          "sha256": "2e401625b2230062ef84312e229b88c903fe132e18130a3520ec6c7257b373d3"
+        }
+      ],
+      "status": "complete"
+    },
+    "labels": {
+      "error": null,
+      "pages": [
+        {
+          "number": 1,
+          "records": 41,
+          "sha256": "98b710de9e8dfbf772285a88e70d4b0f4a499fde99220065d206a629381defa2"
+        }
+      ],
+      "status": "complete"
+    }
+  },
+  "excluded_pull_requests": 1,
+  "finished_at": "2026-10-06T17:25:42Z",
+  "issues": [
+    {
+      "complete": true,
+      "id": 5188455751,
+      "labels": [],
+      "number": 38,
+      "title": "Build the first-party AI artifact validation and publishing pipeline",
+      "updated_at": "2026-08-19T03:01:00Z",
+      "url": "https://github.com/egohygiene/aether/issues/38"
+    },
+    {
+      "complete": true,
+      "id": 5188458582,
+      "labels": [],
+      "number": 40,
+      "title": "Add canonical prompt and instruction libraries",
+      "updated_at": "2026-08-19T03:01:30Z",
+      "url": "https://github.com/egohygiene/aether/issues/40"
+    },
+    {
+      "complete": true,
+      "id": 5188458687,
+      "labels": [],
+      "number": 41,
+      "title": "Add an agent catalog and Copilot cost-control specification",
+      "updated_at": "2026-08-19T03:01:31Z",
+      "url": "https://github.com/egohygiene/aether/issues/41"
+    },
+    {
+      "complete": true,
+      "id": 5273313024,
+      "labels": [],
+      "number": 51,
+      "title": "Publish the Mindgarden curator skill and ChatGPT handoff",
+      "updated_at": "2026-09-18T18:48:53Z",
+      "url": "https://github.com/egohygiene/aether/issues/51"
+    },
+    {
+      "complete": true,
+      "id": 5285933827,
+      "labels": [],
+      "number": 56,
+      "title": "Add a people-first content authoring and review skill",
+      "updated_at": "2026-08-29T10:13:55Z",
+      "url": "https://github.com/egohygiene/aether/issues/56"
+    },
+    {
+      "complete": true,
+      "id": 5303662554,
+      "labels": [],
+      "number": 63,
+      "title": "spec(distribution): extend release declarations with distribution targets, package coordinates, and publisher bindings",
+      "updated_at": "2026-09-28T21:25:40Z",
+      "url": "https://github.com/egohygiene/aether/issues/63"
+    },
+    {
+      "complete": true,
+      "id": 5320732435,
+      "labels": [],
+      "number": 64,
+      "title": "Define an evidence-backed agent capability manifest",
+      "updated_at": "2026-09-02T06:47:28Z",
+      "url": "https://github.com/egohygiene/aether/issues/64"
+    },
+    {
+      "complete": true,
+      "id": 5321929707,
+      "labels": [],
+      "number": 65,
+      "title": "Define governed operational-agent workflows inspired by Teambridge",
+      "updated_at": "2026-09-02T09:02:33Z",
+      "url": "https://github.com/egohygiene/aether/issues/65"
+    },
+    {
+      "complete": true,
+      "id": 5321929943,
+      "labels": [],
+      "number": 66,
+      "title": "Add a provenance-governed Future-First Design specification and skill",
+      "updated_at": "2026-09-02T09:02:35Z",
+      "url": "https://github.com/egohygiene/aether/issues/66"
+    },
+    {
+      "complete": true,
+      "id": 5321930183,
+      "labels": [],
+      "number": 67,
+      "title": "Publish a repository-default skill bundle and generated AGENTS guidance",
+      "updated_at": "2026-10-03T01:34:34Z",
+      "url": "https://github.com/egohygiene/aether/issues/67"
+    },
+    {
+      "complete": true,
+      "id": 5323008619,
+      "labels": [],
+      "number": 68,
+      "title": "Publish the reusable repository and organization checkpoint-audit contract",
+      "updated_at": "2026-09-02T10:57:54Z",
+      "url": "https://github.com/egohygiene/aether/issues/68"
+    },
+    {
+      "complete": true,
+      "id": 5339536840,
+      "labels": [],
+      "number": 69,
+      "title": "Define scoped agent-session and garden-access capabilities",
+      "updated_at": "2026-09-03T17:28:43Z",
+      "url": "https://github.com/egohygiene/aether/issues/69"
+    },
+    {
+      "complete": true,
+      "id": 5339537057,
+      "labels": [],
+      "number": 71,
+      "title": "Publish an opt-in confidential research skill bundle",
+      "updated_at": "2026-09-03T17:28:45Z",
+      "url": "https://github.com/egohygiene/aether/issues/71"
+    },
+    {
+      "complete": true,
+      "id": 5339537159,
+      "labels": [],
+      "number": 72,
+      "title": "Publish an evidence-grounded legal document review skill",
+      "updated_at": "2026-09-03T17:28:45Z",
+      "url": "https://github.com/egohygiene/aether/issues/72"
+    },
+    {
+      "complete": true,
+      "id": 5339570331,
+      "labels": [],
+      "number": 73,
+      "title": "Define task-specific local agent and model evaluation profiles",
+      "updated_at": "2026-09-03T17:32:30Z",
+      "url": "https://github.com/egohygiene/aether/issues/73"
+    },
+    {
+      "complete": true,
+      "id": 5368142427,
+      "labels": [],
+      "number": 77,
+      "title": "Publish a portable consumer-organization AI context and agent profile",
+      "updated_at": "2026-09-06T22:49:28Z",
+      "url": "https://github.com/egohygiene/aether/issues/77"
+    },
+    {
+      "complete": true,
+      "id": 5377971543,
+      "labels": [],
+      "number": 78,
+      "title": "Add reviewable brain-dump triage and GitHub backlog promotion skill",
+      "updated_at": "2026-09-28T19:05:41Z",
+      "url": "https://github.com/egohygiene/aether/issues/78"
+    },
+    {
+      "complete": true,
+      "id": 5434779689,
+      "labels": [],
+      "number": 85,
+      "title": "Backfill repository ADR history and enable continuous decision capture",
+      "updated_at": "2026-09-12T17:03:50Z",
+      "url": "https://github.com/egohygiene/aether/issues/85"
+    },
+    {
+      "complete": true,
+      "id": 5463990853,
+      "labels": [],
+      "number": 86,
+      "title": "Define composable audit profiles and promote the repository-audit skill",
+      "updated_at": "2026-09-15T15:29:42Z",
+      "url": "https://github.com/egohygiene/aether/issues/86"
+    },
+    {
+      "complete": true,
+      "id": 5464101445,
+      "labels": [],
+      "number": 87,
+      "title": "Define an architecture-coherence review and human-ratification skill",
+      "updated_at": "2026-09-15T15:39:31Z",
+      "url": "https://github.com/egohygiene/aether/issues/87"
+    },
+    {
+      "complete": true,
+      "id": 5468988632,
+      "labels": [],
+      "number": 88,
+      "title": "Add roadmap-impact reconciliation as a completion hook for repository-changing agents",
+      "updated_at": "2026-09-16T01:02:28Z",
+      "url": "https://github.com/egohygiene/aether/issues/88"
+    },
+    {
+      "complete": true,
+      "id": 5483868252,
+      "labels": [],
+      "number": 89,
+      "title": "Add a reviewable project-incubation bootstrap pack skill",
+      "updated_at": "2026-09-17T06:34:18Z",
+      "url": "https://github.com/egohygiene/aether/issues/89"
+    },
+    {
+      "complete": true,
+      "id": 5568612629,
+      "labels": [],
+      "number": 90,
+      "title": "spec(repository-intelligence): define repository manifest, health, snapshot, and organization-state contracts",
+      "updated_at": "2026-09-26T18:09:44Z",
+      "url": "https://github.com/egohygiene/aether/issues/90"
+    },
+    {
+      "complete": true,
+      "id": 5619761275,
+      "labels": [],
+      "number": 92,
+      "title": "🧭 Specify bounded issue checkpoints and resumable agent execution",
+      "updated_at": "2026-09-28T19:04:35Z",
+      "url": "https://github.com/egohygiene/aether/issues/92"
+    },
+    {
+      "complete": true,
+      "id": 5620426015,
+      "labels": [],
+      "number": 93,
+      "title": "🧭 Define the shared release-preparation, component-version, and prerelease model",
+      "updated_at": "2026-09-28T21:25:21Z",
+      "url": "https://github.com/egohygiene/aether/issues/93"
+    },
+    {
+      "complete": true,
+      "id": 5621390000,
+      "labels": [],
+      "number": 94,
+      "title": "🧭 [Release checkpoint 1] Decide the shared preparation engine and authority boundary",
+      "updated_at": "2026-09-28T21:19:34Z",
+      "url": "https://github.com/egohygiene/aether/issues/94"
+    },
+    {
+      "complete": true,
+      "id": 5621394945,
+      "labels": [],
+      "number": 95,
+      "title": "📐 [Release checkpoint 2] Specify release units, channels, and state reconciliation",
+      "updated_at": "2026-09-28T21:20:02Z",
+      "url": "https://github.com/egohygiene/aether/issues/95"
+    },
+    {
+      "complete": true,
+      "id": 5680197655,
+      "labels": [],
+      "number": 97,
+      "title": "[Later] Compose roadmap, milestone, and checkpoint planning",
+      "updated_at": "2026-10-02T16:19:05Z",
+      "url": "https://github.com/egohygiene/aether/issues/97"
+    }
+  ],
+  "kind": "github-public",
+  "labels": [
+    {
+      "color": "4338CA",
+      "description": "Local AI, agents, prompts, skills, and workflows ☁️",
+      "name": "☁️ aether"
+    },
+    {
+      "color": "16A34A",
+      "description": "Repository cleanup, restructuring, modernization, and technical debt ♻️",
+      "name": "♻️ refactor"
+    },
+    {
+      "color": "274472",
+      "description": "Infrastructure, repositories, tooling, and configuration ⚙️",
+      "name": "⚙️ infra"
+    },
+    {
+      "color": "7C5C1E",
+      "description": "Developer experience, tooling, and ergonomics ⚡",
+      "name": "⚡ dx"
+    },
+    {
+      "color": "7C3AED",
+      "description": "Writing workflow, editorial improvements, and authoring ✍️",
+      "name": "✍️ writing"
+    },
+    {
+      "color": "15803D",
+      "description": "Life domains, domain models, and domain-specific functionality 🌍",
+      "name": "🌍 domain"
+    },
+    {
+      "color": "0284C7",
+      "description": "Website, documentation site, and public experience 🌐",
+      "name": "🌐 website"
+    },
+    {
+      "color": "3A7D44",
+      "description": "Knowledge management, digital garden, and long-term thinking 🌱",
+      "name": "🌱 mindgarden"
+    },
+    {
+      "color": "B91C1C",
+      "description": "Video production, animation, and cinematic content 🎥",
+      "name": "🎥 video"
+    },
+    {
+      "color": "4E8065",
+      "description": "Design system, UI, UX, branding, and visuals 🎨",
+      "name": "🎨 design"
+    },
+    {
+      "color": "6D28D9",
+      "description": "Creative operating system and AI orchestration 🎬",
+      "name": "🎬 dreamscape"
+    },
+    {
+      "color": "15803D",
+      "description": "Practices, rituals, habits, and exercises 🎯",
+      "name": "🎯 practice"
+    },
+    {
+      "color": "7F1D1D",
+      "description": "Music, albums, lyrics, and audio production 🎵",
+      "name": "🎵 music"
+    },
+    {
+      "color": "1F4D8F",
+      "description": "Architecture, foundations, and system design 🏗️",
+      "name": "🏗️ architecture"
+    },
+    {
+      "color": "6D28D9",
+      "description": "Purpose, principles, ontology, and conceptual evolution 🏛️",
+      "name": "🏛️ philosophy"
+    },
+    {
+      "color": "DC2626",
+      "description": "Something isn't working 🐛",
+      "name": "🐛 bug"
+    },
+    {
+      "color": "B45309",
+      "description": "Grants, sponsorships, partnerships, and monetization 💰",
+      "name": "💰 funding"
+    },
+    {
+      "color": "64748B",
+      "description": "Documentation improvements and knowledge organization 📄",
+      "name": "📄 documentation"
+    },
+    {
+      "color": "486581",
+      "description": "Holistic repository reviews, quality assessments, and engineering audits 📋",
+      "name": "📋 audit"
+    },
+    {
+      "color": "4B5563",
+      "description": "Captured ideas and future work 📋",
+      "name": "📋 backlog"
+    },
+    {
+      "color": "7C3AED",
+      "description": "Schemas, specifications, contracts, and data models 📐",
+      "name": "📐 schema"
+    },
+    {
+      "color": "9333EA",
+      "description": "Magazine, comic, editorial, and visual storytelling 📖",
+      "name": "📖 magazine"
+    },
+    {
+      "color": "2563EB",
+      "description": "Long-form articles and essays 📚",
+      "name": "📚 article"
+    },
+    {
+      "color": "0E7490",
+      "description": "Publishing platform, workflows, and distribution 📝",
+      "name": "📝 publishing"
+    },
+    {
+      "color": "15803D",
+      "description": "Marketing, social media, SEO, and outreach 📣",
+      "name": "📣 marketing"
+    },
+    {
+      "color": "0369A1",
+      "description": "Reusable packages and shared libraries 📦",
+      "name": "📦 package"
+    },
+    {
+      "color": "0175C2",
+      "description": "Flutter application and Flutter Foundation 📱",
+      "name": "📱 flutter"
+    },
+    {
+      "color": "0F766E",
+      "description": "Application lifecycles, managers, and orchestration 🔄",
+      "name": "🔄 lifecycle"
+    },
+    {
+      "color": "2563EB",
+      "description": "Plugin architecture, registries, and extensibility 🔌",
+      "name": "🔌 plugin"
+    },
+    {
+      "color": "0F766E",
+      "description": "Research, literature, evidence, and references 🔬",
+      "name": "🔬 research"
+    },
+    {
+      "color": "0891B2",
+      "description": "Journey modeling, progress, and timeline systems 🗺️",
+      "name": "🗺️ journey"
+    },
+    {
+      "color": "EA580C",
+      "description": "Large initiative spanning multiple issues 🚀",
+      "name": "🚀 milestone"
+    },
+    {
+      "color": "CA8A04",
+      "description": "Merchandise, storefront, and brand products 🛍️",
+      "name": "🛍️ merch"
+    },
+    {
+      "color": "8B5CF6",
+      "description": "Artificial intelligence, providers, orchestration, and prompts 🤖",
+      "name": "🤖 ai"
+    },
+    {
+      "color": "5C3D99",
+      "description": "Automation, pipelines, workflows, and AI agents 🤖",
+      "name": "🤖 automation"
+    },
+    {
+      "color": "0F766E",
+      "description": "Community, contributors, collaboration, and ecosystem 🤝",
+      "name": "🤝 community"
+    },
+    {
+      "color": "7C2D12",
+      "description": "Memory systems, context, embeddings, and knowledge graphs 🧠",
+      "name": "🧠 memory"
+    },
+    {
+      "color": "5A3E99",
+      "description": "Ontology, schemas, semantics, and conceptual modeling 🧠",
+      "name": "🧠 ontology"
+    },
+    {
+      "color": "3B6EA5",
+      "description": "Reusable platform and shared packages 🧩",
+      "name": "🧩 foundation"
+    },
+    {
+      "color": "5A8F3D",
+      "description": "Testing, validation, and quality assurance 🧪",
+      "name": "🧪 testing"
+    },
+    {
+      "color": "7E22CE",
+      "description": "Reflection engine, journey, and self-awareness 🪞",
+      "name": "🪞 reflection"
+    }
+  ],
+  "observed_at": "2026-10-06T17:25:23Z",
+  "repository": {
+    "id": 1315637692,
+    "name": "egohygiene/aether",
+    "visibility": "public"
+  },
+  "schema": "egohygiene.relay.issue-title-snapshot/v1"
+}

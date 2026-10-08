@@ -1,0 +1,42 @@
+{
+  "schema": "egohygiene.relay.issue-title-preview-lock/v1",
+  "status": "experimental",
+  "adoption": "observe",
+  "allowed_repositories": [
+    "egohygiene/aether"
+  ],
+  "contract": {
+    "contract_id": "egohygiene.issue-title/v1",
+    "contract_version": "1.0.0",
+    "repository": "egohygiene/.github",
+    "revision": "19d2be9bf0191710508cefbb9f0b1abb3a40d9be",
+    "authority": "candidate",
+    "source_digests": {
+      ".github/issues/title-contract.v1.json": "205202bda3c3b069a105924499ba7213a6a99645658e500cc910dfa085eeb30e",
+      ".github/issues/schema/title-contract.v1.schema.json": "9df220330ad07758122567620f557aa11aad85522914fe3f4cdc7de6a5ca7295",
+      ".github/labels/catalog.v1.json": "7063a61608a66454310e5a7746b1514d1d11018da08427bfb49f4612326ff6ff",
+      "docs/issue-titles.md": "243b5fdfec3fff82623fdcb43fa490829af9380d5f0b1d568f9f32b277de0660",
+      "fixtures/issue-titles/cases.v1.json": "c21989c506e363c7b7845e0f63bdaf14f2e0de78f9d6c421d04e0f5a444edab2"
+    }
+  },
+  "sources": {
+    "egolint": {
+      "repository": "egohygiene/egolint",
+      "revision": "20edc7d98ab7750388e4783ffaf1bab0d9278d60",
+      "tree": "caeb2d3800d0d65de1822c59e74a9c671f0eab95",
+      "files": {
+        "Cargo.lock": "ecca8f57ebf40c8207ae113a7e14e4522393a8a10dc5f6576b59b6f7b48a96ab",
+        "src/issue_titles.rs": "abac1e651f6f8bc609b27cbd9824e223751d0ee1eb50978179cf718539adab6d",
+        ".config/rules/issue-title-sources.v1.json": "b6df27a6208309dbbdb5d795b264a45586e6e961d47879c7257298ee630007bd",
+        "vendor/github/issue-titles/.github/issues/title-contract.v1.json": "205202bda3c3b069a105924499ba7213a6a99645658e500cc910dfa085eeb30e",
+        "vendor/github/issue-titles/.github/issues/schema/title-contract.v1.schema.json": "9df220330ad07758122567620f557aa11aad85522914fe3f4cdc7de6a5ca7295",
+        "vendor/github/issue-titles/.github/labels/catalog.v1.json": "7063a61608a66454310e5a7746b1514d1d11018da08427bfb49f4612326ff6ff",
+        "vendor/github/issue-titles/docs/issue-titles.md": "243b5fdfec3fff82623fdcb43fa490829af9380d5f0b1d568f9f32b277de0660",
+        "vendor/github/issue-titles/fixtures/issue-titles/cases.v1.json": "c21989c506e363c7b7845e0f63bdaf14f2e0de78f9d6c421d04e0f5a444edab2",
+        "schemas/issue-title-snapshot.schema.json": "d4bcb7053e4f80fd1d9dfa1f5a6ce607279cf8b60caca2a23b6985664da2482e",
+        "schemas/issue-title-report.schema.json": "dbcbe1daabcf272bfe2a7a7794144f4048e0a04121ef60a339df6b44466342e7",
+        "schemas/issue-title-proposal.schema.json": "d35b7ece8a27123cf727c7dc91aa3b32506e97df38df36ec0f523b439a4eea33"
+      }
+    }
+  }
+}

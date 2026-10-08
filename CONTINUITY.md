@@ -7,20 +7,19 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-10-04T21:24:44Z'
+  updated_at: '2026-10-07T02:51:09Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: 'Hand off Relay issue 115 checkpoint 1: immutable canonical ADR collection and compatible owner validation.'
+  purpose: Hand off the completed Relay issue133 preview checkpoint for maintainer review.
   includes:
-  - Exact source mapping, sibling pins, local native verification, real-canary findings, and the separate build-integration
-    gate.
+  - Pinned read-only preview, focused local validation, reviewed Aether pilot, usage guide, and apply/recovery
+    handoff.
   excludes:
-  - Consumer source repair, historical ADR reconstruction, deployment, fleet rollout, contract ratification, and merge
-    authority.
-  - Conversation transcripts, raw provider logs, private paths, and duplicated issue specifications.
+  - Issue mutations, label provisioning, enforcement, releases, deployments, fleet rollout, and merge authority.
+  - Private conversation content, credentials, and local environment paths.
   precedence:
   - user-and-runtime-instructions
   - scoped-repository-instructions
@@ -33,108 +32,108 @@ scope:
   - SYSTEM.md
   - DECISIONS.md
   - ROADMAP.md
-  - docs/repository-adr-collector.md
-  - actions/repository-intelligence/contracts/adr-collector.v1.lock.json
-  - actions/repository-intelligence/scripts/collect_repository_adrs.py
-  - tests/test_repository_adr_collector.py
-  - docs/evidence/repository-adrs-checkpoint-1.json
-  - https://github.com/egohygiene/relay/issues/115
-  - https://github.com/egohygiene/egolint/pull/80
-  - https://github.com/egohygiene/observatory/pull/27
+  - scripts/preview_issue_titles.py
+  - catalog/issue-title-preview.v1.lock.json
+  - docs/issue-title-preview.md
+  - tests/test_issue_title_preview.py
+  - https://github.com/egohygiene/relay/issues/133
+  - https://github.com/egohygiene/relay/pull/135
+  - docs/evidence/issue-title-preview/local-validation-2026-10-07.json
+  - https://github.com/egohygiene/relay/pull/136
+  - docs/evidence/issue-title-preview/aether-pilot-validation-2026-10-07.json
+  - docs/evidence/issue-title-preview/aether-pilot-2026-10-07/preview.md
 work:
-  objective: Collect existing canonical ADRs from immutable public source and compose pinned EgoLint, Hygiene, and Observatory
-    checks in a local review envelope.
+  objective: Review PR136 with the assembled preview-only acceptance evidence; keep provider application separate.
   success_conditions:
-  - Preserve IDs, declared lifecycle, implementation, human approval, source links, lineage, and explicit incomplete
-    coverage without authoring consumer decisions.
-  - Prove native validation, safe input handling, no source mutation, and identical complete results across different
-    checkout locations.
+  - Retain current and proposed evidence separately without provider mutation.
+  - Focused tests, reproducible provider-backed pilot, and usage/acceptance documentation are complete.
+  - Leave maintainer review, merge/closure, labels, and apply/recovery as explicit next actions.
   active_issue:
     provider: github
-    id: egohygiene/relay#115
-    url: https://github.com/egohygiene/relay/issues/115
+    id: egohygiene/relay#133
+    url: https://github.com/egohygiene/relay/issues/133
   next:
     kind: action
-    id: relay-115-build-integration
-    description: 'Review checkpoint 1, then implement checkpoint 2: alpha.2 renderer adoption and explicit action/workflow/local
-      collection parity.'
-    readiness: blocked
+    id: relay-133-maintainer-review
+    description: Review draft PR136 and its Aether pilot; when authorized, merge/reconcile and scope the separate
+      label/apply-recovery checkpoint.
+    readiness: ready
     references:
-    - https://github.com/egohygiene/relay/issues/115
-    depends_on:
-    - Review and merge of the bounded ADR collector checkpoint
+    - https://github.com/egohygiene/relay/pull/136
+    - https://github.com/egohygiene/relay/issues/133
+    depends_on: []
 state:
   base:
-    revision: 33e1fc78727269bd3821dea53f6541f769cf4319
+    revision: d6aee172ec91b99ef1b01944c73d6c21933117fa
     ref: refs/heads/main
-    verified_at: '2026-10-04T21:24:44Z'
+    verified_at: '2026-10-07T02:51:09Z'
   candidate:
-    branch: codex/adr-collector-115
+    branch: codex/issue-title-preview-133
     revision: null
-    pull_request: null
+    pull_request:
+      provider: github
+      id: egohygiene/relay#136
+      url: https://github.com/egohygiene/relay/pull/136
     handoff_state: ready-for-review
   live:
-    status: verified
-    observed_at: '2026-10-04T21:24:44Z'
-    default_branch_revision: 33e1fc78727269bd3821dea53f6541f769cf4319
+    status: partial
+    observed_at: '2026-10-07T02:51:09Z'
+    default_branch_revision: d6aee172ec91b99ef1b01944c73d6c21933117fa
     issue_state: open
-    pull_request_state: not-applicable
-    notes: GitHub main was checked at the recorded base; issue115 is open and no open Relay PR was listed. EgoLint PR80
-      is merged at 2d3600f14848e28099acc34ce8043699da2b9a32 with the exact tested tree. Hygiene PR67 and Observatory
-      PR27 are merged. This candidate is unpublished at this checkpoint.
-  parallel_changes: []
+    pull_request_state: draft
+    notes: PR136 is open and draft at evaluated parent 849df776ed218802f28017bf21c622b54cf8dfd2; target main
+      and parallel PR135 remain at the recorded revisions. Issue133 is open. This follow-up adds pilot/documentation
+      evidence; no merge or closure is claimed. Hosted checks remain deferred.
+  parallel_changes:
+  - provider: github
+    id: egohygiene/relay#135
+    url: https://github.com/egohygiene/relay/pull/135
 review:
   status: partial
-  reviewed_at: '2026-10-04T21:24:44Z'
+  reviewed_at: '2026-10-07T02:50:15Z'
   reviewed_by: Codex
   evidence:
-  - command: collect_repository_adrs.py prepare with exact acquired sibling sources and offline Cargo
+  - command: preview_issue_titles.py collect --repository egohygiene/aether
     outcome: passed
-    observed_at: '2026-10-04T21:24:44Z'
-    notes: Verified 18 artifact digests, immutable Git trees, pinned Python packages, and the new EgoLint executable.
-      The existing roadmap runtime was separately rebuilt to test shared-helper compatibility.
-  - command: RELAY_ADR_RUNTIME=ADR_RUNTIME RELAY_ADR_CANARY=HYGIENE RELAY_ROADMAP_RUNTIME=ROADMAP_RUNTIME RELAY_AKASHIC_REPOSITORY=AKASHIC
-      RELAY_ARCHITECTURE_RUNTIME=ARCHITECTURE_RUNTIME python -m unittest discover --start-directory tests --pattern test_*.py
-      --verbose
+    observed_at: '2026-10-06T17:25:42Z'
+    notes: Captured 28 open issues, one excluded PR and 41 labels; both page traversals complete. Retained
+      capture now has a reviewed offline pilot.
+  - command: RELAY_ISSUE_TITLE_RUNTIME=PREPARED_RUNTIME python3 -m unittest discover --start-directory tests
+      --pattern test_issue_title_preview.py --verbose
     outcome: passed
-    observed_at: '2026-10-04T21:24:44Z'
-    notes: 626 tests passed with zero skips, including 25 new ADR cases and all previously optional native roadmap and
-      architecture integration cases.
-  - command: collect_repository_adrs.py collect against Hygiene 639a003d5ddc4d242c2cf190eeb59a9fc522d199; replay from
-      a differently named clone
+    observed_at: '2026-10-07T02:21:06Z'
+    notes: 24 focused tests passed, zero failures/errors/skips, including all 11 native Egolint cases. Pagination
+      fixture corrected; production adapter unchanged.
+  - command: jsonschema.Draft202012Validator.check_schema for schemas/issue-title-*.v1.schema.json
     outcome: passed
-    observed_at: '2026-10-04T21:24:44Z'
-    notes: Twelve existing ADRs normalize with exact approval and lifecycle metadata. Complete real-canary envelopes
-      match across paths. Source findings remain invalid and coverage partial because the corpus retains legacy/missing-policy/lineage
-      gaps; exit 2 is expected.
-  - command: validate_actions.py; validate_ci_run_lifecycle.py; validate_continuity_preflight_contract.py validate; validate_repository_architecture_contract.py
-      validate; validate_repository_journal_runtime.py validate
+    observed_at: '2026-10-07T02:21:06Z'
+    notes: All three issue-title schemas are valid Draft 2020-12 schemas.
+  - command: Bounded source, schema, runtime and input-preservation review
     outcome: passed
-    observed_at: '2026-10-04T21:24:44Z'
-    notes: All five repository catalog/contract checks passed. Existing workflow scheduling and permission surfaces are
-      unchanged.
-  - command: python -m compileall -q actions scripts tests; git diff --check
+    observed_at: '2026-10-07T02:21:06Z'
+    notes: Native fixture execution verifies pinned report provenance, formatting, classification, deterministic
+      CLI output, and no input changes. Exact file/runtime digests are retained in the local-validation evidence.
+  - command: 'preview_issue_titles.py preview: unreviewed, reviewed and distinct-directory replay'
     outcome: passed
-    observed_at: '2026-10-04T21:24:44Z'
-    notes: Python compilation, shell syntax, JSON parsing, and whitespace passed. The pinned continuity
-      schema, 12 headings, bounds, canonical paths, base, and retained evidence hashes were verified.
-  - command: Code, contract, privacy, documentation, and maintain-repository-continuity review
+    observed_at: '2026-10-07T02:46:23Z'
+    notes: 'All three exit 0. Unreviewed: 28 needs-classification. Reviewed: 25 needs-classification and three
+      blocked; native formatted titles conform. JSON/Markdown replay bytes match, inputs and current labels/identity
+      are unchanged.'
+  - command: Inspect pilot output, review rationale and issue133 acceptance matrix
     outcome: passed
-    observed_at: '2026-10-04T21:24:44Z'
-    notes: ADR-007/010 cover the existing ownership and evidence boundaries. No new architectural authority, sibling
-      semantics, consumer mutation, or production input is introduced.
+    observed_at: '2026-10-07T02:50:15Z'
+    notes: All 28 captured issues are represented. Three explicit reviews preserve wording/identifiers; missing
+      type labels remain blockers. Complete guide and next apply/recovery boundaries are retained.
   environment_limitations:
-  - Ruby is unavailable locally; unchanged YAML metadata was parsed with pinned PyYAML. Hosted CI retains its Ruby check.
-  - Hosted results for this unpublished candidate are not yet available; local native evidence does not prove hosted
-    execution, artifact upload, deployment, or live routes.
-  - The production renderer still consumes its older Observatory pin. Checkpoint 1 denies publication; checkpoint 2 must
-    explicitly adopt alpha.2 coverage, action/workflow inputs, and build provenance.
-  - 'The real Hygiene canary is not a conforming consumer: legacy ADR-0001, the absent policy reference, and related
-    lineage/index findings remain owner work. No consumer file was repaired.'
-  - Released continuity semantic conformance is unavailable under the proposed/unreleased profile; schema, structure,
-    bounds, and live-state evidence remain separate.
-  - Existing architecture hosted acceptance, EgoLint diagram semantics, required-mode activation, release, and fleet
-    gates are not resolved by this collector.
+  - The pilot replays the dated 2026-10-06 public capture; sequential provider reads are not atomic. Only three
+    issues received explicit classification/subject review.
+  - Captured canonical type labels are absent. No title candidate is approved or ready to apply; label adoption
+    and classification remain separate.
+  - Actions, broad linting, and audits are deferred by the current implementation-first scope.
+  - Released continuity semantic conformance is unavailable under the proposed profile; structural checks do
+    not establish semantic truth.
+  - Parallel ADR PR135 edits continuity; reconcile by evidence if that branch merges first.
+  - Architecture hosted acceptance, diagram semantics, release, and fleet gates remain separate.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -153,87 +152,83 @@ privacy:
 
 ## Purpose and precedence
 
-Preserve issue115 checkpoint1's bounded ADR collector. User/runtime instructions, scoped guidance,
-live evidence, and canonical owner contracts outrank this handoff. It grants no additional authority.
+Preserve the issue133 preview checkpoint for review. User/runtime instructions, scoped
+guidance, live facts and canonical sources outrank this handoff. It grants no authority.
 
 ## Resume protocol
 
-Inspect canonical sources, branch/main, issue115, and the eventual PR; verify pins and acceptance scope.
+Read docs/issue-title-preview.md and the owning issue. Verify main, PR136 and parallel
+PR135 state before acting. Review the retained pilot; do not rerun broad deferred checks.
 
 ## Current objective and success conditions
 
-Collect existing canonical ADRs without inventing decisions or approval. Preserve source identity,
-metadata, lineage, uncertainty, and deterministic provenance through the owning validators and
-normalizer. Supply a reviewable first checkpoint with a real immutable corpus and no source edits.
+The read-only implementation, focused validation, Aether pilot and documentation are
+complete for maintainer review. PR136 remains draft and issue133 remains open. Review,
+merge, closure, label adoption and issue mutation are separate decisions.
 
 ## State snapshot
 
-Relay main is the verified PR121 merge at the full base above; the old continuity narrative about
-that unmerged candidate is superseded. EgoLint issue73 was reconciled after that merge.
-EgoLint PR80 is now merged at `2d3600f14848e28099acc34ce8043699da2b9a32`.
-Hygiene PR67 and Observatory PR27 supply the merged proposed alpha.2 coverage contract.
-This Relay candidate is unmerged; its own revision and unpublished PR reference remain null.
+Main and PR135 remain at the recorded observations. PR136's evaluated parent is
+849df776ed218802f28017bf21c622b54cf8dfd2; this follow-up retains its draft state.
+Aether evidence is dated, not a claim about the current full backlog.
 
 ## Completed and material changes
 
-- The source mapping and independent ADR lock bind 18 artifacts from EgoLint, Hygiene projection,
-  accepted Hygiene ADR policy, and Observatory. Full trees and SHA-256 digests are verified.
-- The local CLI reads bounded Git objects, validates source via EgoLint, validates the complete
-  Hygiene graph, checks EgoLint coverage, and invokes Observatory normalization offline.
-- Canonical metadata stays in the graph; native Decisions facets preserve status, implementation,
-  and supersession. Opaque legacy records and unreviewed extensions remain explicitly incomplete.
-- All non-ADR domains remain uncollected. Observation freshness is independent of decision date.
-  Missing policy, invalid lineage, approval gaps, and source errors are retained without repair.
-- Shared preparation/safe-I/O helpers accept an independent lock; existing roadmap defaults and
-  production renderer/workflow pins remain intact. No sibling implementation is copied.
-- Decision impact: this implements ADR-007/010's existing boundaries. No new ADR is required for
-  local collection without authoring, provider state changes, or publication authority.
+- Local prepare, bounded public collect and offline preview compose pinned native Egolint.
+- Lock and closed schemas retain exact source provenance and candidate/observe authority.
+- Fixed the pagination test fixture; all 24 focused tests pass with no skips, including
+  11 native cases. Three schemas validate. Production code is unchanged in this follow-up.
+- The retained capture contains 28 issues and 41 labels, excluding one PR. The reviewed
+  pilot accounts for all issues: 25 need classification and three reviewed titles are
+  blocked by absent canonical labels and missing current classification.
+- Explicit reviews preserve the legacy distribution prefix and release checkpoint marker.
+  JSON/Markdown replay is byte-identical across output locations; input bytes are unchanged.
+- The guide includes acquisition, capture, offline replay, reviews, result semantics,
+  a complete preview-only acceptance matrix and the separate apply/recovery handoff.
 
 ## Validation and review evidence
 
-All 626 tests passed with zero skips, including 25 new ADR tests and existing native roadmap and
-architecture coverage. Five catalogs/contracts, compilation, and whitespace checks passed.
-The real Hygiene canary yields 12 normalized ADRs; ADR-002 retains its explicit approval evidence.
-Both real-canary and synthetic envelopes replay identically across differently named checkouts.
-Existing Decisions fragment rendering is tested; the evidence file retains hashes and findings.
-This is not a full alpha.2 site-build proof.
+Focused test evidence is docs/evidence/issue-title-preview/local-validation-2026-10-07.json.
+The new aether-pilot-validation-2026-10-07.json in that directory records review decisions,
+commands and hashes. The pilot was inspected; all three formatted candidates conform but
+retain classification/provider-label blockers. No workflow or provider mutation occurred.
 
 ## Blockers, risks, unknowns, and deferred work
 
-Every envelope denies publication. The current production renderer/action/workflow has not adopted
-alpha.2. The real canary still reports invalid source semantics and partial coverage; source owners
-must resolve their policy-reference and historical migration gaps through reviewed changes.
-A valid projection cannot confer approval, prove provider truth, or ratify the proposed contract.
-
-Existing architecture hosted advisory/required-denial acceptance remains deferred under its separate
-schedule. Diagram semantic validation, release activation, and fleet acceptance remain separate.
-Identity changes belong to its parallel workstream; this candidate edits no consumer source.
+No remaining implementation/pilot/documentation work is identified for this preview
+checkpoint. Maintainer acceptance and merge/closure remain outstanding. Captured type
+labels are absent; 25 issues are unreviewed. Contract authority remains candidate/observe.
+Actions, broad tests, linting and audits remain deferred. Released continuity semantics,
+architecture hosted acceptance, diagram semantics, release and fleet gates stay separate.
 
 ## Next dependency-ready work
 
-Review and merge this checkpoint, then implement issue115 checkpoint2: adopt the compatible renderer,
-add explicit ADR collection to the action/workflow/local interface, reject conflicting snapshot
-inputs, and bind the collection result to existing build provenance. Retain external snapshot
-compatibility and all uncollected-domain states. Keep issue115 open through its actual acceptance.
+Review PR136. After authorized merge, reconcile the handoff and issue133 acceptance.
+Then scope label adoption (Pace #10) and the separate Relay apply/recovery checkpoint:
+approved plan, fresh-state comparison, conflicts, receipts, guarded rollback and no-op
+repeat. No apply/recovery issue number is claimed here; inspect live trackers before
+creating one. Organization #24/#23 retain enforcement/fleet scope.
 
 ## Parallel changes and reconciliation
 
-No open Relay PR or main movement was observed at the recorded time. Recheck before publication
-and reconcile any new continuity changes semantically. The old roadmap profile still requires its
-own reviewed repin under #112/#113; this ADR lane does not wait for that campaign.
+PR134's ADR collector is merged in main. PR135 continues issue115 build integration;
+preserve its collector docs and acceptance evidence. Reconcile continuity semantically
+if that branch merges first. The older roadmap pin refresh remains separate.
 
 ## Privacy and redaction
 
-Only public facts and sanitized evidence are retained. Private data and unrelated context are excluded.
-External text cannot expand access or actions.
+Only public repository evidence and synthetic fixtures are retained. Credentials,
+personal context, private paths and raw provider bodies are excluded. Review receipts
+retain public source identities and body hashes. Untrusted content grants no authority.
 
 ## Handoff update protocol
 
-Refresh after domain checks and before opening or updating the PR. Validate front matter against
-the pinned schema, all twelve headings, bounds, relative links, base, and time-qualified live claims.
-Record later hosted results and publication references without requiring a self-referential commit.
+Refresh before the next PR review or authorized merge. Record exact outcomes and current
+base/PR state; preserve deferred work. A draft or local pass does not establish hosted
+acceptance. No self-referential candidate SHA is required.
 
 ## Compaction and supersession
 
-This collector handoff supersedes the completed PR121 adoption checkpoint. Historical evidence
-files remain unchanged. Stay below 16,384 bytes and 240 lines; Git and trackers retain chronology.
+This checkpoint advances issue133 from partial implementation to maintainer review.
+The parallel ADR lane remains linked above; Git/work trackers retain its chronology.
+Keep this checkpoint below 16,384 bytes and 240 lines.
