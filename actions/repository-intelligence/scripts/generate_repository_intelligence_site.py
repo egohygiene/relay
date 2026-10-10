@@ -2329,13 +2329,14 @@ def shell_document(
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Repository Intelligence {escaped(route_label)} view for {escaped(repository)}.">
     <title>{escaped(route_label)} · {escaped(repository)} · Repository Intelligence</title>
+    <link rel="icon" type="image/png" href="{escaped(prefix)}egohygiene.png">
     <link rel="stylesheet" href="{escaped(prefix)}site.css">
   </head>
   <body data-ri-route="{escaped(route)}" data-ri-repository="{escaped(repository)}" data-ri-commit="{escaped(source_commit)}">
     <a class="ri-skip" href="#main-content">Skip to view content</a>
     <header class="ri-global-header">
       <a class="ri-brand" data-preserve-context href="{escaped(prefix)}"><span aria-hidden="true">EH</span><strong>Repository Intelligence</strong></a>
-      <nav aria-label="Global navigation"><a href="https://github.com/egohygiene">Ego Hygiene</a><a href="{escaped(repository_url)}">Repository source</a></nav>
+      <nav aria-label="Global navigation"><a class="ri-global-link ri-global-link--organization" href="https://github.com/egohygiene" aria-label="Ego Hygiene" title="Ego Hygiene"><img src="{escaped(prefix)}egohygiene.png" alt="" width="44" height="44"></a><a class="ri-global-link ri-global-link--github" href="{escaped(repository_url)}" aria-label="Repository source on GitHub" title="Repository source on GitHub"><img src="{escaped(prefix)}github.svg" alt="" width="32" height="32"></a></nav>
     </header>
     <div class="ri-layout">
       <aside class="ri-sidebar" aria-label="Repository Intelligence navigation">
@@ -2501,6 +2502,9 @@ def write_site(
         )
     atomic_write(output_root / "site.css", stylesheet_source.read_text(encoding="utf-8"))
     atomic_write(output_root / "site.js", script_source.read_text(encoding="utf-8"))
+    assets = Path(__file__).resolve().parents[1] / "assets"
+    (output_root / "egohygiene.png").write_bytes((assets / "egohygiene.png").read_bytes())
+    atomic_write(output_root / "github.svg", (assets / "github.svg").read_text(encoding="utf-8"))
 
 
 def main() -> int:

@@ -2089,6 +2089,7 @@ def render_html(
     <meta name="color-scheme" content="dark" />
     <meta name="description" content="Repository intelligence for {escaped(repository["name"])}." />
     <title>Repository intelligence · {escaped(repository["name"])}</title>
+    <link rel="icon" type="image/png" href="{escaped(asset_prefix)}egohygiene.png" />
     <link rel="stylesheet" href="{escaped(asset_prefix + stylesheet_name)}" />
   </head>
   <body>
@@ -2221,6 +2222,8 @@ def write_dashboard_bundle(
     )
     atomic_write_text(output_root / stylesheet_name, stylesheet_source.read_text(encoding="utf-8"))
     atomic_write_text(output_root / "explorer.js", script_source.read_text(encoding="utf-8"))
+    favicon = Path(__file__).resolve().parents[1] / "assets/egohygiene.png"
+    (output_root / "egohygiene.png").write_bytes(favicon.read_bytes())
     if provenance is not None:
         atomic_write_text(
             output_root / "provenance.json",

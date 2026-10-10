@@ -21,7 +21,9 @@ ROUTED_BUNDLE_FILES = {
     "dashboard/index.html",
     "decisions/index.html",
     "dependencies/index.html",
+    "egohygiene.png",
     "explorer.js",
+    "github.svg",
     "health/index.html",
     "index.html",
     "journey/index.html",
@@ -38,6 +40,7 @@ ROUTED_BUNDLE_FILES = {
 }
 LEGACY_BUNDLE_FILES = {
     "build-manifest.json",
+    "egohygiene.png",
     "explorer.js",
     "index.html",
     "provenance.json",
@@ -1382,13 +1385,16 @@ def validate_canonical_assets(output_root: Path) -> None:
     assets_root = Path(__file__).resolve().parents[1] / "assets"
     expected = (
         {
+            "egohygiene.png": assets_root / "egohygiene.png",
             "explorer.js": assets_root / "explorer.js",
+            "github.svg": assets_root / "github.svg",
             "site.css": assets_root / "site.css",
             "site.js": assets_root / "site.js",
             "styles.css": assets_root / "dashboard.css",
         }
         if (output_root / "now/index.html").is_file()
         else {
+            "egohygiene.png": assets_root / "egohygiene.png",
             "explorer.js": assets_root / "explorer.js",
             "styles.css": assets_root / "dashboard.css",
         }
@@ -1449,6 +1455,9 @@ def validate_privacy(
         ROUTED_BUNDLE_FILES if (output_root / "now/index.html").is_file() else LEGACY_BUNDLE_FILES
     )
     for name in sorted(bundle_files):
+        if name == "egohygiene.png":
+            # This binary is byte-checked against the canonical asset before privacy validation.
+            continue
         text = (output_root / name).read_text(encoding="utf-8")
         decoded_text = decode_percent_layers(text)
         if decoded_text is None:
