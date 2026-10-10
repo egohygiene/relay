@@ -4,6 +4,7 @@
   "expected_route": "/intelligence/",
   "expected_files": [
     "build-manifest.json",
+    "egohygiene.png",
     "explorer.js",
     "index.html",
     "provenance.json",
