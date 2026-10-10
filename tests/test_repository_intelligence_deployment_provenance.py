@@ -224,6 +224,36 @@ class RepositoryIntelligenceDeploymentProvenanceTests(unittest.TestCase):
                 )
             )
 
+    def test_mixed_prefix_baseline_round_trip_preserves_inventory_order(self) -> None:
+        """Baseline string order must not change historical site-digest ordering."""
+
+        for relative in ("brand/social-preview.svg", "brand-kit/index.html"):
+            target = self.site / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(f"consumer {relative}\n", encoding="utf-8")
+        inventory = deployment.file_inventory(self.site)
+        digest_before = deployment.inventory_digest(inventory)
+        self.assertEqual(
+            [item["path"] for item in inventory if item["path"].startswith("brand")],
+            ["brand/social-preview.svg", "brand-kit/index.html"],
+        )
+
+        self.capture_baseline()
+        self.assertEqual(deployment.main(self.operation_arguments("verify-composition")), 0)
+        baseline = json.loads(self.baseline.read_text(encoding="utf-8"))
+        self.assertEqual(
+            [item["path"] for item in baseline["files"] if item["path"].startswith("brand")],
+            ["brand-kit/index.html", "brand/social-preview.svg"],
+        )
+        self.assertEqual(deployment.file_inventory(self.site), inventory)
+        self.assertEqual(
+            deployment.inventory_digest(deployment.file_inventory(self.site)), digest_before
+        )
+
+        (self.site / "brand/social-preview.svg").write_text("tampered\n", encoding="utf-8")
+        with self.assertRaisesRegex(SystemExit, "consumer-owned file was clobbered"):
+            deployment.main(self.operation_arguments("verify-composition"))
+
     def test_digest_mismatch_is_rejected(self) -> None:
         (self.intelligence / "site.css").write_text("changed\n", encoding="utf-8")
         with self.assertRaisesRegex(SystemExit, "bundle digest mismatch"):

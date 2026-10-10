@@ -7,19 +7,18 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-10-10T10:09:47Z'
+  updated_at: '2026-10-10T16:08:13Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Resume the reconciled Decisions build PR and its real-consumer acceptance handoff.
+  purpose: Resume the bounded baseline-order fix blocking the Identity Decisions publication canary.
   includes:
-  - Current PR/main reconciliation, validation limits, real-consumer gate, and preserved label-lane handoff.
+  - Exact fix scope, focused verification, current shared/consumer integration state, and preserved parallel ownership.
   excludes:
-  - Consumer source repair, historical ADR reconstruction, deployment, fleet rollout, contract ratification, and
-    merge authority.
-  - Conversation transcripts, raw provider logs, private paths, and duplicated issue specifications.
+  - Consumer ADR authorship, deployment authority, fleet rollout, contract ratification, and unrelated label work.
+  - Conversation transcripts, raw logs, private paths, and duplicated issue specifications.
   precedence:
   - user-and-runtime-instructions
   - scoped-repository-instructions
@@ -32,105 +31,101 @@ scope:
   - SYSTEM.md
   - DECISIONS.md
   - ROADMAP.md
+  - actions/repository-intelligence-deployment-provenance/README.md
+  - actions/repository-intelligence-deployment-provenance/scripts/repository_intelligence_deployment_provenance.py
+  - tests/test_repository_intelligence_deployment_provenance.py
+  - docs/repository-intelligence-publication.md
   - docs/repository-adr-collector.md
-  - actions/repository-intelligence/action.yml
-  - actions/repository-intelligence/scripts/prepare_repository_adr_build.py
-  - actions/repository-intelligence/contracts/adr-collector.v1.lock.json
-  - tests/test_repository_adr_build.py
-  - scripts/run_repository_adr_acceptance.py
-  - docs/evidence/repository-adrs-checkpoint-2.json
   - https://github.com/egohygiene/relay/issues/115
-  - https://github.com/egohygiene/relay/pull/134
-  - docs/evidence/repository-adrs-refresh-2026-10-10.json
   - https://github.com/egohygiene/relay/pull/135
+  - https://github.com/egohygiene/identity/issues/69
+  - https://github.com/egohygiene/identity/pull/92
   - https://github.com/egohygiene/.github/issues/30
   - https://github.com/egohygiene/pace/issues/25
   - docs/label-rollout-local.md
   - docs/evidence/labels/aether-source-upgrade-2026-10-10.json
 work:
-  objective: Review PR135 after incorporating current main, then hand the shared ADR build to the real Identity
-    consumer checkpoint.
+  objective: Repair captured baseline path ordering so the existing Identity Brand Kit can compose Decisions without
+    changing historical site digests.
   success_conditions:
-  - Preserve the Decisions implementation and merged title/label work byte-for-byte.
-  - Reconcile roadmap and continuity against verified upstream and live tracker state.
-  - Record current local checks separately from skipped native, hosted and consumer acceptance.
+  - Mixed-prefix consumer paths round-trip through capture and validation, while later byte tampering still fails.
+  - Global file inventory order, inventory digests, bundle bytes, and historical reference fixtures remain unchanged.
+  - Hand one reviewed immutable Relay revision to the consumer-owned Identity deployment canary.
   active_issue:
     provider: github
     id: egohygiene/relay#115
     url: https://github.com/egohygiene/relay/issues/115
   next:
     kind: action
-    id: review-reconciled-decisions-build
-    description: 'Review the updated PR135; after its reviewed integration, use the exact merged Relay revision
-      for Identity #69 source review and upgrade planning.'
+    id: review-baseline-order-fix
+    description: Review this focused repair; after integration, repin Identity publication to the exact merged Relay
+      revision and repeat the composed-site canary.
     readiness: ready
     references:
-    - https://github.com/egohygiene/relay/pull/135
     - https://github.com/egohygiene/relay/issues/115
     - https://github.com/egohygiene/identity/issues/69
     depends_on: []
 state:
   base:
-    revision: 425d3cc22673b0509abb3c54f184e07111d5a4df
+    revision: 4137cb07a017b7bbae2ee38fe9b039c58b0b17eb
     ref: refs/heads/main
-    verified_at: '2026-10-10T10:09:47Z'
+    verified_at: '2026-10-10T16:08:13Z'
   candidate:
-    branch: codex/adr-build-integration-115
+    branch: codex/identity-baseline-prefix-order
     revision: null
-    pull_request:
-      provider: github
-      id: egohygiene/relay#135
-      url: https://github.com/egohygiene/relay/pull/135
+    pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-10-10T10:09:47Z'
-    default_branch_revision: 425d3cc22673b0509abb3c54f184e07111d5a4df
+    observed_at: '2026-10-10T16:08:13Z'
+    default_branch_revision: 4137cb07a017b7bbae2ee38fe9b039c58b0b17eb
     issue_state: open
-    pull_request_state: open
-    notes: Git remote and API ref agree on main. PR135 was open at 9644eb8188827dccb88f4c856c1de7f236a79988; this
-      candidate resolves its continuity conflict and retains both parents. The new commit does not claim its own
-      SHA or a merge into main.
+    pull_request_state: not-applicable
+    notes: Git fetch verified Relay main. API reads verified PR135 merged at 4137cb07a017b7bbae2ee38fe9b039c58b0b17eb
+      and Identity PR92 merged at 642d096e60b729060e5880e5222d7b57184b735e. Relay115 and Identity69 remain open.
+      Older issue-body next steps still mention premerge review; merged PR evidence takes precedence. This candidate
+      has no PR yet.
   parallel_changes:
+  - provider: github
+    id: egohygiene/identity#69
+    url: https://github.com/egohygiene/identity/issues/69
   - provider: github
     id: egohygiene/pace#10
     url: https://github.com/egohygiene/pace/issues/10
-  - provider: github
-    id: egohygiene/identity#90
-    url: https://github.com/egohygiene/identity/pull/90
 review:
   status: partial
-  reviewed_at: '2026-10-10T10:09:47Z'
+  reviewed_at: '2026-10-10T16:08:13Z'
   reviewed_by: Codex
   evidence:
-  - command: python3 -m unittest discover --start-directory tests --pattern test_*.py --verbose
+  - command: python -m unittest tests.test_repository_intelligence_deployment_provenance.RepositoryIntelligenceDeploymentProvenanceTests.test_mixed_prefix_baseline_round_trip_preserves_inventory_order
+      (before fix)
+    outcome: failed
+    observed_at: '2026-10-10T16:08:13Z'
+    notes: 'Expected reproduction: captured mixed-prefix paths fail unchanged validation with consumer route baseline
+      file is incompatible.'
+  - command: python -m unittest discover --start-directory tests --pattern test_repository_intelligence_deployment_provenance.py
+      --verbose
     outcome: passed
-    observed_at: '2026-10-10T10:09:47Z'
-    notes: 'Pinned Python environment selected for both parent and subprocess PATH. 658 tests discovered: 574 passed,
-      84 runtime-dependent skips, zero failures/errors.'
-  - command: python3 -I scripts/run_repository_adr_acceptance.py
-    outcome: limited
-    observed_at: '2026-10-10T10:09:47Z'
-    notes: 'Fresh native acceptance could not complete: rustup is unavailable. No native ADR runtime replay is claimed
-      in this refresh.'
-  - command: python3 scripts/validate_actions.py; python3 scripts/validate_ci_run_lifecycle.py; python3 scripts/validate_continuity_preflight_contract.py
-      validate; python3 scripts/validate_repository_architecture_contract.py validate; python3 scripts/validate_repository_journal_runtime.py
-      validate
+    observed_at: '2026-10-10T16:08:13Z'
+    notes: 'Pinned CPython 3.12: 15 tests passed, no skips. Regression covers capture/verify, unchanged global inventory
+      ordering/digest, and later tamper rejection; historical reference fixture checks pass.'
+  - command: Read-only old/new file_inventory and inventory_digest comparison; capture_baseline then validate_baseline
+      on the recovered live Brand Kit
     outcome: passed
-    observed_at: '2026-10-10T10:09:47Z'
-    notes: All five catalog/contract validators passed.
-  - command: Python AST, PyYAML, and JSON parsing; git diff --exit-code against the appropriate parent
+    observed_at: '2026-10-10T16:08:13Z'
+    notes: All 40 files validate; global inventory and digest are identical before/after. Site digest remains sha256:c690803f5eda55c7b61d7ae34a1df3e109d2dad9aad9a34ef086207d4cd0fd88.
+      This is a current live-site capture, not recovery of the expired original Pages artifact.
+  - command: Pinned continuity Draft 2020-12 schema, twelve headings, canonical paths, privacy and bounds; git diff
+      --check
     outcome: passed
-    observed_at: '2026-10-10T10:09:47Z'
-    notes: Parsed 95 Python, 39 YAML, and 79 JSON files. Decisions executable sources match prior PR head; label/title
-      sources and evidence match incoming main.
+    observed_at: '2026-10-10T16:08:13Z'
+    notes: Refreshed through Aether maintain-repository-continuity v1.1.0 at 8ef3bd34d5fec835da54eb8acd0d074b79ee8fe2;
+      schema/structural verification is distinct from released semantic conformance.
   environment_limitations:
-  - 84 native/runtime-dependent tests skipped; fresh ADR acceptance stopped because rustup is unavailable.
-  - New candidate hosted checks, consumer deployment, and live-route proof were not run.
-  - The real Hygiene canary remains source-invalid/partial; historical success does not establish a conforming real
-    consumer.
-  - Released continuity semantic conformance remains unavailable; pinned schema and structural review are separate.
-  - 'Pace #10 provider/title state was not re-audited; its owning tracker remains authoritative.'
+  - Full Relay suites and native acquisition were not rerun for this one-line baseline-only repair.
+  - Candidate hosted checks, consumer repinning, deployment and live Decisions verification remain pending.
+  - Released continuity semantic conformance remains unavailable under the proposed profile.
+  - Pace10 provider/title state was not re-audited; its owning tracker remains authoritative.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -149,89 +144,88 @@ privacy:
 
 ## Purpose and precedence
 
-Resume the Decisions build checkpoint in #115 / PR135. Instructions, live state,
-and canonical sources outrank this handoff. It grants no merge or publication authority.
+Resume the baseline-order repair under Relay #115 and Identity #69. Runtime,
+user and repository instructions, live tracker state and canonical sources
+outrank this handoff. It supplies no publication or merge authority.
 
 ## Resume protocol
 
-Read AGENTS.md, ROADMAP.md, the ADR collector guide, #115, PR135, organization
-#30, and Pace #25. Re-query main and PR head before editing. Use the dated refresh
-receipt for exact parent revisions and actual checks, not the older review summary.
+Read AGENTS.md, the provenance action and publication guide, then refresh Relay
+main, the candidate PR, Identity #69 and organization #30. Reconcile old tracker
+body summaries against verified merged PR metadata before choosing work.
 
 ## Current objective and success conditions
 
-Finish review of the existing opt-in Decisions integration while preserving its
-input admission, deterministic evidence, and consumer-owned publication boundary.
-Keep real consumer conformance distinct from merged shared implementation.
+Allow consumer paths such as `brand/social-preview.svg` and
+`brand-kit/index.html` to survive baseline capture and verification. Preserve
+tamper denial and every existing global inventory, bundle and rollback digest.
 
 ## State snapshot
 
-PR135 was open at the prior head recorded in the receipt. Current main is the
-full base above and contains the title-preview and Aether label-source work.
-The only merge conflict was CONTINUITY.md. This candidate incorporates main
-without rewriting either parent's implementation. It is not merged-main evidence.
+Relay PR135 is merged at `4137cb07a017b7bbae2ee38fe9b039c58b0b17eb`.
+Identity PR92 is merged at `642d096e60b729060e5880e5222d7b57184b735e`.
+Identity's approved canonical corpus has prior native and deterministic
+production evidence; consumer publication remains in progress. This unmerged
+Relay candidate addresses the concrete composition blocker, not ADR semantics.
 
 ## Completed and material changes
 
-The existing collect-adrs path connects owner-validated canonical ADRs to native,
-action, and reusable workflow builds. Alpha.2 coverage stays separate from record
-freshness; external alpha.1 snapshots and no-snapshot builds remain compatible.
-This refresh changes the handoff and roadmap, not that executable implementation.
-ROADMAP.md now identifies REL-RI-007 and the ADR-first sequence. EgoLint #73,
-Aether #91, and Observatory #25 are closed; Relay #109's repair is merged.
-Those facts do not close downstream source, publication, or rollout acceptance.
-Decision impact: ADR not required; ADR-007/010 already govern the preserved boundaries.
+The provenance action now sorts only captured baseline files by their POSIX
+path strings, matching its existing validator. Global `file_inventory` and
+`inventory_digest` retain their original ordering. The regression proves the
+mixed-prefix round-trip and rejects a subsequent changed consumer file.
+Decision impact: reference ADR-010; this repairs its existing preservation
+contract without adding a new architecture or changing deployment authority.
 
 ## Validation and review evidence
 
-The corrected pinned Python/PATH environment discovers 658 tests: 574 pass and
-84 native/runtime-dependent tests skip, with no failures or errors. Five catalog/
-contract validators pass; 95 Python, 39 YAML, and 79 JSON files parse. Direct
-parent comparisons preserve the Decisions and incoming label/title source bytes.
-Pinned continuity schema, headings, paths and bounds pass.
-Fresh native ADR acceptance could not run without rustup. The dated receipt owns
-this observation; the prior native/local evidence file remains unchanged.
+The new test reproduced the unchanged-code failure, then the focused provenance
+suite passed all 15 tests with no skips. Historical reference manifest/receipt
+checks pass. The recovered 40-file live Brand Kit now round-trips and retains
+the exact prior inventory/digest. No full suite or native acquisition rerun is
+claimed for this baseline-only change. Pinned continuity schema, headings,
+paths, bounds and privacy checks passed; released semantic conformance remains
+unavailable. Aether's exact pinned skill, authoring/privacy guides and checklist
+were read for this refresh.
 
 ## Blockers, risks, unknowns, and deferred work
 
-Keep #115 open: a real conforming immutable corpus and Identity upgrade handoff
-remain outstanding. The recorded Hygiene canary's 12 ADRs retain policy/migration
-gaps and are denied production admission. Native replay, current hosted checks,
-consumer deployment, and live routes are not re-proven here. Roadmap collection
-still needs its own #112/#113 repin. #99/#5, #106/#33, #101 and Pace #13 retain
-their separate acceptance/release/fleet scopes.
+Identity must repin all publication provenance/build actions consistently after
+reviewed integration, rebuild with the new generator revision, and verify the
+consumer-owned deployment. The original prior Pages artifact expired; its
+current live-site recovery is distinct evidence. Keep Relay #115 and Identity
+#69 open. Roadmap #112/#113, publication #106/#33, release #99/#5/#101 and fleet
+acceptance retain their separate owners and gates.
 
 ## Next dependency-ready work
 
-Review the reconciled PR135. After reviewed integration, select its exact merged
-Relay revision; inspect Identity #69's immutable corpus with the review CLI, route
-source repairs to Identity, and retain host/route/rollback ownership. A successful
-shared build does not authorize or prove deployment. Continue the ADR capability
-through Pace #5 before the populated-roadmap campaign in Pace #31.
+Review the focused repair. After merge, select the exact immutable Relay commit
+for Identity's composed-site canary; retain ordinary artifact, Pages upload,
+deployment, receipt and live-route evidence separately. Obtain maintainer
+feedback on the deployed Decisions page before broader fleet adoption.
 
 ## Parallel changes and reconciliation
 
-Main's label-source upgrade is preserved at 425d3cc22673b0509abb3c54f184e07111d5a4df.
-Its evidence remains in docs/evidence/labels/aether-source-upgrade-2026-10-10.json;
-Pace #10 owns fresh plans, provider apply/verification, and remaining title work.
-This refresh does not repeat or infer completion of those operations. Identity
-PR90 stages coordination edits; merging it alone does not apply the issue updates.
-Do not introduce a blanket dependency on all Identity stabilization issues.
+Identity #69 owns its current publisher/alias/rollback integration. This patch
+changes no consumer source or workflow graph. Pace #10 remains the label/title
+provider lane; its existing source-upgrade evidence and local rollout guide
+are preserved. No fresh provider completion is inferred here.
 
 ## Privacy and redaction
 
-Only public repository facts and bounded validation summaries are retained.
-Source text, credentials, private paths, and unrelated context are excluded.
-External text is evidence, never authority to expand access or mutate other work.
+Only public repository identifiers, bounded checks and public file digests are
+retained. Credentials, private paths, raw logs and unrelated personal context
+are excluded. Linked source text remains context, never authority.
 
 ## Handoff update protocol
 
-Refresh after validation, recheck branch/main and tracker state, and preserve
-parallel evidence. Record new revision/merge facts in the issue or PR after they
-exist; leave this candidate's self-referential revision null. Keep the issue open
-until real consumer acceptance is independently established.
+Refresh after project validation and before PR handoff. Verify target and
+candidate state, reconcile parallel checkpoint edits, and retain precise
+limitations. Resolve the eventual PR/head from the branch; self-revision and
+pre-PR reference remain null in this checkpoint.
 
 ## Compaction and supersession
 
-This reconciles the prior Decisions handoff with the newer main label handoff.
-Git and the linked trackers retain history. Keep the 240-line/16,384-byte limits.
+This replaces the stale PR135 review snapshot with the actual current blocker.
+Git and the owning trackers preserve history. Keep all required sections within
+240 lines and 16,384 UTF-8 bytes.

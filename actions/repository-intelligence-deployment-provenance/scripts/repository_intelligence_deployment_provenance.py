@@ -467,6 +467,7 @@ def capture_baseline(
         for item in file_inventory(site)
         if not item["path"].startswith(managed_path_prefix)
     ]
+    files.sort(key=lambda item: item["path"])
     return {
         "schema": BASELINE_SCHEMA,
         "schema_version": 1,
