@@ -211,7 +211,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: "egohygiene/.github"
-          ref: "b415c8029bf2fb5d474f367e7129791588ba3860"
+          ref: "8b16273eaf0709a7ce95f5e352a2b0d38cfac131"
           path: ".relay/label-contract"
           persist-credentials: false
 
