@@ -91,9 +91,11 @@ evidence without claiming corpus conformance or publication. Identity's sources
 and its parallel implementation work remain untouched.
 
 Checkpoint 2 below supplies action/workflow/local parity, mutually exclusive external
-snapshot inputs, reviewed renderer repinning, and build provenance. A real conforming
-consumer corpus and the immutable Identity #69 upgrade remain acceptance work. Deployment and live-route acceptance remain separate.
-Refs #115; this bounded checkpoint does not complete all issue acceptance.
+snapshot inputs, reviewed renderer repinning, and build provenance. The real
+conforming Identity corpus and immutable consumer upgrade are now evidenced in
+the [October 10 handoff](#identity-consumer-handoff--2026-10-10). Consumer
+deployment and live-route acceptance remain separate from Relay #115's
+collector/build scope.
 
 ## Native commands and reproducible checks
 
@@ -299,15 +301,65 @@ build tests. The normal validation workflow runs this read-only acceptance path.
 The complete suite with the documented ADR, roadmap, and architecture runtimes
 also retains the old external-snapshot and no-snapshot regression cases.
 
-Identity #69 should first review its standard-path corpus with the review CLI,
-resolve source-policy and migration findings in Identity, then pin this reviewed
-Relay integration and opt in. Refresh by selecting a new consumer commit and an
-explicit observation instant locally, or rerunning the pinned workflow against
+For each consumer, review its standard-path corpus with the review CLI,
+resolve source-policy and migration findings in that repository, then pin the
+reviewed Relay integration and opt in. Refresh by selecting a new consumer
+commit and an explicit observation instant locally, or rerunning the pinned workflow against
 the intended commit (its default observation is the represented commit time).
 Validate the ordinary artifact before composing it into the existing site;
 preserve unrelated routes and the historical rollback point. Record artifact
 upload, Pages upload, deployment, receipt, and live-route checks separately.
 The Hygiene canary's 12 canonical records still have legacy/missing-policy source
 gaps and therefore cannot pass the production build. No consumer source or
-historical ADR is repaired by this integration, and #115 remains open for the
-real conforming-consumer acceptance and immutable upgrade handoff.
+historical ADR is repaired by this integration.
+
+### Identity consumer handoff — 2026-10-10
+
+[Identity PR #93](https://github.com/egohygiene/identity/pull/93) merged as
+`e6bafa362de900fdcffac60c33b8bed2c3905115`, completing the first immutable
+consumer upgrade. Its [publisher](https://github.com/egohygiene/identity/blob/e6bafa362de900fdcffac60c33b8bed2c3905115/.github/workflows/publish-brand-kit.yml)
+pins the builder and deployment-provenance actions to Relay
+`cabbf5b3b658d585b4d56ef0c99917969a96eed2`. The consumer-owned
+[publication guide](https://github.com/egohygiene/identity/blob/e6bafa362de900fdcffac60c33b8bed2c3905115/docs/publication/IDENTITY_PAGES.md#decisions-composition-checkpoint--2026-10-10)
+defines source bindings, `/decisions/` alias, fresh full-ancestor replay,
+composition, retained recovery bytes and their expiry. Identity retains its
+existing single Pages publisher and stable-release Brand Kit authority.
+
+The [prior immutable receipt](https://github.com/egohygiene/identity/blob/e23fad23227b933f524e6677ea1e195cf1ba1788/docs/evidence/identity-adrs-ratified-2026-10-10.json)
+binds canonical source `12227dad43c90b02e14971030f22242f3a205c9d`: 21 accepted
+records, two byte-identical native replays and two identical 19-file production
+bundles across clean full-history checkouts. Those results remain bound to that
+source and its earlier Relay pin.
+
+PR #93 separately records one successful local integration at source
+`a57e8e4b2f8d314fc29c8d456fcd02e65a2bf849`, observed
+`2026-10-10T16:14:55Z`, using Relay `cabbf5b3b658d585b4d56ef0c99917969a96eed2`.
+It freshly admits 22 records (21 accepted and proposed ADR-022), retains
+12 implemented / 8 in-progress / 2 not-started states, and renders 22 immutable
+source links without broken local links. Its 60-file composition preserves all
+40 Brand Kit files alongside 19 Intelligence files and one consumer alias.
+The final PR head `3a77088c88cf71456eea5553252d775d14013b7f` changes only test
+temporary-path normalization; production, workflow and ADR source bytes match
+the integration-tested candidate. This is not a second replay of the 22-record
+source or a claim that local digests equal a later hosted build.
+
+[Relay PR #138](https://github.com/egohygiene/relay/pull/138) repaired captured
+baseline ordering without changing the global inventory/digest contract. At
+its head `8e98b3cd5a2a9e48d70f559a6865ff5e71f12827`, all 13 jobs in
+[Relay validation](https://github.com/egohygiene/relay/actions/runs/38066523471)
+and the separate [continuity check](https://github.com/egohygiene/relay/actions/runs/38066523310)
+succeeded before the selected merge.
+
+The real-consumer source, build and immutable refresh handoff required by #115
+are complete. At `2026-10-10T16:25:38Z`, provider job metadata for consumer
+[publication run 38067442472](https://github.com/egohygiene/identity/actions/runs/38067442472)
+reported successful build and deployment jobs. That observation does not
+independently verify retained archive bytes, live content or browser behavior.
+Detailed upload/deployment receipts, live verification and maintainer feedback
+remain separately recorded under Identity #69. This checkpoint does not
+complete Relay's parent publication/release issues or the Pace fleet campaign.
+
+Subsequent browser inspection identified a shared card-filter visibility defect
+tracked in [Relay #139](https://github.com/egohygiene/relay/issues/139). That
+separate renderer/consumer follow-up keeps Identity #69 open; it does not undo
+the verified collector/build handoff or imply a fully reviewed user interface.
