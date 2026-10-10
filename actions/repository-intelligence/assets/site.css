@@ -26,6 +26,9 @@
 
 * { box-sizing: border-box; }
 
+/* Layout utilities must not override filtered records or other hidden UI. */
+[hidden] { display: none !important; }
+
 html {
   min-width: 20rem;
   background: var(--ri-canvas);
