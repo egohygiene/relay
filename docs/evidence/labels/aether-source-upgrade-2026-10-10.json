@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-10T02:55:50.255557+00:00",
+  "base_revision": "e273030836b68bcb9912aae73e56ffbb31f33d48",
+  "source_revision": "8b16273eaf0709a7ce95f5e352a2b0d38cfac131",
+  "source_digests": {
+    "catalog": "8c8c118005b828b4c521d11a9c94309dd4d7affb06a3feddc51d4ef195376399",
+    "assignments": "4782d6cf35fceeb66557d0c285d5292e98085ab62c1d497d849e7b07157ba41b"
+  },
+  "checks": [
+    {
+      "command": "python3 -m unittest discover --start-directory tests --pattern \"test_repository_labels.py\" --verbose",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "check": "Native contract validation and synthetic Aether projection",
+      "labels": 18,
+      "removal_policy": "retain",
+      "first_plan_creates": 18,
+      "repeat_byte_equivalent": true,
+      "simulated_post_apply_plan_operations": 0,
+      "provider_applied": false
+    },
+    {
+      "check": "Four workflow comparisons against base Git objects",
+      "outcome": "only the organization checkout revision changed"
+    }
+  ],
+  "limits": [
+    "Synthetic planner evidence does not prove provider application",
+    "No Actions dispatched; hosted validation, broad tests, linting and audits deferred",
+    "No label-create connector and no gh/GH_TOKEN in workspace; provider apply remains pending",
+    "Issue-title runtime pins and historical evidence unchanged"
+  ]
+}
