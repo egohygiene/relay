@@ -289,7 +289,7 @@ def render_page(
         observed_at=observed_at,
         freshness=freshness,
         summary=summary,
-        body=work_body(snapshot),
+        body=site.collection_notice(snapshot, "work") + work_body(snapshot),
         prefix="../",
         snapshot_available=snapshot is not None,
     )

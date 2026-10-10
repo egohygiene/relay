@@ -23,7 +23,8 @@ concurrency:
 jobs:
   validate:
     name: Validate catalog, contracts, implementations, and metadata
-    runs-on: ubuntu-latest
+    # ADR wheel hashes target CPython 3.12 / Linux x86_64.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
 
     steps:
@@ -60,6 +61,9 @@ jobs:
           --start-directory tests
           --pattern "test_*.py"
           --verbose
+
+      - name: Exercise locked acquisition and native canonical ADR builds
+        run: python3 -I scripts/run_repository_adr_acceptance.py
 
       - name: Compile Python sources
         run: python3 -m compileall -q actions scripts tests

@@ -304,6 +304,11 @@ def paths_overlap(first: str, second: str) -> bool:
 def validate_configuration(arguments: argparse.Namespace) -> int:
     """Validate untrusted workflow inputs before checkout or generation."""
 
+    collect_adrs = getattr(arguments, "collect_adrs", "false")
+    if collect_adrs not in {"true", "false"}:
+        raise ContractError("RIW-INPUT-ADR-MODE")
+    if collect_adrs == "true" and (arguments.observatory_snapshot or arguments.observatory_comparison):
+        raise ContractError("RIW-INPUT-ADR-CONFLICT")
     paths = {
         "output": arguments.output_directory,
         "work": arguments.work_directory,
@@ -329,7 +334,7 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
         f"{paths['reports']}/"
     ):
         raise ContractError("RIW-INPUT-WORK-REPORTS-OVERLAP")
-    for child in ("activity", "analytics", "tree", "visualization"):
+    for child in ("activity", "analytics", "tree", "visualization", "adr"):
         if paths_overlap(paths["reports"], f"{paths['work']}/{child}"):
             raise ContractError("RIW-INPUT-WORK-REPORTS-OVERLAP")
 
@@ -615,6 +620,7 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--output-directory", default="dist/intelligence")
     value.add_argument("--work-directory", default=".cache/repository-intelligence")
     value.add_argument("--reports-directory", default=".reports")
+    value.add_argument("--collect-adrs", default="false")
     value.add_argument("--observatory-snapshot", default="")
     value.add_argument("--observatory-comparison", default="")
     value.add_argument("--default-branch", default="")

@@ -9,6 +9,7 @@ import argparse
 from datetime import UTC, datetime
 import hashlib
 import html
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -16,6 +17,11 @@ import re
 import tempfile
 from typing import Any
 from urllib.parse import urlsplit
+
+_coverage_spec = importlib.util.spec_from_file_location(
+    "relay_intelligence_coverage", Path(__file__).with_name("repository_intelligence_coverage.py"))
+coverage_contract = importlib.util.module_from_spec(_coverage_spec)
+_coverage_spec.loader.exec_module(coverage_contract)
 
 SNAPSHOT_SCHEMA = "egohygiene.observatory.repository-intelligence-read-model/v1"
 ROUTES = (
@@ -671,7 +677,12 @@ def validate_snapshot(
         raise SiteInputError("snapshot observed_at must be an RFC 3339 timestamp") from error
     if parsed_observed_at.tzinfo is None:
         raise SiteInputError("snapshot observed_at must be an RFC 3339 timestamp")
-    coverage_status = normalize_state(require_object(snapshot.get("coverage")).get("status"))
+    try:
+        coverage_contract.validate(snapshot)
+    except (ValueError, TypeError, KeyError) as error:
+        raise SiteInputError("snapshot collection coverage is incompatible") from error
+    coverage_status = normalize_state(require_object(snapshot.get("coverage")).get(
+        "record_status" if snapshot.get("contract_version") == "1.0.0-alpha.2" else "status"))
     if coverage_status not in {
         "current",
         "error",
@@ -1378,6 +1389,15 @@ def decision_index(
     decisions = [
         require_object(value) for value in require_list(decisions_view.get("decisions"))
     ]
+    if snapshot.get("contract_version") == "1.0.0-alpha.2":
+        attributes = {item.get("id"): require_object(item.get("attributes"))
+                      for item in require_list(require_object(snapshot.get("graph")).get("entities"))
+                      if isinstance(item, dict) and item.get("kind") == "architecture_decision"
+                      and item.get("visibility") == "public"}
+        facets = ("date", "owners", "affected_contracts", "affected_repositories", "approval")
+        decisions = [{**decision, **{key: value for key, value in attributes.get(entity(decision).get("id"), {}).items()
+                                    if key in facets and key not in decision}}
+                     for decision in decisions]
     decisions.sort(
         key=lambda value: (
             str(value.get("date") or "9999-12-31"),
@@ -1513,6 +1533,16 @@ def render_decision_evidence_record(
     </li>'''
 
 
+def render_decision_approval(decision: dict[str, Any]) -> str:
+    approval = require_object(decision.get("approval"))
+    if not approval:
+        return '<p>Human approval: not projected.</p>'
+    # Render declared owner fields as text; this is never inferred from lifecycle.
+    fields = "".join(f'<dt>{escaped(state_label(key))}</dt><dd>{escaped(value)}</dd>'
+                     for key, value in sorted(approval.items()) if isinstance(value, str))
+    return '<details><summary>Declared human approval</summary><dl>' + fields + '</dl></details>'
+
+
 def render_decision_narrative(decision: dict[str, Any]) -> str:
     """Render optional summaries, otherwise keep the canonical ADR boundary obvious."""
 
@@ -1625,6 +1655,7 @@ def render_decision_card(
         <header><div><a class="ri-decision__permalink" data-decision-link href="#{escaped(anchor)}">Decision {index + 1} of {total} · {escaped(decision_entity.get("key"))}</a><h3>{escaped(decision_entity.get("title"))}</h3><p>{escaped(origin)}</p></div>{status_pill(status)}</header>
         <div class="ri-decision-states"><div><span>Decision lifecycle</span>{status_pill(status)}</div><div><span>Implementation</span>{status_pill(metadata["implementation"])}</div></div>
         <dl class="ri-decision-metadata"><div><dt>Date</dt><dd>{escaped(date_label)}</dd></div><div><dt>Owner</dt><dd>{escaped(owner_label)}</dd></div><div><dt>Scope</dt><dd>{escaped(state_label(metadata["scope"]))}</dd></div><div><dt>Domain</dt><dd>{escaped(domain_label)}</dd></div><div><dt>Affected component</dt><dd>{escaped(component_label)}</dd></div><div><dt>Affected roadmap</dt><dd>{escaped(roadmap_label)}</dd></div></dl>
+        {render_decision_approval(decision)}
         {render_decision_narrative(decision)}
         <div class="ri-relationship-grid">
           {render_decision_relationship_row("Supersedes", require_list(decision.get("supersedes")), decision_anchors, roadmap_anchors)}
@@ -1659,7 +1690,7 @@ def render_decision_compare(decisions: list[dict[str, Any]]) -> str:
     </section>'''
 
 
-def decisions_body(snapshot: dict[str, Any] | None) -> str:
+def decisions_body(snapshot: dict[str, Any] | None, canonical_index: str = "DECISIONS.md") -> str:
     """Render ADR history as a static-first, authority-aware decision ledger."""
 
     if snapshot is None:
@@ -1670,7 +1701,7 @@ def decisions_body(snapshot: dict[str, Any] | None) -> str:
     repository = str(require_object(snapshot.get("repository")).get("key"))
     source_commit = str(snapshot.get("represented_commit"))
     decision_index_url = (
-        f"https://github.com/{repository}/blob/{source_commit}/DECISIONS.md"
+        f"https://github.com/{repository}/blob/{source_commit}/{canonical_index}"
     )
     inherited = [
         decision
@@ -2223,7 +2254,22 @@ def projection_freshness(
         projected = route in require_object(snapshot.get("views"))
     if not projected:
         return "unknown"
-    return normalize_state(require_object(snapshot.get("coverage")).get("status"))
+    return coverage_contract.display_status(snapshot, route)
+
+
+def collection_notice(snapshot: dict[str, Any] | None, route: str) -> str:
+    """Show source coverage independently from record freshness and empty arrays."""
+    claims = coverage_contract.claims(snapshot, route)
+    if not claims:
+        return ""
+    rows = "".join(
+        f'<li><strong>{escaped(state_label(domain))}</strong>: '
+        f'{escaped(state_label(claim["collection"]))} · '
+        f'{escaped(state_label(claim["freshness"]))}</li>'
+        for domain, claim in sorted(claims.items()))
+    return ('<section class="ri-panel" aria-label="Collection coverage"><h2>Collection coverage</h2>'
+            '<p>Uncollected or unavailable evidence cannot establish an empty result, readiness, '
+            'or a passing check.</p><ul>' + rows + '</ul></section>')
 
 
 def navigation(current: str, prefix: str) -> str:
@@ -2404,9 +2450,7 @@ def write_site(
     observed_at = str(
         snapshot.get("observed_at") if snapshot else summary.get("generated_at") or ""
     )
-    freshness = normalize_state(
-        require_object(snapshot.get("coverage")).get("status") if snapshot else "unknown"
-    )
+    freshness = projection_freshness(snapshot, "intelligence", projected=snapshot is not None)
     shared = {
         "repository": repository,
         "source_commit": source_commit,
@@ -2420,7 +2464,7 @@ def write_site(
         shell_document(
             route="intelligence",
             route_label="Intelligence",
-            body=overview_body(),
+            body=collection_notice(snapshot, "intelligence") + overview_body(),
             prefix="",
             **shared,
         ),
@@ -2430,7 +2474,7 @@ def write_site(
         shell_document(
             route="now",
             route_label="Now",
-            body=now_body(snapshot),
+            body=collection_notice(snapshot, "now") + now_body(snapshot),
             prefix="../",
             **shared,
         ),
@@ -2439,7 +2483,7 @@ def write_site(
         body = (
             roadmap_body(snapshot)
             if route == "roadmap"
-            else decisions_body(snapshot)
+            else decisions_body(snapshot, require_object(provenance.get("adr_collection")).get("index", "DECISIONS.md"))
             if route == "decisions"
             else journey_body(snapshot)
             if route == "journey"
@@ -2450,9 +2494,9 @@ def write_site(
             shell_document(
                 route=route,
                 route_label=label,
-                body=body,
+                body=collection_notice(snapshot, route) + body,
                 prefix="../",
-                **shared,
+                **{**shared, "freshness": projection_freshness(snapshot, route)},
             ),
         )
     atomic_write(output_root / "site.css", stylesheet_source.read_text(encoding="utf-8"))

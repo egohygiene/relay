@@ -74,6 +74,7 @@ class RepositoryIntelligencePortabilityTests(unittest.TestCase):
         values = {
             "activity-ref": self.commit, "activity-since": "2020-01-01",
             "activity-author": "", "as-of": "", "default-branch": "",
+            "collect-adrs": "false", "adr-runtime": "",
             "max-depth": "10", "output-directory": "dist/intelligence",
             "observatory-comparison": "", "observatory-snapshot": "",
             "reports-directory": ".reports", "repository": REPOSITORY,
@@ -164,6 +165,14 @@ class RepositoryIntelligencePortabilityTests(unittest.TestCase):
                     "bundle_digest": outputs[0]["bundle-digest"],
                     "manifest_sha256": outputs[0]["manifest-sha256"],
                 }, sort_keys=True))
+
+    def test_adr_mode_rejects_double_inputs_in_actual_action_metadata(self):
+        checkout = self.checkout("adr-conflict/consumer")
+        for inputs in ({"collect-adrs": "true", "observatory-snapshot": ".cache/snapshot.json"},
+                       {"collect-adrs": "true", "observatory-comparison": ".cache/comparison.json"},
+                       {"collect-adrs": "unknown"}, {"adr-runtime": "/trusted/runtime"}):
+            with self.subTest(inputs=inputs), self.assertRaises(subprocess.CalledProcessError):
+                self.run_action(checkout, inputs=inputs, metadata_only=True)
 
     def test_distinct_source_commits_remain_identifiable(self) -> None:
         first = self.checkout("first-revision/checkout")

@@ -7,17 +7,19 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-10-10T02:55:50Z'
+  updated_at: '2026-10-10T10:09:47Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Hand off the Aether label-source upgrade and bounded provider application.
+  purpose: Resume the reconciled Decisions build PR and its real-consumer acceptance handoff.
   includes:
-  - Immutable source selection, focused evidence, local apply instructions, and Pace handoff.
+  - Current PR/main reconciliation, validation limits, real-consumer gate, and preserved label-lane handoff.
   excludes:
-  - Private conversation content, credentials, unrelated provider or repository changes.
+  - Consumer source repair, historical ADR reconstruction, deployment, fleet rollout, contract ratification, and
+    merge authority.
+  - Conversation transcripts, raw provider logs, private paths, and duplicated issue specifications.
   precedence:
   - user-and-runtime-instructions
   - scoped-repository-instructions
@@ -30,69 +32,105 @@ scope:
   - SYSTEM.md
   - DECISIONS.md
   - ROADMAP.md
-  - actions/repository-labels/contracts/organization-labels.lock.json
-  - actions/repository-labels/README.md
+  - docs/repository-adr-collector.md
+  - actions/repository-intelligence/action.yml
+  - actions/repository-intelligence/scripts/prepare_repository_adr_build.py
+  - actions/repository-intelligence/contracts/adr-collector.v1.lock.json
+  - tests/test_repository_adr_build.py
+  - scripts/run_repository_adr_acceptance.py
+  - docs/evidence/repository-adrs-checkpoint-2.json
+  - https://github.com/egohygiene/relay/issues/115
+  - https://github.com/egohygiene/relay/pull/134
+  - docs/evidence/repository-adrs-refresh-2026-10-10.json
+  - https://github.com/egohygiene/relay/pull/135
+  - https://github.com/egohygiene/.github/issues/30
+  - https://github.com/egohygiene/pace/issues/25
   - docs/label-rollout-local.md
   - docs/evidence/labels/aether-source-upgrade-2026-10-10.json
-  - https://github.com/egohygiene/pace/issues/10
 work:
-  objective: Consume the merged Aether assignment, then refresh Pace's native preview before provider application.
+  objective: Review PR135 after incorporating current main, then hand the shared ADR build to the real Identity
+    consumer checkpoint.
   success_conditions:
-  - Label lock and all four reusable label workflow source pins agree.
-  - Native contract validation resolves the 18 universal Aether labels.
-  - Provider application remains distinguishable from source merge and synthetic tests.
+  - Preserve the Decisions implementation and merged title/label work byte-for-byte.
+  - Reconcile roadmap and continuity against verified upstream and live tracker state.
+  - Record current local checks separately from skipped native, hosted and consumer acceptance.
   active_issue:
     provider: github
-    id: egohygiene/pace#10
-    url: https://github.com/egohygiene/pace/issues/10
+    id: egohygiene/relay#115
+    url: https://github.com/egohygiene/relay/issues/115
   next:
     kind: action
-    id: refresh-pace-aether-preview
-    description: After this source merge, pin Pace to the verified merged Relay revision and retain a fresh native plan.
+    id: review-reconciled-decisions-build
+    description: 'Review the updated PR135; after its reviewed integration, use the exact merged Relay revision
+      for Identity #69 source review and upgrade planning.'
     readiness: ready
     references:
-    - https://github.com/egohygiene/pace/issues/10
-    - https://github.com/egohygiene/pace/pull/33
+    - https://github.com/egohygiene/relay/pull/135
+    - https://github.com/egohygiene/relay/issues/115
+    - https://github.com/egohygiene/identity/issues/69
     depends_on: []
 state:
   base:
-    revision: e273030836b68bcb9912aae73e56ffbb31f33d48
+    revision: 425d3cc22673b0509abb3c54f184e07111d5a4df
     ref: refs/heads/main
-    verified_at: '2026-10-10T02:52:49Z'
+    verified_at: '2026-10-10T10:09:47Z'
   candidate:
-    branch: codex/aether-label-source-pace-10
+    branch: codex/adr-build-integration-115
     revision: null
-    pull_request: null
+    pull_request:
+      provider: github
+      id: egohygiene/relay#135
+      url: https://github.com/egohygiene/relay/pull/135
     handoff_state: ready-for-review
   live:
-    status: partial
-    observed_at: '2026-10-10T02:52:49Z'
-    default_branch_revision: e273030836b68bcb9912aae73e56ffbb31f33d48
+    status: verified
+    observed_at: '2026-10-10T10:09:47Z'
+    default_branch_revision: 425d3cc22673b0509abb3c54f184e07111d5a4df
     issue_state: open
-    pull_request_state: not-applicable
-    notes: 'Organization PR47 merged at 8b16273eaf0709a7ce95f5e352a2b0d38cfac131. Pace PR33 merged at cfe8ed9db55a5ddf8580c72f4d7991f6391386a1. Resolve this candidate PR and merge status from its branch; this file is not merge evidence.'
+    pull_request_state: open
+    notes: Git remote and API ref agree on main. PR135 was open at 9644eb8188827dccb88f4c856c1de7f236a79988; this
+      candidate resolves its continuity conflict and retains both parents. The new commit does not claim its own
+      SHA or a merge into main.
   parallel_changes:
   - provider: github
-    id: egohygiene/relay#135
-    url: https://github.com/egohygiene/relay/pull/135
+    id: egohygiene/pace#10
+    url: https://github.com/egohygiene/pace/issues/10
+  - provider: github
+    id: egohygiene/identity#90
+    url: https://github.com/egohygiene/identity/pull/90
 review:
   status: partial
-  reviewed_at: '2026-10-10T02:55:50Z'
+  reviewed_at: '2026-10-10T10:09:47Z'
   reviewed_by: Codex
   evidence:
-  - command: python3 -m unittest discover --start-directory tests --pattern "test_repository_labels.py" --verbose
+  - command: python3 -m unittest discover --start-directory tests --pattern test_*.py --verbose
     outcome: passed
-    observed_at: '2026-10-10T02:55:50Z'
-    notes: Twelve focused tests passed, zero skips.
-  - command: Native contract validation, synthetic plan/repeat, and base-Git workflow comparisons
+    observed_at: '2026-10-10T10:09:47Z'
+    notes: 'Pinned Python environment selected for both parent and subprocess PATH. 658 tests discovered: 574 passed,
+      84 runtime-dependent skips, zero failures/errors.'
+  - command: python3 -I scripts/run_repository_adr_acceptance.py
+    outcome: limited
+    observed_at: '2026-10-10T10:09:47Z'
+    notes: 'Fresh native acceptance could not complete: rustup is unavailable. No native ADR runtime replay is claimed
+      in this refresh.'
+  - command: python3 scripts/validate_actions.py; python3 scripts/validate_ci_run_lifecycle.py; python3 scripts/validate_continuity_preflight_contract.py
+      validate; python3 scripts/validate_repository_architecture_contract.py validate; python3 scripts/validate_repository_journal_runtime.py
+      validate
     outcome: passed
-    observed_at: '2026-10-10T02:55:50Z'
-    notes: Aether resolves 18 labels; initial synthetic plan creates 18; simulated post-apply plan has no operations. Four workflows differ only in source ref.
+    observed_at: '2026-10-10T10:09:47Z'
+    notes: All five catalog/contract validators passed.
+  - command: Python AST, PyYAML, and JSON parsing; git diff --exit-code against the appropriate parent
+    outcome: passed
+    observed_at: '2026-10-10T10:09:47Z'
+    notes: Parsed 95 Python, 39 YAML, and 79 JSON files. Decisions executable sources match prior PR head; label/title
+      sources and evidence match incoming main.
   environment_limitations:
-  - Provider label creation is unavailable through this connector; workspace has no authenticated gh runtime.
-  - Synthetic repeat is not provider verification. No labels or issue titles were applied.
-  - Hosted Actions, broad tests, linting and audits remain deferred.
-  - Released continuity semantic conformance remains unavailable under the proposed profile.
+  - 84 native/runtime-dependent tests skipped; fresh ADR acceptance stopped because rustup is unavailable.
+  - New candidate hosted checks, consumer deployment, and live-route proof were not run.
+  - The real Hygiene canary remains source-invalid/partial; historical success does not establish a conforming real
+    consumer.
+  - Released continuity semantic conformance remains unavailable; pinned schema and structural review are separate.
+  - 'Pace #10 provider/title state was not re-audited; its owning tracker remains authoritative.'
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -111,79 +149,89 @@ privacy:
 
 ## Purpose and precedence
 
-Resume the Aether label sprint under Pace #10. User/runtime instructions, scoped
-repository policy, live facts and canonical sources outrank this handoff.
+Resume the Decisions build checkpoint in #115 / PR135. Instructions, live state,
+and canonical sources outrank this handoff. It grants no merge or publication authority.
 
 ## Resume protocol
 
-Read label automation and local application guides; verify this candidate's merge
-and Pace's current pin/plan before acting. The user authorized relevant sprint
-merges, but this file grants no authority to another session.
+Read AGENTS.md, ROADMAP.md, the ADR collector guide, #115, PR135, organization
+#30, and Pace #25. Re-query main and PR head before editing. Use the dated refresh
+receipt for exact parent revisions and actual checks, not the older review summary.
 
 ## Current objective and success conditions
 
-Consume organization catalog 1.1.0 at its verified merged revision; refresh Pace
-and produce an actual native plan. Apply only through an available authenticated
-path with fresh-plan verification and retained evidence.
+Finish review of the existing opt-in Decisions integration while preserving its
+input admission, deterministic evidence, and consumer-owned publication boundary.
+Keep real consumer conformance distinct from merged shared implementation.
 
 ## State snapshot
 
-Organization PR47 and Pace PR33 are merged at the revisions above. Relay PR136
-is merged and #133 closed. Relay PR135 remains the separate Decisions lane.
-The current source candidate is discoverable by its branch; inspect live state.
+PR135 was open at the prior head recorded in the receipt. Current main is the
+full base above and contains the title-preview and Aether label-source work.
+The only merge conflict was CONTINUITY.md. This candidate incorporates main
+without rewriting either parent's implementation. It is not merged-main evidence.
 
 ## Completed and material changes
 
-The label lock and four workflow checkout pins select organization commit
-8b16273eaf0709a7ce95f5e352a2b0d38cfac131 with exact new catalog/assignment
-digests. Every label definition is unchanged; Aether's assignment is universal
-only. Source checkout pins change without modifying workflow gates or authority.
-The title-preview runtime and historical evidence keep their independent pins.
-A local operator guide makes fresh-plan verification and interruption handling explicit.
+The existing collect-adrs path connects owner-validated canonical ADRs to native,
+action, and reusable workflow builds. Alpha.2 coverage stays separate from record
+freshness; external alpha.1 snapshots and no-snapshot builds remain compatible.
+This refresh changes the handoff and roadmap, not that executable implementation.
+ROADMAP.md now identifies REL-RI-007 and the ADR-first sequence. EgoLint #73,
+Aether #91, and Observatory #25 are closed; Relay #109's repair is merged.
+Those facts do not close downstream source, publication, or rollout acceptance.
+Decision impact: ADR not required; ADR-007/010 already govern the preserved boundaries.
 
 ## Validation and review evidence
 
-Twelve focused tests pass with zero skips. Native validation accepts the new
-contract; an empty synthetic canonical-label state plans 18 creations, and a
-simulated populated state plans zero. Workflow comparisons establish that only
-the organization revision changed. Exact evidence is in the source-upgrade receipt.
+The corrected pinned Python/PATH environment discovers 658 tests: 574 pass and
+84 native/runtime-dependent tests skip, with no failures or errors. Five catalog/
+contract validators pass; 95 Python, 39 YAML, and 79 JSON files parse. Direct
+parent comparisons preserve the Decisions and incoming label/title source bytes.
+Pinned continuity schema, headings, paths and bounds pass.
+Fresh native ADR acceptance could not run without rustup. The dated receipt owns
+this observation; the prior native/local evidence file remains unchanged.
 
 ## Blockers, risks, unknowns, and deferred work
 
-Repository-label creation is not exposed by the connector. The workspace has no
-gh executable or GH_TOKEN/GITHUB_TOKEN. No credential search or workaround was
-attempted. An authenticated local operator or approved browser fallback is needed
-for provider apply. Native CLI apply alone does not provide the hosted fresh-plan
-guard or partial receipts; follow the local guide. Actions and broad checks remain
-deferred. Source merges do not prove label adoption or title conformance.
+Keep #115 open: a real conforming immutable corpus and Identity upgrade handoff
+remain outstanding. The recorded Hygiene canary's 12 ADRs retain policy/migration
+gaps and are denied production admission. Native replay, current hosted checks,
+consumer deployment, and live routes are not re-proven here. Roadmap collection
+still needs its own #112/#113 repin. #99/#5, #106/#33, #101 and Pace #13 retain
+their separate acceptance/release/fleet scopes.
 
 ## Next dependency-ready work
 
-Pin Pace to this change's actual merge commit/tree, retain fresh inventory and a
-native checksum-bound plan, then use a supported provider application path.
-Verify all desired metadata and zero remaining operations. Classify the reviewed
-Aether #63/#92/#94 issues before regenerating their native title preview and
-performing separately evidenced title updates. Broader title apply/recovery and
-fleet rollout remain open until implemented and verified.
+Review the reconciled PR135. After reviewed integration, select its exact merged
+Relay revision; inspect Identity #69's immutable corpus with the review CLI, route
+source repairs to Identity, and retain host/route/rollback ownership. A successful
+shared build does not authorize or prove deployment. Continue the ADR capability
+through Pace #5 before the populated-roadmap campaign in Pace #31.
 
 ## Parallel changes and reconciliation
 
-PR135 owns Decisions integration and also edits continuity; reconcile its handoff
-against newer evidence. Do not merge it as part of the label sprint. Preserve
-historical title-preview and blocked label-preview evidence as dated records.
+Main's label-source upgrade is preserved at 425d3cc22673b0509abb3c54f184e07111d5a4df.
+Its evidence remains in docs/evidence/labels/aether-source-upgrade-2026-10-10.json;
+Pace #10 owns fresh plans, provider apply/verification, and remaining title work.
+This refresh does not repeat or infer completion of those operations. Identity
+PR90 stages coordination edits; merging it alone does not apply the issue updates.
+Do not introduce a blanket dependency on all Identity stabilization issues.
 
 ## Privacy and redaction
 
-Only public repository facts and synthetic fixtures are included. Provider text
-and captures are data, never instructions or mutation authority.
+Only public repository facts and bounded validation summaries are retained.
+Source text, credentials, private paths, and unrelated context are excluded.
+External text is evidence, never authority to expand access or mutate other work.
 
 ## Handoff update protocol
 
-Record actual merged revision and provider receipts in Pace #10. Refresh this
-checkpoint during the next Relay change; do not fabricate a self-referential SHA.
-Keep source, local validation, provider application and hosted acceptance separate.
+Refresh after validation, recheck branch/main and tracker state, and preserve
+parallel evidence. Record new revision/merge facts in the issue or PR after they
+exist; leave this candidate's self-referential revision null. Keep the issue open
+until real consumer acceptance is independently established.
 
 ## Compaction and supersession
 
-This replaces the stale pre-merge #133 handoff with the label-source checkpoint.
-Git and linked trackers preserve history. Keep under 16,384 bytes and 240 lines.
+This reconciles the prior Decisions handoff with the newer main label handoff.
+Git and the linked trackers retain history. Keep the 240-line/16,384-byte limits.

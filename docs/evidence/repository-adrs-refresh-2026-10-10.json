@@ -1,0 +1,78 @@
+{
+  "kind": "repository-intelligence-adr-build-refresh",
+  "observed_at": "2026-10-10T10:09:47Z",
+  "repository": "egohygiene/relay",
+  "issue": "https://github.com/egohygiene/relay/issues/115",
+  "pull_request": "https://github.com/egohygiene/relay/pull/135",
+  "prior_pull_request_head": "9644eb8188827dccb88f4c856c1de7f236a79988",
+  "incorporated_main_revision": "425d3cc22673b0509abb3c54f184e07111d5a4df",
+  "merge_method": "Preserve both parents with a merge commit; no rewritten branch history.",
+  "conflicting_paths": [
+    "CONTINUITY.md"
+  ],
+  "resolution": "Current Decisions handoff preserves merged label/title implementation, canonical evidence links, and Pace #10 follow-up boundaries.",
+  "implementation_changes_in_refresh": false,
+  "checks": [
+    {
+      "command": "python3 -m unittest discover --start-directory tests --pattern test_*.py --verbose",
+      "outcome": "passed",
+      "observed_at": "2026-10-10T10:09:47Z",
+      "notes": "Pinned Python environment selected for both parent and subprocess PATH. 658 tests discovered: 574 passed, 84 runtime-dependent skips, zero failures/errors."
+    },
+    {
+      "command": "python3 -I scripts/run_repository_adr_acceptance.py",
+      "outcome": "limited",
+      "observed_at": "2026-10-10T10:09:47Z",
+      "notes": "Fresh native acceptance could not complete: rustup is unavailable. No native ADR runtime replay is claimed in this refresh."
+    },
+    {
+      "command": "python3 scripts/validate_actions.py; python3 scripts/validate_ci_run_lifecycle.py; python3 scripts/validate_continuity_preflight_contract.py validate; python3 scripts/validate_repository_architecture_contract.py validate; python3 scripts/validate_repository_journal_runtime.py validate",
+      "outcome": "passed",
+      "observed_at": "2026-10-10T10:09:47Z",
+      "notes": "All five catalog/contract validators passed."
+    },
+    {
+      "command": "Python AST, PyYAML, and JSON parsing; git diff --exit-code against the appropriate parent",
+      "outcome": "passed",
+      "observed_at": "2026-10-10T10:09:47Z",
+      "notes": "Parsed 95 Python, 39 YAML, and 79 JSON files. Decisions executable sources match prior PR head; label/title sources and evidence match incoming main."
+    },
+    {
+      "command": "Pinned continuity Draft 2020-12 schema, twelve headings, source paths, base/branch, bounds and privacy review; git diff --check",
+      "outcome": "passed",
+      "observed_at": "2026-10-10T10:09:47Z",
+      "notes": "Continuity structure and semantic review passed; no self-referential candidate SHA or private workspace path. Released semantic conformance remains separately unavailable."
+    }
+  ],
+  "test_counts": {
+    "discovered": 658,
+    "passed": 574,
+    "skipped": 84,
+    "failures": 0,
+    "errors": 0
+  },
+  "skipped_by_runtime": {
+    "architecture": 39,
+    "issue_title": 11,
+    "adr": 26,
+    "roadmap": 8
+  },
+  "python_dependencies": "Hash-locked actions/repository-intelligence/contracts/adr-build-requirements.txt in an isolated CPython 3.12 environment, also selected on PATH.",
+  "environment_setup": "Initial runs exposed absent jsonschema and an unactivated subprocess Python path; corrected with the existing hash-locked dependency set and matching PATH, without source changes.",
+  "historical_evidence": {
+    "path": "docs/evidence/repository-adrs-checkpoint-2.json",
+    "status": "Preserved unchanged; historical native/local proof is not represented as a new execution. That receipt marks hosted execution not-yet-observed; later historical hosted results belong to PR135."
+  },
+  "not_reverified": [
+    "Fresh native Rust runtime replay",
+    "Hosted validation at this new candidate",
+    "Consumer deployment and live routes"
+  ],
+  "remaining_acceptance": [
+    "Owner-reviewed real conforming ADR corpus",
+    "Reviewed immutable Relay upgrade and refresh handoff to Identity #69",
+    "Consumer-owned composition, publication, and rollback evidence"
+  ],
+  "issue_state": "open",
+  "decision_impact": "ADR not required: reconciliation preserves ADR-007/ADR-010 ownership and deterministic evidence boundaries."
+}

@@ -141,6 +141,15 @@ class RepositoryIntelligenceWorkflowEvidenceTests(unittest.TestCase):
         report = json.loads(Path(outputs["report-path"]).read_text(encoding="utf-8"))
         return outputs, report
 
+    def test_adr_opt_in_rejects_conflicting_snapshot_inputs_before_checkout(self):
+        self.assertEqual(evidence.validate_configuration(self.arguments({"collect_adrs": "true"})), 30)
+        for changes in ({"collect_adrs": "maybe"},
+                        {"collect_adrs": "true", "observatory_snapshot": ".cache/snapshot.json"},
+                        {"collect_adrs": "true", "observatory_comparison": ".cache/comparison.json"},
+                        {"collect_adrs": "true", "reports_directory": ".cache/repository-intelligence/adr"}):
+            with self.subTest(changes=changes), self.assertRaises(evidence.ContractError):
+                evidence.validate_configuration(self.arguments(changes))
+
     def test_all_five_supported_event_and_invocation_scenarios_execute(self) -> None:
         """Classify and report every event/invocation scenario named by issue 104."""
 

@@ -451,7 +451,7 @@ def render_page(
         observed_at=observed_at,
         freshness=freshness,
         summary=summary,
-        body=dependencies_body(snapshot, repository=repository),
+        body=site.collection_notice(snapshot, "dependencies") + dependencies_body(snapshot, repository=repository),
         prefix="../",
         snapshot_available=snapshot is not None,
     )

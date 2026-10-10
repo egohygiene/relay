@@ -28,6 +28,20 @@ inputs:
       <producer>/summary.json. A missing directory renders honest unavailable states.
     required: false
     default: ".reports"
+  collect-adrs:
+    description: >-
+      Opt in to validated canonical ADR collection from docs/decisions at the
+      represented commit. Requires public source and complete valid ADR coverage;
+      conflicts with observatory-snapshot and observatory-comparison.
+    required: false
+    default: "false"
+  adr-runtime:
+    description: >-
+      Optional trusted prepared ADR runtime outside the consumer checkout, for
+      offline local/action use with the pinned Python requirements. Otherwise
+      acquire immutable public owner sources and locked dependencies privately.
+    required: false
+    default: ""
   observatory-snapshot:
     description: >-
       Optional repository-relative path to a public-safe Observatory Repository
@@ -188,6 +202,8 @@ runs:
         EVENT_REPOSITORY_PRIVATE: "${{ github.event.repository.private }}"
         EVENT_REPOSITORY_VISIBILITY: "${{ github.event.repository.visibility }}"
         INPUT_ACTIVITY_REF: "${{ inputs.activity-ref }}"
+        INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
+        INPUT_ADR_RUNTIME: "${{ inputs.adr-runtime }}"
         INPUT_AS_OF: "${{ inputs.as-of }}"
         INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
         INPUT_MAX_DEPTH: "${{ inputs.max-depth }}"
@@ -220,6 +236,18 @@ runs:
           fi
         }
 
+        case "${INPUT_COLLECT_ADRS}" in
+          true | false) ;;
+          *) printf 'collect-adrs must be true or false\n' >&2; exit 2 ;;
+        esac
+        if [[ "${INPUT_COLLECT_ADRS}" == "true" && ( -n "${INPUT_OBSERVATORY_SNAPSHOT}" || -n "${INPUT_OBSERVATORY_COMPARISON}" ) ]]; then
+          printf 'collect-adrs conflicts with external snapshot/comparison inputs\n' >&2
+          exit 2
+        fi
+        if [[ "${INPUT_COLLECT_ADRS}" == "false" && -n "${INPUT_ADR_RUNTIME}" ]]; then
+          printf 'adr-runtime requires collect-adrs\n' >&2
+          exit 2
+        fi
         validate_relative_path "output-directory" "${INPUT_OUTPUT_DIRECTORY}"
         validate_relative_path "work-directory" "${INPUT_WORK_DIRECTORY}"
         validate_relative_path "reports-directory" "${INPUT_REPORTS_DIRECTORY}"
@@ -432,6 +460,33 @@ runs:
         printf 'generator-immutable=%s\n' "${generator_immutable}" >> "${GITHUB_OUTPUT}"
         printf 'source-epoch=%s\n' "${source_epoch}" >> "${GITHUB_OUTPUT}"
 
+    - name: "📚 Collect validated canonical ADRs when requested"
+      shell: bash
+      env:
+        INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
+        INPUT_ADR_RUNTIME: "${{ inputs.adr-runtime }}"
+        INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
+        RESOLVED_AS_OF: "${{ steps.metadata.outputs.as-of }}"
+        RESOLVED_REPOSITORY: "${{ steps.metadata.outputs.repository }}"
+        RESOLVED_REPOSITORY_VISIBILITY: "${{ steps.metadata.outputs.repository-visibility }}"
+        RESOLVED_SOURCE_COMMIT: "${{ steps.metadata.outputs.source-commit }}"
+      run: |
+        set -euo pipefail
+        if [[ "${INPUT_COLLECT_ADRS}" == "true" ]]; then
+          runtime_arguments=()
+          if [[ -n "${INPUT_ADR_RUNTIME}" ]]; then
+            runtime_arguments+=(--runtime "${INPUT_ADR_RUNTIME}")
+          fi
+          python3 -I "${GITHUB_ACTION_PATH}/scripts/prepare_repository_adr_build.py" \
+            --repository-root "${GITHUB_WORKSPACE}" \
+            --work-directory "${INPUT_WORK_DIRECTORY}" \
+            --repository "${RESOLVED_REPOSITORY}" \
+            --visibility "${RESOLVED_REPOSITORY_VISIBILITY}" \
+            --source-commit "${RESOLVED_SOURCE_COMMIT}" \
+            --observed-at "${RESOLVED_AS_OF}" \
+            "${runtime_arguments[@]}"
+        fi
+
     - name: "🌳 Generate commit-scoped repository tree"
       shell: bash
       env:
@@ -498,6 +553,7 @@ runs:
     - name: "✨ Render static intelligence site"
       shell: bash
       env:
+        INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
         INPUT_OBSERVATORY_COMPARISON: "${{ inputs.observatory-comparison }}"
         INPUT_OBSERVATORY_SNAPSHOT: "${{ inputs.observatory-snapshot }}"
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
@@ -540,6 +596,13 @@ runs:
           --script-source "${GITHUB_ACTION_PATH}/assets/explorer.js" \
           --dashboard-subdirectory "dashboard"
         snapshot_arguments=()
+        if [[ "${INPUT_COLLECT_ADRS}" == "true" ]]; then
+          INPUT_OBSERVATORY_SNAPSHOT="${INPUT_WORK_DIRECTORY}/adr/snapshot.json"
+          python3 -I "${GITHUB_ACTION_PATH}/scripts/repository_adr_build_contract.py" \
+            --provenance "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/provenance.json" \
+            --receipt "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}/adr/receipt.json" \
+            --snapshot "${GITHUB_WORKSPACE}/${INPUT_OBSERVATORY_SNAPSHOT}"
+        fi
         if [[ -n "${INPUT_OBSERVATORY_SNAPSHOT}" ]]; then
           snapshot_arguments+=(
             --snapshot "${GITHUB_WORKSPACE}/${INPUT_OBSERVATORY_SNAPSHOT}"

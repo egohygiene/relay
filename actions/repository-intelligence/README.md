@@ -11,9 +11,13 @@ The compatible upstream coverage contract is now available; the existing roadmap
 profile still needs reviewed repinning and #112 acceptance before #113 integration.
 
 The [canonical ADR collector](../../docs/repository-adr-collector.md) implements
-#115 checkpoint 1: immutable canonical records, owner validation, and alpha.2
-normalization with explicit domain coverage. Its separate review envelope is also
-publication-denied. Checkpoint 2 owns the action/workflow and renderer adoption.
+#115's immutable source collection and opt-in Decisions build integration.
+Set `collect-adrs: "true"` for a fresh validated canonical corpus; it conflicts
+with external snapshot/comparison inputs. Alpha.2 snapshots preserve per-domain
+collection coverage, while existing alpha.1 inputs remain compatible. The
+separate review-only envelope remains publication-denied. See the collector
+guide for pinned runtime acquisition, offline use, provenance, and Identity #69
+adoption gates.
 
 ## Consumer contract
 
@@ -221,6 +225,8 @@ for provider proof and consumer adoption.
 | `output-directory`          | `dist/intelligence`              | Generated HTML, CSS, JavaScript, and aggregate JSON bundle               |
 | `work-directory`            | `.cache/repository-intelligence` | Private collection workspace; do not publish wholesale                  |
 | `reports-directory`         | `.reports`                       | Optional summaries; always excluded from tree and analytics              |
+| `collect-adrs` | `false` | Collect standard-path canonical public ADRs; requires complete valid ADR coverage |
+| `adr-runtime` | empty | Composite-only trusted prepared runtime outside the consumer; otherwise acquire pinned dependencies |
 | `observatory-snapshot`      | empty                            | Optional commit-matched public-safe Repository Intelligence read model    |
 | `observatory-comparison`    | empty                            | Optional comparison whose after boundary matches the snapshot and commit |
 | `repository`                | workflow repository              | Required without `GITHUB_REPOSITORY`; cannot override GitHub identity    |

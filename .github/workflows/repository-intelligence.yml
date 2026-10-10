@@ -23,6 +23,11 @@ on:
         required: false
         default: ".reports"
         type: string
+      collect-adrs:
+        description: Collect and validate canonical public ADRs instead of accepting an external snapshot.
+        required: false
+        default: false
+        type: boolean
       observatory-snapshot:
         description: Optional public-safe Observatory read model for the represented commit.
         required: false
@@ -92,6 +97,11 @@ on:
         required: true
         default: ".reports"
         type: string
+      collect-adrs:
+        description: Collect and validate canonical public ADRs instead of accepting an external snapshot.
+        required: false
+        default: false
+        type: boolean
       observatory-snapshot:
         description: Optional public-safe Observatory read model for the represented commit.
         required: false
@@ -133,7 +143,8 @@ concurrency:
 jobs:
   generate:
     name: Generate Repository Intelligence site artifact
-    runs-on: ubuntu-latest
+    # ADR wheel hashes target CPython 3.12 / Linux x86_64.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: read
@@ -178,6 +189,7 @@ jobs:
           output-directory: "${{ inputs.output-directory }}"
           work-directory: "${{ inputs.work-directory }}"
           reports-directory: "${{ inputs.reports-directory }}"
+          collect-adrs: "${{ inputs.collect-adrs }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
           observatory-comparison: "${{ inputs.observatory-comparison }}"
           default-branch: "${{ inputs.default-branch }}"
@@ -213,6 +225,7 @@ jobs:
           output-directory: "${{ inputs.output-directory }}"
           work-directory: "${{ inputs.work-directory }}"
           reports-directory: "${{ inputs.reports-directory }}"
+          collect-adrs: "${{ inputs.collect-adrs }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
           observatory-comparison: "${{ inputs.observatory-comparison }}"
           repository: "${{ github.repository }}"
@@ -294,6 +307,7 @@ jobs:
           output-directory: "${{ inputs.output-directory }}"
           work-directory: "${{ inputs.work-directory }}"
           reports-directory: "${{ inputs.reports-directory }}"
+          collect-adrs: "${{ inputs.collect-adrs }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
           observatory-comparison: "${{ inputs.observatory-comparison }}"
           default-branch: "${{ inputs.default-branch }}"

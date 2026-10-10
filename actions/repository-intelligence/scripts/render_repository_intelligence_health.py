@@ -356,7 +356,7 @@ def render_page(
         observed_at=observed_at,
         freshness=freshness,
         summary=summary,
-        body=health_body(snapshot),
+        body=site.collection_notice(snapshot, "health") + health_body(snapshot),
         prefix="../",
         snapshot_available=snapshot is not None,
     )

@@ -821,6 +821,13 @@
           "description": "Optional normalized report-summary root."
         },
         {
+          "name": "collect-adrs",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Collect and validate canonical public ADRs instead of accepting an external snapshot."
+        },
+        {
           "name": "observatory-snapshot",
           "type": "string",
           "required": false,
