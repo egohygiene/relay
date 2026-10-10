@@ -1,0 +1,84 @@
+{
+  "checkpoint": "relay-133-local-validation",
+  "observed_at": "2026-10-07T02:21:06Z",
+  "evaluated_parent": "26db2e2a99c1ba3b4367bc7644ec49d515712f20",
+  "scope": "Pagination fixture correction and focused local verification only",
+  "commands": [
+    {
+      "command": "RELAY_ISSUE_TITLE_RUNTIME=PREPARED_RUNTIME python3 -m unittest discover --start-directory tests --pattern test_issue_title_preview.py --verbose",
+      "outcome": "passed",
+      "tests": 24,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "passed_tests": [
+        "test_captured_inputs_are_closed_and_require_label_completeness (test_issue_title_preview.Boundaries.test_captured_inputs_are_closed_and_require_label_completeness)",
+        "test_claimed_complete_pagination_requires_terminal_page (test_issue_title_preview.Boundaries.test_claimed_complete_pagination_requires_terminal_page)",
+        "test_collects_multiple_pages_and_excludes_pull_requests (test_issue_title_preview.Boundaries.test_collects_multiple_pages_and_excludes_pull_requests)",
+        "test_duplicate_page_is_detected_without_double_counting (test_issue_title_preview.Boundaries.test_duplicate_page_is_detected_without_double_counting)",
+        "test_failed_later_page_keeps_earlier_evidence_partial (test_issue_title_preview.Boundaries.test_failed_later_page_keeps_earlier_evidence_partial)",
+        "test_inventory_race_is_not_claimed_complete (test_issue_title_preview.Boundaries.test_inventory_race_is_not_claimed_complete)",
+        "test_json_rejects_duplicate_keys_and_nonfinite_numbers (test_issue_title_preview.Boundaries.test_json_rejects_duplicate_keys_and_nonfinite_numbers)",
+        "test_missing_runtime_retains_every_issue_and_explicit_failure (test_issue_title_preview.Boundaries.test_missing_runtime_retains_every_issue_and_explicit_failure)",
+        "test_new_output_cannot_clobber_inputs_or_follow_symlinks (test_issue_title_preview.Boundaries.test_new_output_cannot_clobber_inputs_or_follow_symlinks)",
+        "test_public_collection_denies_private_or_mismatched_repository (test_issue_title_preview.Boundaries.test_public_collection_denies_private_or_mismatched_repository)",
+        "test_repository_allowlist_and_canonical_issue_identity (test_issue_title_preview.Boundaries.test_repository_allowlist_and_canonical_issue_identity)",
+        "test_source_preparation_does_not_accept_missing_source (test_issue_title_preview.Boundaries.test_source_preparation_does_not_accept_missing_source)",
+        "test_stale_and_duplicate_reviews_are_rejected_before_tool_execution (test_issue_title_preview.Boundaries.test_stale_and_duplicate_reviews_are_rejected_before_tool_execution)",
+        "test_actual_cli_classification_noop_legacy_and_preserved_checkpoint (test_issue_title_preview.Native.test_actual_cli_classification_noop_legacy_and_preserved_checkpoint)",
+        "test_formatter_rejects_unreviewable_type_or_subject (test_issue_title_preview.Native.test_formatter_rejects_unreviewable_type_or_subject)",
+        "test_mismatched_native_report_provenance_is_unavailable (test_issue_title_preview.Native.test_mismatched_native_report_provenance_is_unavailable)",
+        "test_missing_provider_label_does_not_turn_formatted_title_into_adoption (test_issue_title_preview.Native.test_missing_provider_label_does_not_turn_formatted_title_into_adoption)",
+        "test_no_legacy_parser_strips_reviewed_decoration (test_issue_title_preview.Native.test_no_legacy_parser_strips_reviewed_decoration)",
+        "test_partial_inventory_and_incomplete_issue_are_not_complete (test_issue_title_preview.Native.test_partial_inventory_and_incomplete_issue_are_not_complete)",
+        "test_repeat_and_real_cli_output_are_identical_across_locations (test_issue_title_preview.Native.test_repeat_and_real_cli_output_are_identical_across_locations)",
+        "test_stale_receipt_and_missing_runtime_source_are_unavailable (test_issue_title_preview.Native.test_stale_receipt_and_missing_runtime_source_are_unavailable)",
+        "test_unknown_and_conflicting_labels_are_never_removed (test_issue_title_preview.Native.test_unknown_and_conflicting_labels_are_never_removed)",
+        "test_unknown_label_inventory_stays_unavailable (test_issue_title_preview.Native.test_unknown_label_inventory_stays_unavailable)",
+        "test_untrusted_titles_cannot_inject_markdown_or_html (test_issue_title_preview.Native.test_untrusted_titles_cannot_inject_markdown_or_html)"
+      ]
+    },
+    {
+      "command": "jsonschema.Draft202012Validator.check_schema for schemas/issue-title-*.v1.schema.json",
+      "outcome": "passed",
+      "schemas": 3
+    }
+  ],
+  "diagnosis": {
+    "test": "test_collects_multiple_pages_and_excludes_pull_requests",
+    "before": "24 tests completed; one failure: expected 100 issues, observed 99.",
+    "cause": "Fixture substring page=1 also matched per_page=100 and returned page one twice.",
+    "fix": "Parse the page query parameter exactly; assert page sequence and the returned issue numbers.",
+    "production_adapter_changed": false
+  },
+  "tested_file_sha256": {
+    "scripts/preview_issue_titles.py": "fb39a92dab27330455a3573dfe6e2acedd7cc75ec9db42b07a184756f9193805",
+    "tests/test_issue_title_preview.py": "127a91764396b51002001e8463d1ec41d4fc12f28e9820ed2cc2e9bc654a5da2",
+    "tests/fixtures/issue-title-preview/snapshot.json": "3a9a77e12881b65ea524972b15a014f7ea386900643079acd53c47f45786e9e6",
+    "catalog/issue-title-preview.v1.lock.json": "ba4df41a0a19eb314ebfad4231efcb682d09adcca30307c32a1359b2cdf46ccd",
+    "actions/repository-intelligence/scripts/collect_repository_roadmap.py": "b9e2cad75f0714a5d0cca4d64724020ba263af7899e2d4de740267f077254e22",
+    "schemas/issue-title-plan.v1.schema.json": "ce472b52c6d28cd095cb016cfafea50e5df1f53aabeb02fb76e94d8d89b45196",
+    "schemas/issue-title-reviews.v1.schema.json": "965be01e49ef982fa32a4a228c443693bb4ec0aca0f1dc5450dc804a8eb0c20a",
+    "schemas/issue-title-snapshot.v1.schema.json": "37facbd476eb4d046361949e77a4bdcf485a5e9ea94859d3ad36e437688b5899"
+  },
+  "egolint_source": {
+    "repository": "egohygiene/egolint",
+    "revision": "20edc7d98ab7750388e4783ffaf1bab0d9278d60",
+    "tree": "caeb2d3800d0d65de1822c59e74a9c671f0eab95"
+  },
+  "runtime_receipt": {
+    "egolint_sha256": "6907fd066ec448dd1e19658e617e5463a2fa85b83b2bae6b3b4500290b29bb39",
+    "lock_sha256": "ba4df41a0a19eb314ebfad4231efcb682d09adcca30307c32a1359b2cdf46ccd"
+  },
+  "remaining": [
+    "Generate and review the Aether pilot preview and justified reviewed inputs.",
+    "Finish usage documentation and reconcile issue133 acceptance."
+  ],
+  "deferred": [
+    "Hosted Actions checks",
+    "Broad repository tests, linting and audits",
+    "Issue mutation, label rollout, apply/recovery and fleet reconciliation"
+  ],
+  "provider_mutations": false,
+  "remote_workflow_dispatches": 0
+}

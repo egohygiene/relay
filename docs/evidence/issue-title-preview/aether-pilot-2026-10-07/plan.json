@@ -1,0 +1,838 @@
+{
+  "coverage": {
+    "issues": {
+      "error": null,
+      "pages": [
+        {
+          "number": 1,
+          "records": 29,
+          "sha256": "2e401625b2230062ef84312e229b88c903fe132e18130a3520ec6c7257b373d3"
+        }
+      ],
+      "status": "complete"
+    },
+    "labels": {
+      "error": null,
+      "pages": [
+        {
+          "number": 1,
+          "records": 41,
+          "sha256": "98b710de9e8dfbf772285a88e70d4b0f4a499fde99220065d206a629381defa2"
+        }
+      ],
+      "status": "complete"
+    }
+  },
+  "diagnostics": [],
+  "excluded_pull_requests": 1,
+  "finished_at": "2026-10-06T17:25:42Z",
+  "kind": "github-public",
+  "mode": "observe",
+  "mutation": "forbidden",
+  "observed_at": "2026-10-06T17:25:23Z",
+  "provenance": {
+    "adapter_sha256": "fb39a92dab27330455a3573dfe6e2acedd7cc75ec9db42b07a184756f9193805",
+    "lock_sha256": "ba4df41a0a19eb314ebfad4231efcb682d09adcca30307c32a1359b2cdf46ccd",
+    "reviews_sha256": "9a88a4256085762fa89b8ba098a5cbb0f33b3eb0637d99be78619656fd239261",
+    "runtime": {
+      "egolint_sha256": "6907fd066ec448dd1e19658e617e5463a2fa85b83b2bae6b3b4500290b29bb39",
+      "lock_sha256": "ba4df41a0a19eb314ebfad4231efcb682d09adcca30307c32a1359b2cdf46ccd"
+    },
+    "selection": {
+      "contract": {
+        "authority": "candidate",
+        "contract_id": "egohygiene.issue-title/v1",
+        "contract_version": "1.0.0",
+        "repository": "egohygiene/.github",
+        "revision": "19d2be9bf0191710508cefbb9f0b1abb3a40d9be",
+        "source_digests": {
+          ".github/issues/schema/title-contract.v1.schema.json": "9df220330ad07758122567620f557aa11aad85522914fe3f4cdc7de6a5ca7295",
+          ".github/issues/title-contract.v1.json": "205202bda3c3b069a105924499ba7213a6a99645658e500cc910dfa085eeb30e",
+          ".github/labels/catalog.v1.json": "7063a61608a66454310e5a7746b1514d1d11018da08427bfb49f4612326ff6ff",
+          "docs/issue-titles.md": "243b5fdfec3fff82623fdcb43fa490829af9380d5f0b1d568f9f32b277de0660",
+          "fixtures/issue-titles/cases.v1.json": "c21989c506e363c7b7845e0f63bdaf14f2e0de78f9d6c421d04e0f5a444edab2"
+        }
+      },
+      "egolint": {
+        "repository": "egohygiene/egolint",
+        "revision": "20edc7d98ab7750388e4783ffaf1bab0d9278d60",
+        "tree": "caeb2d3800d0d65de1822c59e74a9c671f0eab95"
+      }
+    },
+    "shared_runtime_sha256": "b9e2cad75f0714a5d0cca4d64724020ba263af7899e2d4de740267f077254e22",
+    "snapshot_sha256": "bb2198f37cc45437528a2e8aede017223e28669ded1ab9da5e4a68d98ea31dbc"
+  },
+  "repository": {
+    "id": 1315637692,
+    "name": "egohygiene/aether",
+    "visibility": "public"
+  },
+  "rows": [
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Build the first-party AI artifact validation and publishing pipeline"
+      },
+      "id": 5188455751,
+      "number": 38,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-08-19T03:01:00Z",
+      "url": "https://github.com/egohygiene/aether/issues/38",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Add canonical prompt and instruction libraries"
+      },
+      "id": 5188458582,
+      "number": 40,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-08-19T03:01:30Z",
+      "url": "https://github.com/egohygiene/aether/issues/40",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Add an agent catalog and Copilot cost-control specification"
+      },
+      "id": 5188458687,
+      "number": 41,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-08-19T03:01:31Z",
+      "url": "https://github.com/egohygiene/aether/issues/41",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Publish the Mindgarden curator skill and ChatGPT handoff"
+      },
+      "id": 5273313024,
+      "number": 51,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-18T18:48:53Z",
+      "url": "https://github.com/egohygiene/aether/issues/51",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Add a people-first content authoring and review skill"
+      },
+      "id": 5285933827,
+      "number": 56,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-08-29T10:13:55Z",
+      "url": "https://github.com/egohygiene/aether/issues/56",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "spec(distribution): extend release declarations with distribution targets, package coordinates, and publisher bindings"
+      },
+      "id": 5303662554,
+      "number": 63,
+      "proposal": {
+        "format_validation": {
+          "message": "Title matches the selected candidate definition; adoption is not assessed.",
+          "report_sha256": "8a675e7fb823c9b6cb32e9f1da54398b5b2c9a32d643e9738bf6bc978c39f1a3",
+          "status": "conformant",
+          "type": "architecture"
+        },
+        "formatter_sha256": "12b9449f02c8ba21115d5c51eaa369a460b88e3f08183b0c0bd283799c6953a4",
+        "provider_label": "missing",
+        "required_label": "type:architecture",
+        "snapshot": {
+          "complete": true,
+          "labels": [],
+          "schema_version": 1,
+          "title": "🏗️ [architecture] spec(distribution): extend release declarations with distribution targets, package coordinates, and publisher bindings"
+        },
+        "validation": {
+          "message": "Select one known primary type label through review.",
+          "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+          "status": "needs-classification",
+          "type": null
+        }
+      },
+      "reasons": [
+        "PROVIDER_LABEL_MISSING",
+        "CLASSIFICATION_REVIEW_REQUIRED"
+      ],
+      "review": {
+        "id": 5303662554,
+        "number": 63,
+        "subject": "spec(distribution): extend release declarations with distribution targets, package coordinates, and publisher bindings",
+        "type": "architecture"
+      },
+      "status": "blocked",
+      "updated_at": "2026-09-28T21:25:40Z",
+      "url": "https://github.com/egohygiene/aether/issues/63",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Define an evidence-backed agent capability manifest"
+      },
+      "id": 5320732435,
+      "number": 64,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-02T06:47:28Z",
+      "url": "https://github.com/egohygiene/aether/issues/64",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Define governed operational-agent workflows inspired by Teambridge"
+      },
+      "id": 5321929707,
+      "number": 65,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-02T09:02:33Z",
+      "url": "https://github.com/egohygiene/aether/issues/65",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Add a provenance-governed Future-First Design specification and skill"
+      },
+      "id": 5321929943,
+      "number": 66,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-02T09:02:35Z",
+      "url": "https://github.com/egohygiene/aether/issues/66",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Publish a repository-default skill bundle and generated AGENTS guidance"
+      },
+      "id": 5321930183,
+      "number": 67,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-10-03T01:34:34Z",
+      "url": "https://github.com/egohygiene/aether/issues/67",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Publish the reusable repository and organization checkpoint-audit contract"
+      },
+      "id": 5323008619,
+      "number": 68,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-02T10:57:54Z",
+      "url": "https://github.com/egohygiene/aether/issues/68",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Define scoped agent-session and garden-access capabilities"
+      },
+      "id": 5339536840,
+      "number": 69,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-03T17:28:43Z",
+      "url": "https://github.com/egohygiene/aether/issues/69",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Publish an opt-in confidential research skill bundle"
+      },
+      "id": 5339537057,
+      "number": 71,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-03T17:28:45Z",
+      "url": "https://github.com/egohygiene/aether/issues/71",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Publish an evidence-grounded legal document review skill"
+      },
+      "id": 5339537159,
+      "number": 72,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-03T17:28:45Z",
+      "url": "https://github.com/egohygiene/aether/issues/72",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Define task-specific local agent and model evaluation profiles"
+      },
+      "id": 5339570331,
+      "number": 73,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-03T17:32:30Z",
+      "url": "https://github.com/egohygiene/aether/issues/73",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Publish a portable consumer-organization AI context and agent profile"
+      },
+      "id": 5368142427,
+      "number": 77,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-06T22:49:28Z",
+      "url": "https://github.com/egohygiene/aether/issues/77",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Add reviewable brain-dump triage and GitHub backlog promotion skill"
+      },
+      "id": 5377971543,
+      "number": 78,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-28T19:05:41Z",
+      "url": "https://github.com/egohygiene/aether/issues/78",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Backfill repository ADR history and enable continuous decision capture"
+      },
+      "id": 5434779689,
+      "number": 85,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-12T17:03:50Z",
+      "url": "https://github.com/egohygiene/aether/issues/85",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Define composable audit profiles and promote the repository-audit skill"
+      },
+      "id": 5463990853,
+      "number": 86,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-15T15:29:42Z",
+      "url": "https://github.com/egohygiene/aether/issues/86",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Define an architecture-coherence review and human-ratification skill"
+      },
+      "id": 5464101445,
+      "number": 87,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-15T15:39:31Z",
+      "url": "https://github.com/egohygiene/aether/issues/87",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Add roadmap-impact reconciliation as a completion hook for repository-changing agents"
+      },
+      "id": 5468988632,
+      "number": 88,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-16T01:02:28Z",
+      "url": "https://github.com/egohygiene/aether/issues/88",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "Add a reviewable project-incubation bootstrap pack skill"
+      },
+      "id": 5483868252,
+      "number": 89,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-17T06:34:18Z",
+      "url": "https://github.com/egohygiene/aether/issues/89",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "spec(repository-intelligence): define repository manifest, health, snapshot, and organization-state contracts"
+      },
+      "id": 5568612629,
+      "number": 90,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-26T18:09:44Z",
+      "url": "https://github.com/egohygiene/aether/issues/90",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "🧭 Specify bounded issue checkpoints and resumable agent execution"
+      },
+      "id": 5619761275,
+      "number": 92,
+      "proposal": {
+        "format_validation": {
+          "message": "Title matches the selected candidate definition; adoption is not assessed.",
+          "report_sha256": "8a675e7fb823c9b6cb32e9f1da54398b5b2c9a32d643e9738bf6bc978c39f1a3",
+          "status": "conformant",
+          "type": "architecture"
+        },
+        "formatter_sha256": "7fd706230f20528eaa5495031477369993839c5e19c6c5a01731b504f97b26fd",
+        "provider_label": "missing",
+        "required_label": "type:architecture",
+        "snapshot": {
+          "complete": true,
+          "labels": [],
+          "schema_version": 1,
+          "title": "🏗️ [architecture] Specify bounded issue checkpoints and resumable agent execution"
+        },
+        "validation": {
+          "message": "Select one known primary type label through review.",
+          "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+          "status": "needs-classification",
+          "type": null
+        }
+      },
+      "reasons": [
+        "PROVIDER_LABEL_MISSING",
+        "CLASSIFICATION_REVIEW_REQUIRED"
+      ],
+      "review": {
+        "id": 5619761275,
+        "number": 92,
+        "subject": "Specify bounded issue checkpoints and resumable agent execution",
+        "type": "architecture"
+      },
+      "status": "blocked",
+      "updated_at": "2026-09-28T19:04:35Z",
+      "url": "https://github.com/egohygiene/aether/issues/92",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "🧭 Define the shared release-preparation, component-version, and prerelease model"
+      },
+      "id": 5620426015,
+      "number": 93,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-28T21:25:21Z",
+      "url": "https://github.com/egohygiene/aether/issues/93",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "🧭 [Release checkpoint 1] Decide the shared preparation engine and authority boundary"
+      },
+      "id": 5621390000,
+      "number": 94,
+      "proposal": {
+        "format_validation": {
+          "message": "Title matches the selected candidate definition; adoption is not assessed.",
+          "report_sha256": "8a675e7fb823c9b6cb32e9f1da54398b5b2c9a32d643e9738bf6bc978c39f1a3",
+          "status": "conformant",
+          "type": "architecture"
+        },
+        "formatter_sha256": "40a5bffa36c296d46a4a074b27f2809e25156d43e4238f9b684db012b139ea96",
+        "provider_label": "missing",
+        "required_label": "type:architecture",
+        "snapshot": {
+          "complete": true,
+          "labels": [],
+          "schema_version": 1,
+          "title": "🏗️ [architecture] [Release checkpoint 1] Decide the shared preparation engine and authority boundary"
+        },
+        "validation": {
+          "message": "Select one known primary type label through review.",
+          "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+          "status": "needs-classification",
+          "type": null
+        }
+      },
+      "reasons": [
+        "PROVIDER_LABEL_MISSING",
+        "CLASSIFICATION_REVIEW_REQUIRED"
+      ],
+      "review": {
+        "id": 5621390000,
+        "number": 94,
+        "subject": "[Release checkpoint 1] Decide the shared preparation engine and authority boundary",
+        "type": "architecture"
+      },
+      "status": "blocked",
+      "updated_at": "2026-09-28T21:19:34Z",
+      "url": "https://github.com/egohygiene/aether/issues/94",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "📐 [Release checkpoint 2] Specify release units, channels, and state reconciliation"
+      },
+      "id": 5621394945,
+      "number": 95,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-09-28T21:20:02Z",
+      "url": "https://github.com/egohygiene/aether/issues/95",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    },
+    {
+      "current": {
+        "complete": true,
+        "labels": [],
+        "schema_version": 1,
+        "title": "[Later] Compose roadmap, milestone, and checkpoint planning"
+      },
+      "id": 5680197655,
+      "number": 97,
+      "proposal": null,
+      "reasons": [
+        "REVIEWED_TYPE_AND_SUBJECT_REQUIRED"
+      ],
+      "review": null,
+      "status": "needs-classification",
+      "updated_at": "2026-10-02T16:19:05Z",
+      "url": "https://github.com/egohygiene/aether/issues/97",
+      "validation": {
+        "message": "Select one known primary type label through review.",
+        "report_sha256": "38b1f1da25ed1871d3f6e15cd1c9abc9aa1817565f6acbdb46e5c35f5d58fc0f",
+        "status": "needs-classification",
+        "type": null
+      }
+    }
+  ],
+  "schema": "egohygiene.relay.issue-title-plan/v1",
+  "status": "complete",
+  "summary": {
+    "blocked": 3,
+    "needs-classification": 25,
+    "needs-review": 0,
+    "proposed": 0,
+    "unavailable": 0,
+    "unchanged": 0
+  }
+}

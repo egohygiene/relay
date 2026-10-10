@@ -63,6 +63,17 @@ owns desired labels.
 
 ## Thin caller workflows
 
+For the Aether pilot under [Pace #10](https://github.com/egohygiene/pace/issues/10),
+the label lock selects organization catalog `1.1.0` at
+`8b16273eaf0709a7ce95f5e352a2b0d38cfac131`. All four reusable label workflows
+select that same source. Aether receives 18 universal labels with no overlays
+or additions; unrelated provider labels remain retained. This source upgrade
+does not provision labels or promote the independently pinned title runtime.
+See the [local application guide](../../docs/label-rollout-local.md) to apply
+an exact reviewed plan without hosted Actions, including fresh-state checks
+and interruption handling. Local validation is retained in the
+[source-upgrade receipt](../../docs/evidence/labels/aether-source-upgrade-2026-10-10.json).
+
 Plan and apply synchronization from explicit manual workflows. The apply call
 must receive the exact SHA-256 exposed by the reviewed plan run:
 

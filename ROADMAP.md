@@ -8,7 +8,7 @@ status: provisional
 owners:
   - egohygiene
 created: 2026-08-19
-updated: 2026-09-28
+updated: 2026-10-10
 governed_by:
   - architecture-roadmap
 depends_on:
@@ -33,21 +33,21 @@ repository: egohygiene/relay
 visibility: public
 publication: central
 route: /roadmap/relay/
-updated: 2026-09-25
+updated: 2026-10-10
 -->
-## 2026-09-25 execution snapshot
+## 2026-10-10 execution snapshot
 
-> This evidence-reconciled snapshot is the issue-generation and visual-roadmap handoff. The longer-horizon strategy below remains canonical context; generated HTML, JSON, progress, issue plans, and commit lists are projections.
+> This snapshot refreshes the Repository Intelligence execution order and its verified upstream gates on 2026-10-10. Unrelated tracks retain their separately dated evidence; this is not a new audit of every roadmap item. The longer-horizon strategy below remains canonical context; generated HTML, JSON, progress, issue plans, and commit lists are projections.
 
 **Lifecycle:** active released product  
-**Current gate:** Review this roadmap reconciliation, then complete the separate three-repository publication acceptance in [#106](https://github.com/egohygiene/relay/issues/106). [#109](https://github.com/egohygiene/relay/issues/109) owns the independent checkout-directory reproduction defect.
+**Current gate:** Review and integrate the canonical ADR Decisions build in [#115](https://github.com/egohygiene/relay/issues/115) / [PR #135](https://github.com/egohygiene/relay/pull/135), then prove the owner-reviewed Identity #69 canary under Pace #5 before the roadmap campaign. Publication acceptance in [#106](https://github.com/egohygiene/relay/issues/106) remains separate. The checkout-directory repair for [#109](https://github.com/egohygiene/relay/issues/109) is merged; its outstanding work is acceptance evidence and reviewed consumer adoption.
 **North-star outcome:** Immutable, reusable CI building blocks that repositories can pin, verify, and upgrade safely.
 
 ### Visual roadmap publication
 
 **Mode:** `central`  
 **Route:** `/roadmap/relay/`  
-**Current publication evidence:** Versioned GitHub releases and reusable workflow distribution; v1.0 through v1.5 observed.
+**Recorded publication evidence (2026-09-25):** Versioned GitHub releases and reusable workflow distribution; v1.0 through v1.5 observed. Release inventory was not refreshed for this Intelligence checkpoint.
 
 Publish the public-safe projection through egohygiene.io at /roadmap/relay/. This repository owns intent and acceptance evidence; it does not add a second site deployment.
 
@@ -104,10 +104,11 @@ issues: []
 
 **Current evidence:**
 
-- This documentation candidate corrects the stale release, renderer, and
-  consumer-publication summaries. Review/merge and tracker synchronization
-  remain distinct from #106 publication acceptance and #101 final release
-  acceptance; this edit does not mark those outcomes complete.
+- The 2026-10-10 reconciliation updates the ADR-first Intelligence sequence,
+  closed upstream gates, and merged implementation evidence. Review/merge and
+  tracker synchronization remain distinct from #106 publication acceptance and
+  #101 final release acceptance; unrelated tracks have not been re-audited and
+  this edit does not mark those outcomes complete.
 
 <!-- roadmap-step
 id: REL-Q03
@@ -179,8 +180,9 @@ issues: []
 
 **Current evidence:**
 
-- Releases through `v1.5.0` exist. The current hardened consumer pin includes
-  source-declared `v1.6.0` work, but no published `v1.6.0` release was observed.
+- On 2026-09-25, releases through `v1.5.0` were observed. The hardened consumer
+  pin recorded at that checkpoint includes source-declared `v1.6.0` work, but
+  no published `v1.6.0` release was observed then.
   #101 owns final Intelligence release acceptance; release dispatch and fleet
   pin changes are outside this documentation checkpoint.
 
@@ -392,20 +394,84 @@ Organization aggregation remains with Observatory and the organization host.
   live route bytes. #106 must reverify its own acceptance evidence before #33
   closes. #101 retains final integration/release acceptance; Pace #13 retains
   fleet adoption.
-- #109 remains open: identical declared inputs can produce different bytes
-  when checkout basenames differ. Existing same-directory canary proof is not
-  proof of portable reproduction. Repair and downstream pin adoption remain
-  separate work before broad local/fleet adoption.
+- #109's implementation merged in [PR #111](https://github.com/egohygiene/relay/pull/111)
+  as `13f22cb67ae7f2b922e0c75de966610802201bdb` on 2026-09-26. Canonical repository
+  identity now replaces checkout basenames, and the regression compares complete
+  bundles across differently named checkouts. The issue remains open for its
+  exact-head provider evidence and tracked consumer-guidance/adoption acceptance;
+  do not schedule the implemented repair again. Historical pins and rollback
+  bytes retain their documented constraints until separately upgraded.
+
+<!-- roadmap-step
+id: REL-RI-007
+status: active
+depends_on: [REL-RI-004]
+issues: [115]
+-->
+#### REL-RI-007 — Connect canonical ADR evidence to Decisions builds
+
+**State:** `active`
+**Depends on:** `REL-RI-004`
+
+**Outcome:** An explicit read-only collection path validates a consumer's
+canonical ADR corpus through pinned owner contracts and populates the existing
+Decisions renderer without inventing decisions or transferring publication
+authority.
+
+**Exit criteria:**
+
+- [x] The first canonical ADR collection checkpoint is merged in PR #134.
+- [ ] The opt-in native/action/workflow build integration is reviewed and merged.
+- [ ] A real owner-reviewed immutable consumer corpus passes admission and
+  reproduces complete bundles while retaining lifecycle, implementation,
+  lineage, source links, and explicit uncollected-domain states.
+- [ ] Identity #69 receives the reviewed immutable upgrade and repeatable
+  refresh instructions; consumer deployment remains separately evidenced.
+
+**Current evidence (2026-10-10):**
+
+- EgoLint #73, Aether #91, and Observatory #25 are closed. Ratified-policy
+  validation, continuous decision-capture guidance, and partial-domain coverage
+  semantics are available from their owners; they are no longer unimplemented
+  blockers for this lane.
+- [PR #135](https://github.com/egohygiene/relay/pull/135) records the reviewed
+  integration candidate at `9644eb8188827dccb88f4c856c1de7f236a79988`. Its recorded validation
+  covers native/action/workflow admission, deterministic replay across checkout
+  and runtime locations, existing external snapshots, and alpha.2 coverage.
+  Review and integration into current `main` remain the immediate checkpoint.
+- The recorded immutable Hygiene canary preserves 12 canonical records but has
+  source-policy and migration gaps, so production admission remains denied.
+  This is consumer source work, not proof that the shared Decisions renderer is
+  missing. Identity #69 owns the first selected consumer migration; Pace #5
+  owns the subsequent ADR capability campaign.
+- Relay #5/#99 retain hosted acceptance, release and required-mode gates.
+  Supported operational validation can serve this bounded ADR lane without
+  claiming those parent issues or consumer publication complete.
 
 ### Bounded Intelligence completion sequence
 
-1. Review this documentation reconciliation without closing #27, #33, or #106.
-2. Complete #106's current three-repository evidence matrix and post-merge
-   verification; keep failed or unavailable criteria explicit.
-3. Repair #109 and review affected consumer upgrades before broad adoption.
-4. Select required remaining route capabilities through #101's entry criteria;
+1. Review and integrate #115 / PR #135 against current `main`, preserving the
+   existing shared renderers and the distinct source-admission gate. Reconcile
+   #115 against real consumer evidence before declaring its acceptance complete.
+2. Complete Identity #69 as the first ADR/Decisions canary, including a reviewed
+   corpus, immutable Relay upgrade, repeatable refresh and consumer-owned
+   publication evidence; advance the capability through Pace #5 one repository
+   at a time.
+3. Resume #112's roadmap collector with the now-available Observatory #25
+   coverage contract, review its separate runtime/profile repin, then complete
+   #113's opt-in build integration. ADR integration does not silently upgrade
+   the roadmap collector or clear its publication gate.
+4. Reconcile Akashic #197's source-state inconsistency and prove its populated
+   roadmap canary, then advance the second capability through Pace #31.
+5. Close outstanding acceptance from recorded proof: #109's provider and
+   consumer follow-up, #106's three-repository publication matrix, and #33's
+   publication closeout. These are separate evidence gates, not renderer rebuilds.
+6. Select required remaining route capabilities through #101's entry criteria;
    record any nonblocking/post-v1 disposition explicitly in the owning issues.
-5. Complete #101 integration/release acceptance, then Pace #13 adoption waves.
+   Field-attributed Search remains Observatory #24 then Relay #102 even though
+   the supporting-view parent #29 is closed.
+7. Complete #101 integration/release acceptance, then the remaining Pace #13
+   adoption waves without duplicating the ADR and roadmap campaigns.
 
 For every route, track renderer delivery, connected normalized evidence, and
 publication verified at a recorded revision separately. Missing Observatory
@@ -479,14 +545,18 @@ contract without moving sibling policy into Relay.
   annotations, actual upload, runtime permissions/provenance and sanitized logs
   remain unverified. The local/CI exit criterion stays open.
 - EgoLint PR #75 merged the #73 ratified-policy fix as
-  `933472b6322d2060c487e5a8a6f0bc5197696af0`. This bounded Relay candidate refreshes
-  the immutable profile and replays native ADR fixtures. Valid ratified ADR
-  coverage may pass; old policy references fail and legacy adoption stays partial.
+  `933472b6322d2060c487e5a8a6f0bc5197696af0`. Relay adopted that profile in
+  [PR #121](https://github.com/egohygiene/relay/pull/121), merged on 2026-10-03 as
+  `33e1fc78727269bd3821dea53f6541f769cf4319`; this is no longer an unmerged
+  adoption candidate. Valid ratified ADR coverage may pass; old policy
+  references fail and legacy adoption stays partial.
   [Local evidence](docs/evidence/repository-architecture-ratified-policy.json)
   remains separate from hosted acceptance, release and consumer rollout.
 - ADR/Decisions adoption under Pace #5 is the current fleet priority. Relay
-  #115 owns canonical collection/build and Aether #91 owns continuous capture
-  guidance; roadmap rollout in Pace #31 follows the ADR campaign.
+  #115 / PR #135 owns the current canonical collection/build checkpoint;
+  Aether #91's continuous-capture guidance is closed. Identity #69 is the
+  selected first canary, and roadmap rollout in Pace #31 follows the ADR
+  campaign. See REL-RI-007 and the bounded completion sequence.
 
 ### Repository continuity preflight track
 
@@ -624,12 +694,14 @@ consumer evidence is tracked in Phase 5.
 
 ## Phase 4: Publish immutable releases
 
-**Status:** `v1.0.0` through `v1.5.0` are published immutably. The current
-release declaration, changelog, and version authority prepare the additive
-`v1.6.0` surface: product-facing release names, legacy-workflow intake policy,
+**Status (release evidence observed 2026-09-25):** `v1.0.0` through `v1.5.0`
+were published immutably. The release declaration, changelog, and version
+authority at that checkpoint prepared the additive `v1.6.0` surface:
+product-facing release names, legacy-workflow intake policy,
 advisory-first stale pull-request lifecycle automation, and reusable artifact
-size/performance budgets, plus bounded CI report preservation. Publication
-remains an explicit manual dispatch after review.
+size/performance budgets, plus bounded CI report preservation. This Intelligence
+refresh does not establish a newer published release; publication remains an
+explicit manual dispatch after review.
 
 **Outcome:** A bounded capability advances from documented intent to validated, independently usable behavior.
 
@@ -678,9 +750,17 @@ Optional managed services, enterprise controls, marketplaces, and the conversati
   complete workflow catalog, immutable-pin adoption example, privacy fixtures,
   and validation suite. Published releases through `v1.5.0`, closed #104/#105,
   and recorded Akashic/Empathy acceptance were observed on 2026-09-25.
-  Source-declared `v1.6.0` is not yet an observed published release.
+  Source-declared `v1.6.0` was not observed as a published release at that
+  checkpoint; release inventory was not re-audited on 2026-10-10.
+- **Observed on 2026-10-10:** The core Intelligence renderers and supporting
+  views are delivered. Relay PR #111's portability repair and PR #121's
+  ratified-policy adoption are merged. EgoLint #73, Aether #91, and Observatory
+  #25 are closed. Relay #115 / PR #135 remains the open ADR build integration
+  checkpoint; real consumer source acceptance and deployment remain separate.
 - **Decided for this draft:** The repository owns the bounded concern described here and participates through versioned contracts.
 - **Proposed:** Target systems and later roadmap phases remain proposals until accepted and implemented.
-- **Open work:** #106 publication reconciliation, #109 portable reproduction,
-  #101 final integration/release acceptance, and Pace #13 fleet rollout remain
-  distinct. Historical acceptance does not prove present deployment freshness.
+- **Open work:** The selected execution path is #115 / PR #135 → Identity #69
+  and Pace #5 → #112/#113 → Akashic #197 and Pace #31. #109 acceptance after its
+  merged repair, #106 publication reconciliation, #101 final integration/release
+  acceptance, and Pace #13 fleet rollout remain distinct. Historical acceptance
+  does not prove present deployment freshness.

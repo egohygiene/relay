@@ -1,0 +1,25 @@
+{
+  "issues": [
+    {
+      "id": 5303662554,
+      "number": 63,
+      "subject": "spec(distribution): extend release declarations with distribution targets, package coordinates, and publisher bindings",
+      "type": "architecture"
+    },
+    {
+      "id": 5619761275,
+      "number": 92,
+      "subject": "Specify bounded issue checkpoints and resumable agent execution",
+      "type": "architecture"
+    },
+    {
+      "id": 5621390000,
+      "number": 94,
+      "subject": "[Release checkpoint 1] Decide the shared preparation engine and authority boundary",
+      "type": "architecture"
+    }
+  ],
+  "repository": "egohygiene/aether",
+  "schema": "egohygiene.relay.issue-title-reviews/v1",
+  "snapshot_sha256": "bb2198f37cc45437528a2e8aede017223e28669ded1ab9da5e4a68d98ea31dbc"
+}

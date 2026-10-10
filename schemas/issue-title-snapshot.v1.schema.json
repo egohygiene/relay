@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/issue-title-snapshot.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "repository",
+    "observed_at",
+    "finished_at",
+    "coverage",
+    "issues",
+    "labels",
+    "excluded_pull_requests"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.relay.issue-title-snapshot/v1"
+    },
+    "kind": {
+      "enum": [
+        "synthetic",
+        "github-public"
+      ]
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "id",
+        "visibility"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+        },
+        "id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "visibility": {
+          "const": "public"
+        }
+      }
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "finished_at": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "issues",
+        "labels"
+      ],
+      "properties": {
+        "issues": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "pages",
+            "error"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "complete",
+                "partial",
+                "unavailable"
+              ]
+            },
+            "pages": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "number",
+                  "records",
+                  "sha256"
+                ],
+                "properties": {
+                  "number": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "records": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              },
+              "maxItems": 20
+            },
+            "error": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z_0-9]{0,79}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "pages",
+            "error"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "complete",
+                "partial",
+                "unavailable"
+              ]
+            },
+            "pages": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "number",
+                  "records",
+                  "sha256"
+                ],
+                "properties": {
+                  "number": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "records": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              },
+              "maxItems": 20
+            },
+            "error": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z_0-9]{0,79}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "number",
+          "url",
+          "updated_at",
+          "title",
+          "labels",
+          "complete"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 1024
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "maxItems": 100,
+            "uniqueItems": true
+          },
+          "complete": {
+            "type": "boolean"
+          }
+        }
+      },
+      "maxItems": 2000
+    },
+    "labels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "color",
+          "description"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{6}$"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1024
+          }
+        }
+      },
+      "maxItems": 2000
+    },
+    "excluded_pull_requests": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2000
+    }
+  }
+}
