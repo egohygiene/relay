@@ -85,7 +85,12 @@ button, input, select { font: inherit; }
   backdrop-filter: blur(18px);
 }
 
-.ri-global-header nav { display: flex; gap: 1.25rem; font-size: 0.88rem; }
+.ri-global-header nav { display: flex; align-items: center; gap: 0.35rem; }
+.ri-global-link { display: inline-flex; align-items: center; justify-content: center; min-width: 3rem; min-height: 3rem; border-radius: 0.7rem; }
+.ri-global-link:hover { background: rgba(174, 186, 228, 0.1); }
+.ri-global-link img { display: block; width: 2rem; height: 2rem; object-fit: contain; }
+.ri-global-link--organization img { width: 2.75rem; height: 2.75rem; }
+.ri-global-link--github img { filter: brightness(0) invert(1); }
 
 .ri-brand {
   display: inline-flex;

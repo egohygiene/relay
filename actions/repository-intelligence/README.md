@@ -19,6 +19,27 @@ separate review-only envelope remains publication-denied. See the collector
 guide for pinned runtime acquisition, offline use, provenance, and Identity #69
 adoption gates.
 
+### Navigation branding
+
+The shared shell packages the organization mark and GitHub icon locally, with
+named, keyboard-focusable navigation links. Every routed page and the standalone
+dashboard uses the same organization favicon with a relative bundle path.
+Consumers receive these assets by selecting the reviewed immutable Relay
+revision and rebuilding; existing host branding outside the subtree is unchanged.
+
+- `assets/egohygiene.png` preserves the exact organization avatar observed on
+  2026-10-10 at `https://avatars.githubusercontent.com/u/196492251?v=4`
+  (GitHub organization `egohygiene`, ID `196492251`; 460 × 460 pixels).
+  SHA-256: `cc09173cd26cade507423c22c5cca914cc424563d402341310fbe796ce81951a`.
+  This is a dated organization-owned branding capture, not an immutable upstream
+  revision or a runtime image request.
+- `assets/github.svg` preserves the exact [existing SVG](https://github.com/egohygiene/egohygiene/blob/5eaa26a1c82fbbc7a351b4cc774758161441f56f/publishing/sources/magazine/app/src/stories/assets/github.svg)
+  (blob `dc513528ca899d698d55418bd3a39c036d01e21e`).
+  SHA-256: `a4113cf2c6e0e6fba99a85498e6b7c84c42d8c13928f89e0eede78bc596e0add`.
+  Its source repository's [MIT notice](https://github.com/egohygiene/egohygiene/blob/5eaa26a1c82fbbc7a351b4cc774758161441f56f/LICENSE)
+  is Copyright (c) 2026 Ego Hygiene; GitHub retains its trademark rights.
+  CSS presents the unchanged dark mark in white against the shared dark header.
+
 ## Consumer contract
 
 After a complete-history checkout, the production integration can be one step:
