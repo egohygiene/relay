@@ -538,7 +538,14 @@ class RepositoryIntelligenceDashboardTests(unittest.TestCase):
         self.assertEqual(first_files, second_files)
         self.assertEqual(
             set(first_files),
-            {"explorer.js", "index.html", "provenance.json", "styles.css", "summary.json"},
+            {
+                "egohygiene.png",
+                "explorer.js",
+                "index.html",
+                "provenance.json",
+                "styles.css",
+                "summary.json",
+            },
         )
         first_json = first_files["summary.json"].decode("utf-8")
         first_html = first_files["index.html"].decode("utf-8")
