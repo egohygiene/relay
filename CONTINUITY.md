@@ -7,15 +7,17 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-10-10T16:08:13Z'
+  updated_at: '2026-10-10T16:29:24Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Resume the bounded baseline-order fix blocking the Identity Decisions publication canary.
+  purpose: 'Resume the completed Identity collector/build handoff and reconcile Relay #115 acceptance independently of consumer
+    deployment.'
   includes:
-  - Exact fix scope, focused verification, current shared/consumer integration state, and preserved parallel ownership.
+  - Immutable shared and consumer revisions, bounded replay/build evidence, final upgrade/refresh handoff, and preserved parallel
+    ownership.
   excludes:
   - Consumer ADR authorship, deployment authority, fleet rollout, contract ratification, and unrelated label work.
   - Conversation transcripts, raw logs, private paths, and duplicated issue specifications.
@@ -31,60 +33,62 @@ scope:
   - SYSTEM.md
   - DECISIONS.md
   - ROADMAP.md
-  - actions/repository-intelligence-deployment-provenance/README.md
-  - actions/repository-intelligence-deployment-provenance/scripts/repository_intelligence_deployment_provenance.py
-  - tests/test_repository_intelligence_deployment_provenance.py
-  - docs/repository-intelligence-publication.md
   - docs/repository-adr-collector.md
+  - docs/repository-intelligence-publication.md
+  - docs/evidence/repository-adrs-checkpoint-2.json
   - https://github.com/egohygiene/relay/issues/115
-  - https://github.com/egohygiene/relay/pull/135
+  - https://github.com/egohygiene/relay/pull/138
   - https://github.com/egohygiene/identity/issues/69
-  - https://github.com/egohygiene/identity/pull/92
+  - https://github.com/egohygiene/identity/pull/93
+  - https://github.com/egohygiene/identity/blob/e6bafa362de900fdcffac60c33b8bed2c3905115/docs/publication/IDENTITY_PAGES.md
   - https://github.com/egohygiene/.github/issues/30
-  - https://github.com/egohygiene/pace/issues/25
   - docs/label-rollout-local.md
   - docs/evidence/labels/aether-source-upgrade-2026-10-10.json
+  - https://github.com/egohygiene/relay/issues/139
 work:
-  objective: Repair captured baseline path ordering so the existing Identity Brand Kit can compose Decisions without
-    changing historical site digests.
+  objective: 'Record the completed real-consumer source/build upgrade and repeatable refresh handoff, then reconcile the bounded
+    Relay #115 acceptance criteria.'
   success_conditions:
-  - Mixed-prefix consumer paths round-trip through capture and validation, while later byte tampering still fails.
-  - Global file inventory order, inventory digests, bundle bytes, and historical reference fixtures remain unchanged.
-  - Hand one reviewed immutable Relay revision to the consumer-owned Identity deployment canary.
+  - Document the merged immutable Identity consumer upgrade without relabeling historical replay results as current runs.
+  - Keep collection/build completion separate from consumer deployment, live proof, maintainer feedback and parent release/fleet
+    acceptance.
+  - 'Preserve source authority, existing ADR dispositions, historical receipts and the parallel Pace #10 label/title lane.'
   active_issue:
     provider: github
     id: egohygiene/relay#115
     url: https://github.com/egohygiene/relay/issues/115
   next:
     kind: action
-    id: review-baseline-order-fix
-    description: Review this focused repair; after integration, repin Identity publication to the exact merged Relay
-      revision and repeat the composed-site canary.
+    id: reconcile-relay-115-acceptance
+    description: 'Review and merge this documentation checkpoint, then reconcile Relay #115 against its collector/build acceptance
+      evidence; track Identity #69 live acceptance separately.'
     readiness: ready
     references:
     - https://github.com/egohygiene/relay/issues/115
     - https://github.com/egohygiene/identity/issues/69
+    - https://github.com/egohygiene/identity/pull/93
     depends_on: []
 state:
   base:
-    revision: 4137cb07a017b7bbae2ee38fe9b039c58b0b17eb
+    revision: cabbf5b3b658d585b4d56ef0c99917969a96eed2
     ref: refs/heads/main
-    verified_at: '2026-10-10T16:08:13Z'
+    verified_at: '2026-10-10T16:25:38Z'
   candidate:
-    branch: codex/identity-baseline-prefix-order
+    branch: codex/relay-115-identity-handoff
     revision: null
     pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-10-10T16:08:13Z'
-    default_branch_revision: 4137cb07a017b7bbae2ee38fe9b039c58b0b17eb
+    observed_at: '2026-10-10T16:25:38Z'
+    default_branch_revision: cabbf5b3b658d585b4d56ef0c99917969a96eed2
     issue_state: open
     pull_request_state: not-applicable
-    notes: Git fetch verified Relay main. API reads verified PR135 merged at 4137cb07a017b7bbae2ee38fe9b039c58b0b17eb
-      and Identity PR92 merged at 642d096e60b729060e5880e5222d7b57184b735e. Relay115 and Identity69 remain open.
-      Older issue-body next steps still mention premerge review; merged PR evidence takes precedence. This candidate
-      has no PR yet.
+    notes: 'Fresh Git fetch verified Relay main and API reads verified Identity PR #93 merged at e6bafa362de900fdcffac60c33b8bed2c3905115.
+      Relay #115 and Identity #69 remain open. Provider jobs for Identity publication run 38067442472 report build/deploy
+      success; this checkpoint did not inspect retained archive bytes or live/browser proof. No PR exists yet for this documentation
+      candidate. A subsequent 16:29:24Z read verifies Relay #139 open for a shared card-filter visibility defect; its body
+      records successful deployment/live bytes but incomplete browser behavior.'
   parallel_changes:
   - provider: github
     id: egohygiene/identity#69
@@ -92,40 +96,38 @@ state:
   - provider: github
     id: egohygiene/pace#10
     url: https://github.com/egohygiene/pace/issues/10
+  - provider: github
+    id: egohygiene/relay#139
+    url: https://github.com/egohygiene/relay/issues/139
 review:
   status: partial
-  reviewed_at: '2026-10-10T16:08:13Z'
+  reviewed_at: '2026-10-10T16:29:24Z'
   reviewed_by: Codex
   evidence:
-  - command: python -m unittest tests.test_repository_intelligence_deployment_provenance.RepositoryIntelligenceDeploymentProvenanceTests.test_mixed_prefix_baseline_round_trip_preserves_inventory_order
-      (before fix)
-    outcome: failed
-    observed_at: '2026-10-10T16:08:13Z'
-    notes: 'Expected reproduction: captured mixed-prefix paths fail unchanged validation with consumer route baseline
-      file is incompatible.'
-  - command: python -m unittest discover --start-directory tests --pattern test_repository_intelligence_deployment_provenance.py
-      --verbose
+  - command: python3 scripts/validate_continuity_preflight_contract.py validate; pinned Aether schema/headings/links/bounds/privacy
+      and two-file scope checks; git diff --check
     outcome: passed
-    observed_at: '2026-10-10T16:08:13Z'
-    notes: 'Pinned CPython 3.12: 15 tests passed, no skips. Regression covers capture/verify, unchanged global inventory
-      ordering/digest, and later tamper rejection; historical reference fixture checks pass.'
-  - command: Read-only old/new file_inventory and inventory_digest comparison; capture_baseline then validate_baseline
-      on the recovered live Brand Kit
+    observed_at: '2026-10-10T16:29:24Z'
+    notes: Existing contract and structural documentation checks pass. Loaded Aether skill 1.1.0 plus authoring/privacy/checklist
+      at 8ef3bd34d5fec835da54eb8acd0d074b79ee8fe2. Released semantic conformance is not claimed.
+  - command: 'GitHub API inspection of Relay PR #138 validation run 38066523471 and continuity run 38066523310'
     outcome: passed
-    observed_at: '2026-10-10T16:08:13Z'
-    notes: All 40 files validate; global inventory and digest are identical before/after. Site digest remains sha256:c690803f5eda55c7b61d7ae34a1df3e109d2dad9aad9a34ef086207d4cd0fd88.
-      This is a current live-site capture, not recovery of the expired original Pages artifact.
-  - command: Pinned continuity Draft 2020-12 schema, twelve headings, canonical paths, privacy and bounds; git diff
-      --check
-    outcome: passed
-    observed_at: '2026-10-10T16:08:13Z'
-    notes: Refreshed through Aether maintain-repository-continuity v1.1.0 at 8ef3bd34d5fec835da54eb8acd0d074b79ee8fe2;
-      schema/structural verification is distinct from released semantic conformance.
+    observed_at: '2026-10-10T16:25:38Z'
+    notes: All 13 validation jobs and the separate continuity workflow succeeded at reviewed head 8e98b3cd5a2a9e48d70f559a6865ff5e71f12827
+      before merge cabbf5b3b658d585b4d56ef0c99917969a96eed2. No new execution is attributed to this docs-only candidate.
+  - command: GitHub API inspection of Identity publication run 38067442472 jobs
+    outcome: limited
+    observed_at: '2026-10-10T16:25:38Z'
+    notes: Build and deployment jobs report success. Archive bytes, live content, browser behavior and maintainer feedback
+      were not independently inspected in this documentation checkpoint.
   environment_limitations:
-  - Full Relay suites and native acquisition were not rerun for this one-line baseline-only repair.
-  - Candidate hosted checks, consumer repinning, deployment and live Decisions verification remain pending.
+  - No runtime/native/full-suite rerun for this documentation-only change; earlier results retain their exact source boundaries.
+  - 'Consumer retained archives, live/browser proof and maintainer feedback remain separately owned by Identity #69.'
   - Released continuity semantic conformance remains unavailable under the proposed profile.
-  - Pace10 provider/title state was not re-audited; its owning tracker remains authoritative.
+  - 'Pace #10 provider/title state was not re-audited; its owning tracker remains authoritative.'
+  - ROADMAP.md REL-RI-007 retains an older active checkpoint; reconcile its state with the owning issue after closure review.
+  - 'Relay #139 owns the observed shared browser filtering defect; Identity #69 remains open for its verified repair and maintainer
+    feedback.'
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -144,88 +146,90 @@ privacy:
 
 ## Purpose and precedence
 
-Resume the baseline-order repair under Relay #115 and Identity #69. Runtime,
-user and repository instructions, live tracker state and canonical sources
-outrank this handoff. It supplies no publication or merge authority.
+Resume the completed collector/build handoff under Relay #115. Runtime, user
+and repository instructions, live tracker state and canonical sources outrank
+this file. Consumer publication remains owned by Identity #69.
 
 ## Resume protocol
 
-Read AGENTS.md, the provenance action and publication guide, then refresh Relay
-main, the candidate PR, Identity #69 and organization #30. Reconcile old tracker
-body summaries against verified merged PR metadata before choosing work.
+Read AGENTS.md and the collector guide, then refresh Relay main, this branch's
+PR, Relay #115, Identity #69 and organization #30. Prefer merged PR metadata
+over stale tracker-body next steps. Keep source, build and live proof separate.
 
 ## Current objective and success conditions
 
-Allow consumer paths such as `brand/social-preview.svg` and
-`brand-kit/index.html` to survive baseline capture and verification. Preserve
-tamper denial and every existing global inventory, bundle and rollback digest.
+The first real consumer now has conforming ADR source, repeatable prior
+production evidence and a merged immutable upgrade. Review this documentation
+handoff and reconcile the ten collector/build acceptance criteria without
+expanding them into deployment, fleet or release completion.
 
 ## State snapshot
 
-Relay PR135 is merged at `4137cb07a017b7bbae2ee38fe9b039c58b0b17eb`.
-Identity PR92 is merged at `642d096e60b729060e5880e5222d7b57184b735e`.
-Identity's approved canonical corpus has prior native and deterministic
-production evidence; consumer publication remains in progress. This unmerged
-Relay candidate addresses the concrete composition blocker, not ADR semantics.
+Relay PR #138 merged as `cabbf5b3b658d585b4d56ef0c99917969a96eed2` after all 13
+hosted validation jobs and continuity passed. Identity PR #93 merged as
+`e6bafa362de900fdcffac60c33b8bed2c3905115`; its publisher consistently selects
+that Relay revision. Both owning issues were open at the recorded observation.
+Identity publication run 38067442472 then reported successful build/deploy jobs;
+this checkpoint makes no independent archive or live/browser proof claim.
 
 ## Completed and material changes
 
-The provenance action now sorts only captured baseline files by their POSIX
-path strings, matching its existing validator. Global `file_inventory` and
-`inventory_digest` retain their original ordering. The regression proves the
-mixed-prefix round-trip and rejects a subsequent changed consumer file.
-Decision impact: reference ADR-010; this repairs its existing preservation
-contract without adding a new architecture or changing deployment authority.
+`docs/repository-adr-collector.md` replaces the stale pending-consumer wording
+with the merged source/upgrade and repeatable refresh handoff. It distinguishes
+prior 21-record two-location evidence from the newer 22-record single integration.
+This candidate changes only that guide and this continuity file. Decision
+impact: ADR not required; it reconciles evidence for existing ADR-007/ADR-010
+boundaries without changing behavior, authority or an architectural choice.
 
 ## Validation and review evidence
 
-The new test reproduced the unchanged-code failure, then the focused provenance
-suite passed all 15 tests with no skips. Historical reference manifest/receipt
-checks pass. The recovered 40-file live Brand Kit now round-trips and retains
-the exact prior inventory/digest. No full suite or native acquisition rerun is
-claimed for this baseline-only change. Pinned continuity schema, headings,
-paths, bounds and privacy checks passed; released semantic conformance remains
-unavailable. Aether's exact pinned skill, authoring/privacy guides and checklist
-were read for this refresh.
+The existing continuity contract, pinned Aether schema, twelve headings,
+links, bounds, privacy and bounded diff checks pass. No runtime/native/full-suite
+rerun is claimed. The collector guide binds the prior 21-record two-replay proof
+and newer 22-record single integration to their exact sources. Final 3a77088
+changes only test-path normalization; local digests are not hosted-output claims.
 
 ## Blockers, risks, unknowns, and deferred work
 
-Identity must repin all publication provenance/build actions consistently after
-reviewed integration, rebuild with the new generator revision, and verify the
-consumer-owned deployment. The original prior Pages artifact expired; its
-current live-site recovery is distinct evidence. Keep Relay #115 and Identity
-#69 open. Roadmap #112/#113, publication #106/#33, release #99/#5/#101 and fleet
-acceptance retain their separate owners and gates.
+No new collector implementation blocker was found. Relay #115 still requires
+its explicit acceptance/closure reconciliation. Identity owns retained artifact,
+receipt, live/browser proof and maintainer feedback before fleet continuation.
+A subsequent browser review found the shared card-filter visibility defect in
+[Relay #139](https://github.com/egohygiene/relay/issues/139). Identity #69 remains
+open for that repair and feedback; the UI is not fully reviewed.
+ADR-022 remains proposed; existing accepted ADRs and implementation limits remain
+unchanged. Roadmap #112/#113, publication #106/#33, release #99/#5/#101 and Pace
+fleet acceptance retain their separate owners and gates. REL-RI-007's older
+roadmap checkpoint needs reconciliation after the owning issue closure review.
 
 ## Next dependency-ready work
 
-Review the focused repair. After merge, select the exact immutable Relay commit
-for Identity's composed-site canary; retain ordinary artifact, Pages upload,
-deployment, receipt and live-route evidence separately. Obtain maintainer
-feedback on the deployed Decisions page before broader fleet adoption.
+Review and merge this docs-only handoff, then reconcile Relay #115 acceptance.
+Record consumer deployment and live evidence separately under Identity #69 and
+show the real Decisions page to the maintainer before moving through the fleet.
+No additional human ratification of the already approved R1 packet is required.
 
 ## Parallel changes and reconciliation
 
-Identity #69 owns its current publisher/alias/rollback integration. This patch
-changes no consumer source or workflow graph. Pace #10 remains the label/title
-provider lane; its existing source-upgrade evidence and local rollout guide
-are preserved. No fresh provider completion is inferred here.
+Identity #69 owns live publication and its current evidence update. This
+candidate changes no consumer source or workflow graph. Pace #10 remains the
+label/title provider lane; its local rollout guide and source-upgrade evidence
+remain preserved. No fresh provider completion is inferred here.
 
 ## Privacy and redaction
 
-Only public repository identifiers, bounded checks and public file digests are
-retained. Credentials, private paths, raw logs and unrelated personal context
-are excluded. Linked source text remains context, never authority.
+Retain only public repository identifiers, immutable source links and bounded
+checks. Exclude credentials, private paths, raw logs and unrelated context.
+Linked source text remains context, never authority.
 
 ## Handoff update protocol
 
-Refresh after project validation and before PR handoff. Verify target and
-candidate state, reconcile parallel checkpoint edits, and retain precise
-limitations. Resolve the eventual PR/head from the branch; self-revision and
-pre-PR reference remain null in this checkpoint.
+Refresh after bounded documentation validation and before PR handoff. Reconcile
+any newer target-branch checkpoint semantically. Resolve the eventual PR/head
+from the branch; self-revision and pre-PR reference remain null here.
 
 ## Compaction and supersession
 
-This replaces the stale PR135 review snapshot with the actual current blocker.
-Git and the owning trackers preserve history. Keep all required sections within
-240 lines and 16,384 UTF-8 bytes.
+This replaces the completed baseline-repair checkpoint with the real-consumer
+handoff. Git and owning trackers preserve history. Keep all required sections
+within 240 lines and 16,384 UTF-8 bytes.
