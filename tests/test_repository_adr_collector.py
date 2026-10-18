@@ -92,6 +92,15 @@ class BoundaryTests(unittest.TestCase):
                 "--policy-owner", "--policy-reference", POLICY])
         self.assertEqual(raised.exception.code, 2)
 
+    def test_external_declarations_are_bounded_unique_qualified_and_canonical(self):
+        first, second = "egohygiene/identity#ADR-017", "egohygiene/relay#ADR-0001"
+        self.assertEqual(collector.inputs.external_decisions(json.dumps([second, first])), [first, second])
+        for value in ("", "{}", '"private prose"', "[null]", '["ADR-017"]',
+                      json.dumps([first, first]), json.dumps([first] * 65),
+                      "[" * 9000, '["egohygiene/identity#ADR-017\\n"]'):
+            with self.subTest(value=value[:30]), self.assertRaises(ValueError):
+                collector.inputs.external_decisions(value)
+
     def test_private_unknown_and_internal_requests_replace_prior_output_with_closed_denial(self):
         consumer = self.root / "consumer"
         consumer.mkdir()
@@ -190,6 +199,23 @@ class NativeTests(unittest.TestCase):
         (self.consumer / "schemas/architecture-decision.v1.schema.json").write_text("dirty bytes")
         replay = self.collect(repository="egohygiene/hygiene", policy_owner=True, source_commit=original.source_commit)
         self.assertEqual(result, replay)
+
+    def test_external_reference_needs_explicit_selection_and_never_fabricates_a_target(self):
+        reference = "egohygiene/identity#ADR-017"
+        self.change(NEW, "related: []", "related: [" + reference + "]")
+        missing = self.collect()
+        wrong = self.collect(known_external_decisions='["egohygiene/identity#ADR-999"]')
+        for result in (missing, wrong):
+            self.assertEqual(result["status"], "invalid")
+            self.assertIn("EGO-INTEL-ADR-LINEAGE-001", {d["code"] for d in result["diagnostics"]})
+        selected = self.collect(known_external_decisions=json.dumps([reference]))
+        self.assertEqual(selected["status"], "ready", selected["diagnostics"])
+        self.assertEqual(selected["inputs"]["known_external_decisions"], [reference])
+        self.assertNotIn("EGO-INTEL-ADR-LINEAGE-001", {d["code"] for d in selected["diagnostics"]})
+        self.assertEqual(len(selected["projection_candidate"]["entities"]), 4)
+        self.assertEqual({e["repository"] for e in selected["projection_candidate"]["entities"]},
+                         {"egohygiene/relay"})
+        self.assertEqual(selected["coverage"]["history"]["collection"], "uncollected")
 
     def test_owner_identity_and_captured_policy_bytes_are_still_egolint_findings(self):
         owner_corpus(self.consumer, self.runtime)

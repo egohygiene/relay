@@ -145,6 +145,7 @@ def collect(args, target):
         "--source-commit", args.source_commit, "--observed-at", observed,
         "--adoption", "present", "--output", str(target.parent / "unused-review.json")])
     native.policy_owner = args.policy_owner
+    native.known_external_decisions = args.known_external_decisions
     current_stage = ["collection"]
     try:
         result = collector.collect(native, on_stage=lambda name: current_stage.__setitem__(0, name))
@@ -187,6 +188,8 @@ def parser():
     result.add_argument("--observatory-comparison", default="")
     result.add_argument("--policy-owner", action="store_true",
                         help="Use the pinned canonical ADR policy-owner selection for Hygiene.")
+    result.add_argument("--known-external-decisions", default="[]",
+                        help="Bounded JSON array of declared external ADR keys for native validation.")
     return result
 
 
@@ -197,6 +200,8 @@ def main():
         if args.observatory_snapshot or args.observatory_comparison:
             raise ValueError("conflicting-inputs")
         target = output_paths(args)
+        input_contract = module("relay_adr_inputs", SCRIPTS / "repository_adr_inputs.py")
+        input_contract.selection(args.known_external_decisions, "true")
         if args.visibility != "public":
             raise ValueError("visibility")
         if args.runtime is None:

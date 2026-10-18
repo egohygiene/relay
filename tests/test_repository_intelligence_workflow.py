@@ -47,7 +47,7 @@ class RepositoryIntelligenceWorkflowTests(unittest.TestCase):
     def test_workflow_exposes_both_observatory_inputs_for_call_and_dispatch(self) -> None:
         """Require snapshot/comparison parity on both public invocation surfaces."""
 
-        for input_name in ("observatory-snapshot", "observatory-comparison", "adr-policy-owner"):
+        for input_name in ("observatory-snapshot", "observatory-comparison", "adr-policy-owner", "adr-known-external-decisions"):
             with self.subTest(input_name=input_name):
                 self.assertEqual(
                     len(re.findall(rf"^      {re.escape(input_name)}:$", self.workflow, re.MULTILINE)),
@@ -69,6 +69,7 @@ class RepositoryIntelligenceWorkflowTests(unittest.TestCase):
             self.workflow,
         )
         self.assertEqual(self.workflow.count('adr-policy-owner: "${{ inputs.adr-policy-owner }}"'), 3)
+        self.assertEqual(self.workflow.count('adr-known-external-decisions: "${{ inputs.adr-known-external-decisions }}"'), 3)
         self.assertNotIn("compare_snapshots", self.workflow)
         self.assertNotIn("score:", self.workflow)
 
@@ -233,12 +234,12 @@ class RepositoryIntelligenceWorkflowTests(unittest.TestCase):
             parameter["name"]: parameter
             for parameter in entry["inputs"]
         }
-        for input_name in ("observatory-snapshot", "observatory-comparison", "adr-policy-owner"):
+        for input_name in ("observatory-snapshot", "observatory-comparison", "adr-policy-owner", "adr-known-external-decisions"):
             with self.subTest(input_name=input_name):
                 self.assertIn(input_name, inputs)
                 self.assertEqual(inputs[input_name]["type"], "boolean" if input_name == "adr-policy-owner" else "string")
                 self.assertFalse(inputs[input_name]["required"])
-                self.assertEqual(inputs[input_name]["default"], False if input_name == "adr-policy-owner" else "")
+                self.assertEqual(inputs[input_name]["default"], False if input_name == "adr-policy-owner" else "[]" if input_name == "adr-known-external-decisions" else "")
 
     def test_existing_smoke_call_remains_the_partial_adoption_canary(self) -> None:
         """No-snapshot workflow execution must stay a first-class tested path."""

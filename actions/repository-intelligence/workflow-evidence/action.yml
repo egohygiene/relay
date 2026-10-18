@@ -74,6 +74,10 @@ inputs:
     description: Explicit canonical Hygiene ADR policy-owner selection; requires collect-adrs.
     required: false
     default: "false"
+  adr-known-external-decisions:
+    description: JSON array of declared external ADR keys; requires collect-adrs when nonempty.
+    required: false
+    default: "[]"
   observatory-snapshot:
     description: "Optional Observatory snapshot path."
     required: false
@@ -188,6 +192,7 @@ runs:
         INPUT_CHECKOUT_OUTCOME: "${{ inputs.checkout-outcome }}"
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
         INPUT_ADR_POLICY_OWNER: "${{ inputs.adr-policy-owner }}"
+        INPUT_ADR_KNOWN_EXTERNAL_DECISIONS: "${{ inputs.adr-known-external-decisions }}"
         INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
         INPUT_EVENT_DEFAULT_BRANCH: "${{ inputs.event-default-branch }}"
         INPUT_EVENT_NAME: "${{ inputs.event-name }}"
@@ -236,6 +241,7 @@ runs:
           --reports-directory="${INPUT_REPORTS_DIRECTORY}" \
           --collect-adrs="${INPUT_COLLECT_ADRS}" \
           --adr-policy-owner="${INPUT_ADR_POLICY_OWNER}" \
+          --adr-known-external-decisions="${INPUT_ADR_KNOWN_EXTERNAL_DECISIONS}" \
           --observatory-snapshot="${INPUT_OBSERVATORY_SNAPSHOT}" \
           --observatory-comparison="${INPUT_OBSERVATORY_COMPARISON}" \
           --default-branch="${INPUT_DEFAULT_BRANCH}" \

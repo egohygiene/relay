@@ -48,6 +48,10 @@ inputs:
       Requires collect-adrs; ordinary consumers keep their inheritance reference.
     required: false
     default: "false"
+  adr-known-external-decisions:
+    description: JSON array of explicitly declared external ADR keys; requires collect-adrs when nonempty.
+    required: false
+    default: "[]"
   observatory-snapshot:
     description: >-
       Optional repository-relative path to a public-safe Observatory Repository
@@ -210,6 +214,7 @@ runs:
         INPUT_ACTIVITY_REF: "${{ inputs.activity-ref }}"
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
         INPUT_ADR_POLICY_OWNER: "${{ inputs.adr-policy-owner }}"
+        INPUT_ADR_KNOWN_EXTERNAL_DECISIONS: "${{ inputs.adr-known-external-decisions }}"
         INPUT_ADR_RUNTIME: "${{ inputs.adr-runtime }}"
         INPUT_AS_OF: "${{ inputs.as-of }}"
         INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
@@ -263,6 +268,7 @@ runs:
           printf 'adr-runtime requires collect-adrs\n' >&2
           exit 2
         fi
+        python3 -I "${GITHUB_ACTION_PATH}/scripts/repository_adr_inputs.py"
         validate_relative_path "output-directory" "${INPUT_OUTPUT_DIRECTORY}"
         validate_relative_path "work-directory" "${INPUT_WORK_DIRECTORY}"
         validate_relative_path "reports-directory" "${INPUT_REPORTS_DIRECTORY}"
@@ -480,6 +486,7 @@ runs:
       env:
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
         INPUT_ADR_POLICY_OWNER: "${{ inputs.adr-policy-owner }}"
+        INPUT_ADR_KNOWN_EXTERNAL_DECISIONS: "${{ inputs.adr-known-external-decisions }}"
         INPUT_ADR_RUNTIME: "${{ inputs.adr-runtime }}"
         INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
         RESOLVED_AS_OF: "${{ steps.metadata.outputs.as-of }}"
@@ -503,6 +510,7 @@ runs:
             --visibility "${RESOLVED_REPOSITORY_VISIBILITY}" \
             --source-commit "${RESOLVED_SOURCE_COMMIT}" \
             --observed-at "${RESOLVED_AS_OF}" \
+            --known-external-decisions="${INPUT_ADR_KNOWN_EXTERNAL_DECISIONS}" \
             "${runtime_arguments[@]}"
         fi
 

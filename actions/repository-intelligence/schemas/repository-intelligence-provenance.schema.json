@@ -166,7 +166,8 @@
             "egolint_sha256",
             "collector_sha256",
             "shared_runtime_sha256",
-            "pins"
+            "pins",
+            "input_contract_sha256"
           ],
           "properties": {
             "lock_sha256": {
@@ -187,6 +188,10 @@
             },
             "pins": {
               "type": "object"
+            },
+            "input_contract_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
             }
           }
         },
@@ -364,6 +369,18 @@
         "policy_owner": {
           "const": true,
           "description": "Explicit canonical-owner selection; omitted for an ordinary inheriting consumer."
+        },
+        "known_external_decisions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "maxLength": 240,
+            "pattern": "^[a-z0-9.-]+/[a-z0-9.-]+#ADR-[0-9]{3,4}$"
+          },
+          "description": "Caller-declared external ADR keys; target existence and visibility are not observed by collection."
         }
       },
       "required": [

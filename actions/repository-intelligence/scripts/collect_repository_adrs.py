@@ -24,6 +24,10 @@ _spec = importlib.util.spec_from_file_location(
     "relay_collection_runtime", Path(__file__).with_name("collect_repository_roadmap.py"))
 base = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(base)
+_input_spec = importlib.util.spec_from_file_location(
+    "relay_adr_inputs", Path(__file__).with_name("repository_adr_inputs.py"))
+inputs = importlib.util.module_from_spec(_input_spec)
+_input_spec.loader.exec_module(inputs)
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCK_PATH = ROOT / "contracts/adr-collector.v1.lock.json"
@@ -180,7 +184,8 @@ def source_validate(args: argparse.Namespace, files: dict, commit: bytes, availa
     state = "not-applicable" if args.adoption == "not-applicable" else "present" if available else "unknown"
     policy += (f'\n[adrs]\nstate = "{state}"\n'
                + ("" if args.policy_owner else f'policy-reference = "{args.policy_reference}"\n')
-               + f'decision-directory = "{args.decision_directory}"\nindex = "{args.index}"\n')
+               + f'decision-directory = "{args.decision_directory}"\nindex = "{args.index}"\n'
+               + 'known-external-decisions = ' + json.dumps(args.known_external_decisions) + '\n')
     if args.policy_owner:
         # This is the semantic owner's supported selection, not a Relay exception.
         policy += ('[adrs.policy-owner]\nsource-revision = '
@@ -295,12 +300,14 @@ def normalize(runtime: Path, projection: dict) -> tuple[dict | None, dict]:
 
 
 def collect(args: argparse.Namespace, *, on_stage=None) -> dict:
+    args = argparse.Namespace(**vars(args))
     stage = on_stage or (lambda _name: None)
     stage("collection")
     if args.visibility != "public":
         base.fail("VISIBILITY")
     if not base.REPOSITORY.fullmatch(args.repository) or not base.SHA.fullmatch(args.source_commit):
         base.fail("INPUT")
+    args.known_external_decisions = inputs.external_decisions(args.known_external_decisions)
     if args.policy_owner:
         args.policy_reference = None
     for path in (args.decision_directory, args.index, args.policy_reference):
@@ -372,11 +379,13 @@ def collect(args: argparse.Namespace, *, on_stage=None) -> dict:
             "represented_commit": args.source_commit, "observed_at": args.observed_at,
             "inputs": {"adoption": args.adoption, "policy_reference": args.policy_reference,
                        **({"policy_owner": True} if args.policy_owner else {}),
+                       **({"known_external_decisions": args.known_external_decisions} if args.known_external_decisions else {}),
                        "decision_directory": args.decision_directory, "index": args.index,
                        "collected_at": args.collected_at, "maximum_age_seconds": args.maximum_age_seconds,
                        "sources": [{"path": p, "sha256": base.digest(b)} for p, b in sorted(files.items())]},
             "runtime": {**receipt, "pins": lock, "collector_sha256": base.digest(Path(__file__).read_bytes()),
-                        "shared_runtime_sha256": base.digest(Path(base.__file__).read_bytes())},
+                        "shared_runtime_sha256": base.digest(Path(base.__file__).read_bytes()),
+                        "input_contract_sha256": base.digest(Path(inputs.__file__).read_bytes())},
             "validation": {**validation, "egolint": report["status"],
                            "diagnostics_truncated": len(report["diagnostics"]) > base.MAX_RECORDS},
             "coverage": projection["collection_coverage"], "diagnostics": diagnostics,
@@ -423,6 +432,8 @@ def parser() -> argparse.ArgumentParser:
     selection.add_argument("--policy-reference", default="docs/decisions/policy-reference.json")
     selection.add_argument("--policy-owner", action="store_true",
                            help="Select EgoLint's canonical Hygiene owner policy without self-inheritance.")
+    command.add_argument("--known-external-decisions", default="[]",
+                         help="Bounded JSON array of declared external ADR keys; no targets are acquired.")
     command.add_argument("--decision-directory", default="docs/decisions")
     command.add_argument("--index", default="docs/decisions/README.md")
     command.add_argument("--collected-at")
