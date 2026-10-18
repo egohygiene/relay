@@ -37,7 +37,12 @@ class AdrBuildTests(unittest.TestCase):
         values.update(overrides)
         command = [sys.executable, "-I", str(SCRIPT)]
         for key, value in values.items():
-            command.extend(["--" + key.replace("_", "-"), value])
+            option = "--" + key.replace("_", "-")
+            if type(value) is bool:
+                if value:
+                    command.append(option)
+            else:
+                command.extend([option, value])
         return subprocess.run(command, capture_output=True, text=True)
 
     def outputs(self):
@@ -64,6 +69,31 @@ class AdrBuildTests(unittest.TestCase):
             if mutation == "digest": altered["candidate_digests"]["snapshot_sha256"] = None
             with self.subTest(mutation=mutation), self.assertRaises(ValueError):
                 contract.validate(altered, "egohygiene/relay", receipt["source_commit"])
+
+    def test_owner_build_binds_selection_source_authority_and_safe_retry(self):
+        native.owner_corpus(self.consumer, self.runtime)
+        result = self.build(repository="egohygiene/hygiene", policy_owner=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        _, receipt = self.outputs()
+        self.assertIs(receipt["policy_owner"], True)
+        self.assertIsNone(receipt["policy_reference"])
+        contract.validate(receipt, "egohygiene/hygiene", receipt["source_commit"])
+        for mutation in ("identity", "selection", "reference", "authority"):
+            altered = deepcopy(receipt)
+            if mutation == "identity": altered["repository"] = "egohygiene/relay"
+            if mutation == "selection": del altered["policy_owner"]
+            if mutation == "reference": altered["policy_reference"] = native.POLICY
+            if mutation == "authority":
+                altered["sources"] = [s for s in altered["sources"] if s["path"] != "catalog/contracts.yaml"]
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                contract.validate(altered, altered["repository"], altered["source_commit"])
+        (self.consumer / "catalog/contracts.yaml").unlink()
+        native.git(self.consumer, "add", "--all", "--", "catalog/contracts.yaml")
+        self.commit()
+        result = self.build(repository="egohygiene/hygiene", policy_owner=True)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("source-validation", result.stderr)
+        self.assertFalse((self.consumer / ".cache/repository-intelligence/adr/snapshot.json").exists())
 
     def test_invalid_retry_removes_previous_candidate_and_preserves_canonical_source(self):
         self.assertEqual(self.build().returncode, 0)
@@ -114,6 +144,13 @@ class AdrBuildTests(unittest.TestCase):
         self.assertEqual(site.projection_freshness(snapshot, "now"), "partial")
 
     def test_complete_action_bundles_match_across_checkouts_and_cli(self):
+        self.check_action_bundle_parity(owner=False)
+
+    def test_owner_action_bundles_match_cli_and_differently_named_checkouts(self):
+        native.owner_corpus(self.consumer, self.runtime)
+        self.check_action_bundle_parity(owner=True)
+
+    def check_action_bundle_parity(self, *, owner):
         harness = portability.RepositoryIntelligencePortabilityTests()
         harness.setUp()
         self.addCleanup(harness.doCleanups)
@@ -121,10 +158,12 @@ class AdrBuildTests(unittest.TestCase):
         harness.commit = native.git(self.consumer, "rev-parse", "HEAD")
         one, two = harness.checkout("first/consumer"), harness.checkout("second/different")
         environment = {"PATH": str(Path(sys.executable).parent) + os.pathsep + os.environ["PATH"]}
-        inputs = {"collect-adrs": "true", "adr-runtime": str(self.runtime), "repository": "egohygiene/relay",
+        repository = "egohygiene/hygiene" if owner else "egohygiene/relay"
+        inputs = {"collect-adrs": "true", "adr-runtime": str(self.runtime), "repository": repository,
+                  "adr-policy-owner": "true" if owner else "false",
                   "as-of": "2026-10-04T21:00:00Z"}
         from unittest.mock import patch
-        with patch.object(portability, "REPOSITORY", "egohygiene/relay"):
+        with patch.object(portability, "REPOSITORY", repository):
             for index, checkout in enumerate((one, two)):
                 replay = os.environ.get("RELAY_ADR_REPLAY_RUNTIME", str(self.runtime)) if index else str(self.runtime)
                 try:
@@ -140,6 +179,6 @@ class AdrBuildTests(unittest.TestCase):
         for value in ("ADR-001", "ADR-002", "ADR-003", "Declared human approval", "/pull/24", "/docs/decisions/README.md"):
             self.assertIn(value, html)
         self.assertIn("Uncollected", (one / "dist/intelligence/roadmap/index.html").read_text())
-        result = self.build()
+        result = self.build(repository=repository, policy_owner=owner)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.outputs()[1], provenance["adr_collection"])

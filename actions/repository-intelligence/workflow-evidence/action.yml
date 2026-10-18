@@ -70,6 +70,10 @@ inputs:
     description: "Opt in to canonical public ADR collection."
     required: false
     default: "false"
+  adr-policy-owner:
+    description: Explicit canonical Hygiene ADR policy-owner selection; requires collect-adrs.
+    required: false
+    default: "false"
   observatory-snapshot:
     description: "Optional Observatory snapshot path."
     required: false
@@ -183,6 +187,7 @@ runs:
         INPUT_CALLER_WORKFLOW_REF: "${{ inputs.caller-workflow-ref }}"
         INPUT_CHECKOUT_OUTCOME: "${{ inputs.checkout-outcome }}"
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
+        INPUT_ADR_POLICY_OWNER: "${{ inputs.adr-policy-owner }}"
         INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
         INPUT_EVENT_DEFAULT_BRANCH: "${{ inputs.event-default-branch }}"
         INPUT_EVENT_NAME: "${{ inputs.event-name }}"
@@ -230,6 +235,7 @@ runs:
           --work-directory="${INPUT_WORK_DIRECTORY}" \
           --reports-directory="${INPUT_REPORTS_DIRECTORY}" \
           --collect-adrs="${INPUT_COLLECT_ADRS}" \
+          --adr-policy-owner="${INPUT_ADR_POLICY_OWNER}" \
           --observatory-snapshot="${INPUT_OBSERVATORY_SNAPSHOT}" \
           --observatory-comparison="${INPUT_OBSERVATORY_COMPARISON}" \
           --default-branch="${INPUT_DEFAULT_BRANCH}" \

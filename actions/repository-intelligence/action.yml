@@ -42,6 +42,12 @@ inputs:
       acquire immutable public owner sources and locked dependencies privately.
     required: false
     default: ""
+  adr-policy-owner:
+    description: >-
+      Explicitly select EgoLint's canonical Hygiene ADR policy-owner mode.
+      Requires collect-adrs; ordinary consumers keep their inheritance reference.
+    required: false
+    default: "false"
   observatory-snapshot:
     description: >-
       Optional repository-relative path to a public-safe Observatory Repository
@@ -203,6 +209,7 @@ runs:
         EVENT_REPOSITORY_VISIBILITY: "${{ github.event.repository.visibility }}"
         INPUT_ACTIVITY_REF: "${{ inputs.activity-ref }}"
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
+        INPUT_ADR_POLICY_OWNER: "${{ inputs.adr-policy-owner }}"
         INPUT_ADR_RUNTIME: "${{ inputs.adr-runtime }}"
         INPUT_AS_OF: "${{ inputs.as-of }}"
         INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
@@ -240,6 +247,14 @@ runs:
           true | false) ;;
           *) printf 'collect-adrs must be true or false\n' >&2; exit 2 ;;
         esac
+        case "${INPUT_ADR_POLICY_OWNER}" in
+          true | false) ;;
+          *) printf 'adr-policy-owner must be true or false\n' >&2; exit 2 ;;
+        esac
+        if [[ "${INPUT_ADR_POLICY_OWNER}" == "true" && "${INPUT_COLLECT_ADRS}" != "true" ]]; then
+          printf 'adr-policy-owner requires collect-adrs\n' >&2
+          exit 2
+        fi
         if [[ "${INPUT_COLLECT_ADRS}" == "true" && ( -n "${INPUT_OBSERVATORY_SNAPSHOT}" || -n "${INPUT_OBSERVATORY_COMPARISON}" ) ]]; then
           printf 'collect-adrs conflicts with external snapshot/comparison inputs\n' >&2
           exit 2
@@ -464,6 +479,7 @@ runs:
       shell: bash
       env:
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
+        INPUT_ADR_POLICY_OWNER: "${{ inputs.adr-policy-owner }}"
         INPUT_ADR_RUNTIME: "${{ inputs.adr-runtime }}"
         INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
         RESOLVED_AS_OF: "${{ steps.metadata.outputs.as-of }}"
@@ -474,6 +490,9 @@ runs:
         set -euo pipefail
         if [[ "${INPUT_COLLECT_ADRS}" == "true" ]]; then
           runtime_arguments=()
+          if [[ "${INPUT_ADR_POLICY_OWNER}" == "true" ]]; then
+            runtime_arguments+=(--policy-owner)
+          fi
           if [[ -n "${INPUT_ADR_RUNTIME}" ]]; then
             runtime_arguments+=(--runtime "${INPUT_ADR_RUNTIME}")
           fi

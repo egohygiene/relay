@@ -144,6 +144,7 @@ def collect(args, target):
         "--repository", args.repository, "--visibility", args.visibility,
         "--source-commit", args.source_commit, "--observed-at", observed,
         "--adoption", "present", "--output", str(target.parent / "unused-review.json")])
+    native.policy_owner = args.policy_owner
     current_stage = ["collection"]
     try:
         result = collector.collect(native, on_stage=lambda name: current_stage.__setitem__(0, name))
@@ -184,6 +185,8 @@ def parser():
         result.add_argument("--" + name, required=True)
     result.add_argument("--observatory-snapshot", default="")
     result.add_argument("--observatory-comparison", default="")
+    result.add_argument("--policy-owner", action="store_true",
+                        help="Use the pinned canonical ADR policy-owner selection for Hygiene.")
     return result
 
 

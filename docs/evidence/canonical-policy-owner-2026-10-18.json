@@ -1,0 +1,96 @@
+{
+  "kind": "relay-canonical-policy-owner-adoption-evidence",
+  "observed_at": "2026-10-18T17:28:54Z",
+  "issue": "https://github.com/egohygiene/relay/issues/144",
+  "scope": "Candidate source validation; neither a publication receipt nor consumer acceptance.",
+  "relay": {
+    "base": "f19b65b3f8bd8466884dee5529fa77f2430440b6",
+    "candidate_branch": "codex/adr-policy-owner-144",
+    "candidate_commit": null
+  },
+  "egolint": {
+    "merged_pull_request": "https://github.com/egohygiene/egolint/pull/82",
+    "revision": "72267fd0a371da6d94922cbc6bd3dedddb68df30",
+    "tree": "fb5184749470c5bb16f18349753995bf6a58fb17"
+  },
+  "locks": {
+    "catalog/repository-architecture-validation.json": "9111689239759915eb0f2be3dca172607fe49515b06aaf57bb5148277edb31fb",
+    "actions/repository-intelligence/contracts/adr-collector.v1.lock.json": "67fd56f5500910a9b750257cc34a2bbe1db243ad44551bb4d76ccf6df5b2f9dc"
+  },
+  "validation": [
+    {
+      "check": "Complete Relay unittest discovery with prepared architecture/ADR runtimes and immutable Hygiene canary",
+      "result": "passed",
+      "tests_discovered": 667,
+      "tests_executed": 648,
+      "tests_skipped": 19,
+      "notes": "Optional other-profile native runtime checks were not configured; no failures."
+    },
+    {
+      "check": "Fresh hash-locked ADR acceptance acquisition and two-runtime CLI/action bundle parity",
+      "result": "passed",
+      "tests_executed": 37,
+      "tests_skipped": 0
+    },
+    {
+      "check": "Prepared native architecture adapter suite",
+      "result": "passed",
+      "tests_executed": 31,
+      "tests_skipped": 0
+    },
+    {
+      "check": "Action/workflow metadata; CI lifecycle; continuity preflight; architecture profile; journal runtime contracts; Python compile and diff hygiene",
+      "result": "passed",
+      "notes": "14 actions, 23 workflows, 16 reusable workflows; hosted checks remain separate."
+    },
+    {
+      "check": "Native pinned Relay continuity profile and schema/heading/size/path checks",
+      "result": "passed",
+      "report_status": "valid",
+      "blocking_diagnostics": 0,
+      "notes": "One observe-only upstream lifecycle warning. The broad EgoLint invocation also reports release/portability findings outside this scoped continuity result; it is not a clean full-repository lint result."
+    }
+  ],
+  "immutable_hygiene_replay": {
+    "repository": "egohygiene/hygiene",
+    "source_commit": "b8d2c02368e40d4f6c2017bb1a22c6ec23323ad3",
+    "policy_owner": true,
+    "policy_reference": null,
+    "captured_source_count": 22,
+    "captured_source_hashes_verified_against_git": true,
+    "source_worktree_clean_after_collection": true,
+    "status": "invalid",
+    "publication": "denied",
+    "validation": {
+      "coverage": "valid",
+      "diagnostics_truncated": false,
+      "egolint": "invalid",
+      "hygiene": "valid",
+      "observatory": "normalized"
+    },
+    "diagnostic_counts": {
+      "EGO-INTEL-ADOPTION-001": 3,
+      "EGO-INTEL-ADR-INDEX-001": 1,
+      "EGO-INTEL-ADR-LINEAGE-001": 12,
+      "EGO-INTEL-ADR-METADATA-001": 2,
+      "EXTRACTION": 1,
+      "INTEGRATION": 1
+    },
+    "candidate_digests": {
+      "projection_sha256": "1b3887b880ae4c7343cc7f8333f0f7b0a92aa1928a7a756bbbdd5a66bd54b1bb",
+      "snapshot_sha256": "f1127fad2b2679d40ee9c2968b9a1827abbe00f97ba3f8db880ae689d77eaecc"
+    },
+    "notes": [
+      "Native EgoLint reports no owner authority/inheritance contract finding. This is not a valid production build.",
+      "Legacy ADR-0001 metadata and ADR-004 anatomy remain findings; proposals are not ratified or promoted.",
+      "Lineage includes ADR-0001 references and an undeclared external reference; bounded collection does not prove external target absence.",
+      "Other evidence domains remain uncollected and shallow-history warnings remain visible."
+    ]
+  },
+  "remaining_gates": [
+    "Hosted candidate CI and review; immutable Relay merge pin before consumer adoption.",
+    "Hygiene #47 source backfill, actual human ADR disposition and external-reference evidence.",
+    "Explicit public host selection and separate consumer render/deploy/live verification."
+  ],
+  "decision_impact": "No new ADR: this consumes EgoLint-owned canonical-owner semantics within Relay orchestration. Existing ratification and publisher authority remain unchanged."
+}

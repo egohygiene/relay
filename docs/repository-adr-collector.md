@@ -35,7 +35,7 @@ the existing Decisions view continues to expose only Observatory-owned facets.
 
 | Owner | Revision | Selected contract |
 | --- | --- | --- |
-| EgoLint | `2d3600f14848e28099acc34ce8043699da2b9a32` | Source report v1, catalog `0.1.0-alpha.3`, coverage CLI/report v1 |
+| EgoLint | `72267fd0a371da6d94922cbc6bd3dedddb68df30` | Source report v1, catalog `0.1.0-alpha.4`, canonical-owner selection, coverage CLI/report v1 |
 | Hygiene projection | `639a003d5ddc4d242c2cf190eeb59a9fc522d199` | Intelligence `1.0.0-alpha.2`, proposed |
 | Hygiene ADR policy | `c589587395750cd1c79c6fa0bef010189c547249` | ADR `1.1.0` and policy reference `1.0.0`, accepted |
 | Observatory | `f411b83398dd07aa3d5e6e2c89d1e8dfff746085` | Intelligence read model `1.0.0-alpha.2` |
@@ -58,7 +58,7 @@ errors remain invalid even when projection normalization succeeds.
 
 The source validator also reports uncollected roadmap/history as `incomplete`;
 Relay preserves that result and never promotes it to whole-repository validity.
-Missing policy references remain missing and produce owner diagnostics. The
+Ordinary-consumer policy references remain mandatory; missing references produce EgoLint diagnostics. The
 collector does not write a replacement reference into the consumer corpus.
 
 Reject private/unknown repository visibility and nonpublic canonical records
@@ -85,7 +85,7 @@ across differently named checkouts. Hash all selected source bytes and both
 projection/read-model candidates; never include local paths or runtime clocks.
 
 Use a real immutable Hygiene ADR corpus as a read-only canary. Its legacy
-ADR-0001 and absent consumer policy-reference file remain visible validation
+ADR-0001 metadata and other genuine migration findings remain visible validation
 gaps; collection must preserve the conforming records and their actual approval
 evidence without claiming corpus conformance or publication. Identity's sources
 and its parallel implementation work remain untouched.
@@ -116,13 +116,13 @@ python actions/repository-intelligence/scripts/collect_repository_adrs.py collec
   --runtime /trusted/adr-runtime --repository-root /sources/hygiene \
   --repository egohygiene/hygiene --visibility public \
   --source-commit 639a003d5ddc4d242c2cf190eeb59a9fc522d199 \
-  --observed-at 2026-10-04T21:00:00Z --adoption legacy \
+  --observed-at 2026-10-04T21:00:00Z --adoption legacy --policy-owner \
   --output /review/hygiene/adr-collection.review.json
 ```
 
 Paths in the example are caller-selected absolute paths, not bundled resources.
 Acquire EgoLint at the locked revision and run `cargo fetch --locked` before
-preparation. Preparation checks 18 owner artifacts, complete Git tree identities,
+preparation. Preparation checks 21 owner artifacts, complete Git tree identities,
 the Python package versions, and the built executable digest. Its destination
 must be new. Receipts from the older roadmap or architecture runtime are not
 compatible with this profile.
@@ -149,7 +149,7 @@ Exit 0 means the requested bounded collection is ready for **local review** (or
 explicitly inapplicable), 2 retains partial/invalid/unavailable/uncollected
 evidence, and 3 denotes an input or runtime denial. Every result still says
 `publication: denied`. The real Hygiene command above returns 2 because its
-existing corpus has unresolved migration and source-validation findings.
+existing corpus has unresolved migration and source-validation findings, independently of owner compatibility.
 
 ```bash
 RELAY_ADR_RUNTIME=/trusted/adr-runtime \
@@ -172,6 +172,65 @@ Fixture provenance: the synthetic canonical corpus adapts EgoLint's public
 The real canary is read directly from the immutable Hygiene clone, not rewritten
 or vendored into Relay. Decision impact: this is implementation of ADR-007/010's
 existing owner and evidence boundaries; no new architectural authority is added.
+
+## Canonical policy-owner selection — Relay #144
+
+Both this collector lock and the separate architecture-validation profile select
+merged EgoLint PR #82 at `72267fd0a371da6d94922cbc6bd3dedddb68df30`.
+Hygiene's accepted policy forbids self-inheritance. The local collector and build
+adapter expose `--policy-owner`; the composite action and both reusable-workflow
+invocation forms expose `adr-policy-owner: true` together with `collect-adrs: true`.
+No owner selection is inferred from a checkout name or repository identity.
+Ordinary consumers retain the default required policy-reference file.
+
+`--policy-owner` and `--policy-reference` are mutually exclusive on the review
+CLI. The selected owner mode omits the inheritance entry and supplies EgoLint's
+supported `[adrs.policy-owner]` ratification revision from its verified catalog.
+The collector reads the catalog-declared policy, ratification, both schemas and
+contract index as bounded regular Git blobs from the **represented consumer
+commit**. Trusted runtime copies are never substituted for missing consumer
+source. EgoLint checks owner identity, canonical paths, immutable policy bytes
+and active ADR authority entries. Additional unrelated catalog entries remain
+compatible; copied policy text or a changed schema cannot become an exception.
+
+The closed review/build evidence adds `policy_owner: true` and sets
+`policy_reference: null` only for owner selection. Ordinary-consumer evidence
+keeps its existing shape. Source hashes include the captured authority files;
+the production provenance validator requires those identities and the supported
+policy/schema digests. Review envelopes can retain an invalid owner request's
+native findings, while production admission still requires the canonical owner
+identity and a complete valid ADR inventory.
+
+```yaml
+with:
+  collect-adrs: true
+  adr-policy-owner: true
+```
+
+Use these inputs only for the canonical Hygiene owner. In architecture
+validation, the caller's original EgoLint TOML selects `[adrs.policy-owner]`;
+that adapter continues passing the checked policy unchanged. Its request
+repository and native policy identity must agree.
+
+Upgrade both runtime profiles and the architecture workflow's acquisition pin
+together. Rebuild runtimes and regenerate profile-bound requests; old receipts,
+old profile digests and substituted binaries fail verification. Rollback pins
+Relay's prior reviewed commit and uses its matching runtime, request/profile
+hash and ordinary-consumer configuration. Never edit a receipt to bless an old
+binary, create Hygiene self-inheritance, or overwrite historical recovery bytes.
+
+Native tests run the actual collector, validators, normalization and action Bash.
+They compare complete owner and ordinary-consumer bundles across different
+checkout names and freshly prepared runtimes, preserve dirty worktree bytes,
+and reject missing authority, spoofed ownership, invalid human approval and
+missing ordinary references. The immutable Hygiene replay retains its genuine
+ADR-0001/ADR-004 and reference findings. Owner support does not ratify ADRs,
+activate required mode, select a host, or grant publication authority.
+
+The next consumer checkpoint is Hygiene #47. Its existing inventory PR #68 and
+ADR-0001 disposition gate remain separate from this runtime adoption. Relay
+#115 and the Identity #69 pilot are already closed; this work uses Refs #144
+while later acceptance remains.
 
 ## Checkpoint 2: opt-in Decisions builds
 
@@ -309,7 +368,7 @@ the intended commit (its default observation is the represented commit time).
 Validate the ordinary artifact before composing it into the existing site;
 preserve unrelated routes and the historical rollback point. Record artifact
 upload, Pages upload, deployment, receipt, and live-route checks separately.
-The Hygiene canary's 12 canonical records still have legacy/missing-policy source
+The Hygiene canary's 12 canonical records still have legacy metadata, anatomy and reference source
 gaps and therefore cannot pass the production build. No consumer source or
 historical ADR is repaired by this integration.
 

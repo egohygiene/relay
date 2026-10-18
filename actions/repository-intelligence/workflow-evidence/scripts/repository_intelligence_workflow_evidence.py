@@ -305,6 +305,9 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
     """Validate untrusted workflow inputs before checkout or generation."""
 
     collect_adrs = getattr(arguments, "collect_adrs", "false")
+    policy_owner = getattr(arguments, "adr_policy_owner", "false")
+    if policy_owner not in {"true", "false"} or (policy_owner == "true" and collect_adrs != "true"):
+        raise ContractError("RIW-INPUT-ADR-MODE")
     if collect_adrs not in {"true", "false"}:
         raise ContractError("RIW-INPUT-ADR-MODE")
     if collect_adrs == "true" and (arguments.observatory_snapshot or arguments.observatory_comparison):
@@ -621,6 +624,7 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--work-directory", default=".cache/repository-intelligence")
     value.add_argument("--reports-directory", default=".reports")
     value.add_argument("--collect-adrs", default="false")
+    value.add_argument("--adr-policy-owner", default="false")
     value.add_argument("--observatory-snapshot", default="")
     value.add_argument("--observatory-comparison", default="")
     value.add_argument("--default-branch", default="")

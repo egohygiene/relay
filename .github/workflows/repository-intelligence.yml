@@ -28,6 +28,11 @@ on:
         required: false
         default: false
         type: boolean
+      adr-policy-owner:
+        description: Explicit canonical Hygiene ADR policy-owner selection; requires collect-adrs.
+        required: false
+        default: false
+        type: boolean
       observatory-snapshot:
         description: Optional public-safe Observatory read model for the represented commit.
         required: false
@@ -99,6 +104,11 @@ on:
         type: string
       collect-adrs:
         description: Collect and validate canonical public ADRs instead of accepting an external snapshot.
+        required: false
+        default: false
+        type: boolean
+      adr-policy-owner:
+        description: Explicit canonical Hygiene ADR policy-owner selection; requires collect-adrs.
         required: false
         default: false
         type: boolean
@@ -190,6 +200,7 @@ jobs:
           work-directory: "${{ inputs.work-directory }}"
           reports-directory: "${{ inputs.reports-directory }}"
           collect-adrs: "${{ inputs.collect-adrs }}"
+          adr-policy-owner: "${{ inputs.adr-policy-owner }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
           observatory-comparison: "${{ inputs.observatory-comparison }}"
           default-branch: "${{ inputs.default-branch }}"
@@ -226,6 +237,7 @@ jobs:
           work-directory: "${{ inputs.work-directory }}"
           reports-directory: "${{ inputs.reports-directory }}"
           collect-adrs: "${{ inputs.collect-adrs }}"
+          adr-policy-owner: "${{ inputs.adr-policy-owner }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
           observatory-comparison: "${{ inputs.observatory-comparison }}"
           repository: "${{ github.repository }}"
@@ -308,6 +320,7 @@ jobs:
           work-directory: "${{ inputs.work-directory }}"
           reports-directory: "${{ inputs.reports-directory }}"
           collect-adrs: "${{ inputs.collect-adrs }}"
+          adr-policy-owner: "${{ inputs.adr-policy-owner }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
           observatory-comparison: "${{ inputs.observatory-comparison }}"
           default-branch: "${{ inputs.default-branch }}"

@@ -7,18 +7,17 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-10-10T17:43:17Z'
+  updated_at: '2026-10-18T17:28:54Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Deliver the specific navigation-logo and favicon feedback through shared Relay presentation and a verified Identity consumer repin.
+  purpose: Adopt merged EgoLint canonical ADR policy-owner support in Relay and hand an exact reviewed pin to Hygiene.
   includes:
-  - Closed pilot state, bounded branding feedback, shared-source ownership, exact-pin consumer handoff and historical recovery evidence.
+  - 'Relay #144 runtime pins, explicit owner input, ordinary-consumer strictness, immutable collection, provenance and bounded validation evidence.'
   excludes:
-  - New ADR dispositions, unrelated refactors, Brand Kit redesign, new route ownership and automatic fleet rollout.
-  - Conversation transcripts, raw logs, private paths and duplicate canonical policy.
+  - Human ADR ratification, host selection, deployment, automatic fleet upgrades, raw logs and private context.
   precedence:
   - user-and-runtime-instructions
   - scoped-repository-instructions
@@ -31,140 +30,90 @@ scope:
   - SYSTEM.md
   - DECISIONS.md
   - ROADMAP.md
-  - actions/repository-intelligence/assets/site.css
-  - actions/repository-intelligence/assets/site.js
-  - tests/test_repository_intelligence_site.py
-  - tests/browser/decisions_filter_regression.py
+  - catalog/repository-architecture-validation.json
+  - actions/repository-intelligence/contracts/adr-collector.v1.lock.json
   - actions/repository-intelligence/README.md
-  - docs/repository-intelligence-publication.md
   - docs/repository-adr-collector.md
-  - https://github.com/egohygiene/relay/issues/139
-  - https://github.com/egohygiene/relay/issues/115
-  - https://github.com/egohygiene/relay/pull/140
-  - https://github.com/egohygiene/identity/issues/69
-  - https://github.com/egohygiene/.github/issues/30
-  - docs/label-rollout-local.md
-  - docs/evidence/labels/aether-source-upgrade-2026-10-10.json
-  - https://github.com/egohygiene/identity/pull/96
-  - https://github.com/egohygiene/identity/actions/runs/38070854820
-  - https://github.com/egohygiene/pace/issues/5
-  - actions/repository-intelligence/assets/egohygiene.png
-  - actions/repository-intelligence/assets/github.svg
-  - actions/repository-intelligence/scripts/generate_repository_intelligence_site.py
-  - actions/repository-intelligence/scripts/generate_repository_intelligence_dashboard.py
-  - actions/repository-intelligence/scripts/validate_repository_intelligence_bundle.py
+  - docs/repository-architecture-validation.md
+  - docs/evidence/canonical-policy-owner-2026-10-18.json
+  - https://github.com/egohygiene/relay/issues/144
+  - https://github.com/egohygiene/egolint/pull/82
+  - https://github.com/egohygiene/hygiene/issues/47
+  - https://github.com/egohygiene/hygiene/pull/68
 work:
-  objective: Implement and verify the requested organization/GitHub navigation marks and organization favicon while preserving existing destinations
-    and consumer authority.
+  objective: Consume EgoLint owner semantics through both independent Relay runtimes and every supported ADR build interface without weakening
+    consumer or publication gates.
   success_conditions:
-  - Use reviewed real organization artwork and a GitHub source-link mark across the shared Repository Intelligence shell; preserve labels
-    and destinations.
-  - Include the organization favicon on every Repository Intelligence route and bind all generated assets through the existing deterministic
-    manifest.
-  - Repin Identity to the exact merged Relay revision, rebuild through the existing publisher and verify visible navigation/favicon behavior
-    plus all 40 preserved Brand Kit files.
-  - 'Keep future consumer adoption as reviewed repin/rebuild work in Pace #5 and organization #30; do not imply automatic upgrades or blanket
-    approval.'
+  - Pin merged EgoLint revision and all captured source hashes; reject stale runtime/provenance receipts.
+  - Owner mode captures canonical Hygiene policy, ratification, schemas and catalog from the represented commit; ordinary consumers still require
+    their policy reference.
+  - Verify positive owner and consumer builds, negative identity/source/authority cases, CLI/action parity and immutable real-source replay.
+  - Save the bounded Relay candidate for review, then prepare dependency-ready Hygiene source work with human and host gates explicit.
   active_issue:
     provider: github
-    id: egohygiene/pace#5
-    url: https://github.com/egohygiene/pace/issues/5
+    id: egohygiene/relay#144
+    url: https://github.com/egohygiene/relay/issues/144
   next:
     kind: action
-    id: shared-navigation-branding-handoff
-    description: Complete the existing-test inventory follow-up, then hand its exact merged revision to Identity for the prepared branding
-      adoption and live verification.
+    id: review-relay-owner-adoption
+    description: 'Review the Relay #144 draft and hosted checks; once merged, hand its exact immutable revision to Hygiene #47.'
     readiness: ready
     references:
-    - https://github.com/egohygiene/pace/issues/5
-    - https://github.com/egohygiene/.github/issues/30
-    - https://identity.egohygiene.io/decisions/
+    - https://github.com/egohygiene/relay/issues/144
+    - https://github.com/egohygiene/hygiene/issues/47
     depends_on: []
 state:
   base:
-    revision: 5f5e27e8ed4071559c284c7c0c8a5bf30be03421
+    revision: f19b65b3f8bd8466884dee5529fa77f2430440b6
     ref: refs/heads/main
-    verified_at: '2026-10-10T17:41:27Z'
+    verified_at: '2026-10-18T17:28:54Z'
   candidate:
-    branch: codex/intelligence-branding-inventory
+    branch: codex/adr-policy-owner-144
     revision: null
     pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-10-10T17:41:27Z'
-    default_branch_revision: 5f5e27e8ed4071559c284c7c0c8a5bf30be03421
+    observed_at: '2026-10-18T17:28:54Z'
+    default_branch_revision: f19b65b3f8bd8466884dee5529fa77f2430440b6
     issue_state: open
     pull_request_state: not-applicable
-    notes: 'Relay PR #142 merged the reviewed branding implementation at 5f5e27e8ed4071559c284c7c0c8a5bf30be03421. Hosted run 38072510240
-      found two older standalone file inventories missing egohygiene.png (659 tests: 573 passed, 2 failed, 84 skipped). This follow-up updates
-      only those existing test inventories; existing byte-safe comparisons are unchanged. Identity has not deployed the branding yet; its
-      last verified source remains e1453d81. Completed issues stay closed.'
+    notes: 'Verified Relay #144 and Hygiene #47 open; Relay #115 and Identity #69 closed/completed. EgoLint PR #82 merged at 72267fd0a371da6d94922cbc6bd3dedddb68df30.
+      Relay main was checked at the recorded base with no overlapping open PR. This is a pre-publication candidate snapshot, not deployed consumer
+      evidence.'
   parallel_changes:
   - provider: github
-    id: egohygiene/pace#5
-    url: https://github.com/egohygiene/pace/issues/5
-  - provider: github
-    id: egohygiene/pace#10
-    url: https://github.com/egohygiene/pace/issues/10
+    id: egohygiene/hygiene#68
+    url: https://github.com/egohygiene/hygiene/pull/68
 review:
-  status: passed
-  reviewed_at: '2026-10-10T17:43:17Z'
+  status: partial
+  reviewed_at: '2026-10-18T17:28:54Z'
   reviewed_by: Codex
   evidence:
-  - command: 'GitHub GET Identity #69, Relay #139, Pace #5, organization #30 and merged Identity PR #96'
+  - command: Complete Relay unittest discovery with prepared native ADR and architecture runtimes
     outcome: passed
-    observed_at: '2026-10-10T17:33:26Z'
-    notes: 'Identity #69 and Relay #139 are closed/completed; Pace #5 and organization #30 stay open. PR #96 merged at b8542fbc8f749397b8f1619fe2b25bc1958e3a8d.
-      Its documentation merge does not replace deployed source e1453d81.'
-  - command: Read scoped architecture, system, roadmap, decisions and current publication boundaries
+    observed_at: '2026-10-18T17:28:54Z'
+    notes: 667 discovered, 648 executed, 19 optional other-profile native checks skipped; zero failures.
+  - command: Fresh hash-locked ADR acceptance and two-runtime CLI/action bundle parity
     outcome: passed
-    observed_at: '2026-10-10T17:33:26Z'
-    notes: Relay owns reusable presentation and immutable artifacts; Identity retains its one publisher, Brand Kit bytes and rollback. This
-      bounded branding follow-up does not change those decisions or ADR lifecycles.
-  - command: Review the maintainer-requested navigation and favicon feedback
+    observed_at: '2026-10-18T17:28:54Z'
+    notes: 37 tests passed, zero skips; fresh acquisition and separate runtime receipts agree.
+  - command: Prepared native architecture suite, metadata/profile contracts and source review
     outcome: passed
-    observed_at: '2026-10-10T17:33:26Z'
-    notes: Specific feedback requests the real organization mark in the upper-right Ego Hygiene link, a GitHub logo for the source link,
-      and the organization-logo favicon throughout Repository Intelligence. Link destinations remain unchanged. This is scoped feedback,
-      not blanket product or fleet approval.
-  - command: python3 -m unittest discover --start-directory tests --pattern test_repository_intelligence_site.py --verbose
+    observed_at: '2026-10-18T17:28:54Z'
+    notes: 31 native adapter tests passed; 14 actions/23 workflows/16 reusable workflows and existing contract validators passed. No scheduling,
+      skip, required or deployment gate changed.
+  - command: Immutable Hygiene b8d2c02368e40d4f6c2017bb1a22c6ec23323ad3 owner replay
     outcome: passed
-    observed_at: '2026-10-10T17:36:41Z'
-    notes: Implementation owner reports all 34 existing focused site tests passed, no skips, in 9.353 seconds. No new tests, options, schemas
-      or dependencies were introduced.
-  - command: Inspect generated routed and standalone dashboard output using existing builder and validator
-    outcome: passed
-    observed_at: '2026-10-10T17:36:41Z'
-    notes: Routed fixture has 21 files; all 12 HTML pages resolve local relative favicons and all 11 shell navs preserve organization/source
-      destinations with aria-label/title. Both asset bytes match. Standalone dashboard has 7 files and passes complete bundle validation
-      with ./egohygiene.png. This is generated-output inspection, not browser execution.
-  - command: Verify preserved organization PNG and GitHub SVG bytes against their public provenance
-    outcome: passed
-    observed_at: '2026-10-10T17:36:41Z'
-    notes: 'Organization PNG: 52800 bytes, SHA256 cc09173cd26cade507423c22c5cca914cc424563d402341310fbe796ce81951a; dated October 10 capture
-      of org avatar ID196492251, not an immutable upstream ref. GitHub SVG: 2720 bytes, SHA256 a4113cf2c6e0e6fba99a85498e6b7c84c42d8c13928f89e0eede78bc596e0add,
-      from monolith 5eaa26a1c82fbbc7a351b4cc774758161441f56f; root MIT notice verified, trademark retained. Full source paths are in the
-      action README.'
-  - command: Pinned continuity schema, twelve ordered headings, size, canonical paths, privacy and git diff --check
-    outcome: passed
-    observed_at: '2026-10-10T17:36:41Z'
-    notes: Structural candidate checks passed; hosted execution, consumer repinning and branding deployment/browser acceptance remain separate
-      future evidence.
-  - command: Existing test_repository_intelligence_bundle.py and test_repository_intelligence_dashboard.py suites; diff review
-    outcome: passed
-    observed_at: '2026-10-10T17:43:17Z'
-    notes: 10 bundle and 23 dashboard tests passed with zero skips. Only two expected-file inventories add egohygiene.png; runtime and existing
-      byte-safe comparisons are unchanged. This resolves the two failures observed in hosted run 38072510240; new hosted execution is pending.
+    observed_at: '2026-10-18T17:28:54Z'
+    notes: All 22 captured source hashes match Git and the source checkout remains clean. Owner contract findings are absent; genuine ADR and
+      adoption findings keep the review invalid and publication denied.
   environment_limitations:
-  - 'PR #142 is merged. This existing-test follow-up, its provider checks, consumer repin and branding deployment/browser proof remain pending;
-    prior filtering evidence is not branding proof.'
-  - The prior generated local browser fixture was not executed under file-URL policy; actual public filtering checks are recorded separately
-    in the immutable receipt.
-  - Specific navigation/favicon feedback is received; no blanket product acceptance, full accessibility audit or fleet completion is inferred.
-  - ADR-022 remains proposed; eight non-ADR evidence domains remain uncollected.
-  - Historical ordinary artifacts expire 2026-11-09; the 40-file rollback archive is a verified fresh capture, not the expired original Pages
-    ZIP, and re-promotion was not exercised.
+  - Hosted candidate CI, merge and consumer repin have not run for this draft.
+  - Nineteen optional native tests for other runtime profiles were not configured; no full-fleet acceptance is claimed.
+  - 'Real Hygiene remains invalid: legacy ADR-0001, ADR-004 anatomy, lineage/index findings and bounded external-reference evidence need source
+    work.'
+  - Hygiene ADR-0001 human disposition and public host selection remain separate maintainer decisions; proposals stay proposed.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -183,50 +132,52 @@ privacy:
 
 ## Purpose and precedence
 
-Canonical Relay contracts, scoped instructions and live trackers outrank this handoff. Relay owns the shared Repository Intelligence presentation; each consumer owns its publisher and upgrade. The current follow-up belongs to [Pace #5](https://github.com/egohygiene/pace/issues/5) and [organization #30](https://github.com/egohygiene/.github/issues/30).
+Canonical contracts, scoped instructions and live trackers outrank this handoff. Relay owns orchestration and exact-pin receipts; EgoLint owns validation semantics and Hygiene owns ADR policy and ratification.
 
 ## Resume protocol
 
-Read AGENTS.md and the shared renderer/assets, then refresh main and the current PR. Confirm reviewed artwork provenance and bounded validation before consumer handoff. Keep source, hosted checks, deployment, live bytes and browser behavior separate.
+Read AGENTS.md and the current owner-adoption docs, refresh Relay #144 and main, and compare the candidate with the recorded base. Preserve ordinary-consumer behavior, immutable source capture, receipt bounds and separate publication authority.
 
 ## Current objective and success conditions
 
-The maintainer has provided specific UI feedback: show the actual organization logo in the upper-right Ego Hygiene link, use a GitHub logo for the source link, and use the organization-logo favicon across all Repository Intelligence routes. Preserve existing destinations and accessible link names. Implement this once in the shared shell so future consumers inherit it when they deliberately repin and rebuild.
+Consume merged EgoLint owner support in both the architecture adapter and ADR collector/build runtime. Expose explicit owner selection through CLI, composite action, reusable workflow and workflow evidence. Keep ordinary consumers strict and reject stale or mismatched receipts. Prepare an exact reviewed Relay revision for Hygiene's reference-repository journey.
 
 ## State snapshot
 
-Base main is `5f5e27e8ed4071559c284c7c0c8a5bf30be03421` after [PR #142](https://github.com/egohygiene/relay/pull/142). Relay #115, Relay #139 and Identity #69 are closed. [Identity PR #96](https://github.com/egohygiene/identity/pull/96) merged the filtering receipt at `b8542fbc8f749397b8f1619fe2b25bc1958e3a8d`; last verified deployed source remains `e1453d81d3e5b20687a67d7bc375dff3b42b1b9a`, not that documentation merge. Existing-test follow-up `codex/intelligence-branding-inventory` is ready for review; self-SHA and PR remain null until known. No branding deployment is claimed.
+Base main is `f19b65b3f8bd8466884dee5529fa77f2430440b6`. Candidate branch is `codex/adr-policy-owner-144`; its containing commit and PR are null in this pre-publication snapshot. EgoLint PR #82 is merged at `72267fd0a371da6d94922cbc6bd3dedddb68df30`. Relay #144 and Hygiene #47 remain open. Relay #115 and Identity #69 are closed/completed and are not reopened by this handoff.
 
 ## Completed and material changes
 
-The collector and filtering pilot are complete. [Identity's immutable filtering receipt](https://github.com/egohygiene/identity/blob/b8542fbc8f749397b8f1619fe2b25bc1958e3a8d/docs/evidence/identity-decisions-filtering-2026-10-10.json) records the successful repaired deployment, all 60 previous live files and 40 preserved Brand Kit files, actual filtering cases, and bounded keyboard/semantic checks. The new branding work responds to specific feedback and does not reopen those completed issues.
+Both runtime pins and file hashes now consume the merged semantic owner. Owner-mode collection captures Hygiene policy, ratification, schemas and catalog from the represented commit; it never substitutes runtime copies for missing repository evidence. CLI `--policy-owner` and action/workflow `adr-policy-owner` select this path explicitly. The ordinary receipt shape and required policy-reference behavior remain intact. Receipts capture owner selection and authority files and continue to enforce closed fields, immutable pins and source binding. Existing privacy, required-check, skip and publisher gates remain in force.
 
-Merged PR #142 packages the exact organization PNG and existing GitHub SVG, adds accessible image navigation, and supplies a local organization favicon to routed pages and the standalone dashboard. Bundle validation admits only the canonical packaged assets and keeps binary bytes outside text-only privacy decoding. Shared assets and rendering remain Relay-owned. Link destinations, normalized source data, ADR lifecycles, contract authority and deployment ownership remain unchanged. Decision impact: ADR not required; this is a bounded presentation update within ADR-007/ADR-010, using existing organization identity rather than introducing a new architecture.
+Decision impact: no new ADR is required. This is adoption of existing EgoLint-owned semantics within Relay's established orchestration boundary, without a new lifecycle, authority or deployment decision.
 
 ## Validation and review evidence
 
-All 34 existing focused site tests pass with no skips; independent review found no blockers. Generated-output inspection finds 21 files in the routed fixture: all 12 HTML pages resolve the local favicon, and all 11 shell navs preserve both destinations and accessible labels. The standalone dashboard builds 7 files and passes complete bundle validation. The two packaged artwork files match their documented source bytes. The organization avatar is a dated public capture; the GitHub SVG binds immutable monolith source `5eaa26a1c82fbbc7a351b4cc774758161441f56f`. See the [action README](actions/repository-intelligence/README.md#navigation-branding) for exact hashes, paths and notice. These are new candidate source checks, not live-browser evidence. Continuity schema, headings, bounds, paths, privacy and diff checks pass.
+The [bounded verification receipt](docs/evidence/canonical-policy-owner-2026-10-18.json) records exact pins, candidate validation and the real Hygiene replay. Full discovery passed: 667 tests, 648 executed and 19 optional native checks for other profiles skipped. Fresh hash-locked ADR acceptance passed all 37 tests, including owner/consumer CLI-action bundle parity through independently prepared runtimes. The prepared architecture adapter suite passed all 31 tests. Existing metadata, architecture, lifecycle, preflight and journal validators passed. The pinned native continuity report is valid with zero blocking findings and the expected observe-only upstream lifecycle warning. The broad lint invocation also reports release/portability findings outside this continuity check; no clean full-repository lint result is claimed.
+
+The immutable Hygiene replay captured 22 source files, verified every hash against Git and left the checkout clean. It reports no canonical-owner contract finding. It remains invalid and publication is denied because genuine source findings remain; this successful adapter check is not production acceptance or deployment evidence.
 
 ## Blockers, risks, unknowns, and deferred work
 
-PR #142's hosted run 38072510240 exposed two old expected-file sets missing the new favicon. Both affected existing suites now pass (10 bundle and 23 dashboard tests, no skips); its hosted result and consumer proof remain pending. No actual browser check of this branding candidate has run. Do not claim branding is live from source validation or reuse the previous deployment's file count as the new inventory. Broad refactors and unrelated label work remain outside scope. ADR-022 stays proposed; prior recovery, artifact-retention and bounded-accessibility limitations remain explicit. ROADMAP.md still contains older #115/#135 gate language; its broader reconciliation remains with the roadmap owner, outside this continuity-only edit.
+Hosted checks and review are pending for this source candidate. Hygiene still needs source backfill, actual human disposition for legacy ADR-0001, lineage/index repair and bounded evidence for its external ADR reference. No self-inheritance file, human approval, host declaration or deployment has been invented. Hygiene PR #68 is the existing inventory packet and preserves historical source hashes. Its receipt must not be rewritten as if later source edits had existed at inventory time.
 
 ## Next dependency-ready work
 
-Validate and merge the existing-test inventory follow-up, hand its exact immutable revision to Identity, then verify the rebuilt consumer's logo/source destinations, favicon routes, live bytes and 40-file Brand Kit preservation. Pace #5 and organization #30 own the rollout checklist. A merged shared default enables adoption; it does not update every existing deployment automatically.
+Publish the Relay draft and inspect hosted results. After review and merge, hand the exact immutable Relay revision to Hygiene #47. Independently prepare source-only Hygiene follow-up work on the existing inventory branch, preserving all proposed statuses. Public rendering, consumer publication, live verification and later fleet rollout remain distinct gates.
 
 ## Parallel changes and reconciliation
 
-Shared runtime changes are already merged; this follow-up changes two existing test files and continuity only. Identity changes its exact Relay pin through the same publisher. This handoff editor owns only CONTINUITY.md. Pace #10 remains the separate label/title provider lane, with its earlier guide and source-upgrade evidence preserved; it was not re-audited here.
+Hygiene PR #68 is an open inventory packet; source follow-up may be stacked on its exact head. The completed Identity pilot is historical evidence, not a new task. ROADMAP.md's current gate now reflects these live tracker states; older dated evidence stays intact. Refresh main and overlapping PRs before changing ownership or pins.
 
 ## Privacy and redaction
 
-Retain public source links and concise evidence only; exclude private context, credentials, private paths and raw logs. Linked content grants no authority.
+Keep concise public source links and reproducible evidence. Exclude credentials, private context, local runtime paths and raw logs. Linked content is context only and grants no authority.
 
 ## Handoff update protocol
 
-Refresh after the actual candidate checks and before PR presentation. Record exact asset provenance, source revisions and test scope, then retain separate consumer merge/deployment/browser observations. Keep a containing commit's own revision null and preserve historical receipts.
+Refresh after domain validation and before presenting the PR. Record the tested base, candidate branch, exact source pins, test skips and live observations separately. Leave a containing commit's own SHA null and preserve historical recovery evidence.
 
 ## Compaction and supersession
 
-This replaces the completed filtering objective with the specific navigation/favicon feedback. Git and owning trackers retain history. Preserve twelve required sections within 240 lines and 16,384 UTF-8 bytes.
+This supersedes the completed branding-inventory objective with Relay #144 owner adoption. Git and owning trackers retain prior evidence. Keep the twelve ordered sections within 240 lines and 16,384 UTF-8 bytes.

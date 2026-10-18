@@ -143,6 +143,10 @@ class RepositoryIntelligenceWorkflowEvidenceTests(unittest.TestCase):
 
     def test_adr_opt_in_rejects_conflicting_snapshot_inputs_before_checkout(self):
         self.assertEqual(evidence.validate_configuration(self.arguments({"collect_adrs": "true"})), 30)
+        self.assertEqual(evidence.validate_configuration(self.arguments({"collect_adrs": "true", "adr_policy_owner": "true"})), 30)
+        for value in ("true", "maybe"):
+            with self.subTest(owner=value), self.assertRaises(evidence.ContractError):
+                evidence.validate_configuration(self.arguments({"adr_policy_owner": value}))
         for changes in ({"collect_adrs": "maybe"},
                         {"collect_adrs": "true", "observatory_snapshot": ".cache/snapshot.json"},
                         {"collect_adrs": "true", "observatory_comparison": ".cache/comparison.json"},

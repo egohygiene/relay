@@ -65,7 +65,11 @@
     "consumer": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["repository", "source_commit", "visibility"],
+      "required": [
+        "repository",
+        "source_commit",
+        "visibility"
+      ],
       "properties": {
         "repository": {
           "type": "string",
@@ -76,19 +80,37 @@
           "pattern": "^[0-9a-f]{40}$"
         },
         "visibility": {
-          "enum": ["public", "private", "internal", "unknown"]
+          "enum": [
+            "public",
+            "private",
+            "internal",
+            "unknown"
+          ]
         }
       }
     },
     "contracts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["dashboard", "analytics", "repository_tree", "repository_report"],
+      "required": [
+        "dashboard",
+        "analytics",
+        "repository_tree",
+        "repository_report"
+      ],
       "properties": {
-        "dashboard": {"$ref": "#/$defs/contract"},
-        "analytics": {"$ref": "#/$defs/contract"},
-        "repository_tree": {"$ref": "#/$defs/contract"},
-        "repository_report": {"$ref": "#/$defs/contract"}
+        "dashboard": {
+          "$ref": "#/$defs/contract"
+        },
+        "analytics": {
+          "$ref": "#/$defs/contract"
+        },
+        "repository_tree": {
+          "$ref": "#/$defs/contract"
+        },
+        "repository_report": {
+          "$ref": "#/$defs/contract"
+        }
       }
     },
     "generated_at": {
@@ -96,18 +118,28 @@
       "format": "date-time"
     },
     "timestamp_source": {
-      "enum": ["consumer-source-commit", "explicit-input"]
+      "enum": [
+        "consumer-source-commit",
+        "explicit-input"
+      ]
     },
     "projection": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["route", "classification", "deployment_authority"],
+      "required": [
+        "route",
+        "classification",
+        "deployment_authority"
+      ],
       "properties": {
         "route": {
           "const": "/intelligence/"
         },
         "classification": {
-          "enum": ["public-safe", "internal-only"]
+          "enum": [
+            "public-safe",
+            "internal-only"
+          ]
         },
         "deployment_authority": {
           "const": "consumer"
@@ -277,7 +309,10 @@
           "const": "present"
         },
         "policy_reference": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "maxLength": 240,
           "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[A-Za-z0-9._/-]+$"
         },
@@ -325,6 +360,10 @@
         },
         "schema": {
           "const": "egohygiene.relay.adr-build/v1"
+        },
+        "policy_owner": {
+          "const": true,
+          "description": "Explicit canonical-owner selection; omitted for an ordinary inheriting consumer."
         }
       },
       "required": [
@@ -343,6 +382,37 @@
         "maximum_age_seconds",
         "sources",
         "schema"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "policy_owner"
+            ],
+            "properties": {
+              "policy_owner": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "policy_reference": {
+                "type": "null"
+              },
+              "repository": {
+                "const": "egohygiene/hygiene"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "policy_reference": {
+                "type": "string"
+              }
+            }
+          }
+        }
       ]
     }
   },
@@ -395,7 +465,10 @@
     "contract": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["schema", "schema_version"],
+      "required": [
+        "schema",
+        "schema_version"
+      ],
       "properties": {
         "schema": {
           "type": "string",

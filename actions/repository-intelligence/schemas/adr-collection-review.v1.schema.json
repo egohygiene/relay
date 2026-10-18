@@ -115,7 +115,10 @@
           ]
         },
         "policy_reference": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "maxLength": 240,
           "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[A-Za-z0-9._/-]+$"
         },
@@ -160,8 +163,40 @@
               }
             }
           }
+        },
+        "policy_owner": {
+          "const": true,
+          "description": "Explicit canonical-owner selection; omitted for an ordinary inheriting consumer."
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "policy_owner"
+            ],
+            "properties": {
+              "policy_owner": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "policy_reference": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "policy_reference": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
     },
     "runtime": {
       "type": "object",

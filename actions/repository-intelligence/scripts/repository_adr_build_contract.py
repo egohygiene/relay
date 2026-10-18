@@ -33,10 +33,13 @@ def require(value):
 
 
 def validate(value, repository, source_commit):
-    require(isinstance(value, dict) and set(value) == KEYS)
+    require(isinstance(value, dict) and set(value) in (KEYS, KEYS | {"policy_owner"}))
     require(value["schema"] == SCHEMA and value["repository"] == repository and value["source_commit"] == source_commit)
+    owner = value.get("policy_owner", False)
+    require(type(owner) is bool and ("policy_owner" not in value or owner))
+    require((owner and repository == "egohygiene/hygiene" and value["policy_reference"] is None)
+            or (not owner and value["policy_reference"] == "docs/decisions/policy-reference.json"))
     require(value["adoption"] == "present" and value["decision_directory"] == "docs/decisions"
-            and value["policy_reference"] == "docs/decisions/policy-reference.json"
             and value["index"] == "docs/decisions/README.md"
             and value["collected_at"] == value["observed_at"] and value["maximum_age_seconds"] == 86400)
     coverage.validate_domains(value["coverage"], value["observed_at"])
@@ -53,20 +56,29 @@ def validate(value, repository, source_commit):
     require(isinstance(runtime, dict) and set(runtime) == {"lock_sha256", "egolint_sha256", "pins",
                                                         "collector_sha256", "shared_runtime_sha256"})
     lock_bytes = (ROOT / "contracts/adr-collector.v1.lock.json").read_bytes()
-    require(runtime["pins"] == json.loads(lock_bytes) and runtime["lock_sha256"] == digest(lock_bytes))
+    lock = json.loads(lock_bytes)
+    require(runtime["pins"] == lock and runtime["lock_sha256"] == digest(lock_bytes))
     require(runtime["collector_sha256"] == digest((ROOT / "scripts/collect_repository_adrs.py").read_bytes())
             and runtime["shared_runtime_sha256"] == digest((ROOT / "scripts/collect_repository_roadmap.py").read_bytes())
             and isinstance(runtime["egolint_sha256"], str) and SHA256.fullmatch(runtime["egolint_sha256"]))
     require(isinstance(value["sources"], list) and 2 <= len(value["sources"]) <= 256)
+    # These are captured source identities in the provenance contract. EgoLint
+    # remains responsible for semantic authority and catalog-entry validation.
+    authority = {"docs/decisions/POLICY.md", "docs/decisions/RATIFICATION.md", "catalog/contracts.yaml"}
+    authority.update(path for path in lock["sources"]["hygiene_adr"]["files"] if path.startswith("schemas/architecture-decision"))
     names = []
     for source in value["sources"]:
         require(isinstance(source, dict) and set(source) == {"path", "sha256"})
         path = source["path"]
-        require(isinstance(path, str) and re.fullmatch(r"docs/decisions/[A-Za-z0-9._/-]+", path)
+        require(isinstance(path, str) and (re.fullmatch(r"docs/decisions/[A-Za-z0-9._/-]+", path)
+                                          or (owner and path in authority))
                 and all(p not in {"", ".", ".."} for p in path.split("/")))
         require(isinstance(source["sha256"], str) and SHA256.fullmatch(source["sha256"]))
+        if owner and path in authority and path != "catalog/contracts.yaml":
+            require(source["sha256"] == lock["sources"]["hygiene_adr"]["files"][path])
         names.append(path)
-    require(names == sorted(set(names)) and value["index"] in names and value["policy_reference"] in names)
+    require(names == sorted(set(names)) and value["index"] in names)
+    require(authority.issubset(names) if owner else value["policy_reference"] in names)
     digests = value["candidate_digests"]
     require(isinstance(digests, dict) and set(digests) == {"snapshot_sha256", "projection_sha256"}
             and all(isinstance(item, str) and SHA256.fullmatch(item) for item in digests.values()))

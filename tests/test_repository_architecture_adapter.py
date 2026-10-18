@@ -13,6 +13,7 @@ from pathlib import Path
 import shutil
 import sys
 import tempfile
+import tomllib
 import unittest
 from unittest import mock
 
@@ -179,6 +180,21 @@ maximum-commits = 256
     def artifact(self, result: dict, name: str) -> dict:
         return json.loads((self.root / result["artifacts"][name]).read_bytes())
 
+    def add_owner_adrs(self) -> None:
+        self.add_adrs()
+        self.request["repository"]["id"] = "egohygiene/hygiene"
+        authority = tomllib.loads(adapter.read_file(
+            self.runtime / "egolint/.config/rules/repository-intelligence.v1.toml").decode())["canonical-policy-owner"]
+        policy = (self.root / "policy/intelligence.toml").read_text().replace(
+            'repository = "egohygiene/example"', 'repository = "egohygiene/hygiene"')
+        policy = policy.replace('policy-reference = "docs/decisions/policy-reference.json"\n', "")
+        policy = policy.replace("[roadmap]", '[adrs.policy-owner]\nsource-revision = '
+                                + json.dumps(authority["source-revision"]) + "\n[roadmap]")
+        self.put("policy/intelligence.toml", policy)
+        (self.root / "docs/decisions/policy-reference.json").unlink()
+        for path in (*authority["artifact-sha256"], authority["catalog-path"]):
+            self.put(path, (self.runtime / "hygiene" / path).read_text())
+
 
 class ArchitectureAdapterBoundaryTests(AdapterFixture):
     def test_runtime_cannot_be_supplied_from_the_consumer(self) -> None:
@@ -245,6 +261,36 @@ class ArchitectureAdapterBoundaryTests(AdapterFixture):
 
 @unittest.skipUnless(RUNTIME, "set RELAY_ARCHITECTURE_RUNTIME to a prepared pinned native runtime")
 class ArchitectureAdapterNativeTests(AdapterFixture):
+    def test_canonical_owner_is_conformant_without_a_consumer_reference(self) -> None:
+        self.add_owner_adrs()
+        self.commit()
+        before = adapter.git(self.root, "status", "--porcelain=v1")
+        result = self.invoke()
+        self.assertEqual(result["semantic_status"], "conformant", result["findings"])
+        self.assertEqual(result["coverage"]["architecture-records"], "passed")
+        self.assertEqual(self.artifact(result, "repository_intelligence")["status"], "valid")
+        self.assertFalse((self.root / "docs/decisions/policy-reference.json").exists())
+        self.assertEqual(adapter.git(self.root, "status", "--porcelain=v1"), before)
+
+    def test_owner_identity_moving_pin_and_changed_authority_are_not_waivers(self) -> None:
+        self.add_owner_adrs()
+        policy = (self.root / "policy/intelligence.toml").read_text()
+        revision = next(pin["source-revision"] for pin in adapter.catalog(self.runtime)["pins"]
+                        if pin["id"] == "egohygiene.architecture-decision/v1")
+        for mutation in ("identity", "pin", "authority"):
+            with self.subTest(mutation=mutation):
+                candidate = policy.replace(revision, "main") if mutation == "pin" else policy
+                identity = "egohygiene/example" if mutation == "identity" else "egohygiene/hygiene"
+                candidate = candidate.replace('repository = "egohygiene/hygiene"', 'repository = ' + json.dumps(identity))
+                self.put("policy/intelligence.toml", candidate)
+                self.request["repository"]["id"] = identity
+                self.put("docs/decisions/POLICY.md", "spoofed authority" if mutation == "authority"
+                         else (self.runtime / "hygiene/docs/decisions/POLICY.md").read_text())
+                self.commit()
+                result = self.invoke()
+                self.assertEqual(result["semantic_status"], "nonconformant")
+                self.assertIn("EGO-INTEL-CONTRACT-001", {f["id"] for f in result["findings"]})
+
     def test_runtime_artifact_tamper_is_rejected(self) -> None:
         copied = self.directory / "trusted-runtime-copy"
         shutil.copytree(self.runtime, copied)
@@ -303,7 +349,7 @@ class ArchitectureAdapterNativeTests(AdapterFixture):
         self.assertEqual(result["findings"], [])
         self.assertEqual(before, adapter.git(self.root, "status", "--porcelain=v1"))
         self.assertIn({"repository": "egohygiene/egolint",
-                       "revision": "933472b6322d2060c487e5a8a6f0bc5197696af0",
+                       "revision": "72267fd0a371da6d94922cbc6bd3dedddb68df30",
                        "profile_source_id": "egolint-repository-validation"}, result["provenance"])
 
     def test_catalog_drift_still_caps_native_validity_at_partial(self) -> None:
