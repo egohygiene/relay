@@ -40,7 +40,7 @@ updated: 2026-10-10
 > This snapshot refreshes the Repository Intelligence execution order and its verified upstream gates on 2026-10-10. Unrelated tracks retain their separately dated evidence; this is not a new audit of every roadmap item. The longer-horizon strategy below remains canonical context; generated HTML, JSON, progress, issue plans, and commit lists are projections.
 
 **Lifecycle:** active released product  
-**Current gate:** Review and integrate the canonical ADR Decisions build in [#115](https://github.com/egohygiene/relay/issues/115) / [PR #135](https://github.com/egohygiene/relay/pull/135), then prove the owner-reviewed Identity #69 canary under Pace #5 before the roadmap campaign. Publication acceptance in [#106](https://github.com/egohygiene/relay/issues/106) remains separate. The checkout-directory repair for [#109](https://github.com/egohygiene/relay/issues/109) is merged; its outstanding work is acceptance evidence and reviewed consumer adoption.
+**Current gate (2026-10-18):** Canonical ADR collection #115 and the Identity #69 pilot are closed. EgoLint [PR #82](https://github.com/egohygiene/egolint/pull/82) is merged. Review the bounded [#144](https://github.com/egohygiene/relay/issues/144) owner-mode adoption in both Relay runtimes, then hand the compatible pinned pipeline to Hygiene #47 for source migration and a separately selected publication host. This updates only the current execution gate; older dated quest evidence below is retained. Publication #106, final release #101 and the Pace fleet campaign remain separate acceptance tracks.
 **North-star outcome:** Immutable, reusable CI building blocks that repositories can pin, verify, and upgrade safely.
 
 ### Visual roadmap publication

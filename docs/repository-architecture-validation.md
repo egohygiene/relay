@@ -38,7 +38,7 @@ binds the reviewed source artifacts by full commit SHA and SHA-256 digest:
 | Source | Revision | Lifecycle |
 | --- | --- | --- |
 | `egohygiene/hygiene` | `c589587395750cd1c79c6fa0bef010189c547249` | Accepted policy, not release-included |
-| `egohygiene/egolint` | `933472b6322d2060c487e5a8a6f0bc5197696af0` | Proposed validator, not release-included |
+| `egohygiene/egolint` | `72267fd0a371da6d94922cbc6bd3dedddb68df30` | Proposed validator, not release-included |
 | `egohygiene/holon` | `660b941f99618806fcadd589bcdae61c519f96e4` | Accepted materializer, not release-included |
 
 Repository-contract and architecture-record validation are available through
@@ -201,6 +201,44 @@ The adapter checks caller TOML against EgoLint's pinned schemas, requires matchi
 repository identity and enabled ADR coverage, and passes the original policy
 bytes to EgoLint. It never writes a policy or chooses an ADR's lifecycle state.
 Explicit `legacy` adoption stays legacy even if native syntax checks pass.
+
+## Canonical ADR policy-owner compatibility
+
+Profile `1.0.0-alpha.3` adopts merged EgoLint PR #82 and catalog
+`0.1.0-alpha.4`, including its explicit owner selection. The reusable
+architecture workflow acquires that same immutable EgoLint revision. The
+independent ADR collector lock is upgraded in Relay #144 as well; neither path
+may silently keep an older validator while the other accepts owner input.
+
+Hygiene's caller-owned TOML retains all supported contract pins and selects:
+
+```toml
+[adrs]
+state = "present"
+decision-directory = "docs/decisions"
+index = "docs/decisions/README.md"
+
+[adrs.policy-owner]
+source-revision = "c589587395750cd1c79c6fa0bef010189c547249"
+```
+
+Its top-level repository is `egohygiene/hygiene`; omit `policy-reference`.
+EgoLint verifies the policy, ratification, schemas and canonical contract-index
+ADR authority entries captured in the represented checkout. Relay checks that
+the caller policy's repository matches the request and passes the original
+policy bytes unchanged. Ordinary consumers still provide their inherited
+policy-reference. Owner spoofing, changed authority, moving pins and independent
+ADR metadata/lifecycle findings remain native failures.
+
+Regenerate the profile digest in requests and rebuild the trusted runtime.
+Old profile requests and runtime receipts are incompatible and rejected. The
+proposed/advisory lifecycle and required-mode release/opt-in gates remain
+unchanged. Rollback restores the previous reviewed Relay revision, its matching
+profile/request/runtime and the consumer's previously supported configuration.
+Do not synthesize Hygiene inheritance when reverting owner-aware validation.
+
+See [the ADR collector handoff](repository-adr-collector.md#canonical-policy-owner-selection--relay-144)
+for the action/workflow owner input, captured-source and production-build seam.
 
 ## Snapshot and retained evidence
 

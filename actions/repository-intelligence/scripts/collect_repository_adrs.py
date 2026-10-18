@@ -57,10 +57,13 @@ def relative(value: str) -> str:
     return value
 
 
-def inventory(args: argparse.Namespace) -> tuple[dict[str, bytes], bool]:
+def inventory(args: argparse.Namespace, authority_paths: tuple[str, ...] = ()) -> tuple[dict[str, bytes], bool]:
     """Read only bounded regular Git blobs; never follow checkout links or filters."""
-    paths = [relative(args.decision_directory), relative(args.index), relative(args.policy_reference)]
-    if not args.index.endswith(".md") or not args.policy_reference.endswith(".json"):
+    paths = [relative(args.decision_directory), relative(args.index)]
+    paths.extend(relative(path) for path in authority_paths)
+    if not args.policy_owner:
+        paths.append(relative(args.policy_reference))
+    if not args.index.endswith(".md") or (not args.policy_owner and not args.policy_reference.endswith(".json")):
         base.fail("PATH")
     raw = base.git(args.repository_root, "ls-tree", "-r", "-z", "--full-tree",
                    args.source_commit, "--", *paths, limit=base.MAX_JSON)
@@ -175,8 +178,14 @@ def source_validate(args: argparse.Namespace, files: dict, commit: bytes, availa
     for pin in pins:
         policy += "\n[[contracts]]\n" + "".join(f"{k} = {json.dumps(v)}\n" for k, v in pin.items())
     state = "not-applicable" if args.adoption == "not-applicable" else "present" if available else "unknown"
-    policy += (f'\n[adrs]\nstate = "{state}"\npolicy-reference = "{args.policy_reference}"\n'
-               f'decision-directory = "{args.decision_directory}"\nindex = "{args.index}"\n'
+    policy += (f'\n[adrs]\nstate = "{state}"\n'
+               + ("" if args.policy_owner else f'policy-reference = "{args.policy_reference}"\n')
+               + f'decision-directory = "{args.decision_directory}"\nindex = "{args.index}"\n')
+    if args.policy_owner:
+        # This is the semantic owner's supported selection, not a Relay exception.
+        policy += ('[adrs.policy-owner]\nsource-revision = '
+                   + json.dumps(catalog["canonical-policy-owner"]["source-revision"]) + "\n")
+    policy += (
                '[roadmap]\nstate = "unknown"\npath = "ROADMAP.md"\n'
                '[commit-history]\nstate = "unknown"\nmaximum-commits = 1\n')
     with tempfile.TemporaryDirectory() as directory:
@@ -292,7 +301,11 @@ def collect(args: argparse.Namespace, *, on_stage=None) -> dict:
         base.fail("VISIBILITY")
     if not base.REPOSITORY.fullmatch(args.repository) or not base.SHA.fullmatch(args.source_commit):
         base.fail("INPUT")
+    if args.policy_owner:
+        args.policy_reference = None
     for path in (args.decision_directory, args.index, args.policy_reference):
+        if path is None:
+            continue
         relative(path)
         if base.SECRET.search(path):
             base.fail("VISIBILITY")
@@ -302,11 +315,16 @@ def collect(args: argparse.Namespace, *, on_stage=None) -> dict:
     if age < 0 or not 1 <= args.maximum_age_seconds <= 2678400:
         base.fail("INPUT")
     lock, receipt = base.runtime_files(args.runtime, lock_path=LOCK_PATH)
+    catalog = tomllib.loads(base.read_file(args.runtime / "egolint/.config/rules/repository-intelligence.v1.toml").decode())
+    authority_paths = ()
+    if args.policy_owner:
+        authority = catalog["canonical-policy-owner"]
+        authority_paths = (*authority["artifact-sha256"], authority["catalog-path"])
     commit = base.git(args.repository_root, "cat-file", "commit", args.source_commit, limit=base.MAX_SOURCE)
     diagnostics, records, files = [], [], {}
     available, partial = False, False
     if args.adoption != "unknown":
-        files, directory_present = inventory(args)
+        files, directory_present = inventory(args, authority_paths)
         records, diagnostics, partial = extract(files, args, args.runtime)
         available = directory_present and args.index in files
         if args.adoption == "not-applicable":
@@ -333,7 +351,6 @@ def collect(args: argparse.Namespace, *, on_stage=None) -> dict:
             status = "partial" if partial else "ready"
     stage("source-validation")
     report = source_validate(args, files, commit, available)
-    catalog = tomllib.loads(base.read_file(args.runtime / "egolint/.config/rules/repository-intelligence.v1.toml").decode())
     rules = {r["id"]: r["remediation"] for r in catalog["rules"]}
     for item in report["diagnostics"][:base.MAX_RECORDS]:
         if item["rule_id"] not in rules:
@@ -354,6 +371,7 @@ def collect(args: argparse.Namespace, *, on_stage=None) -> dict:
     return {"schema": SCHEMA, "status": status, "publication": "denied", "repository": args.repository,
             "represented_commit": args.source_commit, "observed_at": args.observed_at,
             "inputs": {"adoption": args.adoption, "policy_reference": args.policy_reference,
+                       **({"policy_owner": True} if args.policy_owner else {}),
                        "decision_directory": args.decision_directory, "index": args.index,
                        "collected_at": args.collected_at, "maximum_age_seconds": args.maximum_age_seconds,
                        "sources": [{"path": p, "sha256": base.digest(b)} for p, b in sorted(files.items())]},
@@ -401,7 +419,10 @@ def parser() -> argparse.ArgumentParser:
     for name in ("repository", "visibility", "source-commit", "observed-at"):
         command.add_argument("--" + name, required=True)
     command.add_argument("--adoption", choices=("present", "legacy", "unknown", "not-applicable"), required=True)
-    command.add_argument("--policy-reference", default="docs/decisions/policy-reference.json")
+    selection = command.add_mutually_exclusive_group()
+    selection.add_argument("--policy-reference", default="docs/decisions/policy-reference.json")
+    selection.add_argument("--policy-owner", action="store_true",
+                           help="Select EgoLint's canonical Hygiene owner policy without self-inheritance.")
     command.add_argument("--decision-directory", default="docs/decisions")
     command.add_argument("--index", default="docs/decisions/README.md")
     command.add_argument("--collected-at")

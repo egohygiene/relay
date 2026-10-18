@@ -16,8 +16,10 @@ Set `collect-adrs: "true"` for a fresh validated canonical corpus; it conflicts
 with external snapshot/comparison inputs. Alpha.2 snapshots preserve per-domain
 collection coverage, while existing alpha.1 inputs remain compatible. The
 separate review-only envelope remains publication-denied. See the collector
-guide for pinned runtime acquisition, offline use, provenance, and Identity #69
-adoption gates.
+guide for pinned runtime acquisition, offline use, provenance, canonical owner
+selection and the completed Identity #69 pilot. Hygiene owner collection sets
+`adr-policy-owner: "true"`; this does not supply missing ADR approval or select
+a publication host.
 
 ### Navigation branding
 
@@ -247,6 +249,7 @@ for provider proof and consumer adoption.
 | `work-directory`            | `.cache/repository-intelligence` | Private collection workspace; do not publish wholesale                  |
 | `reports-directory`         | `.reports`                       | Optional summaries; always excluded from tree and analytics              |
 | `collect-adrs` | `false` | Collect standard-path canonical public ADRs; requires complete valid ADR coverage |
+| `adr-policy-owner` | `false` | Explicit canonical Hygiene policy-owner mode; requires `collect-adrs`; ordinary consumers keep inheritance |
 | `adr-runtime` | empty | Composite-only trusted prepared runtime outside the consumer; otherwise acquire pinned dependencies |
 | `observatory-snapshot`      | empty                            | Optional commit-matched public-safe Repository Intelligence read model    |
 | `observatory-comparison`    | empty                            | Optional comparison whose after boundary matches the snapshot and commit |

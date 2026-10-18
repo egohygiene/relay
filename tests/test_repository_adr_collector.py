@@ -47,6 +47,22 @@ def git(root, *args):
         env=environment, stderr=subprocess.PIPE).decode().strip()
 
 
+def owner_corpus(consumer, runtime):
+    """Pair synthetic local ADRs with the pinned public owner authority files."""
+    (consumer / POLICY).unlink()
+    for path in (consumer / "docs/decisions").glob("ADR-*.md"):
+        path.write_text(path.read_text().replace("egohygiene/relay", "egohygiene/hygiene"))
+    lock = json.loads((SCRIPT.parent.parent / "contracts/adr-collector.v1.lock.json").read_text())
+    for name in lock["sources"]["hygiene_adr"]["files"]:
+        if name == "docs/decisions/MIGRATION.md":
+            continue
+        target = consumer / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((runtime / "hygiene_adr" / name).read_bytes())
+    git(consumer, "add", "--all")
+    return git(consumer, "commit", "--quiet", "--message", "test: synthetic canonical owner")
+
+
 class BoundaryTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -66,6 +82,15 @@ class BoundaryTests(unittest.TestCase):
                      ".reports/egolint/report.json", "docs/../secret", "docs/decisions/", "docs/evil\nname"):
             with self.subTest(path=path), self.assertRaises(collector.base.CollectorError):
                 collector.relative(path)
+
+    def test_owner_selection_cannot_also_declare_consumer_inheritance(self):
+        with self.assertRaises(SystemExit) as raised:
+            collector.parser().parse_args([
+                "collect", "--runtime", str(self.root), "--repository-root", str(self.root),
+                "--repository", "egohygiene/hygiene", "--visibility", "public", "--source-commit", "a" * 40,
+                "--observed-at", "2026-10-18T17:00:00Z", "--adoption", "present", "--output", "review.json",
+                "--policy-owner", "--policy-reference", POLICY])
+        self.assertEqual(raised.exception.code, 2)
 
     def test_private_unknown_and_internal_requests_replace_prior_output_with_closed_denial(self):
         consumer = self.root / "consumer"
@@ -145,6 +170,60 @@ class NativeTests(unittest.TestCase):
         target = self.consumer / path
         target.write_text(target.read_text().replace(old, new))
         self.commit()
+
+    def test_canonical_owner_captures_pinned_authority_without_self_inheritance(self):
+        owner_corpus(self.consumer, self.runtime)
+        before = git(self.consumer, "status", "--porcelain")
+        result = self.collect(repository="egohygiene/hygiene", policy_owner=True)
+        self.assertEqual(result["status"], "ready", result["diagnostics"])
+        self.assertEqual(result["publication"], "denied")
+        self.assertIs(result["inputs"]["policy_owner"], True)
+        self.assertIsNone(result["inputs"]["policy_reference"])
+        sources = {item["path"]: item["sha256"] for item in result["inputs"]["sources"]}
+        for path in ("docs/decisions/POLICY.md", "docs/decisions/RATIFICATION.md", "catalog/contracts.yaml",
+                     "schemas/architecture-decision.v1.schema.json", "schemas/architecture-decision-policy-reference.v1.schema.json"):
+            self.assertEqual(sources[path], collector.base.digest((self.consumer / path).read_bytes()))
+        self.assertNotIn(POLICY, sources)
+        self.assertFalse((self.consumer / POLICY).exists())
+        self.assertEqual(git(self.consumer, "status", "--porcelain"), before)
+        original = self.args(repository="egohygiene/hygiene", policy_owner=True)
+        (self.consumer / "schemas/architecture-decision.v1.schema.json").write_text("dirty bytes")
+        replay = self.collect(repository="egohygiene/hygiene", policy_owner=True, source_commit=original.source_commit)
+        self.assertEqual(result, replay)
+
+    def test_owner_identity_and_captured_policy_bytes_are_still_egolint_findings(self):
+        owner_corpus(self.consumer, self.runtime)
+        wrong_identity = self.collect(policy_owner=True)
+        self.assertEqual(wrong_identity["status"], "invalid")
+        self.assertIn("EGO-INTEL-CONTRACT-001", {d["code"] for d in wrong_identity["diagnostics"]})
+        path = self.consumer / "schemas/architecture-decision.v1.schema.json"
+        path.unlink()
+        self.commit()
+        missing = self.collect(repository="egohygiene/hygiene", policy_owner=True)
+        self.assertEqual(missing["status"], "invalid")
+        self.assertIn("EGO-INTEL-CONTRACT-001", {d["code"] for d in missing["diagnostics"]})
+
+    def test_owner_selection_does_not_approve_records_or_relax_ordinary_inheritance(self):
+        (self.consumer / POLICY).unlink()
+        self.commit()
+        ordinary = self.collect()
+        self.assertEqual(ordinary["status"], "invalid")
+        self.assertIn("EGO-INTEL-ADR-METADATA-001", {d["code"] for d in ordinary["diagnostics"]})
+        # Restore the fixture input only so the helper can remove it explicitly.
+        (self.consumer / POLICY).write_bytes((FIXTURE / POLICY).read_bytes())
+        owner_corpus(self.consumer, self.runtime)
+        record = self.consumer / NEW
+        original = record.read_text()
+        changed = original.replace(
+            "approval:\n  date: 2026-08-25\n  by: egohygiene-maintainer\n  evidence: https://github.com/egohygiene/hygiene/pull/24",
+            "approval: null")
+        self.assertNotEqual(original, changed)
+        record.write_text(changed)
+        self.commit()
+        invalid = self.collect(repository="egohygiene/hygiene", policy_owner=True)
+        self.assertEqual(invalid["status"], "invalid")
+        self.assertNotIn("EGO-INTEL-CONTRACT-001", {d["code"] for d in invalid["diagnostics"]})
+        self.assertIn("EGO-INTEL-ADR-LIFECYCLE-001", {d["code"] for d in invalid["diagnostics"]})
 
     def test_actual_native_pipeline_preserves_authority_lineage_and_existing_decisions_fragment(self):
         result = self.collect()
@@ -370,7 +449,7 @@ class NativeTests(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("RELAY_ADR_CANARY"), "set RELAY_ADR_CANARY to the acquired Hygiene clone")
     def test_real_hygiene_corpus_retains_approval_and_reports_existing_migration_gaps(self):
         result = self.collect(repository_root=Path(os.environ["RELAY_ADR_CANARY"]), repository="egohygiene/hygiene",
-            source_commit="639a003d5ddc4d242c2cf190eeb59a9fc522d199", adoption="legacy")
+            source_commit="639a003d5ddc4d242c2cf190eeb59a9fc522d199", adoption="legacy", policy_owner=True)
         self.assertEqual(result["status"], "invalid")
         self.assertEqual(result["coverage"]["decisions"]["collection"], "partial")
         self.assertEqual(result["validation"]["hygiene"], "valid")
@@ -382,6 +461,10 @@ class NativeTests(unittest.TestCase):
         self.assertEqual(foundation["attributes"]["approval"]["by"], "szmyty")
         self.assertIn("issuecomment-5647398908", foundation["attributes"]["approval"]["evidence"])
         self.assertNotIn("ADR-0001", [e["key"] for e in records])
+        self.assertNotIn("EGO-INTEL-CONTRACT-001", {d["code"] for d in result["diagnostics"]})
+        self.assertEqual({d["path"] for d in result["diagnostics"] if d["code"] == "EGO-INTEL-ADR-METADATA-001"},
+                         {"docs/decisions/ADR-0001-holistic-architecture-v0.1.md",
+                          "docs/decisions/ADR-004-register-sanctuary-incubation-boundary.md"})
 
 
 if __name__ == "__main__":

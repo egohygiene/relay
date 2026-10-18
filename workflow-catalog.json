@@ -828,6 +828,13 @@
           "description": "Collect and validate canonical public ADRs instead of accepting an external snapshot."
         },
         {
+          "name": "adr-policy-owner",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Explicit canonical Hygiene ADR policy-owner selection; requires collect-adrs."
+        },
+        {
           "name": "observatory-snapshot",
           "type": "string",
           "required": false,
