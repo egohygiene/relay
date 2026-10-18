@@ -1,0 +1,96 @@
+{
+  "kind": "relay-explicit-external-adr-declaration-evidence",
+  "observed_at": "2026-10-18T17:53:59Z",
+  "scope": "Stacked candidate source verification; no external provider collector or consumer publication.",
+  "issue": "https://github.com/egohygiene/relay/issues/5",
+  "parent_pull_request": "https://github.com/egohygiene/relay/pull/154",
+  "parent_revision": "acfb1222b5f05298ad8c94b2e83bfece84b6cdf8",
+  "candidate_branch": "codex/adr-external-references-5",
+  "candidate_commit": null,
+  "egolint_revision": "72267fd0a371da6d94922cbc6bd3dedddb68df30",
+  "native_semantic_field": "adrs.known-external-decisions",
+  "input_contract_sha256": "eb52326ed131c930b0ef37b6c84a233e953a75d7ff40049580696584ff8c54a8",
+  "validation": [
+    {
+      "check": "Complete Relay unittest discovery with prepared native ADR and architecture runtimes",
+      "result": "passed",
+      "discovered": 670,
+      "executed": 651,
+      "skipped": 19,
+      "notes": "Optional other-profile native runtime checks unconfigured; zero failures."
+    },
+    {
+      "check": "Fresh hash-locked ADR acceptance with independent runtime receipts and complete owner/consumer CLI-action bundle parity",
+      "result": "passed",
+      "executed": 40,
+      "skipped": 0
+    },
+    {
+      "check": "Metadata, lifecycle, continuity preflight, architecture/journal contracts, compile, JSON/YAML, inline Bash and diff checks",
+      "result": "passed",
+      "notes": "14 actions, 23 workflows, 16 reusable workflows; no deployment/scheduling gate changes."
+    },
+    {
+      "check": "Pinned native Relay continuity and schema/heading/bounds/path checks",
+      "result": "passed",
+      "report_status": "valid",
+      "blocking_diagnostics": 0,
+      "notes": "Expected observe-only upstream lifecycle warning; broader lint also reports release/portability findings outside the scoped continuity result."
+    }
+  ],
+  "immutable_hygiene_pair": {
+    "source_commit": "48143eff8fb6c9ef9c679a2d71f9dee4e722b3bd",
+    "observed_at": "2026-10-18T17:50:17Z",
+    "declared_reference": "egohygiene/identity#ADR-017",
+    "status": "invalid",
+    "publication": "denied",
+    "source_count": 23,
+    "counts_before": {
+      "EGO-INTEL-ADOPTION-001": 3,
+      "EGO-INTEL-ADR-INDEX-001": 1,
+      "EGO-INTEL-ADR-LINEAGE-001": 13,
+      "EGO-INTEL-ADR-METADATA-001": 1,
+      "EXTRACTION": 1,
+      "INTEGRATION": 1
+    },
+    "counts_after": {
+      "EGO-INTEL-ADOPTION-001": 3,
+      "EGO-INTEL-ADR-INDEX-001": 1,
+      "EGO-INTEL-ADR-LINEAGE-001": 12,
+      "EGO-INTEL-ADR-METADATA-001": 1,
+      "EXTRACTION": 1,
+      "INTEGRATION": 1
+    },
+    "captured_sources_unchanged": true,
+    "candidate_digests_identical": true,
+    "candidate_digests": {
+      "projection_sha256": "7e2bdfc3d12459850486c1e18ade51c72fc0fa98a5b5a58abae9dc588ca22af5",
+      "snapshot_sha256": "c6d9bd16a5f10db9fb99804f2229ed812641a399ddd58b06f0ca0556c55232ba"
+    },
+    "no_external_graph_entity": true,
+    "source_clean": true,
+    "remaining": "Legacy ADR-0001 metadata, its twelve local references and index gap remain; legacy adoption is partial and other domains uncollected."
+  },
+  "manual_public_target_observation": {
+    "repository": "egohygiene/identity",
+    "revision": "69d55c1caaa5b3959ed2ffdbbcd1fd69357d87dc",
+    "path": "docs/decisions/ADR-017-zensical-launchkit-publication-architecture.md",
+    "git_blob": "6461d1c063766c0a8160decb5a26815bb35457dc",
+    "scope": "GitHub connector fetched first 42 lines at the exact commit, including public identity and existing human approval metadata. Separate manual observation; not collector-acquired target evidence."
+  },
+  "bounds": {
+    "input_utf8_bytes": 8192,
+    "maximum_keys": 64,
+    "maximum_key_characters": 240,
+    "duplicates": "denied",
+    "normalization": "sorted qualified keys",
+    "empty_selection": "optional receipt field omitted",
+    "target_acquisition": "none"
+  },
+  "remaining_gates": [
+    "Hosted candidate validation and review; merge the owner-support parent then this follow-up and use its exact reviewed merge revision.",
+    "Hygiene ADR-0001 actual disposition/legacy identity exception and source migration, then native corpus admission.",
+    "A valid production artifact and explicit host/declaration before separately approved publication and live/rollback acceptance."
+  ],
+  "decision_impact": "ADR not required: forward an existing EgoLint semantic selection through established Relay input/provenance boundaries."
+}

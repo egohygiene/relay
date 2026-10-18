@@ -21,6 +21,9 @@ SHA256 = re.compile(r"[0-9a-f]{64}")
 _spec = importlib.util.spec_from_file_location("relay_adr_coverage", Path(__file__).with_name("repository_intelligence_coverage.py"))
 coverage = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(coverage)
+_input_spec = importlib.util.spec_from_file_location("relay_adr_inputs", Path(__file__).with_name("repository_adr_inputs.py"))
+inputs = importlib.util.module_from_spec(_input_spec)
+_input_spec.loader.exec_module(inputs)
 
 
 def digest(content):
@@ -33,7 +36,11 @@ def require(value):
 
 
 def validate(value, repository, source_commit):
-    require(isinstance(value, dict) and set(value) in (KEYS, KEYS | {"policy_owner"}))
+    require(isinstance(value, dict) and KEYS.issubset(value)
+            and set(value) <= KEYS | {"policy_owner", "known_external_decisions"})
+    if "known_external_decisions" in value:
+        declared = value["known_external_decisions"]
+        require(bool(declared) and inputs.external_decisions(json.dumps(declared)) == declared)
     require(value["schema"] == SCHEMA and value["repository"] == repository and value["source_commit"] == source_commit)
     owner = value.get("policy_owner", False)
     require(type(owner) is bool and ("policy_owner" not in value or owner))
@@ -54,12 +61,13 @@ def validate(value, repository, source_commit):
                                diagnostics_truncated=False) for status in ("valid", "incomplete")])
     runtime = value["runtime"]
     require(isinstance(runtime, dict) and set(runtime) == {"lock_sha256", "egolint_sha256", "pins",
-                                                        "collector_sha256", "shared_runtime_sha256"})
+                                                        "collector_sha256", "shared_runtime_sha256", "input_contract_sha256"})
     lock_bytes = (ROOT / "contracts/adr-collector.v1.lock.json").read_bytes()
     lock = json.loads(lock_bytes)
     require(runtime["pins"] == lock and runtime["lock_sha256"] == digest(lock_bytes))
     require(runtime["collector_sha256"] == digest((ROOT / "scripts/collect_repository_adrs.py").read_bytes())
             and runtime["shared_runtime_sha256"] == digest((ROOT / "scripts/collect_repository_roadmap.py").read_bytes())
+            and runtime["input_contract_sha256"] == digest((ROOT / "scripts/repository_adr_inputs.py").read_bytes())
             and isinstance(runtime["egolint_sha256"], str) and SHA256.fullmatch(runtime["egolint_sha256"]))
     require(isinstance(value["sources"], list) and 2 <= len(value["sources"]) <= 256)
     # These are captured source identities in the provenance contract. EgoLint

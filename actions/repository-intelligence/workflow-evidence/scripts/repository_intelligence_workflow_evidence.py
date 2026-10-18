@@ -5,12 +5,18 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 from pathlib import Path
 import re
 import tempfile
 from typing import Final
 
+
+_input_spec = importlib.util.spec_from_file_location(
+    "relay_adr_inputs", Path(__file__).resolve().parents[2] / "scripts/repository_adr_inputs.py")
+adr_inputs = importlib.util.module_from_spec(_input_spec)
+_input_spec.loader.exec_module(adr_inputs)
 
 WORKFLOW_CONTRACT: Final = "v1"
 REPORT_CONTRACT: Final = "v1"
@@ -305,6 +311,10 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
     """Validate untrusted workflow inputs before checkout or generation."""
 
     collect_adrs = getattr(arguments, "collect_adrs", "false")
+    try:
+        adr_inputs.selection(getattr(arguments, "adr_known_external_decisions", "[]"), collect_adrs)
+    except ValueError:
+        raise ContractError("RIW-INPUT-ADR-MODE") from None
     policy_owner = getattr(arguments, "adr_policy_owner", "false")
     if policy_owner not in {"true", "false"} or (policy_owner == "true" and collect_adrs != "true"):
         raise ContractError("RIW-INPUT-ADR-MODE")
@@ -625,6 +635,7 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--reports-directory", default=".reports")
     value.add_argument("--collect-adrs", default="false")
     value.add_argument("--adr-policy-owner", default="false")
+    value.add_argument("--adr-known-external-decisions", default="[]")
     value.add_argument("--observatory-snapshot", default="")
     value.add_argument("--observatory-comparison", default="")
     value.add_argument("--default-branch", default="")

@@ -250,6 +250,7 @@ for provider proof and consumer adoption.
 | `reports-directory`         | `.reports`                       | Optional summaries; always excluded from tree and analytics              |
 | `collect-adrs` | `false` | Collect standard-path canonical public ADRs; requires complete valid ADR coverage |
 | `adr-policy-owner` | `false` | Explicit canonical Hygiene policy-owner mode; requires `collect-adrs`; ordinary consumers keep inheritance |
+| `adr-known-external-decisions` | `[]` | JSON array of declared external ADR keys for native lineage checks; nonempty requires `collect-adrs`; no target acquisition |
 | `adr-runtime` | empty | Composite-only trusted prepared runtime outside the consumer; otherwise acquire pinned dependencies |
 | `observatory-snapshot`      | empty                            | Optional commit-matched public-safe Repository Intelligence read model    |
 | `observatory-comparison`    | empty                            | Optional comparison whose after boundary matches the snapshot and commit |

@@ -147,7 +147,11 @@ class RepositoryIntelligenceWorkflowEvidenceTests(unittest.TestCase):
         for value in ("true", "maybe"):
             with self.subTest(owner=value), self.assertRaises(evidence.ContractError):
                 evidence.validate_configuration(self.arguments({"adr_policy_owner": value}))
-        for changes in ({"collect_adrs": "maybe"},
+        self.assertEqual(evidence.validate_configuration(self.arguments({"collect_adrs": "true",
+            "adr_known_external_decisions": '["egohygiene/identity#ADR-017"]'})), 30)
+        for changes in ({"adr_known_external_decisions": '["egohygiene/identity#ADR-017"]'},
+                        {"collect_adrs": "true", "adr_known_external_decisions": "{}"},
+                        {"collect_adrs": "maybe"},
                         {"collect_adrs": "true", "observatory_snapshot": ".cache/snapshot.json"},
                         {"collect_adrs": "true", "observatory_comparison": ".cache/comparison.json"},
                         {"collect_adrs": "true", "reports_directory": ".cache/repository-intelligence/adr"}):

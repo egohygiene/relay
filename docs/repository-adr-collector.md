@@ -232,6 +232,63 @@ ADR-0001 disposition gate remain separate from this runtime adoption. Relay
 #115 and the Identity #69 pilot are already closed; this work uses Refs #144
 while later acceptance remains.
 
+## Explicit external ADR declarations — Relay #5
+
+EgoLint's native `adrs.known-external-decisions` selection supports qualified
+external decision references. Relay forwards an explicit bounded caller list;
+it does not treat every unresolved reference as known or infer authority from a
+link. Both collection and build CLIs accept the same JSON input:
+
+```bash
+--known-external-decisions '["egohygiene/identity#ADR-017"]'
+```
+
+The composite action and both reusable-workflow invocation forms accept:
+
+```yaml
+collect-adrs: true
+adr-known-external-decisions: '["egohygiene/identity#ADR-017"]'
+```
+
+The default is `[]`. Nonempty lists require `collect-adrs`; malformed JSON,
+non-arrays, unqualified keys, duplicates, over 64 keys or over 8192 UTF-8 input
+bytes fail before acquisition. Each key is at most 240 characters. The shared
+stdlib input adapter sorts declarations for deterministic provenance. Workflow
+preflight, action metadata, build CLI and collector use that same adapter;
+EgoLint remains responsible for actual lineage validation. Owner selection and
+ordinary policy inheritance retain their independent gates.
+
+Collection records a nonempty canonical `known_external_decisions` list in
+review inputs and build provenance; an empty list leaves the optional field
+absent. Runtime evidence now also binds `input_contract_sha256` to the trusted
+input adapter. Older receipts lack that source binding or have an older
+collector digest and must be regenerated through the selected exact Relay
+revision. Do not edit receipts to upgrade them. No upstream semantic contract
+or independent runtime lock is repinned by this input addition.
+
+This is a **caller declaration**, not provider observation. The collector does
+not acquire external repositories, follow linked instructions, import external
+nodes, approve a decision or claim an external target's freshness, existence or
+visibility. The consumer must review a public target against durable source
+before selecting its key. A selected wrong key leaves the native dangling
+reference finding intact. Local missing IDs remain invalid even when other
+external keys are selected. The graph preserves the public source's declared
+reference without fabricating an external entity or collected domain.
+
+The native paired Hygiene replay selects
+`egohygiene/identity#ADR-017` at the exact source from Hygiene draft #70. It
+removes one undeclared-external lineage finding; all 23 captured source hashes,
+projection/read-model candidate digests and remaining findings are identical.
+Unchanged legacy ADR-0001 still blocks source conformance and publication.
+The target was separately inspected at immutable public Identity
+`69d55c1caaa5b3959ed2ffdbbcd1fd69357d87dc`; that bounded manual observation does
+not become collector-acquired evidence.
+
+Rollback the caller input and exact Relay selection together after checking
+for later changes, then regenerate compatible receipts. Preserve canonical
+relationships; do not delete an external reference to make an older collector
+pass. Consumer adoption, host selection and publication remain separate.
+
 ## Checkpoint 2: opt-in Decisions builds
 
 `collect-adrs: true` now connects a fresh native collection to the existing

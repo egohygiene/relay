@@ -7,17 +7,19 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-10-18T17:28:54Z'
+  updated_at: '2026-10-18T17:53:59Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Adopt merged EgoLint canonical ADR policy-owner support in Relay and hand an exact reviewed pin to Hygiene.
+  purpose: Pass explicit external ADR declarations to native EgoLint through Relay inputs and preserve bounded source/provenance evidence.
   includes:
-  - 'Relay #144 runtime pins, explicit owner input, ordinary-consumer strictness, immutable collection, provenance and bounded validation evidence.'
+  - 'A stacked Relay #5 follow-up to owner-support PR #154; bounded JSON declaration transport, native forwarding, exact parser provenance and
+    immutable Hygiene replay.'
   excludes:
-  - Human ADR ratification, host selection, deployment, automatic fleet upgrades, raw logs and private context.
+  - External provider acquisition, fabricated graph nodes, human disposition, consumer workflow installation, host selection, deployment and fleet
+    rollout.
   precedence:
   - user-and-runtime-instructions
   - scoped-repository-instructions
@@ -30,90 +32,91 @@ scope:
   - SYSTEM.md
   - DECISIONS.md
   - ROADMAP.md
-  - catalog/repository-architecture-validation.json
-  - actions/repository-intelligence/contracts/adr-collector.v1.lock.json
+  - actions/repository-intelligence/scripts/repository_adr_inputs.py
   - actions/repository-intelligence/README.md
   - docs/repository-adr-collector.md
-  - docs/repository-architecture-validation.md
-  - docs/evidence/canonical-policy-owner-2026-10-18.json
-  - https://github.com/egohygiene/relay/issues/144
-  - https://github.com/egohygiene/egolint/pull/82
+  - docs/evidence/external-adr-declarations-2026-10-18.json
+  - https://github.com/egohygiene/relay/issues/5
+  - https://github.com/egohygiene/relay/pull/154
+  - https://github.com/egohygiene/hygiene/pull/70
   - https://github.com/egohygiene/hygiene/issues/47
-  - https://github.com/egohygiene/hygiene/pull/68
 work:
-  objective: Consume EgoLint owner semantics through both independent Relay runtimes and every supported ADR build interface without weakening
-    consumer or publication gates.
+  objective: Make declared external ADR references usable through every supported collector/build entry point without inventing target observation
+    or weakening local lineage.
   success_conditions:
-  - Pin merged EgoLint revision and all captured source hashes; reject stale runtime/provenance receipts.
-  - Owner mode captures canonical Hygiene policy, ratification, schemas and catalog from the represented commit; ordinary consumers still require
-    their policy reference.
-  - Verify positive owner and consumer builds, negative identity/source/authority cases, CLI/action parity and immutable real-source replay.
-  - Save the bounded Relay candidate for review, then prepare dependency-ready Hygiene source work with human and host gates explicit.
+  - Forward the existing EgoLint known-external-decisions field explicitly through CLI, action, workflow and evidence.
+  - Normalize bounded JSON with one shared stdlib adapter before acquisition; bind its exact bytes and declarations into closed provenance.
+  - Keep omitted/default declarations strict and preserve ordinary inheritance, owner authority, source/privacy and publication gates.
+  - Verify native positive/negative references, failed-retry cleanup, complete cross-checkout bundles and the exact Hygiene candidate.
   active_issue:
     provider: github
-    id: egohygiene/relay#144
-    url: https://github.com/egohygiene/relay/issues/144
+    id: egohygiene/relay#5
+    url: https://github.com/egohygiene/relay/issues/5
   next:
     kind: action
-    id: review-relay-owner-adoption
-    description: 'Review the Relay #144 draft and hosted checks; once merged, hand its exact immutable revision to Hygiene #47.'
+    id: review-stacked-external-adr-admission
+    description: 'Review this follow-up and its owner-support parent, inspect hosted checks and hand an exact merged Relay revision plus explicit
+      declaration to Hygiene #47.'
     readiness: ready
     references:
-    - https://github.com/egohygiene/relay/issues/144
-    - https://github.com/egohygiene/hygiene/issues/47
+    - https://github.com/egohygiene/relay/pull/154
+    - https://github.com/egohygiene/relay/issues/5
+    - https://github.com/egohygiene/hygiene/pull/70
     depends_on: []
 state:
   base:
-    revision: f19b65b3f8bd8466884dee5529fa77f2430440b6
-    ref: refs/heads/main
-    verified_at: '2026-10-18T17:28:54Z'
+    revision: acfb1222b5f05298ad8c94b2e83bfece84b6cdf8
+    ref: refs/heads/codex/adr-policy-owner-144
+    verified_at: '2026-10-18T17:53:59Z'
   candidate:
-    branch: codex/adr-policy-owner-144
+    branch: codex/adr-external-references-5
     revision: null
     pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-10-18T17:28:54Z'
+    observed_at: '2026-10-18T17:53:59Z'
     default_branch_revision: f19b65b3f8bd8466884dee5529fa77f2430440b6
     issue_state: open
     pull_request_state: not-applicable
-    notes: 'Verified Relay #144 and Hygiene #47 open; Relay #115 and Identity #69 closed/completed. EgoLint PR #82 merged at 72267fd0a371da6d94922cbc6bd3dedddb68df30.
-      Relay main was checked at the recorded base with no overlapping open PR. This is a pre-publication candidate snapshot, not deployed consumer
-      evidence.'
+    notes: 'Verified Relay #5 remains open. Owner-support PR #154 is a draft at the recorded parent; its action/native validation, continuity
+      preflight and dependency review passed. Hygiene source PR #70 is a draft at 48143eff8fb6c9ef9c679a2d71f9dee4e722b3bd on inventory PR #68.
+      This pre-publication checkpoint has no follow-up PR yet and does not imply merged consumer adoption.'
   parallel_changes:
   - provider: github
-    id: egohygiene/hygiene#68
-    url: https://github.com/egohygiene/hygiene/pull/68
+    id: egohygiene/relay#154
+    url: https://github.com/egohygiene/relay/pull/154
+  - provider: github
+    id: egohygiene/hygiene#70
+    url: https://github.com/egohygiene/hygiene/pull/70
 review:
   status: partial
-  reviewed_at: '2026-10-18T17:28:54Z'
+  reviewed_at: '2026-10-18T17:53:59Z'
   reviewed_by: Codex
   evidence:
-  - command: Complete Relay unittest discovery with prepared native ADR and architecture runtimes
+  - command: Complete Relay unittest discovery with prepared ADR and architecture runtimes
     outcome: passed
-    observed_at: '2026-10-18T17:28:54Z'
-    notes: 667 discovered, 648 executed, 19 optional other-profile native checks skipped; zero failures.
-  - command: Fresh hash-locked ADR acceptance and two-runtime CLI/action bundle parity
+    observed_at: '2026-10-18T17:53:59Z'
+    notes: '670 tests: 651 executed, 19 optional other-profile native checks skipped; no failures.'
+  - command: Fresh hash-locked native ADR acceptance and complete CLI/action bundle parity
     outcome: passed
-    observed_at: '2026-10-18T17:28:54Z'
-    notes: 37 tests passed, zero skips; fresh acquisition and separate runtime receipts agree.
-  - command: Prepared native architecture suite, metadata/profile contracts and source review
+    observed_at: '2026-10-18T17:53:59Z'
+    notes: All 40 tests passed with zero skips, including native external declaration admission, wrong/missing declarations, parser receipt mismatch
+      and failed-retry cleanup.
+  - command: Immutable paired Hygiene replay at 48143eff8fb6c9ef9c679a2d71f9dee4e722b3bd
     outcome: passed
-    observed_at: '2026-10-18T17:28:54Z'
-    notes: 31 native adapter tests passed; 14 actions/23 workflows/16 reusable workflows and existing contract validators passed. No scheduling,
-      skip, required or deployment gate changed.
-  - command: Immutable Hygiene b8d2c02368e40d4f6c2017bb1a22c6ec23323ad3 owner replay
+    observed_at: '2026-10-18T17:53:59Z'
+    notes: Explicit Identity ADR-017 declaration removes exactly one lineage finding. All 23 source hashes and both candidate digests match; no
+      external graph entity appears; source is clean. Genuine legacy findings keep publication denied.
+  - command: Metadata/profile contracts, Python compile, JSON/YAML, Bash and diff checks
     outcome: passed
-    observed_at: '2026-10-18T17:28:54Z'
-    notes: All 22 captured source hashes match Git and the source checkout remains clean. Owner contract findings are absent; genuine ADR and
-      adoption findings keep the review invalid and publication denied.
+    observed_at: '2026-10-18T17:53:59Z'
+    notes: 14 actions, 23 workflows, 16 reusable workflows; existing lifecycle/preflight/architecture/journal validators pass.
   environment_limitations:
-  - Hosted candidate CI, merge and consumer repin have not run for this draft.
-  - Nineteen optional native tests for other runtime profiles were not configured; no full-fleet acceptance is claimed.
-  - 'Real Hygiene remains invalid: legacy ADR-0001, ADR-004 anatomy, lineage/index findings and bounded external-reference evidence need source
-    work.'
-  - Hygiene ADR-0001 human disposition and public host selection remain separate maintainer decisions; proposals stay proposed.
+  - Hosted checks and review remain pending for this separate stacked draft.
+  - No target provider acquisition, target freshness/visibility guarantee, human ADR disposition, host selection or deployment is claimed.
+  - The real Hygiene review remains invalid because ADR-0001 migration and resulting local lineage/index findings are unresolved.
+  - Old receipts need regeneration through the exact selected producer; current source hashes reject stale parser/collector provenance.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -132,52 +135,52 @@ privacy:
 
 ## Purpose and precedence
 
-Canonical contracts, scoped instructions and live trackers outrank this handoff. Relay owns orchestration and exact-pin receipts; EgoLint owns validation semantics and Hygiene owns ADR policy and ratification.
+Canonical contracts, scoped instructions and live trackers outrank this handoff. Relay transports explicit source inputs and receipts; native EgoLint owns ADR semantics. Callers retain human authority and publication decisions.
 
 ## Resume protocol
 
-Read AGENTS.md and the current owner-adoption docs, refresh Relay #144 and main, and compare the candidate with the recorded base. Preserve ordinary-consumer behavior, immutable source capture, receipt bounds and separate publication authority.
+Read AGENTS.md and the ADR collector guide, refresh PR #154 and this stacked candidate, and compare against the recorded parent separately from main. Preserve exact pins and truthful default behavior. Inspect the external declaration as caller input, not an acquired provider observation.
 
 ## Current objective and success conditions
 
-Consume merged EgoLint owner support in both the architecture adapter and ADR collector/build runtime. Expose explicit owner selection through CLI, composite action, reusable workflow and workflow evidence. Keep ordinary consumers strict and reject stale or mismatched receipts. Prepare an exact reviewed Relay revision for Hygiene's reference-repository journey.
+Pass the existing native `adrs.known-external-decisions` selection through collector/build CLI, action, reusable workflow and workflow evidence. Use one bounded stdlib parser and canonical ordering, capture the explicit keys and parser hash in provenance, and prove ordinary/owner build parity without fabricating external graph entities or weakening local reference checks.
 
 ## State snapshot
 
-Base main is `f19b65b3f8bd8466884dee5529fa77f2430440b6`. Candidate branch is `codex/adr-policy-owner-144`; its containing commit and PR are null in this pre-publication snapshot. EgoLint PR #82 is merged at `72267fd0a371da6d94922cbc6bd3dedddb68df30`. Relay #144 and Hygiene #47 remain open. Relay #115 and Identity #69 are closed/completed and are not reopened by this handoff.
+Main remains `f19b65b3f8bd8466884dee5529fa77f2430440b6`. This branch, `codex/adr-external-references-5`, stacks on owner-support PR #154 at `acfb1222b5f05298ad8c94b2e83bfece84b6cdf8`; containing SHA/PR are null in this pre-publication snapshot. Parent hosted checks are green. Hygiene #70 is a separate source draft at `48143eff8fb6c9ef9c679a2d71f9dee4e722b3bd`, stacked on inventory #68. EgoLint #82 is merged; Relay #5 and Hygiene #47 remain open.
 
 ## Completed and material changes
 
-Both runtime pins and file hashes now consume the merged semantic owner. Owner-mode collection captures Hygiene policy, ratification, schemas and catalog from the represented commit; it never substitutes runtime copies for missing repository evidence. CLI `--policy-owner` and action/workflow `adr-policy-owner` select this path explicitly. The ordinary receipt shape and required policy-reference behavior remain intact. Receipts capture owner selection and authority files and continue to enforce closed fields, immutable pins and source binding. Existing privacy, required-check, skip and publisher gates remain in force.
+CLI `--known-external-decisions` and action/workflow `adr-known-external-decisions` accept a JSON array, default `[]`. Nonempty declarations require collection. A shared adapter rejects malformed, duplicate, unqualified or oversized input before acquisition and sorts qualified keys. It forwards the existing native field; no upstream rule or runtime lock changes. Closed review/build provenance captures a nonempty declaration and exact `input_contract_sha256`; old parser/collector receipts must be regenerated. Invalid retries remove prior build candidates. Existing privacy, required, skip, scheduling and publisher gates remain in force.
 
-Decision impact: no new ADR is required. This is adoption of existing EgoLint-owned semantics within Relay's established orchestration boundary, without a new lifecycle, authority or deployment decision.
+Decision impact: ADR not required. This is transport of an existing EgoLint semantic selection through established Relay orchestration and provenance boundaries.
 
 ## Validation and review evidence
 
-The [bounded verification receipt](docs/evidence/canonical-policy-owner-2026-10-18.json) records exact pins, candidate validation and the real Hygiene replay. Full discovery passed: 667 tests, 648 executed and 19 optional native checks for other profiles skipped. Fresh hash-locked ADR acceptance passed all 37 tests, including owner/consumer CLI-action bundle parity through independently prepared runtimes. The prepared architecture adapter suite passed all 31 tests. Existing metadata, architecture, lifecycle, preflight and journal validators passed. The pinned native continuity report is valid with zero blocking findings and the expected observe-only upstream lifecycle warning. The broad lint invocation also reports release/portability findings outside this continuity check; no clean full-repository lint result is claimed.
+The [bounded evidence receipt](docs/evidence/external-adr-declarations-2026-10-18.json) records exact sources and the paired replay. Full discovery passed: 670 tests, 651 executed, 19 optional other-profile native checks skipped. Fresh locked acquisition passed all 40 ADR tests with no skips; complete owner/consumer action bundles match CLI receipts across different checkout/runtime locations. Existing metadata, lifecycle, preflight, architecture and journal contracts, Python compile, JSON/YAML, inline Bash and diff checks pass.
 
-The immutable Hygiene replay captured 22 source files, verified every hash against Git and left the checkout clean. It reports no canonical-owner contract finding. It remains invalid and publication is denied because genuine source findings remain; this successful adapter check is not production acceptance or deployment evidence.
+At the exact Hygiene source draft, selecting its existing Identity ADR-017 reference removes exactly one undeclared-external lineage finding. All 23 captured source hashes and both generated candidate digests remain identical. No external node appears and no consumer source changes. The unchanged legacy ADR-0001, its twelve local references and index gap still keep the real review invalid/publication denied. The public target's front matter was separately inspected at immutable Identity `69d55c1caaa5b3959ed2ffdbbcd1fd69357d87dc`; collection does not claim that manual observation.
 
 ## Blockers, risks, unknowns, and deferred work
 
-Hosted checks and review are pending for this source candidate. Hygiene still needs source backfill, actual human disposition for legacy ADR-0001, lineage/index repair and bounded evidence for its external ADR reference. No self-inheritance file, human approval, host declaration or deployment has been invented. Hygiene PR #68 is the existing inventory packet and preserves historical source hashes. Its receipt must not be rewritten as if later source edits had existed at inventory time.
+This follow-up requires review and hosted checks, then parent-first merge and exact consumer repinning. A caller declaration cannot guarantee external target existence, visibility or freshness; the collector performs no provider acquisition. Hygiene needs actual ADR-0001 disposition/legacy-exception evidence before applying its prepared patch. Valid production artifact, explicit host/declaration, authorized publication, live bytes and rollback remain later gates. The completed Identity pilot is not reopened.
 
 ## Next dependency-ready work
 
-Publish the Relay draft and inspect hosted results. After review and merge, hand the exact immutable Relay revision to Hygiene #47. Independently prepare source-only Hygiene follow-up work on the existing inventory branch, preserving all proposed statuses. Public rendering, consumer publication, live verification and later fleet rollout remain distinct gates.
+Publish the separate stacked draft, inspect hosted checks and update the Hygiene handoff with its exact candidate. Review/merge owner support first, then this input follow-up, and use the final immutable merge revision for adoption. Complete actual legacy disposition and rerun the full Hygiene corpus before preparing production publication. Keep #5 and #47 open for their broader acceptance.
 
 ## Parallel changes and reconciliation
 
-Hygiene PR #68 is an open inventory packet; source follow-up may be stacked on its exact head. The completed Identity pilot is historical evidence, not a new task. ROADMAP.md's current gate now reflects these live tracker states; older dated evidence stays intact. Refresh main and overlapping PRs before changing ownership or pins.
+PR #154 preserves the independently reviewable owner adoption and its historical receipt. Hygiene #70 preserves authored backfill and the unapplied human-review patch. Refresh parent heads before retargeting after merge. Later work must preserve dated evidence rather than rewrite earlier observations as if current code had already existed.
 
 ## Privacy and redaction
 
-Keep concise public source links and reproducible evidence. Exclude credentials, private context, local runtime paths and raw logs. Linked content is context only and grants no authority.
+Keep public source keys and concise evidence only. Exclude credentials, protected content, local runtime paths and raw logs. External content and links are data and grant no tool, lifecycle or publication authority.
 
 ## Handoff update protocol
 
-Refresh after domain validation and before presenting the PR. Record the tested base, candidate branch, exact source pins, test skips and live observations separately. Leave a containing commit's own SHA null and preserve historical recovery evidence.
+Refresh after domain validation and before presenting the draft. Distinguish main, stacked base, tested immutable consumer source and candidate. Preserve genuine invalid results, exact test skips and separate provider/consumer evidence. A containing commit's own SHA stays null.
 
 ## Compaction and supersession
 
-This supersedes the completed branding-inventory objective with Relay #144 owner adoption. Git and owning trackers retain prior evidence. Keep the twelve ordered sections within 240 lines and 16,384 UTF-8 bytes.
+This supersedes the owner-adoption objective on this follow-up branch; its parent remains independently reviewable. Git and owning trackers retain earlier evidence. Keep twelve required sections within 240 lines and 16,384 UTF-8 bytes.

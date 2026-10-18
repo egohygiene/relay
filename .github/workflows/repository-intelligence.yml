@@ -33,6 +33,11 @@ on:
         required: false
         default: false
         type: boolean
+      adr-known-external-decisions:
+        description: JSON array of explicitly declared external ADR keys; requires collect-adrs when nonempty.
+        required: false
+        default: "[]"
+        type: string
       observatory-snapshot:
         description: Optional public-safe Observatory read model for the represented commit.
         required: false
@@ -112,6 +117,11 @@ on:
         required: false
         default: false
         type: boolean
+      adr-known-external-decisions:
+        description: JSON array of explicitly declared external ADR keys; requires collect-adrs when nonempty.
+        required: false
+        default: "[]"
+        type: string
       observatory-snapshot:
         description: Optional public-safe Observatory read model for the represented commit.
         required: false
@@ -201,6 +211,7 @@ jobs:
           reports-directory: "${{ inputs.reports-directory }}"
           collect-adrs: "${{ inputs.collect-adrs }}"
           adr-policy-owner: "${{ inputs.adr-policy-owner }}"
+          adr-known-external-decisions: "${{ inputs.adr-known-external-decisions }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
           observatory-comparison: "${{ inputs.observatory-comparison }}"
           default-branch: "${{ inputs.default-branch }}"
@@ -238,6 +249,7 @@ jobs:
           reports-directory: "${{ inputs.reports-directory }}"
           collect-adrs: "${{ inputs.collect-adrs }}"
           adr-policy-owner: "${{ inputs.adr-policy-owner }}"
+          adr-known-external-decisions: "${{ inputs.adr-known-external-decisions }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
           observatory-comparison: "${{ inputs.observatory-comparison }}"
           repository: "${{ github.repository }}"
@@ -321,6 +333,7 @@ jobs:
           reports-directory: "${{ inputs.reports-directory }}"
           collect-adrs: "${{ inputs.collect-adrs }}"
           adr-policy-owner: "${{ inputs.adr-policy-owner }}"
+          adr-known-external-decisions: "${{ inputs.adr-known-external-decisions }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
           observatory-comparison: "${{ inputs.observatory-comparison }}"
           default-branch: "${{ inputs.default-branch }}"

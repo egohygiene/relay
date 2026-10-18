@@ -95,6 +95,28 @@ class AdrBuildTests(unittest.TestCase):
         self.assertIn("source-validation", result.stderr)
         self.assertFalse((self.consumer / ".cache/repository-intelligence/adr/snapshot.json").exists())
 
+    def test_external_declarations_bind_provenance_and_invalid_retry_clears_candidates(self):
+        reference = "egohygiene/identity#ADR-017"
+        self.change(native.NEW, "related: []", "related: [" + reference + "]")
+        self.assertEqual(self.build().returncode, 2)
+        result = self.build(known_external_decisions=json.dumps([reference]))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        _, receipt = self.outputs()
+        self.assertEqual(receipt["known_external_decisions"], [reference])
+        contract.validate(receipt, "egohygiene/relay", receipt["source_commit"])
+        for mutation in ("empty", "duplicate", "unqualified", "parser"):
+            altered = deepcopy(receipt)
+            if mutation == "empty": altered["known_external_decisions"] = []
+            if mutation == "duplicate": altered["known_external_decisions"] *= 2
+            if mutation == "unqualified": altered["known_external_decisions"] = ["ADR-017"]
+            if mutation == "parser": altered["runtime"]["input_contract_sha256"] = "0" * 64
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                contract.validate(altered, "egohygiene/relay", receipt["source_commit"])
+        invalid = self.build(known_external_decisions="not-json")
+        self.assertEqual(invalid.returncode, 2)
+        for name in ("snapshot.json", "receipt.json"):
+            self.assertFalse((self.consumer / ".cache/repository-intelligence/adr" / name).exists())
+
     def test_invalid_retry_removes_previous_candidate_and_preserves_canonical_source(self):
         self.assertEqual(self.build().returncode, 0)
         (self.consumer / native.POLICY).unlink()
@@ -151,6 +173,8 @@ class AdrBuildTests(unittest.TestCase):
         self.check_action_bundle_parity(owner=True)
 
     def check_action_bundle_parity(self, *, owner):
+        declared = '["egohygiene/identity#ADR-017"]'
+        self.change(native.NEW, "related: []", "related: [egohygiene/identity#ADR-017]")
         harness = portability.RepositoryIntelligencePortabilityTests()
         harness.setUp()
         self.addCleanup(harness.doCleanups)
@@ -161,6 +185,7 @@ class AdrBuildTests(unittest.TestCase):
         repository = "egohygiene/hygiene" if owner else "egohygiene/relay"
         inputs = {"collect-adrs": "true", "adr-runtime": str(self.runtime), "repository": repository,
                   "adr-policy-owner": "true" if owner else "false",
+                  "adr-known-external-decisions": declared,
                   "as-of": "2026-10-04T21:00:00Z"}
         from unittest.mock import patch
         with patch.object(portability, "REPOSITORY", repository):
@@ -179,6 +204,6 @@ class AdrBuildTests(unittest.TestCase):
         for value in ("ADR-001", "ADR-002", "ADR-003", "Declared human approval", "/pull/24", "/docs/decisions/README.md"):
             self.assertIn(value, html)
         self.assertIn("Uncollected", (one / "dist/intelligence/roadmap/index.html").read_text())
-        result = self.build(repository=repository, policy_owner=owner)
+        result = self.build(repository=repository, policy_owner=owner, known_external_decisions=declared)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.outputs()[1], provenance["adr_collection"])

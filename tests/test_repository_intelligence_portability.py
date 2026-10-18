@@ -75,6 +75,7 @@ class RepositoryIntelligencePortabilityTests(unittest.TestCase):
             "activity-ref": self.commit, "activity-since": "2020-01-01",
             "activity-author": "", "as-of": "", "default-branch": "",
             "collect-adrs": "false", "adr-runtime": "", "adr-policy-owner": "false",
+            "adr-known-external-decisions": "[]",
             "max-depth": "10", "output-directory": "dist/intelligence",
             "observatory-comparison": "", "observatory-snapshot": "",
             "reports-directory": ".reports", "repository": REPOSITORY,
@@ -171,7 +172,9 @@ class RepositoryIntelligencePortabilityTests(unittest.TestCase):
         for inputs in ({"collect-adrs": "true", "observatory-snapshot": ".cache/snapshot.json"},
                        {"collect-adrs": "true", "observatory-comparison": ".cache/comparison.json"},
                        {"collect-adrs": "unknown"}, {"adr-runtime": "/trusted/runtime"},
-                       {"adr-policy-owner": "true"}, {"adr-policy-owner": "unknown"}):
+                       {"adr-policy-owner": "true"}, {"adr-policy-owner": "unknown"},
+                       {"adr-known-external-decisions": '["egohygiene/identity#ADR-017"]'},
+                       {"collect-adrs": "true", "adr-known-external-decisions": "not-json"}):
             with self.subTest(inputs=inputs), self.assertRaises(subprocess.CalledProcessError):
                 self.run_action(checkout, inputs=inputs, metadata_only=True)
 
