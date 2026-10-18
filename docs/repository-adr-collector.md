@@ -5,7 +5,7 @@
 This mapping precedes implementation. The collector reads an explicit public
 repository at one immutable Git revision. Hygiene owns ADR and graph semantics,
 EgoLint owns source and coverage validation, Observatory owns normalization, and
-Relay owns bounded acquisition and orchestration. ADR-007 and ADR-010 apply.
+Relay owns bounded acquisition and orchestration. ADR-0007 and ADR-0010 apply.
 Canonical files remain unchanged. Collection never authors a decision, infers
 human approval from a merge, or reconstructs intent from history.
 
@@ -170,7 +170,7 @@ Fixture provenance: the synthetic canonical corpus adapts EgoLint's public
 `tests/fixtures/repository-intelligence/valid/docs/decisions` at
 `2d3600f14848e28099acc34ce8043699da2b9a32` to Relay identity and local-only lineage.
 The real canary is read directly from the immutable Hygiene clone, not rewritten
-or vendored into Relay. Decision impact: this is implementation of ADR-007/010's
+or vendored into Relay. Decision impact: this is implementation of ADR-0007/010's
 existing owner and evidence boundaries; no new architectural authority is added.
 
 ## Canonical policy-owner selection — Relay #144
@@ -224,7 +224,7 @@ They compare complete owner and ordinary-consumer bundles across different
 checkout names and freshly prepared runtimes, preserve dirty worktree bytes,
 and reject missing authority, spoofed ownership, invalid human approval and
 missing ordinary references. The immutable Hygiene replay retains its genuine
-ADR-0001/ADR-004 and reference findings. Owner support does not ratify ADRs,
+ADR-0001/ADR-0004 and reference findings. Owner support does not ratify ADRs,
 activate required mode, select a host, or grant publication authority.
 
 The next consumer checkpoint is Hygiene #47. Its existing inventory PR #68 and
@@ -479,3 +479,7 @@ Subsequent browser inspection identified a shared card-filter visibility defect
 tracked in [Relay #139](https://github.com/egohygiene/relay/issues/139). That
 separate renderer/consumer follow-up keeps Identity #69 open; it does not undo
 the verified collector/build handoff or imply a fully reviewed user interface.
+
+## Four-digit policy adoption (2026-10-18)
+
+Both independent runtime profiles now select Hygiene v1.2.0 at `a05b14f8b9e2772124f879f818e09a911e996ad8` and native EgoLint catalog alpha.5 at `d917ea524962639494e5bb4b3196192238ba57d9`. The architecture profile also selects Holon blueprint 1.1.0 at `a7734dba83305276b12932fcd4ce348044d9a2e9`. Exact Git trees and per-file hashes bind acquisition. Fresh canonical fixtures use four digits; historical receipts and rollback artifacts retain their original source bytes. New runtime selections require new profile-bound requests. No lifecycle, required-mode or deployment gate is changed.

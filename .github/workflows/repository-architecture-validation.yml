@@ -146,7 +146,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: egohygiene/hygiene
-          ref: c589587395750cd1c79c6fa0bef010189c547249
+          ref: a05b14f8b9e2772124f879f818e09a911e996ad8
           path: relay-architecture-sources/hygiene
           fetch-depth: 1
           persist-credentials: false
@@ -160,7 +160,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: egohygiene/egolint
-          ref: 72267fd0a371da6d94922cbc6bd3dedddb68df30
+          ref: d917ea524962639494e5bb4b3196192238ba57d9
           path: relay-architecture-sources/egolint
           fetch-depth: 1
           persist-credentials: false
@@ -174,7 +174,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: egohygiene/holon
-          ref: 660b941f99618806fcadd589bcdae61c519f96e4
+          ref: a7734dba83305276b12932fcd4ce348044d9a2e9
           path: relay-architecture-sources/holon
           fetch-depth: 1
           persist-credentials: false

@@ -27,7 +27,7 @@ architecture records, or materialization.
 | Fleet rollout | Pace | Outside this task |
 | Aggregated read models | Observatory | Outside this task |
 
-The profile operationalizes ADR-001, ADR-002, ADR-003, ADR-005, and ADR-006.
+The profile operationalizes ADR-0001, ADR-0002, ADR-0003, ADR-0005, and ADR-0006.
 It does not change ownership, so it requires no new architecture decision.
 
 ## Immutable source profile

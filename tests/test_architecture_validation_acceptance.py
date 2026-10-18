@@ -40,7 +40,7 @@ class ArchitectureAcceptanceTests(ArchitectureWorkflowFixture):
             invalid = ADR.replace("status: proposed", "status: accepted").replace(
                 "implementation_status: not_started", "implementation_status: implemented").replace(
                 "pull_request: null", "pull_request: https://github.com/egohygiene/example/pull/2")
-            self.put("docs/decisions/ADR-001-repository-records.md", invalid)
+            self.put("docs/decisions/ADR-0001-repository-records.md", invalid)
         if name == "old-policy-adr":
             path = self.root / "docs/decisions/policy-reference.json"
             reference = json.loads(path.read_bytes())

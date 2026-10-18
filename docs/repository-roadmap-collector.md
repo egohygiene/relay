@@ -6,7 +6,7 @@ This design precedes the collector implementation. The native collector reads
 one immutable `ROADMAP.md`, invokes EgoLint, validates the resulting Hygiene
 projection, and invokes Observatory's pinned normalizer. It never runs consumer
 code, repairs canonical intent, discovers the organization, or publishes a site.
-ADR-007 and ADR-010 retain their existing ownership boundaries. The newer Aether
+ADR-0007 and ADR-0010 retain their existing ownership boundaries. The newer Aether
 #90 and organization #42 proposals do not replace Hygiene authority.
 
 **This historical roadmap profile remains publication-blocked.**
@@ -217,6 +217,6 @@ for review. Before resuming roadmap publication, review the exact collector
 repin to the merged Observatory #25 contract and complete #112 before #113 integration. Consumer
 deployment and canonical source repair remain separately owned.
 
-ADR not required for this checkpoint: it implements the existing ADR-007/010
+ADR not required for this checkpoint: it implements the existing ADR-0007/010
 ownership boundary, adds only a local review seam, and explicitly defers the
 upstream compatibility decision instead of creating a competing read model.

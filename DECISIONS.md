@@ -37,18 +37,18 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 
 ## Index
 
-- ADR-001: Package reusable behavior outside templates
-- ADR-002: Default to least-privilege permissions
-- ADR-003: Require immutable references in consumer workflows
-- ADR-004: Preserve extracted Intelligence contract identities
-- ADR-005: Release the action catalog as one repository unit
-- ADR-006: Catalog workflow authority and failure semantics
-- ADR-007: Compose Repository Intelligence from bounded sibling contracts
-- ADR-008: Separate continuity orchestration from semantic authority
-- ADR-009: Separate product release identity from artifact validation profile
-- ADR-010: Separate deterministic Repository Intelligence builds from deployment receipts
+- ADR-0001: Package reusable behavior outside templates
+- ADR-0002: Default to least-privilege permissions
+- ADR-0003: Require immutable references in consumer workflows
+- ADR-0004: Preserve extracted Intelligence contract identities
+- ADR-0005: Release the action catalog as one repository unit
+- ADR-0006: Catalog workflow authority and failure semantics
+- ADR-0007: Compose Repository Intelligence from bounded sibling contracts
+- ADR-0008: Separate continuity orchestration from semantic authority
+- ADR-0009: Separate product release identity from artifact validation profile
+- ADR-0010: Separate deterministic Repository Intelligence builds from deployment receipts
 
-## ADR-001: Package reusable behavior outside templates
+## ADR-0001: Package reusable behavior outside templates
 
 - **Status:** Accepted as the current architectural direction
 - **Date:** 2026-08-19
@@ -57,7 +57,7 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - **Consequences:** The choice improves ownership and predictability while requiring maintained contracts, validation, and migration discipline.
 - **Reconsider when:** New evidence shows that the boundary prevents standalone usefulness, safety, portability, or maintainability.
 
-## ADR-002: Default to least-privilege permissions
+## ADR-0002: Default to least-privilege permissions
 
 - **Status:** Accepted as the current architectural direction
 - **Date:** 2026-08-19
@@ -66,7 +66,7 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - **Consequences:** The choice improves ownership and predictability while requiring maintained contracts, validation, and migration discipline.
 - **Reconsider when:** New evidence shows that the boundary prevents standalone usefulness, safety, portability, or maintainability.
 
-## ADR-003: Require immutable references in consumer workflows
+## ADR-0003: Require immutable references in consumer workflows
 
 - **Status:** Accepted as the current architectural direction
 - **Date:** 2026-08-19
@@ -75,7 +75,7 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - **Consequences:** The choice improves ownership and predictability while requiring maintained contracts, validation, and migration discipline.
 - **Reconsider when:** New evidence shows that the boundary prevents standalone usefulness, safety, portability, or maintainability.
 
-## ADR-004: Preserve extracted Intelligence contract identities
+## ADR-0004: Preserve extracted Intelligence contract identities
 
 - **Status:** Accepted for Intelligence v1
 - **Date:** 2026-08-19
@@ -84,7 +84,7 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - **Consequences:** Existing snapshots and consumers remain compatible. The historical namespace split is explicit rather than accidental. A future unified namespace requires a versioned v2 contract and documented compatibility aliases.
 - **Reconsider when:** The organization can publish permanent redirects and a deliberate v2 migration plan.
 
-## ADR-005: Release the action catalog as one repository unit
+## ADR-0005: Release the action catalog as one repository unit
 
 - **Status:** Accepted for Relay v1
 - **Date:** 2026-08-19
@@ -93,7 +93,7 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - **Consequences:** One release proves compatibility across actions and reusable workflows. A change to any public package advances the Relay repository version.
 - **Reconsider when:** An action needs an incompatible cadence or trust boundary substantial enough to justify a separate repository.
 
-## ADR-006: Catalog workflow authority and failure semantics
+## ADR-0006: Catalog workflow authority and failure semantics
 
 - **Status:** Accepted for Relay v1
 - **Date:** 2026-08-21
@@ -102,7 +102,7 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - **Consequences:** Reviewers and automation can compare declared authority with implementation. Adding a workflow becomes an explicit contract change. The catalog duplicates a bounded amount of YAML metadata and therefore requires executable drift checks.
 - **Reconsider when:** GitHub provides a portable native workflow manifest with equivalent closed, versioned semantics that Pace and offline validators can consume.
 
-## ADR-007: Compose Repository Intelligence from bounded sibling contracts
+## ADR-0007: Compose Repository Intelligence from bounded sibling contracts
 
 - **Status:** Accepted for the Repository Intelligence experience
 - **Date:** 2026-08-25
@@ -111,7 +111,7 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - **Consequences:** `/now/` can answer operational questions without scraping providers or manufacturing readiness. Sibling changes require pinned contract evidence and compatibility tests. The routed shell may reserve future pages before their focused projections exist, but those pages must state that limitation honestly.
 - **Reconsider when:** A versioned shared site runtime can preserve the same offline determinism, privacy boundary, and consumer-owned publication with less duplicated composition code.
 
-## ADR-008: Separate continuity orchestration from semantic authority
+## ADR-0008: Separate continuity orchestration from semantic authority
 
 - **Status:** Accepted for the proposed continuity preflight contract
 - **Date:** 2026-09-09
@@ -120,7 +120,7 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - **Consequences:** Consumers receive consistent evidence and exact corrective actions while retaining semantic ownership. Release promotion requires coordinated sibling releases and reviewed repinning. CI can detect but cannot repair a stale checkpoint.
 - **Reconsider when:** A released owner contract supplies an equivalent portable orchestration envelope without transferring semantic or write authority to Relay.
 
-## ADR-009: Separate product release identity from artifact validation profile
+## ADR-0009: Separate product release identity from artifact validation profile
 
 - **Status:** Accepted for Relay v1 publication
 - **Date:** 2026-09-12
@@ -129,7 +129,7 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - **Consequences:** Consumers can publish recognizable product assets without creating product-specific validation profiles. Both identifiers remain explicit, safe, and independently reviewable, and an existing immutable release cannot be resumed under a contradictory name.
 - **Reconsider when:** A versioned repository release declaration supplies an equivalent product-identity field that Relay can consume without inferring or owning consumer semantics.
 
-## ADR-010: Separate deterministic Repository Intelligence builds from deployment receipts
+## ADR-0010: Separate deterministic Repository Intelligence builds from deployment receipts
 
 - **Status:** Accepted for Repository Intelligence deployment provenance
 - **Date:** 2026-09-22
@@ -149,3 +149,20 @@ Do not rewrite historical context to fit current understanding. Amend a record f
 - **Decided for this draft:** The repository owns the bounded concern described here and participates through versioned contracts.
 - **Proposed:** Target systems and later roadmap phases remain proposals until accepted and implemented.
 - **Open question:** Which parts of this draft should become active in the first independently versioned release?
+
+## Identifier format migration (2026-10-18)
+
+The maintainer selected four-digit numbering in [Hygiene #73](https://github.com/egohygiene/hygiene/issues/73). This padding-only migration changes current labels and anchors; logical numbers, decision content, dates and disposition remain unchanged. Git retains prior versions. New canonical records use `ADR-NNNN` under Hygiene policy v1.2.0.
+
+| Previous ID | Current ID | Record |
+| --- | --- | --- |
+| `ADR-001` | `ADR-0001` | [DECISIONS.md](DECISIONS.md#adr-0001-package-reusable-behavior-outside-templates) |
+| `ADR-002` | `ADR-0002` | [DECISIONS.md](DECISIONS.md#adr-0002-default-to-least-privilege-permissions) |
+| `ADR-003` | `ADR-0003` | [DECISIONS.md](DECISIONS.md#adr-0003-require-immutable-references-in-consumer-workflows) |
+| `ADR-004` | `ADR-0004` | [DECISIONS.md](DECISIONS.md#adr-0004-preserve-extracted-intelligence-contract-identities) |
+| `ADR-005` | `ADR-0005` | [DECISIONS.md](DECISIONS.md#adr-0005-release-the-action-catalog-as-one-repository-unit) |
+| `ADR-006` | `ADR-0006` | [DECISIONS.md](DECISIONS.md#adr-0006-catalog-workflow-authority-and-failure-semantics) |
+| `ADR-007` | `ADR-0007` | [DECISIONS.md](DECISIONS.md#adr-0007-compose-repository-intelligence-from-bounded-sibling-contracts) |
+| `ADR-008` | `ADR-0008` | [DECISIONS.md](DECISIONS.md#adr-0008-separate-continuity-orchestration-from-semantic-authority) |
+| `ADR-009` | `ADR-0009` | [DECISIONS.md](DECISIONS.md#adr-0009-separate-product-release-identity-from-artifact-validation-profile) |
+| `ADR-010` | `ADR-0010` | [DECISIONS.md](DECISIONS.md#adr-0010-separate-deterministic-repository-intelligence-builds-from-deployment-receipts) |

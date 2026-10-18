@@ -19,9 +19,9 @@ SCRIPT = ROOT / "actions/repository-intelligence/scripts/collect_repository_adrs
 FIXTURE = ROOT / "tests/fixtures/repository-adr-collector/canonical"
 POLICY = "docs/decisions/policy-reference.json"
 INDEX = "docs/decisions/README.md"
-FIRST = "docs/decisions/ADR-001-validation-contract.md"
-OLD = "docs/decisions/ADR-002-legacy-projection.md"
-NEW = "docs/decisions/ADR-003-versioned-projection.md"
+FIRST = "docs/decisions/ADR-0001-validation-contract.md"
+OLD = "docs/decisions/ADR-0002-legacy-projection.md"
+NEW = "docs/decisions/ADR-0003-versioned-projection.md"
 
 
 def load(name, path):
@@ -93,11 +93,11 @@ class BoundaryTests(unittest.TestCase):
         self.assertEqual(raised.exception.code, 2)
 
     def test_external_declarations_are_bounded_unique_qualified_and_canonical(self):
-        first, second = "egohygiene/identity#ADR-017", "egohygiene/relay#ADR-0001"
+        first, second = "egohygiene/identity#ADR-0017", "egohygiene/relay#ADR-0001"
         self.assertEqual(collector.inputs.external_decisions(json.dumps([second, first])), [first, second])
-        for value in ("", "{}", '"private prose"', "[null]", '["ADR-017"]',
+        for value in ("", "{}", '"private prose"', "[null]", '["ADR-0017"]',
                       json.dumps([first, first]), json.dumps([first] * 65),
-                      "[" * 9000, '["egohygiene/identity#ADR-017\\n"]'):
+                      "[" * 9000, '["egohygiene/identity#ADR-0017\\n"]'):
             with self.subTest(value=value[:30]), self.assertRaises(ValueError):
                 collector.inputs.external_decisions(value)
 
@@ -201,10 +201,10 @@ class NativeTests(unittest.TestCase):
         self.assertEqual(result, replay)
 
     def test_external_reference_needs_explicit_selection_and_never_fabricates_a_target(self):
-        reference = "egohygiene/identity#ADR-017"
+        reference = "egohygiene/identity#ADR-0017"
         self.change(NEW, "related: []", "related: [" + reference + "]")
         missing = self.collect()
-        wrong = self.collect(known_external_decisions='["egohygiene/identity#ADR-999"]')
+        wrong = self.collect(known_external_decisions='["egohygiene/identity#ADR-0999"]')
         for result in (missing, wrong):
             self.assertEqual(result["status"], "invalid")
             self.assertIn("EGO-INTEL-ADR-LINEAGE-001", {d["code"] for d in result["diagnostics"]})
@@ -259,14 +259,14 @@ class NativeTests(unittest.TestCase):
                          "observatory": "normalized", "diagnostics_truncated": False})
         snapshot = result["snapshot_candidate"]
         records = {r["key"]: r for r in snapshot["graph"]["entities"] if r["kind"] == "architecture_decision"}
-        self.assertEqual(set(records), {"ADR-001", "ADR-002", "ADR-003"})
-        self.assertIsNone(records["ADR-001"]["attributes"]["approval"])
-        self.assertEqual(records["ADR-003"]["attributes"]["implementation_status"], "implemented")
-        self.assertEqual(records["ADR-003"]["state"]["value"], "accepted")
-        self.assertIn("/pull/24", records["ADR-003"]["attributes"]["approval"]["evidence"])
+        self.assertEqual(set(records), {"ADR-0001", "ADR-0002", "ADR-0003"})
+        self.assertIsNone(records["ADR-0001"]["attributes"]["approval"])
+        self.assertEqual(records["ADR-0003"]["attributes"]["implementation_status"], "implemented")
+        self.assertEqual(records["ADR-0003"]["state"]["value"], "accepted")
+        self.assertIn("/pull/24", records["ADR-0003"]["attributes"]["approval"]["evidence"])
         self.assertEqual(len(snapshot["graph"]["relationships"]), 1)
         decisions = {d["entity"]["key"]: d for d in snapshot["views"]["decisions"]["decisions"]}
-        self.assertEqual(decisions["ADR-002"]["superseded_by"][0]["key"], "ADR-003")
+        self.assertEqual(decisions["ADR-0002"]["superseded_by"][0]["key"], "ADR-0003")
         self.assertEqual(result["coverage"]["decisions"]["collection"], "observed")
         for name, claim in result["coverage"].items():
             if name != "decisions":
@@ -274,7 +274,7 @@ class NativeTests(unittest.TestCase):
         self.assertEqual(snapshot["graph"]["events"], [])
         site = load("adr_site", SCRIPT.with_name("generate_repository_intelligence_site.py"))
         fragment = site.decisions_body(snapshot)
-        for text in ("ADR-001", "ADR-002", "ADR-003", "Use a versioned projection"):
+        for text in ("ADR-0001", "ADR-0002", "ADR-0003", "Use a versioned projection"):
             self.assertIn(text, fragment)
         # Fragment rendering is not alpha.2 shell adoption; checkpoint 2 owns it.
         with self.assertRaises(site.SiteInputError):
@@ -310,16 +310,16 @@ class NativeTests(unittest.TestCase):
         self.assertEqual(git(self.consumer, "status", "--porcelain"), before)
 
     def test_duplicate_ids_broken_index_and_lineage_remain_owner_findings(self):
-        self.change(FIRST, "ADR-001", "ADR-003")
+        self.change(FIRST, "ADR-0001", "ADR-0003")
         result = self.collect()
         self.assertEqual(result["status"], "invalid")
         codes = {d["code"] for d in result["diagnostics"]}
         self.assertIn("EGO-INTEL-ADR-METADATA-001", codes)
         self.assertIn("EGO-INTEL-ADR-INDEX-001", codes)
-        self.assertNotIn("ADR-003", [e["key"] for e in result["projection_candidate"]["entities"]])
+        self.assertNotIn("ADR-0003", [e["key"] for e in result["projection_candidate"]["entities"]])
 
     def test_reciprocal_supersession_is_checked_by_egolint(self):
-        self.change(OLD, "superseded_by: [ADR-003]", "superseded_by: [ADR-999]")
+        self.change(OLD, "superseded_by: [ADR-0003]", "superseded_by: [ADR-0999]")
         result = self.collect()
         self.assertEqual(result["status"], "invalid")
         self.assertIn("EGO-INTEL-ADR-LINEAGE-001", {d["code"] for d in result["diagnostics"]})
@@ -329,7 +329,7 @@ class NativeTests(unittest.TestCase):
         result = self.collect()
         self.assertEqual(result["status"], "invalid")
         self.assertIn("EGO-INTEL-ADR-LIFECYCLE-001", {d["code"] for d in result["diagnostics"]})
-        self.assertNotIn("ADR-003", [e["key"] for e in result["projection_candidate"]["entities"]])
+        self.assertNotIn("ADR-0003", [e["key"] for e in result["projection_candidate"]["entities"]])
 
     def test_missing_and_unsupported_policy_are_not_repaired(self):
         (self.consumer / POLICY).unlink()
@@ -339,7 +339,7 @@ class NativeTests(unittest.TestCase):
         self.assertFalse((self.consumer / POLICY).exists())
         self.assertNotIn(POLICY, [s["path"] for s in result["inputs"]["sources"]])
         shutil.copyfile(FIXTURE / POLICY, self.consumer / POLICY)
-        self.change(POLICY, "c589587395750cd1c79c6fa0bef010189c547249", "a" * 40)
+        self.change(POLICY, "a05b14f8b9e2772124f879f818e09a911e996ad8", "a" * 40)
         result = self.collect()
         self.assertIn("EGO-INTEL-CONTRACT-001", {d["code"] for d in result["diagnostics"]})
 
@@ -379,17 +379,17 @@ class NativeTests(unittest.TestCase):
         self.assertNotIn("UNREVIEWED_EXTENSION_PAYLOAD", collector.base.json_bytes(result).decode())
 
     def test_external_links_remain_declared_references_without_invented_entities(self):
-        self.change(FIRST, "related: []", "related: [egohygiene/hygiene#ADR-002]")
+        self.change(FIRST, "related: []", "related: [egohygiene/hygiene#ADR-0002]")
         result = self.collect()
         self.assertEqual(result["status"], "invalid")
         self.assertEqual({e["repository"] for e in result["projection_candidate"]["entities"]}, {"egohygiene/relay"})
-        record = next(e for e in result["projection_candidate"]["entities"] if e["key"] == "ADR-001")
-        self.assertEqual(record["attributes"]["related"], ["egohygiene/hygiene#ADR-002"])
+        record = next(e for e in result["projection_candidate"]["entities"] if e["key"] == "ADR-0001")
+        self.assertEqual(record["attributes"]["related"], ["egohygiene/hygiene#ADR-0002"])
 
     def test_stale_collection_preserves_decision_dates_and_explicit_freshness(self):
         result = self.collect(collected_at="2026-10-01T12:00:00Z")
         self.assertEqual(result["coverage"]["decisions"]["freshness"], "stale")
-        decision = next(e for e in result["snapshot_candidate"]["graph"]["entities"] if e["key"] == "ADR-001")
+        decision = next(e for e in result["snapshot_candidate"]["graph"]["entities"] if e["key"] == "ADR-0001")
         self.assertEqual(decision["attributes"]["date"], "2026-08-25")
         with self.assertRaises(collector.base.CollectorError):
             self.collect(collected_at="2026-10-05T12:00:00Z")
@@ -442,9 +442,9 @@ class NativeTests(unittest.TestCase):
 
     def test_four_digit_canonical_identity_and_filename_are_not_rewritten(self):
         target = self.consumer / FIRST
-        target.write_text(target.read_text().replace("ADR-001", "ADR-0001"))
+        target.write_text(target.read_text().replace("ADR-0001", "ADR-0001"))
         target.rename(target.with_name("ADR-0001-validation-contract.md"))
-        self.change(INDEX, "ADR-001", "ADR-0001")
+        self.change(INDEX, "ADR-0001", "ADR-0001")
         result = self.collect()
         decision = next(e for e in result["projection_candidate"]["entities"] if e["key"] == "ADR-0001")
         self.assertTrue(decision["id"].endswith(":ADR-0001"))
@@ -475,22 +475,21 @@ class NativeTests(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("RELAY_ADR_CANARY"), "set RELAY_ADR_CANARY to the acquired Hygiene clone")
     def test_real_hygiene_corpus_retains_approval_and_reports_existing_migration_gaps(self):
         result = self.collect(repository_root=Path(os.environ["RELAY_ADR_CANARY"]), repository="egohygiene/hygiene",
-            source_commit="639a003d5ddc4d242c2cf190eeb59a9fc522d199", adoption="legacy", policy_owner=True)
+            source_commit="a05b14f8b9e2772124f879f818e09a911e996ad8", adoption="legacy", policy_owner=True)
         self.assertEqual(result["status"], "invalid")
         self.assertEqual(result["coverage"]["decisions"]["collection"], "partial")
         self.assertEqual(result["validation"]["hygiene"], "valid")
         self.assertEqual(result["validation"]["coverage"], "valid")
         records = [e for e in result["snapshot_candidate"]["graph"]["entities"] if e["kind"] == "architecture_decision"]
-        self.assertEqual(len(records), 12)
-        foundation = next(e for e in records if e["key"] == "ADR-002")
+        self.assertEqual(len(records), 13)
+        foundation = next(e for e in records if e["key"] == "ADR-0002")
         self.assertEqual(foundation["state"]["value"], "accepted")
         self.assertEqual(foundation["attributes"]["approval"]["by"], "szmyty")
         self.assertIn("issuecomment-5647398908", foundation["attributes"]["approval"]["evidence"])
         self.assertNotIn("ADR-0001", [e["key"] for e in records])
         self.assertNotIn("EGO-INTEL-CONTRACT-001", {d["code"] for d in result["diagnostics"]})
         self.assertEqual({d["path"] for d in result["diagnostics"] if d["code"] == "EGO-INTEL-ADR-METADATA-001"},
-                         {"docs/decisions/ADR-0001-holistic-architecture-v0.1.md",
-                          "docs/decisions/ADR-004-register-sanctuary-incubation-boundary.md"})
+                         {"docs/decisions/ADR-0001-holistic-architecture-v0.1.md"})
 
 
 if __name__ == "__main__":

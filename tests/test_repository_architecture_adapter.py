@@ -25,7 +25,7 @@ RUNTIME = os.environ.get("RELAY_ARCHITECTURE_RUNTIME")
 
 ADR = """---
 schema: egohygiene.architecture-decision/v1
-id: ADR-001
+id: ADR-0001
 title: Keep decisions in the repository
 status: proposed
 date: 2026-09-20
@@ -46,7 +46,7 @@ approval: null
 extensions: {}
 ---
 
-# ADR-001: Keep decisions in the repository
+# ADR-0001: Keep decisions in the repository
 
 ## Context
 
@@ -131,7 +131,7 @@ profile = "fixture"
 provisional = false
 [source]
 repository = "egohygiene/hygiene"
-revision = "c589587395750cd1c79c6fa0bef010189c547249"
+revision = "a05b14f8b9e2772124f879f818e09a911e996ad8"
 revision-kind = "git-commit"
 path = "contracts/repository-context.v1.toml"
 decision = "https://github.com/egohygiene/hygiene/issues/15"
@@ -165,8 +165,8 @@ state = "not-applicable"
 maximum-commits = 256
 """
         self.put("policy/intelligence.toml", policy)
-        self.put("docs/decisions/ADR-001-repository-records.md", ADR)
-        self.put("docs/decisions/README.md", "# Decisions\n\n[ADR-001](ADR-001-repository-records.md)\n")
+        self.put("docs/decisions/ADR-0001-repository-records.md", ADR)
+        self.put("docs/decisions/README.md", "# Decisions\n\n[ADR-0001](ADR-0001-repository-records.md)\n")
         pin = next(p for p in definitions["pins"] if p["id"] == "egohygiene.architecture-decision/v1")
         reference = {"schema": "egohygiene.architecture-decision-policy-reference/v1", "repository": "egohygiene/example",
                      "policy": {"contract": pin["id"], "version": pin["version"],
@@ -349,7 +349,7 @@ class ArchitectureAdapterNativeTests(AdapterFixture):
         self.assertEqual(result["findings"], [])
         self.assertEqual(before, adapter.git(self.root, "status", "--porcelain=v1"))
         self.assertIn({"repository": "egohygiene/egolint",
-                       "revision": "72267fd0a371da6d94922cbc6bd3dedddb68df30",
+                       "revision": "d917ea524962639494e5bb4b3196192238ba57d9",
                        "profile_source_id": "egolint-repository-validation"}, result["provenance"])
 
     def test_catalog_drift_still_caps_native_validity_at_partial(self) -> None:
@@ -367,7 +367,7 @@ class ArchitectureAdapterNativeTests(AdapterFixture):
 
     def test_accepted_without_authority_is_invalid_even_in_advisory_mode(self) -> None:
         self.add_adrs()
-        self.put("docs/decisions/ADR-001-repository-records.md", ADR.replace("status: proposed", "status: accepted"))
+        self.put("docs/decisions/ADR-0001-repository-records.md", ADR.replace("status: proposed", "status: accepted"))
         self.commit()
         result = self.invoke()
         self.assertEqual(result["semantic_status"], "nonconformant")
@@ -391,7 +391,7 @@ class ArchitectureAdapterNativeTests(AdapterFixture):
 
     def test_missing_index_and_duplicate_id_are_native_findings(self) -> None:
         self.add_adrs()
-        self.put("docs/decisions/ADR-001-duplicate.md", ADR)
+        self.put("docs/decisions/ADR-0001-duplicate.md", ADR)
         (self.root / "docs/decisions/README.md").unlink()
         self.commit()
         result = self.invoke()
@@ -485,7 +485,7 @@ markers = ["PRIVATE_CANARY_CONTENT"]
 
     def test_findings_are_bounded_without_losing_invalid_status(self) -> None:
         self.add_adrs()
-        self.put("docs/decisions/ADR-001-repository-records.md", ADR.replace("status: proposed", "status: accepted"))
+        self.put("docs/decisions/ADR-0001-repository-records.md", ADR.replace("status: proposed", "status: accepted"))
         (self.root / "docs/decisions/README.md").unlink()
         self.commit()
         self.request["bounds"]["maximum_findings"] = 1
