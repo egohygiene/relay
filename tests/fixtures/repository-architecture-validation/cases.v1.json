@@ -1,12 +1,12 @@
 {
   "schema_version": "relay.repository-architecture-validation-fixtures/v1",
-  "profile_sha256": "9111689239759915eb0f2be3dca172607fe49515b06aaf57bb5148277edb31fb",
+  "profile_sha256": "9a836e93d4b8ea684006aa82e0c2db18f276f92d53449f2fbaa156a34f3b6e9f",
   "requests": {
     "public-present-advisory": {
       "schema_version": "relay.repository-architecture-validation-request/v1",
       "profile": {
-        "version": "1.0.0-alpha.3",
-        "sha256": "9111689239759915eb0f2be3dca172607fe49515b06aaf57bb5148277edb31fb"
+        "version": "1.0.0-alpha.4",
+        "sha256": "9a836e93d4b8ea684006aa82e0c2db18f276f92d53449f2fbaa156a34f3b6e9f"
       },
       "repository": {
         "id": "egohygiene/example",
@@ -42,8 +42,8 @@
     "private-legacy-required": {
       "schema_version": "relay.repository-architecture-validation-request/v1",
       "profile": {
-        "version": "1.0.0-alpha.3",
-        "sha256": "9111689239759915eb0f2be3dca172607fe49515b06aaf57bb5148277edb31fb"
+        "version": "1.0.0-alpha.4",
+        "sha256": "9a836e93d4b8ea684006aa82e0c2db18f276f92d53449f2fbaa156a34f3b6e9f"
       },
       "repository": {
         "id": "example/private-legacy",
@@ -79,8 +79,8 @@
     "unknown-adoption-advisory": {
       "schema_version": "relay.repository-architecture-validation-request/v1",
       "profile": {
-        "version": "1.0.0-alpha.3",
-        "sha256": "9111689239759915eb0f2be3dca172607fe49515b06aaf57bb5148277edb31fb"
+        "version": "1.0.0-alpha.4",
+        "sha256": "9a836e93d4b8ea684006aa82e0c2db18f276f92d53449f2fbaa156a34f3b6e9f"
       },
       "repository": {
         "id": "example/unclassified",
@@ -114,8 +114,8 @@
     "conformant-public": {
       "schema_version": "relay.repository-architecture-validation-result/v1",
       "profile": {
-        "version": "1.0.0-alpha.3",
-        "sha256": "9111689239759915eb0f2be3dca172607fe49515b06aaf57bb5148277edb31fb"
+        "version": "1.0.0-alpha.4",
+        "sha256": "9a836e93d4b8ea684006aa82e0c2db18f276f92d53449f2fbaa156a34f3b6e9f"
       },
       "repository": {
         "id": "egohygiene/example",
@@ -133,17 +133,17 @@
       "provenance": [
         {
           "repository": "egohygiene/hygiene",
-          "revision": "c589587395750cd1c79c6fa0bef010189c547249",
+          "revision": "a05b14f8b9e2772124f879f818e09a911e996ad8",
           "profile_source_id": "hygiene-repository-architecture"
         },
         {
           "repository": "egohygiene/egolint",
-          "revision": "72267fd0a371da6d94922cbc6bd3dedddb68df30",
+          "revision": "d917ea524962639494e5bb4b3196192238ba57d9",
           "profile_source_id": "egolint-repository-validation"
         },
         {
           "repository": "egohygiene/holon",
-          "revision": "660b941f99618806fcadd589bcdae61c519f96e4",
+          "revision": "a7734dba83305276b12932fcd4ce348044d9a2e9",
           "profile_source_id": "holon-architecture-decisions"
         }
       ],
@@ -181,8 +181,8 @@
     "legacy-private-advisory": {
       "schema_version": "relay.repository-architecture-validation-result/v1",
       "profile": {
-        "version": "1.0.0-alpha.3",
-        "sha256": "9111689239759915eb0f2be3dca172607fe49515b06aaf57bb5148277edb31fb"
+        "version": "1.0.0-alpha.4",
+        "sha256": "9a836e93d4b8ea684006aa82e0c2db18f276f92d53449f2fbaa156a34f3b6e9f"
       },
       "repository": {
         "id": "example/private-legacy",
@@ -200,17 +200,17 @@
       "provenance": [
         {
           "repository": "egohygiene/hygiene",
-          "revision": "c589587395750cd1c79c6fa0bef010189c547249",
+          "revision": "a05b14f8b9e2772124f879f818e09a911e996ad8",
           "profile_source_id": "hygiene-repository-architecture"
         },
         {
           "repository": "egohygiene/egolint",
-          "revision": "72267fd0a371da6d94922cbc6bd3dedddb68df30",
+          "revision": "d917ea524962639494e5bb4b3196192238ba57d9",
           "profile_source_id": "egolint-repository-validation"
         },
         {
           "repository": "egohygiene/holon",
-          "revision": "660b941f99618806fcadd589bcdae61c519f96e4",
+          "revision": "a7734dba83305276b12932fcd4ce348044d9a2e9",
           "profile_source_id": "holon-architecture-decisions"
         }
       ],
@@ -258,8 +258,8 @@
     "nonconformant-required": {
       "schema_version": "relay.repository-architecture-validation-result/v1",
       "profile": {
-        "version": "1.0.0-alpha.3",
-        "sha256": "9111689239759915eb0f2be3dca172607fe49515b06aaf57bb5148277edb31fb"
+        "version": "1.0.0-alpha.4",
+        "sha256": "9a836e93d4b8ea684006aa82e0c2db18f276f92d53449f2fbaa156a34f3b6e9f"
       },
       "repository": {
         "id": "example/required",
@@ -277,17 +277,17 @@
       "provenance": [
         {
           "repository": "egohygiene/hygiene",
-          "revision": "c589587395750cd1c79c6fa0bef010189c547249",
+          "revision": "a05b14f8b9e2772124f879f818e09a911e996ad8",
           "profile_source_id": "hygiene-repository-architecture"
         },
         {
           "repository": "egohygiene/egolint",
-          "revision": "72267fd0a371da6d94922cbc6bd3dedddb68df30",
+          "revision": "d917ea524962639494e5bb4b3196192238ba57d9",
           "profile_source_id": "egolint-repository-validation"
         },
         {
           "repository": "egohygiene/holon",
-          "revision": "660b941f99618806fcadd589bcdae61c519f96e4",
+          "revision": "a7734dba83305276b12932fcd4ce348044d9a2e9",
           "profile_source_id": "holon-architecture-decisions"
         }
       ],
@@ -335,8 +335,8 @@
     "unavailable-validator": {
       "schema_version": "relay.repository-architecture-validation-result/v1",
       "profile": {
-        "version": "1.0.0-alpha.3",
-        "sha256": "9111689239759915eb0f2be3dca172607fe49515b06aaf57bb5148277edb31fb"
+        "version": "1.0.0-alpha.4",
+        "sha256": "9a836e93d4b8ea684006aa82e0c2db18f276f92d53449f2fbaa156a34f3b6e9f"
       },
       "repository": {
         "id": "example/unavailable",
@@ -354,17 +354,17 @@
       "provenance": [
         {
           "repository": "egohygiene/hygiene",
-          "revision": "c589587395750cd1c79c6fa0bef010189c547249",
+          "revision": "a05b14f8b9e2772124f879f818e09a911e996ad8",
           "profile_source_id": "hygiene-repository-architecture"
         },
         {
           "repository": "egohygiene/egolint",
-          "revision": "72267fd0a371da6d94922cbc6bd3dedddb68df30",
+          "revision": "d917ea524962639494e5bb4b3196192238ba57d9",
           "profile_source_id": "egolint-repository-validation"
         },
         {
           "repository": "egohygiene/holon",
-          "revision": "660b941f99618806fcadd589bcdae61c519f96e4",
+          "revision": "a7734dba83305276b12932fcd4ce348044d9a2e9",
           "profile_source_id": "holon-architecture-decisions"
         }
       ],

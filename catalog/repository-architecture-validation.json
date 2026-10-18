@@ -1,7 +1,7 @@
 {
   "$schema": "../schemas/repository-architecture-validation-profile.v1.schema.json",
   "schema_version": "relay.repository-architecture-validation-profile/v1",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "status": "proposed",
   "owner": "egohygiene/relay",
   "updated": "2026-10-18",
@@ -25,8 +25,8 @@
       "id": "hygiene-repository-architecture",
       "role": "organization-policy",
       "repository": "egohygiene/hygiene",
-      "revision": "c589587395750cd1c79c6fa0bef010189c547249",
-      "version": "architecture-v0.1.0+adr-1.1.0",
+      "revision": "a05b14f8b9e2772124f879f818e09a911e996ad8",
+      "version": "architecture-v0.1.0+adr-1.2.0",
       "lifecycle": "accepted",
       "release_included": false,
       "artifacts": [
@@ -53,7 +53,7 @@
         {
           "id": "dependency-boundary-register",
           "path": "catalog/dependency-boundaries.yaml",
-          "sha256": "6d0a1bc65d328435585355271974ab0b88e49e72da1eff99ca46393396067554"
+          "sha256": "ac65d38619f3c6f4f8c8f1592946d022495db5f6de22d478132ccda640f2a79a"
         },
         {
           "id": "dependency-boundary-schema",
@@ -63,17 +63,17 @@
         {
           "id": "architecture-decision-policy",
           "path": "docs/decisions/POLICY.md",
-          "sha256": "e8b1f3c379a56d389d7689d187b2932ff3cfdf5e80acc829d244fb2527fcd361"
+          "sha256": "b8832d30363fc9005460c7353f73a58444f0230bc98960df201969f54682839b"
         },
         {
           "id": "architecture-decision-ratification",
           "path": "docs/decisions/RATIFICATION.md",
-          "sha256": "0d3569c85955ae0412b4cd6778c1d6cdc899f4fc9b93e89795343ea82af043d1"
+          "sha256": "0e31c754c28b432b22d6698f1ab89231c223bf731831430d5efd67dab7afcddb"
         },
         {
           "id": "architecture-decision-schema",
           "path": "schemas/architecture-decision.v1.schema.json",
-          "sha256": "491eae26e498ee311bb37d5eff23a51d682eb687196c80a3df10ac1ce98e04d4"
+          "sha256": "725a7cf58cd0b0454d4d481e8ef72815f29ecca80a5b44da5ce48f7ec6e6b8c4"
         },
         {
           "id": "architecture-decision-policy-reference-schema",
@@ -83,7 +83,7 @@
         {
           "id": "organization-contract-index",
           "path": "catalog/contracts.yaml",
-          "sha256": "41e1ceb50382d0fe299ac583dabb9dbad90286966341c3b9ed4e3ddc6582577f"
+          "sha256": "2a8c4e114c2964acbf160ed6f0183013f175d07f6752878b9984542596b6622a"
         }
       ]
     },
@@ -91,7 +91,7 @@
       "id": "egolint-repository-validation",
       "role": "validator",
       "repository": "egohygiene/egolint",
-      "revision": "72267fd0a371da6d94922cbc6bd3dedddb68df30",
+      "revision": "d917ea524962639494e5bb4b3196192238ba57d9",
       "version": "0.1.0-alpha.1",
       "lifecycle": "proposed",
       "release_included": false,
@@ -104,7 +104,7 @@
         {
           "id": "repository-intelligence-rules",
           "path": ".config/rules/repository-intelligence.v1.toml",
-          "sha256": "bf3dd99fd1a26735b8e85008bbd1034a6cc10f12f4501fad75ae2f42b499b730"
+          "sha256": "a0a03c63a722a0af37109976abb40a6691a6cd2cd8e7d25b412862a40b744993"
         },
         {
           "id": "repository-contract-schema",
@@ -142,25 +142,25 @@
       "id": "holon-architecture-decisions",
       "role": "materializer",
       "repository": "egohygiene/holon",
-      "revision": "660b941f99618806fcadd589bcdae61c519f96e4",
-      "version": "1.0.0",
+      "revision": "a7734dba83305276b12932fcd4ce348044d9a2e9",
+      "version": "1.1.0",
       "lifecycle": "accepted",
       "release_included": false,
       "artifacts": [
         {
           "id": "architecture-decision-blueprint",
           "path": "blueprints/architecture-decisions/blueprint.json",
-          "sha256": "071432623f77def6cf0f263e3dae7c522169b8f00b8e101de0adef30043f73c6"
+          "sha256": "130395c5762ba30e9135f52db8ceb739719ed255f254f710f8804a70e081d38d"
         },
         {
           "id": "architecture-decision-blueprint-schema",
           "path": "schemas/architecture-decision-blueprint.v1.schema.json",
-          "sha256": "91be4e32e0ef0e5caebdfb136994d9a346a469f3514bd847bcba500e90837fef"
+          "sha256": "ab68297ed6089a37eab04c156c0e86e8f628b3da3397037ab1a795ebdf92118c"
         },
         {
           "id": "architecture-decision-template",
           "path": "blueprints/architecture-decisions/files/docs/decisions/ADR-TEMPLATE.md",
-          "sha256": "d426afbd06c1472559892291b6aabcfa58c9083127df5ab59c65c2b6c970b22d"
+          "sha256": "2e72d95cdb3bc37847e62073d4c9f129945f7b8de7ab8c81b66a7a9821893e9f"
         }
       ]
     }

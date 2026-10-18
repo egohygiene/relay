@@ -5,7 +5,7 @@ Relay may preserve a historical workflow so its behavior can be studied, but a
 candidate is not supported automation until it has been normalized, tested,
 cataloged, reviewed, and released through Relay's current contracts.
 
-This policy operationalizes ADR-001, ADR-002, ADR-003, ADR-005, and ADR-006.
+This policy operationalizes ADR-0001, ADR-0002, ADR-0003, ADR-0005, and ADR-0006.
 It does not expand Relay's authority or turn a legacy repository into a source
 of executable policy.
 

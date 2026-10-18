@@ -7,7 +7,7 @@
     "egolint": {
       "files": {
         ".config/rules/repository-intelligence-coverage-sources.v1.json": "d092a56ac69eb27bbdab60ee322e8eaa0dcd59c74a77ef4e98b7dae02b159870",
-        ".config/rules/repository-intelligence.v1.toml": "bf3dd99fd1a26735b8e85008bbd1034a6cc10f12f4501fad75ae2f42b499b730",
+        ".config/rules/repository-intelligence.v1.toml": "a0a03c63a722a0af37109976abb40a6691a6cd2cd8e7d25b412862a40b744993",
         "Cargo.lock": "ecca8f57ebf40c8207ae113a7e14e4522393a8a10dc5f6576b59b6f7b48a96ab",
         "Cargo.toml": "0949d1e241d8346e8485885b929892a018dd04d098d1cd3c13915c007f4510c6",
         "rust-toolchain.toml": "24e1453b4e314d5d4407c1da60e7c7eac3914e7483b5098efd436cdd5978fccd",
@@ -16,8 +16,8 @@
         "schemas/repository-intelligence.schema.json": "06cee6d863c6c2c9b5009b85fba8574aa55535fffecaa06415b839b0d6c752f5"
       },
       "repository": "egohygiene/egolint",
-      "revision": "72267fd0a371da6d94922cbc6bd3dedddb68df30",
-      "tree": "fb5184749470c5bb16f18349753995bf6a58fb17"
+      "revision": "d917ea524962639494e5bb4b3196192238ba57d9",
+      "tree": "033b3d4c4b91d31de7e9004744dcf97549d12de8"
     },
     "hygiene": {
       "files": {
@@ -32,16 +32,16 @@
     },
     "hygiene_adr": {
       "files": {
-        "catalog/contracts.yaml": "41e1ceb50382d0fe299ac583dabb9dbad90286966341c3b9ed4e3ddc6582577f",
-        "docs/decisions/MIGRATION.md": "6e89f99ccd2855a827bcbcb2bc17b38958a19ec4e010d88ecdd46fcdf76a4ea2",
-        "docs/decisions/POLICY.md": "e8b1f3c379a56d389d7689d187b2932ff3cfdf5e80acc829d244fb2527fcd361",
-        "docs/decisions/RATIFICATION.md": "0d3569c85955ae0412b4cd6778c1d6cdc899f4fc9b93e89795343ea82af043d1",
+        "catalog/contracts.yaml": "2a8c4e114c2964acbf160ed6f0183013f175d07f6752878b9984542596b6622a",
+        "docs/decisions/MIGRATION.md": "401efcd02d899d37621ac5b315404d6b2dea2db48461884b94a978b03f36e7be",
+        "docs/decisions/POLICY.md": "b8832d30363fc9005460c7353f73a58444f0230bc98960df201969f54682839b",
+        "docs/decisions/RATIFICATION.md": "0e31c754c28b432b22d6698f1ab89231c223bf731831430d5efd67dab7afcddb",
         "schemas/architecture-decision-policy-reference.v1.schema.json": "fdf451cfa38ba666ec579aa75d2acbd52a56b95e73c7437565b79dfcfb689216",
-        "schemas/architecture-decision.v1.schema.json": "491eae26e498ee311bb37d5eff23a51d682eb687196c80a3df10ac1ce98e04d4"
+        "schemas/architecture-decision.v1.schema.json": "725a7cf58cd0b0454d4d481e8ef72815f29ecca80a5b44da5ce48f7ec6e6b8c4"
       },
       "repository": "egohygiene/hygiene",
-      "revision": "c589587395750cd1c79c6fa0bef010189c547249",
-      "tree": "b1a49bd33dac766d4ad9e0d7013ac34cd3d603db"
+      "revision": "a05b14f8b9e2772124f879f818e09a911e996ad8",
+      "tree": "16da72be28aa06c784e3e706e264d1765f130441"
     },
     "observatory": {
       "files": {

@@ -96,7 +96,7 @@ class AdrBuildTests(unittest.TestCase):
         self.assertFalse((self.consumer / ".cache/repository-intelligence/adr/snapshot.json").exists())
 
     def test_external_declarations_bind_provenance_and_invalid_retry_clears_candidates(self):
-        reference = "egohygiene/identity#ADR-017"
+        reference = "egohygiene/identity#ADR-0017"
         self.change(native.NEW, "related: []", "related: [" + reference + "]")
         self.assertEqual(self.build().returncode, 2)
         result = self.build(known_external_decisions=json.dumps([reference]))
@@ -108,7 +108,7 @@ class AdrBuildTests(unittest.TestCase):
             altered = deepcopy(receipt)
             if mutation == "empty": altered["known_external_decisions"] = []
             if mutation == "duplicate": altered["known_external_decisions"] *= 2
-            if mutation == "unqualified": altered["known_external_decisions"] = ["ADR-017"]
+            if mutation == "unqualified": altered["known_external_decisions"] = ["ADR-0017"]
             if mutation == "parser": altered["runtime"]["input_contract_sha256"] = "0" * 64
             with self.subTest(mutation=mutation), self.assertRaises(ValueError):
                 contract.validate(altered, "egohygiene/relay", receipt["source_commit"])
@@ -129,7 +129,7 @@ class AdrBuildTests(unittest.TestCase):
         self.assertEqual(native.git(self.consumer, "status", "--short", "--untracked-files=no"), "")
 
     def test_legacy_and_private_source_cannot_be_admitted(self):
-        legacy = self.consumer / "docs/decisions/ADR-004-legacy.md"
+        legacy = self.consumer / "docs/decisions/ADR-0004-legacy.md"
         legacy.write_text("# Legacy decision\n")
         self.commit()
         self.assertNotEqual(self.build().returncode, 0)
@@ -173,8 +173,8 @@ class AdrBuildTests(unittest.TestCase):
         self.check_action_bundle_parity(owner=True)
 
     def check_action_bundle_parity(self, *, owner):
-        declared = '["egohygiene/identity#ADR-017"]'
-        self.change(native.NEW, "related: []", "related: [egohygiene/identity#ADR-017]")
+        declared = '["egohygiene/identity#ADR-0017"]'
+        self.change(native.NEW, "related: []", "related: [egohygiene/identity#ADR-0017]")
         harness = portability.RepositoryIntelligencePortabilityTests()
         harness.setUp()
         self.addCleanup(harness.doCleanups)
@@ -201,7 +201,7 @@ class AdrBuildTests(unittest.TestCase):
         schema = json.loads((native.SCRIPT.parent.parent / "schemas/repository-intelligence-provenance.schema.json").read_text())
         native.collector.jsonschema.Draft202012Validator(schema, format_checker=native.collector.jsonschema.FormatChecker()).validate(provenance)
         html = (one / "dist/intelligence/decisions/index.html").read_text()
-        for value in ("ADR-001", "ADR-002", "ADR-003", "Declared human approval", "/pull/24", "/docs/decisions/README.md"):
+        for value in ("ADR-0001", "ADR-0002", "ADR-0003", "Declared human approval", "/pull/24", "/docs/decisions/README.md"):
             self.assertIn(value, html)
         self.assertIn("Uncollected", (one / "dist/intelligence/roadmap/index.html").read_text())
         result = self.build(repository=repository, policy_owner=owner, known_external_decisions=declared)
