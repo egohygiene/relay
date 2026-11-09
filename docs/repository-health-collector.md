@@ -118,6 +118,14 @@ older than `--maximum-age-seconds` (default 86,400) stay stale. Whole-second UTC
 timestamps are required. A valid complete empty capture can prove observed-empty
 only with the explicit complete-inventory declaration below.
 
+The live [GitHub source producer](../actions/repository-intelligence-github-sources/README.md)
+can add the closed optional `relay_capture` metadata defined by
+`github-check-runs-capture.v1.schema.json`. Repository, exact source SHA and
+original capture time must match the selected build. Received page count,
+exhaustion, truncation and fixed terminal outcome participate in completeness:
+`total_count == len(check_runs)` alone cannot make a failed/truncated empty
+capture complete. Legacy raw REST captures retain their existing behavior.
+
 ```bash
 python actions/repository-intelligence/scripts/collect_repository_health.py collect \
   --runtime /review/health-runtime --repository-root /sources/consumer \
