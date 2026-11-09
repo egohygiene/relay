@@ -44,7 +44,15 @@ def execute(argv, cwd, env, timeout=180):
             raise ValueError("acquisition")
 
 
-def acquire(work):
+def acquire(work, *, normalization_profile="legacy-adr"):
+    lock_path = LOCK
+    prepare_script = SCRIPTS / "collect_repository_adrs.py"
+    if normalization_profile != "legacy-adr":
+        if normalization_profile != "search-attribution-v1":
+            raise ValueError("acquisition-profile")
+        search = module("relay_acquisition_search_profile", SCRIPTS / "repository_search_normalization.py")
+        lock_path = search.LOCK_PATH
+        prepare_script = SCRIPTS / "repository_search_normalization.py"
     if sys.version_info[:2] != (3, 12) or sys.platform != "linux" or platform.machine() != "x86_64":
         raise ValueError("acquisition-platform")
     env = {"PATH": os.environ.get("PATH", os.defpath), "LC_ALL": "C.UTF-8",
@@ -58,7 +66,7 @@ def acquire(work):
                 "CURL_CA_BUNDLE", "GIT_SSL_CAINFO"):
         if key in os.environ:
             env[key] = os.environ[key]
-    lock = json.loads(LOCK.read_text())
+    lock = json.loads(lock_path.read_text())
     sources = {}
     for name, pin in lock["sources"].items():
         owner = "hygiene" if name.startswith("hygiene_") else name
@@ -96,7 +104,7 @@ def acquire(work):
     (manifests / "src/main.rs").write_text("fn main() {}\n")
     execute([cargo, "fetch", "--locked", "--manifest-path", str(manifests / "Cargo.toml")], work, env)
     runtime = work / "runtime"
-    command = [str(python), "-I", str(SCRIPTS / "collect_repository_adrs.py"), "prepare",
+    command = [str(python), "-I", str(prepare_script), "prepare",
                "--cargo", cargo, "--output", str(runtime)]
     for owner, source in sources.items():
         command.extend(["--" + owner, str(source)])

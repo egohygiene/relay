@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/search-normalization-profile.v1.schema.json",
+  "title": "Relay opt-in Search normalization execution profile",
+  "$comment": "The trusted repository_search_normalization.validate_metadata verifier additionally requires exact lock and implementation bytes. This is execution provenance, not a new Search model or source authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "profile", "feature_kwargs", "runtime", "implementation"],
+  "properties": {
+    "schema": {"const": "egohygiene.relay.search-normalization-profile/v1"},
+    "profile": {"const": "search-attribution-v1"},
+    "feature_kwargs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["search_attribution"],
+      "properties": {"search_attribution": {"const": true}}
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lock_sha256", "egolint_sha256", "pins"],
+      "properties": {
+        "lock_sha256": {"$ref": "#/$defs/hash"},
+        "egolint_sha256": {"$ref": "#/$defs/hash"},
+        "pins": {"type": "object"}
+      }
+    },
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository_search_normalization.py",
+        "collect_repository_adrs.py",
+        "collect_repository_roadmap.py",
+        "prepare_repository_adr_build.py"
+      ],
+      "properties": {
+        "repository_search_normalization.py": {"$ref": "#/$defs/hash"},
+        "collect_repository_adrs.py": {"$ref": "#/$defs/hash"},
+        "collect_repository_roadmap.py": {"$ref": "#/$defs/hash"},
+        "prepare_repository_adr_build.py": {"$ref": "#/$defs/hash"}
+      }
+    }
+  },
+  "$defs": {"hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+}
