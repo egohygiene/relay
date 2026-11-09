@@ -251,6 +251,16 @@ def collect(args, target):
         temporary = base.safe_path(Path(directory))
         if temporary.is_relative_to(base.safe_path(args.repository_root)):
             raise ValueError("runtime-layout")
+        if args.collect_dependencies:
+            args.active_source = "dependencies"
+            admission = module("relay_sources_public_catalog", "public_catalog_admission.py")
+            catalog_root = args.dependency_catalog or admission.acquire(temporary)
+            collector = module("relay_sources_dependencies", "collect_repository_dependency_source.py")
+            result = collector.collect(argparse.Namespace(runtime=args.runtime, catalog_root=catalog_root,
+                repository_root=args.repository_root, repository=args.repository, visibility=args.visibility,
+                source_commit=args.source_commit, observed_at=args.observed_at))
+            projections.append(result["projection"])
+            receipts["dependencies"] = result["receipt"]
         captured_sources(args, base, projections, receipts, temporary)
         normalizer_runtime = args.runtime or args.work_runtime or args.health_runtime or args.release_runtime
         contract = module("relay_sources_contract", "repository_sources_build_contract.py")
@@ -317,6 +327,9 @@ def parser():
     value.add_argument("--collect-adrs", action="store_true")
     value.add_argument("--collect-roadmap", action="store_true")
     value.add_argument("--collect-journey", action="store_true")
+    value.add_argument("--collect-dependencies", action="store_true")
+    value.add_argument("--dependency-catalog", type=Path,
+        help="Optional trusted exact Hygiene public-catalog Git source outside the consumer; otherwise acquire it privately.")
     value.add_argument("--journey-maximum-commits", type=int, default=256)
     value.add_argument("--journey-since")
     value.add_argument("--journey-until")
@@ -368,10 +381,10 @@ def replay_arguments(args, runtime):
         # Reparse the same immutable plan in the acquired interpreter. Do not
         # replay its expanded selections as duplicate explicit source inputs.
         values.extend(["--capture-plan", str(args.capture_plan)])
-    for name in ("capture_root", "capture_intake_receipt", "generator_repository_root", "journey_since", "journey_until", "search_runtime"):
+    for name in ("capture_root", "capture_intake_receipt", "generator_repository_root", "journey_since", "journey_until", "search_runtime", "dependency_catalog"):
         if getattr(args, name) is not None:
             values.extend(["--" + name.replace("_", "-"), str(getattr(args, name))])
-    for name in ("collect_adrs", "collect_roadmap", "collect_work", "collect_health", "collect_journey", "collect_releases", "policy_owner", "search_attribution"):
+    for name in ("collect_adrs", "collect_roadmap", "collect_work", "collect_health", "collect_journey", "collect_releases", "collect_dependencies", "policy_owner", "search_attribution"):
         if name in {"collect_work", "collect_health", "collect_releases"} and name.removeprefix("collect_") in plan:
             continue
         if getattr(args, name):
@@ -399,7 +412,7 @@ def write_failure(target, stage, source):
     # of failure evidence. This private work namespace is never public output.
     if stage not in {"input", "acquisition", "collection-validation-normalization"}:
         stage = "input"
-    if source not in {"decisions", "roadmap", "work", "health", "journey", "releases"}:
+    if source not in {"decisions", "roadmap", "work", "health", "journey", "releases", "dependencies"}:
         source = None
     if any(path.is_symlink() for path in (target, *target.parents)) or not target.is_dir():
         return
@@ -421,7 +434,7 @@ def main():
     args = parser().parse_args()
     args.repository_root = args.repository_root.absolute()
     for name in ("runtime", "work_runtime", "health_runtime", "work_capture", "health_check_runs", "capture_root", "capture_intake_receipt",
-            "release_runtime", "release_capture", "generator_repository_root", "search_runtime"):
+            "release_runtime", "release_capture", "generator_repository_root", "search_runtime", "dependency_catalog"):
         if getattr(args, name) is not None:
             setattr(args, name, getattr(args, name).absolute())
     args.release_deployment_receipt = [path.absolute() for path in args.release_deployment_receipt]
@@ -436,8 +449,10 @@ def main():
         args.input_plan_sha256 = None
         if args.search_runtime is not None and not args.search_attribution:
             raise ValueError("search-runtime-selection")
+        if args.dependency_catalog is not None and not args.collect_dependencies:
+            raise ValueError("dependency-catalog-selection")
         if not any((args.collect_roadmap, args.collect_adrs, args.collect_work, args.collect_health, args.collect_journey,
-                args.collect_releases, args.capture_plan is not None)):
+                args.collect_releases, args.collect_dependencies, args.capture_plan is not None)):
             raise ValueError("empty-source-plan")
         if args.observatory_snapshot or args.observatory_comparison:
             raise ValueError("conflicting-inputs")
@@ -496,7 +511,7 @@ def main():
         # Validate bounded declarations before network/runtime acquisition.
         module("relay_sources_inputs", "repository_adr_inputs.py").selection(
             args.known_external_decisions, "true" if args.collect_adrs else "false")
-        needs_shared_runtime = (args.collect_adrs or args.collect_roadmap or args.collect_journey
+        needs_shared_runtime = (args.collect_adrs or args.collect_roadmap or args.collect_journey or args.collect_dependencies
             or args.collect_work and args.work_runtime is None or args.collect_health and args.health_runtime is None
             or args.collect_releases and args.release_runtime is None)
         if args.runtime is None and needs_shared_runtime:

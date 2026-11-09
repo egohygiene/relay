@@ -385,6 +385,687 @@
             },
             "releases": {
               "$ref": "source-release-build.v1.schema.json"
+            },
+            "dependencies": {
+              "$comment": "Transport receipt; Hygiene owns dependency intent. All nine native inventory domains remain uncollected. Identity membership and current implementation bytes require repository_dependency_build_contract.validate.",
+              "$defs": {
+                "hash": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "immutableEvidenceUrl": {
+                  "format": "uri",
+                  "pattern": "^https://github\\.com/egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)/blob/[a-f0-9]{40}/[A-Za-z0-9._/-]+$",
+                  "type": "string"
+                },
+                "nextGate": {
+                  "additionalProperties": false,
+                  "allOf": [
+                    {
+                      "else": {
+                        "properties": {
+                          "description": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "source_observed_at": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "source_url": {
+                            "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/immutableEvidenceUrl"
+                          }
+                        }
+                      },
+                      "if": {
+                        "properties": {
+                          "state": {
+                            "const": "unknown"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "description": {
+                            "type": "null"
+                          },
+                          "source_observed_at": {
+                            "type": "null"
+                          },
+                          "source_url": {
+                            "type": "null"
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "properties": {
+                    "description": {
+                      "maxLength": 2048,
+                      "minLength": 1,
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_observed_at": {
+                      "format": "date",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_url": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/immutableEvidenceUrl"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "state": {
+                      "enum": [
+                        "unknown",
+                        "source-declared"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "state",
+                    "description",
+                    "source_url",
+                    "source_observed_at"
+                  ],
+                  "type": "object"
+                },
+                "repository": {
+                  "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$",
+                  "type": "string"
+                },
+                "strings": {
+                  "items": {
+                    "maxLength": 2048,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 256,
+                  "type": "array",
+                  "uniqueItems": true
+                }
+              },
+              "additionalProperties": false,
+              "properties": {
+                "admission": {
+                  "const": "fresh-owner-declarations"
+                },
+                "candidate_digests": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "projection_sha256": {
+                      "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                    },
+                    "snapshot_sha256": {
+                      "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                    }
+                  },
+                  "required": [
+                    "projection_sha256",
+                    "snapshot_sha256"
+                  ],
+                  "type": "object"
+                },
+                "coverage": {
+                  "const": {
+                    "checks": {
+                      "collection": "uncollected",
+                      "freshness": "unknown",
+                      "observed_at": null,
+                      "reason": "not_requested"
+                    },
+                    "decisions": {
+                      "collection": "uncollected",
+                      "freshness": "unknown",
+                      "observed_at": null,
+                      "reason": "not_requested"
+                    },
+                    "deployments": {
+                      "collection": "uncollected",
+                      "freshness": "unknown",
+                      "observed_at": null,
+                      "reason": "not_requested"
+                    },
+                    "git": {
+                      "collection": "uncollected",
+                      "freshness": "unknown",
+                      "observed_at": null,
+                      "reason": "not_requested"
+                    },
+                    "history": {
+                      "collection": "uncollected",
+                      "freshness": "unknown",
+                      "observed_at": null,
+                      "reason": "not_requested"
+                    },
+                    "issues": {
+                      "collection": "uncollected",
+                      "freshness": "unknown",
+                      "observed_at": null,
+                      "reason": "not_requested"
+                    },
+                    "pull_requests": {
+                      "collection": "uncollected",
+                      "freshness": "unknown",
+                      "observed_at": null,
+                      "reason": "not_requested"
+                    },
+                    "releases": {
+                      "collection": "uncollected",
+                      "freshness": "unknown",
+                      "observed_at": null,
+                      "reason": "not_requested"
+                    },
+                    "roadmap": {
+                      "collection": "uncollected",
+                      "freshness": "unknown",
+                      "observed_at": null,
+                      "reason": "not_requested"
+                    }
+                  }
+                },
+                "inputs": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "authorized_repositories": {
+                      "items": {
+                        "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/repository"
+                      },
+                      "maxItems": 256,
+                      "minItems": 1,
+                      "type": "array",
+                      "uniqueItems": true
+                    },
+                    "catalog_admission": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "artifact_path": {
+                          "const": "catalog/public-repositories.json"
+                        },
+                        "artifact_sha256": {
+                          "const": "af9c7186ded0bb57b18741eaa5905314b96d6adb03736946c868e0fc4aa50b26"
+                        },
+                        "helper_sha256": {
+                          "const": "fd3bb2099f2b9040502f19a8e582e4c4100653bd6cf2ea640cc36338dcfc4273"
+                        },
+                        "observed_at": {
+                          "format": "date-time",
+                          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+                          "type": "string"
+                        },
+                        "owner": {
+                          "const": "egohygiene/hygiene"
+                        },
+                        "revision": {
+                          "const": "49639c1845cdfd08fbd5a768261a8b3cf515f80f"
+                        },
+                        "schema": {
+                          "const": "egohygiene.relay.public-catalog-admission/v1"
+                        },
+                        "schema_sha256": {
+                          "const": "eeb88b6a99de987500b946bd71c987e1fb7d0bd7350f466885c11ac7603c96d8"
+                        },
+                        "selected_sha256": {
+                          "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                        }
+                      },
+                      "required": [
+                        "schema",
+                        "owner",
+                        "revision",
+                        "artifact_path",
+                        "artifact_sha256",
+                        "schema_sha256",
+                        "helper_sha256",
+                        "observed_at",
+                        "selected_sha256"
+                      ],
+                      "type": "object"
+                    },
+                    "catalog_freshness": {
+                      "enum": [
+                        "current",
+                        "stale"
+                      ]
+                    },
+                    "declaration_reference_sha256": {
+                      "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                    },
+                    "declarations_observed_at": {
+                      "const": "2026-11-09",
+                      "format": "date",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                      "type": "string"
+                    },
+                    "maximum_catalog_age_days": {
+                      "maximum": 3650,
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "maximum_depth": {
+                      "maximum": 8,
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "public_evidence": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "boundary_evidence": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "policies": {
+                                "items": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "contract": {
+                                      "maxLength": 2048,
+                                      "minLength": 1,
+                                      "type": [
+                                        "string",
+                                        "null"
+                                      ]
+                                    },
+                                    "contract_status": {
+                                      "enum": [
+                                        "active",
+                                        "required"
+                                      ]
+                                    },
+                                    "id": {
+                                      "pattern": "^RELATIONSHIP-[0-9]{3}$",
+                                      "type": "string"
+                                    },
+                                    "pinning": {
+                                      "enum": [
+                                        "immutable",
+                                        "immutable-or-versioned",
+                                        "versioned"
+                                      ]
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "contract",
+                                    "contract_status",
+                                    "pinning"
+                                  ],
+                                  "type": "object"
+                                },
+                                "maxItems": 256,
+                                "minItems": 1,
+                                "type": "array"
+                              },
+                              "source": {
+                                "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/repository"
+                              },
+                              "target": {
+                                "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/repository"
+                              }
+                            },
+                            "required": [
+                              "source",
+                              "target",
+                              "policies"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 2048,
+                          "minItems": 0,
+                          "type": "array"
+                        },
+                        "relationships": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "source": {
+                                "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/repository"
+                              },
+                              "target": {
+                                "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/repository"
+                              }
+                            },
+                            "required": [
+                              "source",
+                              "target"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 2048,
+                          "minItems": 0,
+                          "type": "array"
+                        },
+                        "repositories": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "aliases": {
+                                "items": {
+                                  "pattern": "^(\\.github|[a-z0-9][a-z0-9.-]*)(?![\\s\\S])",
+                                  "type": "string"
+                                },
+                                "maxItems": 32,
+                                "type": "array",
+                                "uniqueItems": true
+                              },
+                              "archived": {
+                                "type": "boolean"
+                              },
+                              "default_branch": {
+                                "maxLength": 255,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "full_name": {
+                                "pattern": "^egohygiene/(\\.github|[a-z0-9][a-z0-9.-]*)(?![\\s\\S])",
+                                "type": "string"
+                              },
+                              "name": {
+                                "pattern": "^(\\.github|[a-z0-9][a-z0-9.-]*)(?![\\s\\S])",
+                                "type": "string"
+                              },
+                              "next_gate": {
+                                "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/nextGate"
+                              },
+                              "repository_id": {
+                                "maximum": 9007199254740991,
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "role": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "evidence": {
+                                    "items": {
+                                      "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/immutableEvidenceUrl"
+                                    },
+                                    "maxItems": 32,
+                                    "type": "array",
+                                    "uniqueItems": true
+                                  },
+                                  "excludes": {
+                                    "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/strings"
+                                  },
+                                  "lifecycle": {
+                                    "minLength": 1,
+                                    "type": "string"
+                                  },
+                                  "maturity": {
+                                    "minLength": 1,
+                                    "type": "string"
+                                  },
+                                  "outputs": {
+                                    "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/strings"
+                                  },
+                                  "owns": {
+                                    "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/strings"
+                                  },
+                                  "plane": {
+                                    "minLength": 1,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "plane",
+                                  "lifecycle",
+                                  "maturity",
+                                  "owns",
+                                  "excludes",
+                                  "outputs",
+                                  "evidence"
+                                ],
+                                "type": "object"
+                              },
+                              "source_url": {
+                                "format": "uri",
+                                "pattern": "^https://github\\.com/egohygiene/(\\.github|[a-z0-9][a-z0-9.-]*)(?![\\s\\S])",
+                                "type": "string"
+                              },
+                              "visibility": {
+                                "const": "public"
+                              }
+                            },
+                            "required": [
+                              "name",
+                              "full_name",
+                              "repository_id",
+                              "visibility",
+                              "source_url",
+                              "default_branch",
+                              "archived",
+                              "aliases",
+                              "role",
+                              "next_gate"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 256,
+                          "minItems": 1,
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "repositories",
+                        "relationships",
+                        "boundary_evidence"
+                      ],
+                      "type": "object"
+                    },
+                    "public_evidence_sha256": {
+                      "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                    },
+                    "scope": {
+                      "const": {
+                        "authority": "egohygiene/hygiene",
+                        "bounded": true,
+                        "excluded_topology": "uncollected",
+                        "kind": "declared_consumption",
+                        "package_dependencies": "uncollected",
+                        "runtime_adoption": "uncollected"
+                      }
+                    }
+                  },
+                  "required": [
+                    "catalog_admission",
+                    "public_evidence",
+                    "public_evidence_sha256",
+                    "declarations_observed_at",
+                    "maximum_depth",
+                    "maximum_catalog_age_days",
+                    "catalog_freshness",
+                    "scope",
+                    "authorized_repositories",
+                    "declaration_reference_sha256"
+                  ],
+                  "type": "object"
+                },
+                "kind": {
+                  "const": "dependencies"
+                },
+                "observed_at": {
+                  "format": "date-time",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+                  "type": "string"
+                },
+                "repository": {
+                  "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/repository"
+                },
+                "runtime": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "egolint_sha256": {
+                      "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                    },
+                    "lock_sha256": {
+                      "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                    },
+                    "pins": {
+                      "const": {
+                        "integration_issue": "https://github.com/egohygiene/relay/issues/115",
+                        "profile": "adr-review-only/v1",
+                        "publication": "denied",
+                        "schema": "egohygiene.relay.adr-collector-lock/v1",
+                        "sources": {
+                          "egolint": {
+                            "files": {
+                              ".config/rules/repository-intelligence-coverage-sources.v1.json": "d092a56ac69eb27bbdab60ee322e8eaa0dcd59c74a77ef4e98b7dae02b159870",
+                              ".config/rules/repository-intelligence.v1.toml": "a0a03c63a722a0af37109976abb40a6691a6cd2cd8e7d25b412862a40b744993",
+                              "Cargo.lock": "ecca8f57ebf40c8207ae113a7e14e4522393a8a10dc5f6576b59b6f7b48a96ab",
+                              "Cargo.toml": "0949d1e241d8346e8485885b929892a018dd04d098d1cd3c13915c007f4510c6",
+                              "rust-toolchain.toml": "24e1453b4e314d5d4407c1da60e7c7eac3914e7483b5098efd436cdd5978fccd",
+                              "schemas/intelligence-coverage-report.schema.json": "1e2742f003d780900f7b7de2d6556b07a71be623742906b79b4965aadb78eb20",
+                              "schemas/repository-intelligence-report.schema.json": "fa2d0ac0660a6ebdca23f450aa2400017835bfa6a0ae8b3ddaecf7f352155716",
+                              "schemas/repository-intelligence.schema.json": "06cee6d863c6c2c9b5009b85fba8574aa55535fffecaa06415b839b0d6c752f5"
+                            },
+                            "repository": "egohygiene/egolint",
+                            "revision": "d917ea524962639494e5bb4b3196192238ba57d9",
+                            "tree": "033b3d4c4b91d31de7e9004744dcf97549d12de8"
+                          },
+                          "hygiene": {
+                            "files": {
+                              "catalog/repository-intelligence-vocabulary.json": "e61ac19d7907b80d3e1d3e9158d34039a5da43208c309b81919105a9450f8cd7",
+                              "docs/ecosystem/REPOSITORY_INTELLIGENCE_COVERAGE.md": "e2889b9481d05afeb3f8e030887ccf1420827ab2ee4cfb524cdfea0a09e1e5f5",
+                              "schemas/repository-intelligence.alpha2.schema.json": "7fd7b19c22b2df8c4c6b6f6e8b7c36ae9082a1c415786dc23e33090790c45cf1",
+                              "tools/intelligence.py": "a46e0899fc50c8b03a51f1b1cf80c8ca8b8a7f4e6a4dfcae3fdb067f14c7a4c5"
+                            },
+                            "repository": "egohygiene/hygiene",
+                            "revision": "639a003d5ddc4d242c2cf190eeb59a9fc522d199",
+                            "tree": "212a81d3f0527dc925ab1379afacaffeebb23658"
+                          },
+                          "hygiene_adr": {
+                            "files": {
+                              "catalog/contracts.yaml": "2a8c4e114c2964acbf160ed6f0183013f175d07f6752878b9984542596b6622a",
+                              "docs/decisions/MIGRATION.md": "401efcd02d899d37621ac5b315404d6b2dea2db48461884b94a978b03f36e7be",
+                              "docs/decisions/POLICY.md": "b8832d30363fc9005460c7353f73a58444f0230bc98960df201969f54682839b",
+                              "docs/decisions/RATIFICATION.md": "0e31c754c28b432b22d6698f1ab89231c223bf731831430d5efd67dab7afcddb",
+                              "schemas/architecture-decision-policy-reference.v1.schema.json": "fdf451cfa38ba666ec579aa75d2acbd52a56b95e73c7437565b79dfcfb689216",
+                              "schemas/architecture-decision.v1.schema.json": "725a7cf58cd0b0454d4d481e8ef72815f29ecca80a5b44da5ce48f7ec6e6b8c4"
+                            },
+                            "repository": "egohygiene/hygiene",
+                            "revision": "a05b14f8b9e2772124f879f818e09a911e996ad8",
+                            "tree": "16da72be28aa06c784e3e706e264d1765f130441"
+                          },
+                          "observatory": {
+                            "files": {
+                              "contracts/hygiene.repository-intelligence.alpha2.lock.json": "df0b55290173a574c079f12018e316d0ee68bf0bd8a1d7092793889622a9dec1",
+                              "schemas/repository-intelligence-read-model.v1.schema.json": "1671c32157a1224695bc81e9c89f2c04516954f6d593f1f8483835a7556a7a53",
+                              "src/observatory/intelligence.py": "d6a4b29580edad547f667f184457420b01cde6bae34198ade9c56351baacabe6"
+                            },
+                            "repository": "egohygiene/observatory",
+                            "revision": "f411b83398dd07aa3d5e6e2c89d1e8dfff746085",
+                            "tree": "bf621ef1b6c389979179e27c0f074b25d6f1565e"
+                          }
+                        }
+                      }
+                    },
+                    "relay_files_sha256": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "collect_repository_adrs.py": {
+                          "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                        },
+                        "collect_repository_dependencies.py": {
+                          "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                        },
+                        "collect_repository_dependency_source.py": {
+                          "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                        },
+                        "collect_repository_roadmap.py": {
+                          "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                        },
+                        "contracts/public-catalog-admission.v1.lock.json": {
+                          "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                        },
+                        "contracts/public-dependency-declarations.hygiene-49639c1.json": {
+                          "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                        },
+                        "contracts/public-repositories.hygiene-49639c1.json": {
+                          "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                        },
+                        "public_catalog_admission.py": {
+                          "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                        },
+                        "repository_adr_inputs.py": {
+                          "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                        },
+                        "repository_dependency_build_contract.py": {
+                          "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                        },
+                        "schemas/dependency-source-build.v1.schema.json": {
+                          "$ref": "#/properties/source_collection/properties/domains/properties/dependencies/$defs/hash"
+                        }
+                      },
+                      "required": [
+                        "collect_repository_dependency_source.py",
+                        "collect_repository_dependencies.py",
+                        "public_catalog_admission.py",
+                        "repository_dependency_build_contract.py",
+                        "collect_repository_roadmap.py",
+                        "collect_repository_adrs.py",
+                        "repository_adr_inputs.py",
+                        "contracts/public-catalog-admission.v1.lock.json",
+                        "contracts/public-repositories.hygiene-49639c1.json",
+                        "contracts/public-dependency-declarations.hygiene-49639c1.json",
+                        "schemas/dependency-source-build.v1.schema.json"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "lock_sha256",
+                    "egolint_sha256",
+                    "pins",
+                    "relay_files_sha256"
+                  ],
+                  "type": "object"
+                },
+                "schema": {
+                  "const": "egohygiene.relay.source-dependency-build/v1"
+                },
+                "source_commit": {
+                  "pattern": "^[0-9a-f]{40}$",
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "ready",
+                    "stale"
+                  ]
+                },
+                "validation": {
+                  "const": {
+                    "coverage": "valid",
+                    "hygiene": "valid",
+                    "observatory": "normalized"
+                  }
+                }
+              },
+              "required": [
+                "schema",
+                "kind",
+                "admission",
+                "repository",
+                "source_commit",
+                "observed_at",
+                "status",
+                "inputs",
+                "runtime",
+                "validation",
+                "coverage",
+                "candidate_digests"
+              ],
+              "title": "Fresh public declared dependency build receipt",
+              "type": "object"
             }
           }
         },
@@ -475,7 +1156,10 @@
             "repository_journey_build_contract.py",
             "collect_repository_releases.py",
             "repository_release_build_contract.py",
-            "repository_search_normalization.py"
+            "repository_search_normalization.py",
+            "collect_repository_dependency_source.py",
+            "public_catalog_admission.py",
+            "repository_dependency_build_contract.py"
           ],
           "properties": {
             "collect_repository_roadmap_source.py": {
@@ -535,6 +1219,18 @@
               "pattern": "^[0-9a-f]{64}$"
             },
             "repository_search_normalization.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "collect_repository_dependency_source.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "public_catalog_admission.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "repository_dependency_build_contract.py": {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$"
             }
@@ -921,6 +1617,136 @@
           }
         }
       ]
+    },
+    "hygiene_conformance": {
+      "title": "Bounded Hygiene conformance input binding",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "repository",
+        "source_commit",
+        "as_of",
+        "owner",
+        "input_sha256",
+        "model_sha256",
+        "implementation",
+        "freshness",
+        "assessment_status",
+        "applicability",
+        "contract_inventory",
+        "checks",
+        "current_checks",
+        "other_revision_checks"
+      ],
+      "properties": {
+        "schema": {
+          "const": "egohygiene.relay.hygiene-conformance-receipt/v1"
+        },
+        "repository": {
+          "type": "string",
+          "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "as_of": {
+          "type": "string",
+          "pattern": "Z$",
+          "format": "date-time"
+        },
+        "owner": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "repository",
+            "revision",
+            "schema",
+            "contract_version"
+          ],
+          "properties": {
+            "repository": {
+              "const": "egohygiene/observatory"
+            },
+            "revision": {
+              "const": "a1884942e953bb371499b2822b52f6865ecdae9d"
+            },
+            "schema": {
+              "const": "egohygiene.observatory.repository-conformance/v1"
+            },
+            "contract_version": {
+              "const": "1.0.0-alpha.1"
+            }
+          }
+        },
+        "input_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "model_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "implementation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "renderer_sha256",
+            "lock_sha256"
+          ],
+          "properties": {
+            "renderer_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "lock_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "freshness": {
+          "enum": [
+            "current",
+            "stale",
+            "unknown"
+          ]
+        },
+        "assessment_status": {
+          "enum": [
+            "conformant",
+            "non_conformant",
+            "blocked",
+            "stale",
+            "unknown",
+            "partial",
+            "not_applicable"
+          ]
+        },
+        "applicability": {
+          "const": "unknown"
+        },
+        "contract_inventory": {
+          "const": "unknown"
+        },
+        "checks": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "current_checks": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "other_revision_checks": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        }
+      },
+      "$comment": "Trusted validate_receipt additionally checks exact owner/implementation bytes, row-count consistency and clock/repository equality. validate_page checks exact model bindings in the real shared page."
     }
   },
   "$defs": {

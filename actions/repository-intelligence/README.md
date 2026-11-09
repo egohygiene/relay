@@ -539,3 +539,5 @@ a build or Pages artifact instead.
   digests remain transport digests and are not substitutes for `bundle-digest`.
 - Deployment receipts must stay outside `output-directory` and the final
   composed site. See the consumer integration and rollback action linked above.
+
+Production source admission, optional owner-backed Hygiene and the queued organization sanity sweep are documented in [production data paths](../../docs/repository-intelligence-production-paths.md).

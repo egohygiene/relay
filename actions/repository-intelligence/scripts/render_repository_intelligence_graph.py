@@ -124,9 +124,12 @@ def _entity_href(node: dict, snapshot: dict, repository: str, prefix: str) -> st
     return prefix + "search/"
 
 
-def graph_model(snapshot: dict | None, repository: str, prefix: str = "") -> dict:
+def graph_model(snapshot: dict | None, repository: str, prefix: str = "", *, owner_views=None) -> dict:
     """Project a bounded navigation aid from an already-admitted owner snapshot."""
     if prefix not in {"", "../"} or not REPOSITORY.fullmatch(repository):
+        raise ValueError("GRAPH_INPUT")
+    owner_views = owner_views or {}
+    if not isinstance(owner_views, dict) or not set(owner_views) <= {"hygiene"}:
         raise ValueError("GRAPH_INPUT")
     current = snapshot if isinstance(snapshot, dict) and snapshot.get("visibility") == "public" else None
     if current and site.require_object(current.get("repository")).get("key") != repository:
@@ -140,6 +143,8 @@ def graph_model(snapshot: dict | None, repository: str, prefix: str = "") -> dic
             state = site.projection_freshness(current, route) if projected else "unavailable"
         except (ValueError, TypeError, KeyError, AttributeError):
             state = "unknown"
+        if route in owner_views:
+            state = owner_views[route]["freshness"]
         nodes.append({"id": "navigation:" + route, "label": label, "kind": "view", "state": state,
                       "assertion": "presentation", "freshness": "not_applicable", "repository": repository,
                       "href": (prefix or "./") if route == "intelligence" else prefix + route + "/",
@@ -245,9 +250,9 @@ def _link(node: dict, content: str) -> str:
     return f'<a href="{site.escaped(node["href"])}"{context}>{content}</a>'
 
 
-def graph_body(snapshot: dict | None, repository: str, prefix: str = "") -> str:
+def graph_body(snapshot: dict | None, repository: str, prefix: str = "", *, owner_views=None) -> str:
     """Keep the same graph and evidence directories in static/no-script output."""
-    model = graph_model(snapshot, repository, prefix)
+    model = graph_model(snapshot, repository, prefix, owner_views=owner_views)
     nodes, edges = model["nodes"], model["edges"]
     rows = {"view": 0, "repository": 0, "entity": 0}
     columns = {"repository": 0, "view": 1, "entity": 2}
@@ -311,8 +316,8 @@ def graph_body(snapshot: dict | None, repository: str, prefix: str = "") -> str:
 {END}'''
 
 
-def enhance_document(document: str, snapshot: dict | None, repository: str, prefix: str = "") -> str:
-    body = graph_body(snapshot, repository, prefix)
+def enhance_document(document: str, snapshot: dict | None, repository: str, prefix: str = "", *, owner_views=None) -> str:
+    body = graph_body(snapshot, repository, prefix, owner_views=owner_views)
     if BEGIN in document or END in document:
         if document.count(BEGIN) != 1 or document.count(END) != 1:
             raise ValueError("GRAPH_DOCUMENT")
@@ -360,6 +365,14 @@ def main() -> int:
         summary = site.load_object(paths[0], "dashboard summary")
         provenance = site.load_object(paths[1], "bundle provenance")
         site.validate_site_contracts(summary, provenance, args.repository, args.source_commit)
+        owner_views = {}
+        if "hygiene_conformance" in provenance:
+            if provenance["consumer"]["visibility"] != "public":
+                raise ValueError("GRAPH_INPUT")
+            helper = site.load_hygiene_helper()
+            helper.validate_receipt(provenance["hygiene_conformance"], args.repository,
+                args.source_commit, provenance["generated_at"])
+            owner_views["hygiene"] = provenance["hygiene_conformance"]
         snapshot = site.validate_snapshot(site.load_object(snapshot_path, "Observatory snapshot"), args.repository, args.source_commit) if snapshot_path else None
         targets = []
         if args.target in {"overview", "both", "all"}:
@@ -380,7 +393,8 @@ def main() -> int:
         for path, prefix in targets:
             if not path.is_file() or path.stat().st_size > MAX_INPUT:
                 raise ValueError("GRAPH_DOCUMENT")
-            rendered.append((path, enhance_document(path.read_text(encoding="utf-8"), snapshot, args.repository, prefix)))
+            rendered.append((path, enhance_document(path.read_text(encoding="utf-8"), snapshot,
+                args.repository, prefix, owner_views=owner_views)))
         for path, content in rendered:
             site.atomic_write(path, content)
         for name in ("graph.js", "graph.css"):

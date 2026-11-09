@@ -51,7 +51,7 @@ selection without executing repository or input code:
         value = json.loads(raw, object_pairs_hook=unique)
         patterns = {'lease': r'[0-9a-f]{64}:[0-9a-f]{64}',
                     'artifact_id': r'[1-9][0-9]{0,19}',
-                    'artifact_digest': r'sha256:[0-9a-f]{64}',
+                    'artifact_digest': r'(?:sha256:)?[0-9a-f]{64}',
                     'source_commit': r'[0-9a-f]{40}',
                     'run_id': r'[1-9][0-9]{0,19}', 'run_attempt': r'[1-9][0-9]{0,5}'}
         if not isinstance(value, dict) or set(value) != set(keys) or any(

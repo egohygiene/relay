@@ -21,10 +21,11 @@ FILES = ("collect_repository_roadmap_source.py", "prepare_repository_sources_bui
          "collect_repository_work.py", "collect_repository_health.py", "repository_capture_build_contract.py",
          "repository_source_capture_inputs.py", "repository_capture_artifact.py", "collect_repository_journey.py",
          "repository_journey_build_contract.py", "collect_repository_releases.py", "repository_release_build_contract.py",
-         "repository_search_normalization.py")
+         "repository_search_normalization.py", "collect_repository_dependency_source.py",
+         "public_catalog_admission.py", "repository_dependency_build_contract.py")
 SOURCE_DOMAINS = {"decisions": ("decisions",), "roadmap": ("roadmap",),
                   "work": ("issues", "pull_requests"), "health": ("checks",),
-                  "journey": ("git", "history"), "releases": ("releases", "deployments")}
+                  "journey": ("git", "history"), "releases": ("releases", "deployments"), "dependencies": ()}
 UNCOLLECTED = {"collection": "uncollected", "freshness": "unknown", "reason": "not_requested", "observed_at": None}
 
 
@@ -127,6 +128,10 @@ def validate(value, repository, source_commit):
             coverage.validate_domains(receipt["coverage"], value["observed_at"])
         elif domain == "releases":
             module("relay_sources_release_receipt", "repository_release_build_contract.py").validate(
+                receipt, repository, source_commit, value["observed_at"])
+            coverage.validate_domains(receipt["coverage"], value["observed_at"])
+        elif domain == "dependencies":
+            module("relay_sources_dependency_receipt", "repository_dependency_build_contract.py").validate(
                 receipt, repository, source_commit, value["observed_at"])
             coverage.validate_domains(receipt["coverage"], value["observed_at"])
         else:

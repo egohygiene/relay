@@ -37,7 +37,8 @@
         "health",
         "journey",
         "releases",
-        null
+        null,
+        "dependencies"
       ]
     },
     "code": {

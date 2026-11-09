@@ -1,0 +1,491 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.io/schemas/observatory/repository-conformance.v1.schema.json",
+  "title": "Bounded public repository conformance query v1",
+  "description": "Proposed alpha.1. Applicability and complete contract inventory remain unknown; assessment covers only supplied current-revision conformance evidence. The standalone owner validator additionally authenticates admission and checks freshness, revision, aggregate and digest consistency.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "contract_version",
+    "visibility",
+    "repository",
+    "represented_commit",
+    "as_of",
+    "admission",
+    "scope",
+    "assessment",
+    "checks",
+    "evidence"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.observatory.repository-conformance/v1"
+    },
+    "contract_version": {
+      "const": "1.0.0-alpha.1"
+    },
+    "visibility": {
+      "const": "public"
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "full_name",
+        "repository_id",
+        "visibility",
+        "source_url"
+      ],
+      "properties": {
+        "full_name": {
+          "type": "string",
+          "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+        },
+        "repository_id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "visibility": {
+          "const": "public"
+        },
+        "source_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://github.com/egohygiene/"
+        }
+      }
+    },
+    "represented_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "owner",
+        "revision",
+        "artifact_path",
+        "artifact_sha256",
+        "schema_sha256",
+        "helper_sha256",
+        "observed_at",
+        "selected_sha256"
+      ],
+      "properties": {
+        "schema": {
+          "const": "egohygiene.relay.public-catalog-admission/v1"
+        },
+        "owner": {
+          "const": "egohygiene/hygiene"
+        },
+        "revision": {
+          "const": "49639c1845cdfd08fbd5a768261a8b3cf515f80f"
+        },
+        "artifact_path": {
+          "const": "catalog/public-repositories.json"
+        },
+        "artifact_sha256": {
+          "const": "af9c7186ded0bb57b18741eaa5905314b96d6adb03736946c868e0fc4aa50b26"
+        },
+        "schema_sha256": {
+          "const": "eeb88b6a99de987500b946bd71c987e1fb7d0bd7350f466885c11ac7603c96d8"
+        },
+        "helper_sha256": {
+          "const": "fd3bb2099f2b9040502f19a8e582e4c4100653bd6cf2ea640cc36338dcfc4273"
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "selected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contracts",
+        "applicability",
+        "contract_inventory"
+      ],
+      "properties": {
+        "contracts": {
+          "const": "supplied-conformance-assessments-only"
+        },
+        "applicability": {
+          "const": "unknown"
+        },
+        "contract_inventory": {
+          "const": "unknown"
+        }
+      }
+    },
+    "assessment": {
+      "$ref": "#/$defs/assessment"
+    },
+    "checks": {
+      "type": "array",
+      "maxItems": 4096,
+      "items": {
+        "$ref": "#/$defs/checkResult"
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "record_count",
+        "checks_sha256",
+        "current_check_count",
+        "other_revision_check_count"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "supplied",
+            "unavailable"
+          ]
+        },
+        "record_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "checks_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "current_check_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "other_revision_check_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        }
+      }
+    }
+  },
+  "$defs": {
+    "checkResult": {
+      "additionalProperties": false,
+      "properties": {
+        "assesses": {
+          "items": {
+            "enum": [
+              "conformance",
+              "maturity"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "contract": {
+          "$ref": "#/$defs/contractReference"
+        },
+        "domain": {
+          "enum": [
+            "lifecycle",
+            "foundation",
+            "identity",
+            "architecture",
+            "automation",
+            "security",
+            "documentation",
+            "releases",
+            "sites",
+            "migration",
+            "dependencies"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "format": "uri",
+            "pattern": "^https?://",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "freshness": {
+          "enum": [
+            "current",
+            "stale"
+          ],
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "key": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "observation": {
+          "additionalProperties": false,
+          "properties": {
+            "observed_at": {
+              "format": "date-time",
+              "pattern": "Z$",
+              "type": "string"
+            },
+            "producer": {
+              "$ref": "#/$defs/producer"
+            },
+            "represented_commit": {
+              "pattern": "^[0-9a-f]{40}$",
+              "type": "string"
+            },
+            "source": {
+              "$ref": "#/$defs/evidenceSource"
+            },
+            "valid_until": {
+              "format": "date-time",
+              "pattern": "Z$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "observed_at",
+            "valid_until",
+            "represented_commit",
+            "producer",
+            "source"
+          ],
+          "type": "object"
+        },
+        "reported_status": {
+          "enum": [
+            "pass",
+            "fail",
+            "partial",
+            "unknown",
+            "blocked",
+            "not_applicable"
+          ],
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "required",
+            "advisory"
+          ],
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "pass",
+            "fail",
+            "partial",
+            "unknown",
+            "blocked",
+            "not_applicable",
+            "stale"
+          ],
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "revision_status": {
+          "enum": [
+            "matched",
+            "different"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "key",
+        "title",
+        "domain",
+        "status",
+        "reported_status",
+        "freshness",
+        "severity",
+        "assesses",
+        "contract",
+        "evidence",
+        "observation",
+        "revision_status"
+      ],
+      "type": "object"
+    },
+    "contractReference": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "url": {
+          "format": "uri",
+          "pattern": "^https?://",
+          "type": "string"
+        },
+        "version": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "url"
+      ],
+      "type": "object"
+    },
+    "evidenceSource": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sha256": {
+          "oneOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "url": {
+          "format": "uri",
+          "pattern": "^https?://",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "url",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "assessment": {
+      "additionalProperties": false,
+      "properties": {
+        "check_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "counts": {
+          "additionalProperties": false,
+          "properties": {
+            "blocked": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "fail": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "not_applicable": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "partial": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "pass": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "stale": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "unknown": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "pass",
+            "fail",
+            "partial",
+            "unknown",
+            "blocked",
+            "not_applicable",
+            "stale"
+          ],
+          "type": "object"
+        },
+        "reason": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "rule": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "status": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "reason",
+        "rule",
+        "counts",
+        "check_ids"
+      ],
+      "type": "object"
+    },
+    "producer": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "url": {
+          "format": "uri",
+          "pattern": "^https?://",
+          "type": "string"
+        },
+        "version": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "url"
+      ],
+      "type": "object"
+    }
+  }
+}

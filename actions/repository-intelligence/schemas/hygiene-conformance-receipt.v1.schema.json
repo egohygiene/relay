@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.io/schemas/relay/hygiene-conformance-receipt.v1.schema.json",
+  "title": "Bounded Hygiene conformance input binding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "repository",
+    "source_commit",
+    "as_of",
+    "owner",
+    "input_sha256",
+    "model_sha256",
+    "implementation",
+    "freshness",
+    "assessment_status",
+    "applicability",
+    "contract_inventory",
+    "checks",
+    "current_checks",
+    "other_revision_checks"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.relay.hygiene-conformance-receipt/v1"
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+    },
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "as_of": {
+      "type": "string",
+      "pattern": "Z$",
+      "format": "date-time"
+    },
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "revision",
+        "schema",
+        "contract_version"
+      ],
+      "properties": {
+        "repository": {
+          "const": "egohygiene/observatory"
+        },
+        "revision": {
+          "const": "a1884942e953bb371499b2822b52f6865ecdae9d"
+        },
+        "schema": {
+          "const": "egohygiene.observatory.repository-conformance/v1"
+        },
+        "contract_version": {
+          "const": "1.0.0-alpha.1"
+        }
+      }
+    },
+    "input_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "model_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "renderer_sha256",
+        "lock_sha256"
+      ],
+      "properties": {
+        "renderer_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "lock_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "freshness": {
+      "enum": [
+        "current",
+        "stale",
+        "unknown"
+      ]
+    },
+    "assessment_status": {
+      "enum": [
+        "conformant",
+        "non_conformant",
+        "blocked",
+        "stale",
+        "unknown",
+        "partial",
+        "not_applicable"
+      ]
+    },
+    "applicability": {
+      "const": "unknown"
+    },
+    "contract_inventory": {
+      "const": "unknown"
+    },
+    "checks": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4096
+    },
+    "current_checks": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4096
+    },
+    "other_revision_checks": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4096
+    }
+  },
+  "$comment": "Trusted validate_receipt additionally checks exact owner/implementation bytes, row-count consistency and clock/repository equality. validate_page checks exact model bindings in the real shared page."
+}

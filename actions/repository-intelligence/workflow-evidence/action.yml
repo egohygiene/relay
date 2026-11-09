@@ -74,6 +74,10 @@ inputs:
     description: Opt in to canonical public Roadmap source collection.
     required: false
     default: "false"
+  collect-dependencies:
+    description: Collect admitted public declared dependency source evidence.
+    required: false
+    default: "false"
   collect-journey:
     description: Collect bounded immutable public Git Journey evidence; cross-domain history stays partial.
     required: false
@@ -124,6 +128,10 @@ inputs:
     default: "[]"
   observatory-snapshot:
     description: "Optional Observatory snapshot path."
+    required: false
+    default: ""
+  observatory-hygiene:
+    description: Optional public Observatory conformance model; requires explicit as-of.
     required: false
     default: ""
   observatory-comparison:
@@ -237,6 +245,7 @@ runs:
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
         INPUT_COLLECT_ROADMAP: "${{ inputs.collect-roadmap }}"
         INPUT_COLLECT_JOURNEY: "${{ inputs.collect-journey }}"
+        INPUT_COLLECT_DEPENDENCIES: "${{ inputs.collect-dependencies }}"
         INPUT_SEARCH_ATTRIBUTION: "${{ inputs.search-attribution }}"
         INPUT_JOURNEY_MAXIMUM_COMMITS: "${{ inputs.journey-maximum-commits }}"
         INPUT_JOURNEY_SINCE: "${{ inputs.journey-since }}"
@@ -256,6 +265,7 @@ runs:
         INPUT_MAX_DEPTH: "${{ inputs.max-depth }}"
         INPUT_OBSERVATORY_COMPARISON: "${{ inputs.observatory-comparison }}"
         INPUT_OBSERVATORY_SNAPSHOT: "${{ inputs.observatory-snapshot }}"
+        INPUT_OBSERVATORY_HYGIENE: "${{ inputs.observatory-hygiene }}"
         INPUT_OPERATION: "${{ inputs.operation }}"
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
         INPUT_PREFLIGHT_OUTCOME: "${{ inputs.preflight-outcome }}"
@@ -297,6 +307,7 @@ runs:
           --collect-adrs="${INPUT_COLLECT_ADRS}" \
           --collect-roadmap="${INPUT_COLLECT_ROADMAP}" \
           --collect-journey="${INPUT_COLLECT_JOURNEY}" \
+          --collect-dependencies="${INPUT_COLLECT_DEPENDENCIES}" \
           --search-attribution="${INPUT_SEARCH_ATTRIBUTION}" \
           --journey-maximum-commits="${INPUT_JOURNEY_MAXIMUM_COMMITS}" \
           --journey-since="${INPUT_JOURNEY_SINCE}" \
@@ -310,6 +321,7 @@ runs:
           --adr-known-external-decisions="${INPUT_ADR_KNOWN_EXTERNAL_DECISIONS}" \
           --observatory-snapshot="${INPUT_OBSERVATORY_SNAPSHOT}" \
           --observatory-comparison="${INPUT_OBSERVATORY_COMPARISON}" \
+          --observatory-hygiene="${INPUT_OBSERVATORY_HYGIENE}" \
           --default-branch="${INPUT_DEFAULT_BRANCH}" \
           --activity-since="${INPUT_ACTIVITY_SINCE}" \
           --max-depth="${INPUT_MAX_DEPTH}" \
