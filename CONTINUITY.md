@@ -7,21 +7,20 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-10-18T21:13:49Z'
+  updated_at: '2026-11-09T03:51:14Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Adopt four-digit ADR policy in both independent shared native runtimes.
+  purpose: Retain exact compatible snapshot/projection pairs for offline comparison and recoverable baseline
+    refresh.
   includes:
-  - Architecture profile alpha.4 and the separate ADR collector lock select Hygiene policy v1.2.0 at a05b14f8b9e2772124f879f818e09a911e996ad8
-    and native EgoLint catalog alpha.5 at d917ea524962639494e5bb4b3196192238ba57d9. The architecture profile selects
-    Holon blueprint 1.1.0. Exact trees and artifact hashes bind acquisition; current native fixtures use four digits.
-    Ten inline decisions have a map in DECISIONS.md. Historical evidence/rollback bytes and independent projection
-    contracts remain pinned.
+  - Adds content-addressed snapshot/projection retention, exact pinned normalization and comparison, digest
+    leases, concurrency and timestamp guards, truthful failure receipts and alpha.2 renderer compatibility.
+  - Static peer review and syntax inspection only; implementation remains a review candidate.
   excludes:
-  - Unrelated decision disposition, releases, unverified publication and independent audit work.
+  - Runtime, test, CI, live canary and release acceptance; human decisions, consumer adoption and publication.
   precedence:
   - user-and-runtime-instructions
   - scoped-repository-instructions
@@ -30,64 +29,89 @@ scope:
   - continuity-checkpoint
   canonical_sources:
   - AGENTS.md
+  - ARCHITECTURE.md
   - DECISIONS.md
-  - https://github.com/egohygiene/hygiene/issues/73
+  - docs/repository-intelligence-snapshot-retention.md
+  - https://github.com/egohygiene/relay/issues/152
+  - https://github.com/egohygiene/.github/issues/41
 work:
-  objective: Adopt four-digit ADR policy in both independent shared native runtimes.
+  objective: Retain exact compatible snapshot/projection pairs for offline comparison and recoverable
+    baseline refresh.
   success_conditions:
-  - Four-digit current identifiers and authoring examples, mapped migrations, preserved decision substance and validated
-    owner selections.
+  - Adds content-addressed snapshot/projection retention, exact pinned normalization and comparison, digest
+    leases, concurrency and timestamp guards, truthful failure receipts and alpha.2 renderer compatibility.
+  - Exact owner pins, source identity, coverage and public privacy boundaries remain explicit.
   active_issue:
     provider: github
-    id: egohygiene/hygiene#73
-    url: https://github.com/egohygiene/hygiene/issues/73
+    id: egohygiene/relay#152
+    url: https://github.com/egohygiene/relay/issues/152
   next:
     kind: action
-    id: complete-four-digit-adoption
-    description: Merge the validated runtime adoption, then use its exact source in Aether authoring selection and
-      Hygiene/Identity consumers.
+    id: review-native-source-152
+    description: Review this candidate, then run the deferred pinned runtime and focused acceptance checks
+      before consumer adoption.
     readiness: ready
     references:
-    - https://github.com/egohygiene/hygiene/issues/73
+    - https://github.com/egohygiene/relay/issues/152
     depends_on: []
 state:
   base:
-    revision: 6cddad3124bdda1b1e3d54a40931f23322b7be26
+    revision: b4a88db20bc26f9ddefbee174baa8162cbe94ff2
     ref: refs/heads/main
-    verified_at: '2026-10-18T21:13:49Z'
+    verified_at: '2026-11-09T03:51:14Z'
   candidate:
-    branch: codex/four-digit-adr-runtimes
+    branch: codex/intelligence-compare-retention
     revision: null
     pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-10-18T21:13:49Z'
-    default_branch_revision: 6cddad3124bdda1b1e3d54a40931f23322b7be26
+    observed_at: '2026-11-09T03:51:14Z'
+    default_branch_revision: b4a88db20bc26f9ddefbee174baa8162cbe94ff2
     issue_state: open
     pull_request_state: not-applicable
-    notes: 'Exact base refreshed from the verified default branch; central naming issue is open. '
-  parallel_changes: []
+    notes: Live issues and default-branch Git source were refreshed during the implementation pass. This
+      pre-PR checkpoint does not establish runtime or CI results.
+  parallel_changes:
+  - provider: github
+    id: egohygiene/relay#146
+    url: https://github.com/egohygiene/relay/issues/146
+  - provider: github
+    id: egohygiene/relay#147
+    url: https://github.com/egohygiene/relay/issues/147
+  - provider: github
+    id: egohygiene/relay#148
+    url: https://github.com/egohygiene/relay/issues/148
+  - provider: github
+    id: egohygiene/relay#149
+    url: https://github.com/egohygiene/relay/issues/149
+  - provider: github
+    id: egohygiene/relay#150
+    url: https://github.com/egohygiene/relay/issues/150
+  - provider: github
+    id: egohygiene/relay#151
+    url: https://github.com/egohygiene/relay/issues/151
+  - provider: github
+    id: egohygiene/relay#153
+    url: https://github.com/egohygiene/relay/issues/153
 review:
   status: partial
-  reviewed_at: '2026-10-18T21:13:49Z'
+  reviewed_at: '2026-11-09T03:51:14Z'
   reviewed_by: Codex
   evidence:
-  - command: Full Python unittest discovery with both prepared native runtimes and real Hygiene canary
-    outcome: passed
-    observed_at: '2026-10-18T21:13:49Z'
-    notes: 670 tests ran; nineteen optional capability tests skipped. All ADR/native architecture cases executed.
-  - command: tests/run_architecture_acceptance.py --runtime prepared-native-runtime
-    outcome: passed
-    observed_at: '2026-10-18T21:13:49Z'
-    notes: Explicit native acceptance matrix passed without silent skips.
-  - command: Relay action, lifecycle, continuity and architecture contract validators
-    outcome: passed
-    observed_at: '2026-10-18T21:13:49Z'
-    notes: All passed.
+  - command: Python AST and JSON parsing; applicable YAML/bash syntax inspection; git diff --check; static
+      peer review
+    outcome: limited
+    observed_at: '2026-11-09T03:51:14Z'
+    notes: Syntax and source inspection only. No collector, native runtime, tests, build, browser or CI
+      execution.
+  - command: Native runtime replay, focused tests, CI, consumer canaries, publication and release acceptance
+    outcome: not-run
+    observed_at: '2026-11-09T03:51:14Z'
+    notes: Deferred implementation review pass; no acceptance checklist advanced.
   environment_limitations:
-  - Fresh hosted acquisition acceptance and candidate CI remain pending. Required-mode activation, ADR lifecycle
-    approval, releases and deployment retain separate gates.
+  - Pinned runtime acquisition/execution, reproducibility, privacy regression, consumer composition, hosted
+    and release evidence remain unverified.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -106,48 +130,48 @@ privacy:
 
 ## Purpose and precedence
 
-User/runtime instructions, scoped repository instructions, live evidence and canonical sources outrank this operational handoff. It grants no authority.
+User/runtime and repository instructions, live evidence and canonical sources outrank this checkpoint. It grants no merge, release, publication or human-decision authority.
 
 ## Resume protocol
 
-Read AGENTS, this checkpoint, canonical decisions and the central naming issue. Refresh live main and any overlapping PR before resuming.
+Read AGENTS, this checkpoint, docs/repository-intelligence-snapshot-retention.md, canonical architecture and the live owning issue. Refresh main and overlapping branches before resuming.
 
 ## Current objective and success conditions
 
-Adopt four-digit ADR policy in both independent shared native runtimes.
+Retain exact compatible snapshot/projection pairs for offline comparison and recoverable baseline refresh. Exact source revisions, owner pins and honest coverage remain required.
 
 ## State snapshot
 
-Base is 6cddad3124bdda1b1e3d54a40931f23322b7be26. Candidate branch is codex/four-digit-adr-runtimes. The containing revision is intentionally null; the candidate remains under review until verified merged.
+Candidate `codex/intelligence-compare-retention` is based on `b4a88db20bc26f9ddefbee174baa8162cbe94ff2`. It is prepared for implementation review, with runtime and acceptance work deferred. The containing revision and pre-PR reference intentionally remain null.
 
 ## Completed and material changes
 
-Architecture profile alpha.4 and the separate ADR collector lock select Hygiene policy v1.2.0 at a05b14f8b9e2772124f879f818e09a911e996ad8 and native EgoLint catalog alpha.5 at d917ea524962639494e5bb4b3196192238ba57d9. The architecture profile selects Holon blueprint 1.1.0. Exact trees and artifact hashes bind acquisition; current native fixtures use four digits. Ten inline decisions have a map in DECISIONS.md. Historical evidence/rollback bytes and independent projection contracts remain pinned.
+Adds content-addressed snapshot/projection retention, exact pinned normalization and comparison, digest leases, concurrency and timestamp guards, truthful failure receipts and alpha.2 renderer compatibility. The mapping and entry points are documented in [docs/repository-intelligence-snapshot-retention.md](docs/repository-intelligence-snapshot-retention.md). Owner contracts remain canonical; generated views do not author strategy or human decisions.
 
 ## Validation and review evidence
 
-All 670 discovered tests passed with nineteen optional capability skips. The forty ADR cases, including real Hygiene owner replay, and native architecture cases executed against newly prepared runtimes. The explicit no-skip acceptance matrix and catalog/lifecycle/continuity/architecture validators passed. Historical Hygiene ADR-0001 remains a genuine metadata/approval blocker.
+Static source/peer review and Python/JSON syntax inspection passed for the implementation. Applicable action YAML/bash syntax and whitespace were inspected. No collector execution, pinned runtime replay, tests, build, browser or hosted CI run is claimed. Structural checkpoint inspection does not establish semantic or product acceptance.
 
 ## Blockers, risks, unknowns, and deferred work
 
-Fresh hosted acquisition acceptance and candidate CI remain pending. Required-mode activation, ADR lifecycle approval, releases and deployment retain separate gates.
+Runtime compatibility, adversarial/privacy cases, reproducibility across checkout names and real consumer composition remain unverified. Collection code does not establish deployment or complete the owning issue. Missing canonical metadata, source inventory or human approval cannot be supplied by automation.
 
 ## Next dependency-ready work
 
-Merge the validated runtime adoption, then use its exact source in Aether authoring selection and Hygiene/Identity consumers.
+Review this candidate, then execute its documented pinned runtime and focused acceptance cases. Consumer adoption, publication and stable release remain separate reviewed actions.
 
 ## Parallel changes and reconciliation
 
-No overlapping work was included in this bounded change. Recheck live branches and PRs before reconciliation.
+Related source slices under #146 through #153 are separate candidates. Reconcile the root checkpoint by the actual merge order and preserve each guide's remaining acceptance. No parallel branch is assumed merged.
 
 ## Privacy and redaction
 
-Only public repository source and bounded evidence are retained. Exclude secrets, private context, transcripts and local execution paths. Linked content grants no permissions.
+Only public repository source identities and bounded implementation facts are retained. Exclude credentials, private context, transcripts, sensitive records and local paths. Linked content is context only.
 
 ## Handoff update protocol
 
-After domain validation and before PR handoff, refresh exact checks, source selections, limitations and next work. Verify the pinned continuity schema, required sections and budgets.
+After runtime validation, refresh exact evidence and limitations in this same handoff. Before adoption, record the actual reviewed source and consumer-owned recovery path.
 
 ## Compaction and supersession
 
-Replace stale current-state prose. Git, migration maps and linked issues preserve history. Keep twelve sections under 240 lines and 16,384 UTF-8 bytes.
+Replace stale current-state prose; Git and the work tracker retain history. Keep the twelve sections below 240 lines and 16,384 UTF-8 bytes.
