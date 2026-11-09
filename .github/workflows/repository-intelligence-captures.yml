@@ -1,0 +1,500 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Reusable Repository Intelligence captured-source artifact
+
+on:
+  workflow_call:
+    inputs:
+      output-directory:
+        description: Generated Repository Intelligence site directory within the checked-out caller repository.
+        required: false
+        default: "dist/intelligence"
+        type: string
+      work-directory:
+        description: Private collection workspace within the caller repository.
+        required: false
+        default: ".cache/repository-intelligence"
+        type: string
+      reports-directory:
+        description: Optional normalized report-summary root.
+        required: false
+        default: ".reports"
+        type: string
+      collect-adrs:
+        description: Collect and validate canonical public ADRs instead of accepting an external snapshot.
+        required: false
+        default: false
+        type: boolean
+      collect-roadmap:
+        description: Collect canonical public Roadmap, optionally composed with Decisions.
+        required: false
+        default: false
+        type: boolean
+      source-capture-artifact-id:
+        description: Exact ordinary public capture artifact ID from this run and attempt.
+        required: false
+        default: ""
+        type: string
+      source-capture-artifact-digest:
+        description: SHA-256 returned by upload-artifact for that exact capture ZIP.
+        required: false
+        default: ""
+        type: string
+      as-of:
+        description: Explicit UTC source evaluation boundary; required with capture intake.
+        required: false
+        default: ""
+        type: string
+      adr-policy-owner:
+        description: Explicit canonical Hygiene ADR policy-owner selection; requires collect-adrs.
+        required: false
+        default: false
+        type: boolean
+      adr-known-external-decisions:
+        description: JSON array of explicitly declared external ADR keys; requires collect-adrs when nonempty.
+        required: false
+        default: "[]"
+        type: string
+      observatory-snapshot:
+        description: Optional public-safe Observatory read model for the represented commit.
+        required: false
+        default: ""
+        type: string
+      observatory-comparison:
+        description: Optional public-safe Observatory comparison whose after boundary matches the snapshot and represented commit.
+        required: false
+        default: ""
+        type: string
+      default-branch:
+        description: Optional caller default-branch override.
+        required: false
+        default: ""
+        type: string
+      activity-since:
+        description: Deterministic Git history window.
+        required: false
+        default: "1 year ago"
+        type: string
+      max-depth:
+        description: Maximum repository tree depth.
+        required: false
+        default: "10"
+        type: string
+      artifact-retention-days:
+        description: Retention from 1 through 90 days for the generated public dashboard artifact; run evidence is fixed at 30 days.
+        required: false
+        default: 30
+        type: number
+    outputs:
+      artifact-name:
+        description: Name of the uploaded dashboard artifact.
+        value: "${{ jobs.generate.outputs.artifact-name }}"
+      artifact-digest:
+        description: SHA-256 digest reported for the uploaded dashboard artifact.
+        value: "${{ jobs.generate.outputs.artifact-digest }}"
+      build-manifest-sha256:
+        description: Tagged SHA-256 digest of the deterministic build manifest inside the site artifact.
+        value: "${{ jobs.generate.outputs.build-manifest-sha256 }}"
+      bundle-digest:
+        description: Deterministic digest of the Repository Intelligence payload inventory.
+        value: "${{ jobs.generate.outputs.bundle-digest }}"
+      report-artifact-name:
+        description: Name of the preserved sanitized run-report artifact.
+        value: "${{ jobs.generate.outputs.report-artifact-name }}"
+      report-artifact-digest:
+        description: SHA-256 digest reported for the run-report artifact.
+        value: "${{ jobs.generate.outputs.report-artifact-digest }}"
+      report-manifest-sha256:
+        description: SHA-256 of the exact run-report manifest.
+        value: "${{ jobs.generate.outputs.report-manifest-sha256 }}"
+  workflow_dispatch:
+    inputs:
+      output-directory:
+        description: Generated Repository Intelligence site directory.
+        required: true
+        default: "dist/intelligence"
+        type: string
+      work-directory:
+        description: Private collection workspace.
+        required: true
+        default: ".cache/repository-intelligence"
+        type: string
+      reports-directory:
+        description: Optional normalized report-summary root.
+        required: true
+        default: ".reports"
+        type: string
+      collect-adrs:
+        description: Collect and validate canonical public ADRs instead of accepting an external snapshot.
+        required: false
+        default: false
+        type: boolean
+      collect-roadmap:
+        description: Collect canonical public Roadmap, optionally composed with Decisions.
+        required: false
+        default: false
+        type: boolean
+      source-capture-artifact-id:
+        description: Exact ordinary public capture artifact ID from this run and attempt.
+        required: false
+        default: ""
+        type: string
+      source-capture-artifact-digest:
+        description: SHA-256 returned by upload-artifact for that exact capture ZIP.
+        required: false
+        default: ""
+        type: string
+      as-of:
+        description: Explicit UTC source evaluation boundary; required with capture intake.
+        required: false
+        default: ""
+        type: string
+      adr-policy-owner:
+        description: Explicit canonical Hygiene ADR policy-owner selection; requires collect-adrs.
+        required: false
+        default: false
+        type: boolean
+      adr-known-external-decisions:
+        description: JSON array of explicitly declared external ADR keys; requires collect-adrs when nonempty.
+        required: false
+        default: "[]"
+        type: string
+      observatory-snapshot:
+        description: Optional public-safe Observatory read model for the represented commit.
+        required: false
+        default: ""
+        type: string
+      observatory-comparison:
+        description: Optional public-safe Observatory comparison whose after boundary matches the snapshot and represented commit.
+        required: false
+        default: ""
+        type: string
+      default-branch:
+        description: Optional repository default-branch override.
+        required: false
+        default: ""
+        type: string
+      activity-since:
+        description: Deterministic Git history window.
+        required: true
+        default: "1 year ago"
+        type: string
+      max-depth:
+        description: Maximum repository tree depth.
+        required: true
+        default: "10"
+        type: string
+      artifact-retention-days:
+        description: Site artifact retention from 1 through 90 days; run evidence is fixed at 30 days.
+        required: true
+        default: 30
+        type: number
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: "relay-intelligence-v1-${{ github.repository }}-${{ github.workflow_ref }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    name: Generate Repository Intelligence site artifact
+    # ADR wheel hashes target CPython 3.12 / Linux x86_64.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      artifact-name: "${{ steps.finalize.outputs.artifact-name }}"
+      artifact-digest: "${{ steps.site.outputs.artifact-digest }}"
+      build-manifest-sha256: "${{ steps.generation.outputs.build-manifest-sha256 }}"
+      bundle-digest: "${{ steps.generation.outputs.bundle-digest }}"
+      report-artifact-name: "${{ steps.preserve.outputs.artifact-name }}"
+      report-artifact-digest: "${{ steps.preserve.outputs.artifact-digest }}"
+      report-manifest-sha256: "${{ steps.preserve.outputs.manifest-sha256 }}"
+
+    steps:
+      - name: Harden runner
+        id: harden
+        continue-on-error: true
+        # step-security/harden-runner v2.21.0
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c
+        with:
+          egress-policy: audit
+
+      - name: Validate event trust and bounded inputs
+        id: preflight
+        if: "${{ steps.harden.outcome == 'success' }}"
+        continue-on-error: true
+        uses: $/actions/repository-intelligence/workflow-evidence
+        with:
+          operation: prepare
+          repository: "${{ github.repository }}"
+          repository-id: "${{ github.repository_id }}"
+          represented-revision: "${{ github.sha }}"
+          run-id: "${{ github.run_id }}"
+          run-attempt: "${{ github.run_attempt }}"
+          event-name: "${{ github.event_name }}"
+          ref: "${{ github.ref }}"
+          event-default-branch: "${{ github.event.repository.default_branch }}"
+          pull-request-head-repository: "${{ github.event.pull_request.head.repo.full_name }}"
+          caller-workflow-ref: "${{ github.workflow_ref }}"
+          called-workflow-ref: "${{ job.workflow_ref }}"
+          called-workflow-repository: "${{ job.workflow_repository }}"
+          called-workflow-revision: "${{ job.workflow_sha }}"
+          output-directory: "${{ inputs.output-directory }}"
+          work-directory: "${{ inputs.work-directory }}"
+          reports-directory: "${{ inputs.reports-directory }}"
+          collect-adrs: "${{ inputs.collect-adrs }}"
+          collect-roadmap: "${{ inputs.collect-roadmap }}"
+          source-capture-artifact-id: "${{ inputs.source-capture-artifact-id }}"
+          source-capture-artifact-digest: "${{ inputs.source-capture-artifact-digest }}"
+          as-of: "${{ inputs.as-of }}"
+          adr-policy-owner: "${{ inputs.adr-policy-owner }}"
+          adr-known-external-decisions: "${{ inputs.adr-known-external-decisions }}"
+          observatory-snapshot: "${{ inputs.observatory-snapshot }}"
+          observatory-comparison: "${{ inputs.observatory-comparison }}"
+          default-branch: "${{ inputs.default-branch }}"
+          activity-since: "${{ inputs.activity-since }}"
+          max-depth: "${{ inputs.max-depth }}"
+          artifact-retention-days: "${{ inputs.artifact-retention-days }}"
+
+      - name: Checkout caller repository with complete history
+        id: checkout
+        if: >-
+          ${{ steps.harden.outcome == 'success' &&
+          steps.preflight.outcome == 'success' }}
+        continue-on-error: true
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: "${{ github.sha }}"
+          fetch-depth: 0
+          persist-credentials: false
+          clean: true
+          lfs: false
+          submodules: false
+
+      - name: Generate Repository Intelligence site
+        id: generation
+        if: >-
+          ${{ steps.harden.outcome == 'success' &&
+          steps.preflight.outcome == 'success' &&
+          steps.checkout.outcome == 'success' }}
+        continue-on-error: true
+        uses: $/actions/repository-intelligence
+        with:
+          output-directory: "${{ inputs.output-directory }}"
+          work-directory: "${{ inputs.work-directory }}"
+          reports-directory: "${{ inputs.reports-directory }}"
+          collect-adrs: "${{ inputs.collect-adrs }}"
+          collect-roadmap: "${{ inputs.collect-roadmap }}"
+          source-capture-artifact-id: "${{ inputs.source-capture-artifact-id }}"
+          source-capture-artifact-digest: "${{ inputs.source-capture-artifact-digest }}"
+          as-of: "${{ inputs.as-of }}"
+          adr-policy-owner: "${{ inputs.adr-policy-owner }}"
+          adr-known-external-decisions: "${{ inputs.adr-known-external-decisions }}"
+          observatory-snapshot: "${{ inputs.observatory-snapshot }}"
+          observatory-comparison: "${{ inputs.observatory-comparison }}"
+          repository: "${{ github.repository }}"
+          default-branch: "${{ inputs.default-branch }}"
+          source-commit: "${{ github.sha }}"
+          activity-since: "${{ inputs.activity-since }}"
+          max-depth: "${{ inputs.max-depth }}"
+          require-full-history: "true"
+
+      - name: Verify reusable-workflow generator provenance
+        id: provenance
+        if: "${{ steps.generation.outcome == 'success' }}"
+        continue-on-error: true
+        shell: bash
+        env:
+          EXPECTED_WORKFLOW_REF: "${{ job.workflow_ref }}"
+          EXPECTED_WORKFLOW_REPOSITORY: "${{ job.workflow_repository }}"
+          EXPECTED_WORKFLOW_SHA: "${{ job.workflow_sha }}"
+          PROVENANCE_PATH: "${{ inputs.output-directory }}/provenance.json"
+          CAPTURE_REQUEST_ID: "${{ inputs.source-capture-artifact-id }}"
+          CAPTURE_REQUEST_DIGEST: "${{ inputs.source-capture-artifact-digest }}"
+          CAPTURE_RECEIPT_PATH: "${{ steps.generation.outputs.capture-intake-receipt }}"
+          CAPTURE_RECEIPT_DIGEST: "${{ steps.generation.outputs.capture-intake-receipt-sha256 }}"
+          CAPTURE_AS_OF: "${{ inputs.as-of }}"
+          CAPTURE_REPOSITORY: "${{ github.repository }}"
+          CAPTURE_REPOSITORY_ID: "${{ github.repository_id }}"
+          CAPTURE_SOURCE_COMMIT: "${{ github.sha }}"
+          CAPTURE_RUN_ID: "${{ github.run_id }}"
+          CAPTURE_RUN_ATTEMPT: "${{ github.run_attempt }}"
+        run: |
+          set -euo pipefail
+          python3 -I - "${PROVENANCE_PATH}" <<'PYTHON'
+          import json
+          import os
+          from pathlib import Path
+          import re
+          import sys
+
+          provenance = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          generator = provenance["generator"]
+          expected_ref = os.environ["EXPECTED_WORKFLOW_REF"]
+          expected_repository = os.environ["EXPECTED_WORKFLOW_REPOSITORY"]
+          expected_sha = os.environ["EXPECTED_WORKFLOW_SHA"]
+          immutable = re.search(r"@([0-9a-f]{40})$", expected_ref)
+          if generator != {
+              "name": "egohygiene/relay/actions/repository-intelligence",
+              "version": generator["version"],
+              "repository": expected_repository,
+              "source_ref": expected_ref,
+              "source_commit": expected_sha,
+              "immutable": bool(immutable and immutable.group(1) == expected_sha),
+          }:
+              raise SystemExit("Reusable-workflow generator provenance is inconsistent")
+          if os.environ["CAPTURE_REQUEST_ID"]:
+              import hashlib
+              raw_path = os.environ["CAPTURE_RECEIPT_PATH"]
+              path = Path(raw_path).absolute() if raw_path else None
+              root = Path(os.environ["RUNNER_TEMP"]).resolve(strict=True)
+              if (path is None or ".." in path.parts or not path.is_relative_to(root)
+                      or not path.parent.name.startswith("relay-capture-intake-")
+                      or any(item.is_symlink() for item in (path, *path.parents))
+                      or not path.resolve(strict=True).is_relative_to(root)
+                      or not path.is_file() or path.stat().st_size > 65536):
+                  raise SystemExit("Capture admission receipt unavailable")
+              raw = path.read_bytes()
+              if hashlib.sha256(raw).hexdigest() != os.environ["CAPTURE_RECEIPT_DIGEST"]:
+                  raise SystemExit("Capture admission receipt digest mismatch")
+              receipt = json.loads(raw)
+              if (receipt["schema"] != "egohygiene.relay.source-capture-intake/v1"
+                      or receipt["repository"] != os.environ["CAPTURE_REPOSITORY"]
+                      or receipt["repository_id"] != int(os.environ["CAPTURE_REPOSITORY_ID"])
+                      or receipt["source_commit"] != os.environ["CAPTURE_SOURCE_COMMIT"]
+                      or receipt["run_id"] != int(os.environ["CAPTURE_RUN_ID"])
+                      or receipt["run_attempt"] != int(os.environ["CAPTURE_RUN_ATTEMPT"])
+                      or receipt["observed_at"] != os.environ["CAPTURE_AS_OF"]
+                      or receipt["artifact"]["id"] != int(os.environ["CAPTURE_REQUEST_ID"])
+                      or receipt["artifact"]["sha256"] != os.environ["CAPTURE_REQUEST_DIGEST"].removeprefix("sha256:")
+                      or receipt["plan_sha256"] != provenance["source_collection"]["input_plan_sha256"]):
+                  raise SystemExit("Capture admission receipt source binding mismatch")
+          PYTHON
+
+      - name: Upload generated Repository Intelligence site artifact
+        id: site
+        if: "${{ steps.provenance.outcome == 'success' }}"
+        continue-on-error: true
+        # actions/upload-artifact v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: "${{ steps.preflight.outputs.artifact-name }}"
+          path: "${{ inputs.output-directory }}"
+          if-no-files-found: error
+          retention-days: "${{ steps.preflight.outputs.site-retention-days }}"
+          compression-level: 9
+
+      - name: Write sanitized Repository Intelligence run report
+        id: finalize
+        if: "${{ always() }}"
+        continue-on-error: true
+        uses: $/actions/repository-intelligence/workflow-evidence
+        with:
+          operation: finalize
+          repository: "${{ github.repository }}"
+          repository-id: "${{ github.repository_id }}"
+          represented-revision: "${{ github.sha }}"
+          run-id: "${{ github.run_id }}"
+          run-attempt: "${{ github.run_attempt }}"
+          event-name: "${{ github.event_name }}"
+          ref: "${{ github.ref }}"
+          event-default-branch: "${{ github.event.repository.default_branch }}"
+          pull-request-head-repository: "${{ github.event.pull_request.head.repo.full_name }}"
+          caller-workflow-ref: "${{ github.workflow_ref }}"
+          called-workflow-ref: "${{ job.workflow_ref }}"
+          called-workflow-repository: "${{ job.workflow_repository }}"
+          called-workflow-revision: "${{ job.workflow_sha }}"
+          output-directory: "${{ inputs.output-directory }}"
+          work-directory: "${{ inputs.work-directory }}"
+          reports-directory: "${{ inputs.reports-directory }}"
+          collect-adrs: "${{ inputs.collect-adrs }}"
+          collect-roadmap: "${{ inputs.collect-roadmap }}"
+          source-capture-artifact-id: "${{ inputs.source-capture-artifact-id }}"
+          source-capture-artifact-digest: "${{ inputs.source-capture-artifact-digest }}"
+          as-of: "${{ inputs.as-of }}"
+          adr-policy-owner: "${{ inputs.adr-policy-owner }}"
+          adr-known-external-decisions: "${{ inputs.adr-known-external-decisions }}"
+          observatory-snapshot: "${{ inputs.observatory-snapshot }}"
+          observatory-comparison: "${{ inputs.observatory-comparison }}"
+          default-branch: "${{ inputs.default-branch }}"
+          activity-since: "${{ inputs.activity-since }}"
+          max-depth: "${{ inputs.max-depth }}"
+          artifact-retention-days: "${{ inputs.artifact-retention-days }}"
+          hardening-outcome: "${{ steps.harden.outcome }}"
+          preflight-outcome: "${{ steps.preflight.outcome }}"
+          checkout-outcome: "${{ steps.checkout.outcome }}"
+          generation-outcome: "${{ steps.generation.outcome }}"
+          provenance-outcome: "${{ steps.provenance.outcome }}"
+          site-upload-outcome: "${{ steps.site.outcome }}"
+          site-artifact-digest: "${{ steps.site.outputs.artifact-digest }}"
+          capture-intake-receipt: "${{ steps.generation.outputs.capture-intake-receipt }}"
+          capture-intake-receipt-sha256: "${{ steps.generation.outputs.capture-intake-receipt-sha256 }}"
+
+      - name: Preserve sanitized Repository Intelligence run report
+        id: preserve
+        if: "${{ always() && steps.finalize.outcome == 'success' }}"
+        continue-on-error: true
+        uses: $/actions/preserve-ci-report
+        with:
+          producer: repository-intelligence-v1
+          outcome: "${{ steps.finalize.outputs.workflow-outcome }}"
+          source-directory: "${{ steps.finalize.outputs.report-directory }}"
+          retention-days: 30
+          maximum-files: 2
+          maximum-bytes: 65536
+
+      - name: Summarize Repository Intelligence evidence
+        if: "${{ always() }}"
+        shell: bash
+        env:
+          ERROR_CODE: "${{ steps.finalize.outputs.error-code }}"
+          FAILED_STAGE: "${{ steps.finalize.outputs.failed-stage }}"
+          REPORT_ARTIFACT: "${{ steps.preserve.outputs.artifact-name }}"
+          REPORT_DIGEST: "${{ steps.preserve.outputs.artifact-digest }}"
+          SITE_ARTIFACT: "${{ steps.finalize.outputs.artifact-name }}"
+          SITE_DIGEST: "${{ steps.site.outputs.artifact-digest }}"
+          WORKFLOW_OUTCOME: "${{ steps.finalize.outputs.workflow-outcome }}"
+        run: |
+          set -euo pipefail
+          {
+            printf '## Repository Intelligence workflow evidence\n\n'
+            printf -- '- Outcome: `%s`\n' "${WORKFLOW_OUTCOME:-unavailable}"
+            printf -- '- Failed stage: `%s`\n' "${FAILED_STAGE:-none}"
+            printf -- '- Stable code: `%s`\n' "${ERROR_CODE:-RIW-INTERNAL-ERROR}"
+            printf -- '- Site artifact: `%s`\n' "${SITE_ARTIFACT:-not-uploaded}"
+            printf -- '- Site artifact digest: `%s`\n' "${SITE_DIGEST:-unavailable}"
+            printf -- '- Run-report artifact: `%s`\n' "${REPORT_ARTIFACT:-unavailable}"
+            printf -- '- Run-report artifact digest: `%s`\n' "${REPORT_DIGEST:-unavailable}"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Reassert Repository Intelligence result after evidence preservation
+        if: "${{ always() }}"
+        shell: bash
+        env:
+          FINALIZE_OUTCOME: "${{ steps.finalize.outcome }}"
+          PRESERVE_OUTCOME: "${{ steps.preserve.outcome }}"
+          WORKFLOW_OUTCOME: "${{ steps.finalize.outputs.workflow-outcome }}"
+        run: |
+          set -euo pipefail
+          if [[ "${FINALIZE_OUTCOME}" != "success" ]]; then
+            printf 'Repository Intelligence evidence finalization failed\n' >&2
+            exit 1
+          fi
+          if [[ "${PRESERVE_OUTCOME}" != "success" ]]; then
+            printf 'Repository Intelligence run-report preservation failed\n' >&2
+            exit 1
+          fi
+          if [[ "${WORKFLOW_OUTCOME}" != "success" ]]; then
+            printf 'Repository Intelligence failed; see the preserved run report\n' >&2
+            exit 1
+          fi

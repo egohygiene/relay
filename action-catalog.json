@@ -60,7 +60,7 @@
       "summary": "Build a deterministic routed intelligence site with operational, roadmap, decision, journey, dependencies, health, releases, work, search, comparison, and analytics views.",
       "status": "beta",
       "runtime": ["bash", "git", "python3", "cargo", "rustup"],
-      "permissions": {"contents": "read"},
+      "permissions": {"contents": "read", "actions": "read"},
       "side_effects": ["network-read", "workspace-write"],
       "consumer_ref": "egohygiene/relay/actions/repository-intelligence@v1"
     },
@@ -191,6 +191,22 @@
         "workspace-write"
       ],
       "consumer_ref": "egohygiene/relay/actions/verify-publication-pages@v1"
+    },
+    {
+      "id": "repository-intelligence-capture-artifact",
+      "path": "actions/repository-intelligence-capture-artifact",
+      "name": "Repository Intelligence Capture Artifact",
+      "summary": "Pack only referenced public JSON captures into a same-head/run/attempt artifact tree without uploading or executing consumer content.",
+      "status": "experimental",
+      "runtime": [
+        "bash",
+        "python3"
+      ],
+      "permissions": {},
+      "side_effects": [
+        "workspace-write"
+      ],
+      "consumer_ref": "egohygiene/relay/actions/repository-intelligence-capture-artifact@v1"
     }
   ],
   "workflows": [
@@ -389,6 +405,18 @@
       "consumer_ref": "egohygiene/relay/.github/workflows/repository-architecture-validation.yml@v1",
       "name": "Repository Architecture Validation",
       "summary": "Read-only architecture and ADR checks with diagram inventory and bounded current-run reports."
+    },
+    {
+      "id": "repository-intelligence-captures",
+      "path": ".github/workflows/repository-intelligence-captures.yml",
+      "name": "Repository Intelligence Captured-Source Artifact",
+      "summary": "Read exact same-run JSON captures and generate a consumer-owned repository site artifact with bounded intake/run receipts.",
+      "status": "experimental",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "consumer_ref": "egohygiene/relay/.github/workflows/repository-intelligence-captures.yml@v1"
     }
   ]
 }

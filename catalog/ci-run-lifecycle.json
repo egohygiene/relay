@@ -61,6 +61,7 @@
     {"id": "publication-review", "path": ".github/workflows/publication-review.yml", "class": "evidence-preserving-check"},
     {"id": "publication-pages", "path": ".github/workflows/publication-pages.yml", "class": "serialized-write"},
     {"id": "repository-intelligence", "path": ".github/workflows/repository-intelligence.yml", "class": "supersedable-check"},
+    {"id": "repository-intelligence-captures", "path": ".github/workflows/repository-intelligence-captures.yml", "class": "supersedable-check"},
     {"id": "repository-journal", "path": ".github/workflows/repository-journal.yml", "class": "supersedable-check"},
     {"id": "repository-journal-copilot", "path": ".github/workflows/repository-journal-copilot.yml", "class": "supersedable-check"},
     {"id": "repository-journal-dogfood", "path": ".github/workflows/repository-journal-dogfood.yml", "class": "supersedable-check"},

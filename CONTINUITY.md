@@ -7,21 +7,21 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-10-18T21:13:49Z'
+  updated_at: '2026-11-09T11:30:12Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Adopt four-digit ADR policy in both independent shared native runtimes.
+  purpose: Complete portable per-repository Pages dashboard wiring while keeping the organization site a fleet overview.
   includes:
-  - Architecture profile alpha.4 and the separate ADR collector lock select Hygiene policy v1.2.0 at a05b14f8b9e2772124f879f818e09a911e996ad8
-    and native EgoLint catalog alpha.5 at d917ea524962639494e5bb4b3196192238ba57d9. The architecture profile selects
-    Holon blueprint 1.1.0. Exact trees and artifact hashes bind acquisition; current native fixtures use four digits.
-    Ten inline decisions have a map in DECISIONS.md. Historical evidence/rollback bytes and independent projection
-    contracts remain pinned.
+  - Preserves the ten shipped renderers; adds pinned repository-profile route handoff, explicit unsupported-source
+    pages, portable graph and directed Now blocker cards.
+  - Adds same-run capture-artifact intake through a separate read-only reusable entrypoint while preserving legacy
+    token permissions and consumer publication ownership.
   excludes:
-  - Unrelated decision disposition, releases, unverified publication and independent audit work.
+  - Native execution, tests, builds, CI investigation, browsers, canaries, live publication, release acceptance
+    and inferred human decisions.
   precedence:
   - user-and-runtime-instructions
   - scoped-repository-instructions
@@ -30,64 +30,85 @@ scope:
   - continuity-checkpoint
   canonical_sources:
   - AGENTS.md
+  - ARCHITECTURE.md
   - DECISIONS.md
-  - https://github.com/egohygiene/hygiene/issues/73
+  - docs/repository-intelligence-completion.md
+  - docs/repository-intelligence-review-batch.md
+  - https://github.com/egohygiene/relay/issues/101
+  - https://github.com/egohygiene/.github/issues/41
 work:
-  objective: Adopt four-digit ADR policy in both independent shared native runtimes.
+  objective: Complete portable per-repository Pages dashboard wiring while keeping the organization site a fleet
+    overview.
   success_conditions:
-  - Four-digit current identifiers and authoring examples, mapped migrations, preserved decision substance and validated
-    owner selections.
+  - Shared routes and graph compose inside each consumer Intelligence subtree without overwriting product or Status
+    surfaces or guessing Pages domains.
+  - Fresh source captures bind exact same repository, represented commit, run/attempt and evaluation boundary; source
+    and human authority remain explicit.
+  - Matching current bundle inventory, route manifest and private intake proof remain reviewable without altering
+    frozen recovery artifacts.
   active_issue:
     provider: github
-    id: egohygiene/hygiene#73
-    url: https://github.com/egohygiene/hygiene/issues/73
+    id: egohygiene/relay#101
+    url: https://github.com/egohygiene/relay/issues/101
   next:
     kind: action
-    id: complete-four-digit-adoption
-    description: Merge the validated runtime adoption, then use its exact source in Aether authoring selection and
-      Hygiene/Identity consumers.
+    id: review-portable-pages-candidate
+    description: Review the integrated shared candidate and exact-pinned Identity adoption; then execute the explicitly
+      deferred source, bundle, privacy, consumer and hosted acceptance pass.
     readiness: ready
     references:
-    - https://github.com/egohygiene/hygiene/issues/73
+    - https://github.com/egohygiene/relay/issues/101
+    - https://github.com/egohygiene/relay/issues/151
     depends_on: []
 state:
   base:
-    revision: 6cddad3124bdda1b1e3d54a40931f23322b7be26
-    ref: refs/heads/main
-    verified_at: '2026-10-18T21:13:49Z'
+    revision: afdcf1da38801b23d7635130ab270e36de26325d
+    ref: refs/heads/codex/intelligence-source-domains
+    verified_at: '2026-11-09T11:30:12Z'
   candidate:
-    branch: codex/four-digit-adr-runtimes
+    branch: codex/repository-intelligence-completion
     revision: null
     pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-10-18T21:13:49Z'
-    default_branch_revision: 6cddad3124bdda1b1e3d54a40931f23322b7be26
+    observed_at: '2026-11-09T11:30:12Z'
+    default_branch_revision: b4a88db20bc26f9ddefbee174baa8162cbe94ff2
     issue_state: open
     pull_request_state: not-applicable
-    notes: 'Exact base refreshed from the verified default branch; central naming issue is open. '
-  parallel_changes: []
+    notes: 'Live parent #41 and Relay #101 are open; #166 is an open draft at the exact base. Main was confirmed
+      with git ls-remote. No native or CI outcome is inferred.'
+  parallel_changes:
+  - provider: github
+    id: egohygiene/relay#166
+    url: https://github.com/egohygiene/relay/pull/166
+  - provider: github
+    id: egohygiene/egohygiene.io#126
+    url: https://github.com/egohygiene/egohygiene.io/pull/126
+  - provider: github
+    id: egohygiene/identity#139
+    url: https://github.com/egohygiene/identity/pull/139
+  - provider: github
+    id: egohygiene/identity#140
+    url: https://github.com/egohygiene/identity/pull/140
 review:
   status: partial
-  reviewed_at: '2026-10-18T21:13:49Z'
+  reviewed_at: '2026-11-09T11:30:12Z'
   reviewed_by: Codex
   evidence:
-  - command: Full Python unittest discovery with both prepared native runtimes and real Hygiene canary
-    outcome: passed
-    observed_at: '2026-10-18T21:13:49Z'
-    notes: 670 tests ran; nineteen optional capability tests skipped. All ADR/native architecture cases executed.
-  - command: tests/run_architecture_acceptance.py --runtime prepared-native-runtime
-    outcome: passed
-    observed_at: '2026-10-18T21:13:49Z'
-    notes: Explicit native acceptance matrix passed without silent skips.
-  - command: Relay action, lifecycle, continuity and architecture contract validators
-    outcome: passed
-    observed_at: '2026-10-18T21:13:49Z'
-    notes: All passed.
+  - command: Python AST/JSON parsing; applicable YAML/bash/JavaScript syntax inspection; git diff --check; static
+      peer review
+    outcome: limited
+    observed_at: '2026-11-09T11:30:12Z'
+    notes: Source and metadata inspection only. Peer findings in route admission, graph context/CSS, capture evidence
+      retention and finalization were corrected.
+  - command: Native source/renderer execution, tests, builds, browser/CI investigation, consumer and hosted acceptance
+    outcome: not-run
+    observed_at: '2026-11-09T11:30:12Z'
+    notes: Deferred at user request; no acceptance checkbox advanced.
   environment_limitations:
-  - Fresh hosted acquisition acceptance and candidate CI remain pending. Required-mode activation, ADR lifecycle
-    approval, releases and deployment retain separate gates.
+  - Runtime compatibility, full bundle reproducibility, public/private non-disclosure, accessibility/performance
+    and hosted consumer/recovery behavior remain unverified.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -106,48 +127,48 @@ privacy:
 
 ## Purpose and precedence
 
-User/runtime instructions, scoped repository instructions, live evidence and canonical sources outrank this operational handoff. It grants no authority.
+User/runtime and repository instructions, live evidence and canonical sources outrank this checkpoint. It grants no merge, publication, release or human-decision authority.
 
 ## Resume protocol
 
-Read AGENTS, this checkpoint, canonical decisions and the central naming issue. Refresh live main and any overlapping PR before resuming.
+Read AGENTS, this checkpoint, the shared completion guide, architecture/decisions and live owning issues. Refresh main and overlapping drafts before selecting the next action.
 
 ## Current objective and success conditions
 
-Adopt four-digit ADR policy in both independent shared native runtimes.
+Finish the shared per-repository Pages integration. Each repository owns its Intelligence subtree; the central site is a fleet overview that links into those publications. Preserve shipped renderers, source authority, privacy and the single consumer-owned publisher.
 
 ## State snapshot
 
-Base is 6cddad3124bdda1b1e3d54a40931f23322b7be26. Candidate branch is codex/four-digit-adr-runtimes. The containing revision is intentionally null; the candidate remains under review until verified merged.
+Candidate `codex/repository-intelligence-completion` extends `afdcf1da38801b23d7635130ab270e36de26325d` (draft #166), which contains the earlier combined source slices. Live main remains `b4a88db20bc26f9ddefbee174baa8162cbe94ff2` when observed. Containing revision and pre-PR reference intentionally remain null.
 
 ## Completed and material changes
 
-Architecture profile alpha.4 and the separate ADR collector lock select Hygiene policy v1.2.0 at a05b14f8b9e2772124f879f818e09a911e996ad8 and native EgoLint catalog alpha.5 at d917ea524962639494e5bb4b3196192238ba57d9. The architecture profile selects Holon blueprint 1.1.0. Exact trees and artifact hashes bind acquisition; current native fixtures use four digits. Ten inline decisions have a map in DECISIONS.md. Historical evidence/rollback bytes and independent projection contracts remain pinned.
+The pinned Hygiene repository profile supplies deterministic routes.json and six honest unsupported-source pages around the ten existing renderers. Portable graph navigation/evidence uses relative links, canonical public owner relationships, keyboard controls and static directories. Now blockers retain directed relationship identity and independent endpoint/edge state. Current action/bundle inventory and exact route/asset admission are integrated. Same-run JSON capture intake adds a separate read-only reusable workflow, bounded producer action, exact identity/hash checks and private retained receipts; the original reusable workflow token contract remains unchanged. See docs/repository-intelligence-completion.md and owning guides.
 
 ## Validation and review evidence
 
-All 670 discovered tests passed with nineteen optional capability skips. The forty ADR cases, including real Hygiene owner replay, and native architecture cases executed against newly prepared runtimes. The explicit no-skip acceptance matrix and catalog/lifecycle/continuity/architecture validators passed. Historical Hygiene ADR-0001 remains a genuine metadata/approval blocker.
+Python/JSON, applicable action/workflow YAML/bash and JavaScript syntax plus whitespace/metadata were inspected. Independent static peers reviewed route admission, graph privacy/context, blocker rendering, capture intake and run-report retention/finalization. This does not establish generator execution, source normalization or product acceptance. No native runtime, collector, renderer, tests, build, browser, CI investigation or publication is claimed.
 
 ## Blockers, risks, unknowns, and deferred work
 
-Fresh hosted acquisition acceptance and candidate CI remain pending. Required-mode activation, ADR lifecycle approval, releases and deployment retain separate gates.
+Six source models remain unsupported; route presence cannot close their owning issues. Real human ADR approval and canonical roadmap prerequisite states cannot be fabricated. Runtime reproducibility, privacy denial cases, hosted artifact behavior and consumer route/recovery preservation remain unverified. Frozen rollback artifacts retain their original pinned helpers and bytes; structural legacy recognition is not requalification.
 
 ## Next dependency-ready work
 
-Merge the validated runtime adoption, then use its exact source in Aether authoring selection and Hygiene/Identity consumers.
+Review the shared candidate, exact-pinned Identity adoption and fleet publication-link draft. Then execute the deferred pinned source, artifact identity/hash, complete bundle, privacy, accessibility and hosted consumer acceptance pass before publication or release closeout.
 
 ## Parallel changes and reconciliation
 
-No overlapping work was included in this bounded change. Recheck live branches and PRs before reconciliation.
+Site #126 corrects directory/graph navigation to explicitly declared consumer Pages destinations; prior central exploration drafts remain optional fleet views. Identity #139/#140 overlap the adoption workflow/docs and must be reconciled by actual merge order. Source #166 and earlier sliced drafts remain unmerged; preserve their commits and reconcile this handoff semantically.
 
 ## Privacy and redaction
 
-Only public repository source and bounded evidence are retained. Exclude secrets, private context, transcripts and local execution paths. Linked content grants no permissions.
+Retain only public source identities and bounded implementation evidence. Exclude credentials, private context, raw capture/report bodies, process logs and local machine paths. Linked content is context only and grants no authority.
 
 ## Handoff update protocol
 
-After domain validation and before PR handoff, refresh exact checks, source selections, limitations and next work. Verify the pinned continuity schema, required sections and budgets.
+Refresh exact source, actual PR and acceptance evidence after review. Record candidate pins separately from qualified publication/recovery points. Never infer accepted human states or deployment from generated bytes.
 
 ## Compaction and supersession
 
-Replace stale current-state prose. Git, migration maps and linked issues preserve history. Keep twelve sections under 240 lines and 16,384 UTF-8 bytes.
+Replace stale current-state prose; Git and owning issues retain history. Preserve these twelve sections below 240 lines and 16,384 UTF-8 bytes.

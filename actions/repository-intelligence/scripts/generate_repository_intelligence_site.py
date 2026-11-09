@@ -22,32 +22,14 @@ _coverage_spec = importlib.util.spec_from_file_location(
     "relay_intelligence_coverage", Path(__file__).with_name("repository_intelligence_coverage.py"))
 coverage_contract = importlib.util.module_from_spec(_coverage_spec)
 _coverage_spec.loader.exec_module(coverage_contract)
+_routes_spec = importlib.util.spec_from_file_location(
+    "relay_intelligence_routes", Path(__file__).with_name("repository_intelligence_routes.py"))
+route_contract = importlib.util.module_from_spec(_routes_spec)
+_routes_spec.loader.exec_module(route_contract)
 
 SNAPSHOT_SCHEMA = "egohygiene.observatory.repository-intelligence-read-model/v1"
-ROUTES = (
-    ("now", "Now"),
-    ("roadmap", "Roadmap"),
-    ("decisions", "Decisions"),
-    ("journey", "Journey"),
-    ("dependencies", "Dependencies"),
-    ("health", "Health"),
-    ("releases", "Releases"),
-    ("work", "Work"),
-    ("search", "Search"),
-    ("compare", "Compare"),
-)
-ROUTE_QUESTIONS = {
-    "now": "What changed, what needs attention, and which grounded moves come next?",
-    "roadmap": "What should happen next, what is blocked, and which evidence proves progress?",
-    "decisions": "Why did the architecture change, and what authority does each decision retain?",
-    "journey": "How did intent become work, code, proof, and delivery over time?",
-    "dependencies": "What depends on what, and where can a change or blocker propagate?",
-    "health": "What do normalized checks and freshness evidence say right now?",
-    "releases": "What actually shipped, when, and with which included evidence?",
-    "work": "Which execution records and roadmap queues need attention?",
-    "search": "Where is a normalized repository object and its canonical source?",
-    "compare": "What structurally changed between two accepted snapshots?",
-}
+ROUTES = route_contract.ROUTES
+ROUTE_QUESTIONS = route_contract.ROUTE_QUESTIONS
 FULL_SHA = re.compile(r"^[0-9a-f]{40}$")
 EMAIL = re.compile(r"(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 SECRET = re.compile(r"(?i)(?:github_pat_|gh[pousr]_|(?:token|password|secret)\s*[:=])")
@@ -811,8 +793,68 @@ def empty_state(title: str, message: str, state: str = "unknown") -> str:
     </div>'''
 
 
+def relationship_card(value: dict[str, Any], *, eyebrow: str) -> str:
+    """Present a supplied directed relationship without inventing an entity state."""
+    source = require_object(value.get("source"))
+    target = require_object(value.get("target"))
+    # Inspect both endpoint visibility declarations before identities or prose.
+    # Restricted endpoints never become named public cards or placeholders.
+    if any(endpoint.get("visibility") != "public" for endpoint in (source, target)):
+        return ""
+    endpoints = (source, target)
+    valid = (
+        value.get("type") in ("blocks", "depends-on")
+        and isinstance(value.get("id"), str) and bool(value["id"])
+        and isinstance(value.get("assertion"), str) and value["assertion"] in JOURNEY_ASSERTIONS
+        and isinstance(value.get("freshness"), str) and value["freshness"] in JOURNEY_FRESHNESS
+        and all(endpoint.get("visibility") == "public" for endpoint in endpoints)
+    )
+    for endpoint in endpoints:
+        valid &= all(isinstance(endpoint.get(key), str) and bool(endpoint[key])
+                     for key in ("id", "repository", "key", "kind", "state"))
+        valid &= isinstance(endpoint.get("assertion"), str) and endpoint["assertion"] in JOURNEY_ASSERTIONS
+        valid &= isinstance(endpoint.get("freshness"), str) and endpoint["freshness"] in JOURNEY_FRESHNESS
+        valid &= endpoint.get("title") is None or (
+            isinstance(endpoint.get("title"), str) and bool(endpoint["title"]))
+    provenance = value.get("provenance")
+    valid &= isinstance(provenance, list) and bool(provenance) and all(
+        isinstance(identifier, str) and bool(identifier) for identifier in provenance)
+    if not valid:
+        return empty_state(
+            "Relationship evidence unavailable",
+            "The directed relationship is incomplete or incompatible. No endpoint state is inferred.",
+        )
+    relation = "blocks" if value["type"] == "blocks" else "depends on"
+    labels = [str(endpoint.get("title") or endpoint["key"]) for endpoint in endpoints]
+    direction = f"{labels[0]} {relation} {labels[1]}"
+    endpoint_states = sorted({normalize_state(endpoint["state"]) for endpoint in endpoints})
+    endpoint_kinds = sorted({normalize_state(endpoint["kind"]) for endpoint in endpoints})
+    search = " ".join(str(item or "") for item in (
+        value["id"], value["type"], value["assertion"], value["freshness"],
+        *(endpoint[key] for endpoint in endpoints for key in ("key", "repository", "kind", "state")),
+        *labels,
+    )).lower()
+    rendered_endpoints = []
+    for label, endpoint in zip(("Source", "Target"), endpoints):
+        rendered_endpoints.append(f'''<section{source_repository_attribute(endpoint)}>
+          <h4>{escaped(label)}: {escaped(endpoint.get("title") or endpoint["key"])}</h4>
+          <p>{escaped(state_label(endpoint["kind"]))} · {escaped(endpoint["key"])} · {escaped(endpoint["repository"])}</p>
+          <dl class="ri-provenance"><div><dt>Canonical state</dt><dd>{status_pill(endpoint["state"])}</dd></div><div><dt>Assertion</dt><dd>{escaped(state_label(endpoint["assertion"]))}</dd></div><div><dt>Freshness</dt><dd>{escaped(state_label(endpoint["freshness"]))}</dd></div></dl>
+          {source_link(endpoint, f"Inspect {label.lower()} source")}
+        </section>''')
+    return f'''<article class="ri-record" data-entity-id="{escaped(value["id"])}" data-filter-item data-states="{escaped(" ".join(endpoint_states))}" data-kinds="{escaped(" ".join(endpoint_kinds))}" data-filter-relationship="{escaped(value["type"])}" data-filter-assertion="{escaped(value["assertion"])}" data-filter-freshness="{escaped(value["freshness"])}" data-search="{escaped(search)}">
+      <div class="ri-record__top"><span class="ri-eyebrow">{escaped(eyebrow)}</span>{status_pill(value["assertion"], f"Assertion: {state_label(value['assertion'])}")} {status_pill(value["freshness"], f"Freshness: {state_label(value['freshness'])}")}</div>
+      <h3>{escaped(direction)}</h3>
+      <p>Directed relationship: source → target. Endpoint states remain independent.</p>
+      <div class="ri-relationship-grid">{"".join(rendered_endpoints)}</div>
+      <details class="ri-evidence"><summary>Inspect relationship evidence</summary><dl class="ri-provenance"><div><dt>Relationship ID</dt><dd><code>{escaped(value["id"])}</code></dd></div><div><dt>Provenance source IDs</dt><dd>{escaped(", ".join(provenance))}</dd></div></dl></details>
+    </article>'''
+
+
 def record_card(item: Any, *, eyebrow: str = "Evidence") -> str:
     value = entity(item)
+    if value.get("type") in ("blocks", "depends-on"):
+        return relationship_card(value, eyebrow=eyebrow)
     title = value.get("title") or value.get("key") or "Untitled record"
     kind = state_label(value.get("kind"))
     state = normalize_state(value.get("state"))
@@ -847,11 +889,11 @@ def render_recent_change(now: dict[str, Any]) -> str:
 def render_collection(
     items: list[Any], *, empty_title: str, empty_message: str, eyebrow: str
 ) -> str:
-    if not items:
+    cards = [record_card(item, eyebrow=eyebrow) for item in items]
+    visible = [card for card in cards if card]
+    if not visible:
         return empty_state(empty_title, empty_message, "empty")
-    return '<div class="ri-record-list">' + "".join(
-        record_card(item, eyebrow=eyebrow) for item in items
-    ) + "</div>"
+    return '<div class="ri-record-list">' + "".join(visible) + "</div>"
 
 
 def newly_broken(now: dict[str, Any]) -> list[dict[str, Any]]:
@@ -1114,6 +1156,22 @@ def render_relationship_row(
     )
 
 
+def render_roadmap_issue_references(step: dict[str, Any]) -> str:
+    """Show authored references without assigning uncollected provider state."""
+
+    links = []
+    for value in require_list(step.get("issue_references")):
+        if not isinstance(value, str):
+            continue
+        href = safe_href(value)
+        if href:
+            links.append(f'<a class="ri-link-chip" href="{escaped(href)}">{escaped(value)}</a>')
+    if not links:
+        return ""
+    return ('<div class="ri-relationship-row"><strong>Authored issue references</strong><div>'
+            + "".join(links) + '</div><p>Provider state is not collected for these references.</p></div>')
+
+
 def render_quest_step(
     step: dict[str, Any],
     *,
@@ -1186,6 +1244,7 @@ def render_quest_step(
           {render_relationship_row("Unlocks", dependents.get(step_id, []), anchors)}
           {render_relationship_row("Blocked by", require_list(step.get("blocked_by")), anchors)}
           {render_relationship_row("Blocks", blocks.get(step_id, []), anchors)}
+          {render_roadmap_issue_references(step)}
         </div>
         <div class="ri-quest__source">{canonical}<span>Assertion: {escaped(state_label(step_entity.get("assertion")))} · Freshness: {escaped(state_label(step_entity.get("freshness")))}</span></div>
         <details class="ri-evidence" data-quest-evidence>
@@ -2248,7 +2307,7 @@ def projection_freshness(
 ) -> str:
     """Report freshness only when this route's accepted evidence is present."""
 
-    if snapshot is None:
+    if snapshot is None or route in route_contract.RESERVED_IDS:
         return "unknown"
     if projected is None:
         projected = route in require_object(snapshot.get("views"))
@@ -2259,6 +2318,8 @@ def projection_freshness(
 
 def collection_notice(snapshot: dict[str, Any] | None, route: str) -> str:
     """Show source coverage independently from record freshness and empty arrays."""
+    if route in route_contract.RESERVED_IDS:
+        return ""
     claims = coverage_contract.claims(snapshot, route)
     if not claims:
         return ""
@@ -2277,11 +2338,18 @@ def navigation(current: str, prefix: str) -> str:
     links = [
         f'<a href="{escaped(prefix or "./")}"{overview_current}>Overview</a>'
     ]
-    for route, label in ROUTES:
+    for route, label in route_contract.CORE_ROUTES:
         current_attribute = ' aria-current="page"' if current == route else ""
         links.append(
             f'<a href="{escaped(prefix + route + "/")}"{current_attribute}>{escaped(label)}</a>'
         )
+    extra = []
+    for route, label in route_contract.RESERVED_ROUTES:
+        current_attribute = ' aria-current="page"' if current == route else ""
+        extra.append(f'<a href="{escaped(prefix + route + "/")}"{current_attribute}>{escaped(label)}</a>')
+    open_attribute = " open" if current in route_contract.RESERVED_IDS else ""
+    links.append(f'<details{open_attribute}><summary>Additional evidence views</summary>'
+                 '<p>Source projections unsupported</p>' + "".join(extra) + '</details>')
     links.append(
         f'<a href="{escaped(prefix + "dashboard/")}">Dashboard</a>'
     )
@@ -2302,9 +2370,14 @@ def shell_document(
     snapshot_available: bool,
 ) -> str:
     state, build_label = build_status(summary)
+    route_metadata = route_contract.route(route)
+    unsupported = route_metadata["renderer_state"] == "source-unsupported"
     repository_url = f"https://github.com/{repository}"
     commit_url = f"{repository_url}/commit/{source_commit}"
-    snapshot_label = "Observatory snapshot loaded" if snapshot_available else "Snapshot unavailable"
+    snapshot_label = ("Source projection unsupported" if unsupported else
+                      "Observatory snapshot loaded" if snapshot_available else "Snapshot unavailable")
+    canonical_href = (prefix or "./") if route == "intelligence" else prefix + route + "/"
+    known_routes = json.dumps(["intelligence", *(name for name, _label in ROUTES), "dashboard"], separators=(",", ":"))
     route_descriptions = {
         "intelligence": "Orient in one commit-matched Repository Intelligence projection, then move into the focused evidence view that answers the next question.",
         **ROUTE_QUESTIONS,
@@ -2314,7 +2387,7 @@ def shell_document(
         "Explore one commit-matched projection without replacing its canonical repository sources.",
     )
     command_bar = ""
-    if route != "intelligence":
+    if route != "intelligence" and not unsupported:
         command_bar = '''<div class="ri-command-bar" data-filters>
           <label class="ri-search"><span class="ri-visually-hidden">Search this view</span><span aria-hidden="true">⌕</span><input type="search" data-filter-query placeholder="Search this view…" autocomplete="off"></label>
           <label><span>State</span><select data-filter-state><option value="all">All states</option><option value="accepted">Accepted</option><option value="active">Active</option><option value="blocked">Blocked</option><option value="complete">Complete</option><option value="deprecated">Deprecated</option><option value="deferred">Deferred</option><option value="failure">Failure</option><option value="planned">Planned</option><option value="proposed">Proposed</option><option value="ready">Ready</option><option value="rejected">Rejected</option><option value="superseded">Superseded</option><option value="unknown">Unknown</option></select></label>
@@ -2329,10 +2402,13 @@ def shell_document(
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Repository Intelligence {escaped(route_label)} view for {escaped(repository)}.">
     <title>{escaped(route_label)} · {escaped(repository)} · Repository Intelligence</title>
+    <link rel="canonical" href="{escaped(canonical_href)}">
+    <link rel="describedby" type="application/json" href="{escaped(prefix)}routes.json">
+    <meta name="ri:surface-id" content="{escaped(route_metadata['surface_id'])}">
     <link rel="icon" type="image/png" href="{escaped(prefix)}egohygiene.png">
     <link rel="stylesheet" href="{escaped(prefix)}site.css">
   </head>
-  <body data-ri-route="{escaped(route)}" data-ri-repository="{escaped(repository)}" data-ri-commit="{escaped(source_commit)}">
+  <body data-ri-route="{escaped(route)}" data-ri-routes="{escaped(known_routes)}" data-ri-renderer-state="{escaped(route_metadata['renderer_state'])}" data-ri-repository="{escaped(repository)}" data-ri-commit="{escaped(source_commit)}">
     <a class="ri-skip" href="#main-content">Skip to view content</a>
     <header class="ri-global-header">
       <a class="ri-brand" data-preserve-context href="{escaped(prefix)}"><span aria-hidden="true">EH</span><strong>Repository Intelligence</strong></a>
@@ -2357,14 +2433,14 @@ def shell_document(
         <section class="ri-context" aria-label="Represented source and build context">
           <a href="{escaped(commit_url)}"><span>Represented commit</span><code>{escaped(source_commit[:12])}</code></a>
           <div><span>Observed</span><strong>{escaped(format_date(observed_at))}</strong></div>
-          <div><span>Collection</span>{status_pill(freshness, snapshot_label)}</div>
+          <div><span>Collection</span>{status_pill("unsupported" if unsupported else freshness, snapshot_label)}</div>
           <a data-preserve-context href="{escaped(prefix)}dashboard/"><span>Build evidence</span>{status_pill(state, build_label)}</a>
           <a href="{escaped(prefix)}provenance.json"><span>Generator</span><strong>View provenance ↗</strong></a>
         </section>
         <div class="ri-visually-hidden" role="status" aria-live="polite" aria-atomic="true" data-context-status></div>
         {command_bar}
         <main id="main-content" tabindex="-1">{body}<div class="ri-no-results" data-no-results hidden>{empty_state("No matching evidence", "Clear a filter or broaden the search to continue.", "empty")}</div></main>
-        <footer><span>Operational state is rendered only from <code>{escaped(SNAPSHOT_SCHEMA)}</code>.</span><a href="#main-content">Back to top ↑</a></footer>
+        <footer><span>Operational state is rendered only from <code>{escaped(SNAPSHOT_SCHEMA)}</code>. Unsupported domain projections remain unprojected.</span><a href="#main-content">Back to top ↑</a></footer>
       </div>
     </div>
     <script src="{escaped(prefix)}site.js" defer></script>
@@ -2377,7 +2453,7 @@ def overview_body() -> str:
     """Render the product entry point without duplicating the operational Now view."""
 
     cards = []
-    for index, (route, label) in enumerate(ROUTES, start=1):
+    for index, (route, label) in enumerate(route_contract.CORE_ROUTES, start=1):
         question = ROUTE_QUESTIONS[route]
         cards.append(
             f'''<article class="ri-panel">
@@ -2386,10 +2462,15 @@ def overview_body() -> str:
               <a class="ri-button ri-button--quiet" data-preserve-context href="./{escaped(route)}/">Open {escaped(label)}</a>
             </article>'''
         )
+    additional = "".join(
+        f'<li><a data-preserve-context href="./{escaped(route)}/">{escaped(label)}</a>: '
+        f'{escaped(ROUTE_QUESTIONS[route])} <strong>Source projection unsupported.</strong></li>'
+        for route, label in route_contract.RESERVED_ROUTES)
     return f'''<section class="ri-section ri-section--lead" aria-labelledby="intelligence-heading">
       <div class="ri-section-heading"><div><span class="ri-eyebrow">Repository orientation</span><h2 id="intelligence-heading">Choose the evidence question</h2></div><p>Each route answers one bounded question from the same represented commit. Unknown and unavailable evidence stays explicit inside the selected view.</p></div>
       <div class="ri-now-grid ri-overview-grid">{"".join(cards)}</div>
     </section>
+    <section class="ri-section"><details class="ri-panel"><summary>Additional registered evidence views</summary><p>These repository-profile routes preserve stable navigation while their owning source contracts remain unsupported by the current build. Missing evidence never means a repository has passed or is not applicable.</p><ul>{additional}</ul></details></section>
     <section class="ri-section" aria-labelledby="dashboard-heading"><div class="ri-panel ri-panel--wide"><div class="ri-panel-heading"><span class="ri-panel-icon" aria-hidden="true">↗</span><div><span class="ri-eyebrow">Build evidence</span><h2 id="dashboard-heading">Inspect the analytics dashboard</h2></div></div><p>Review source-tree, activity, dependency, and generator evidence without confusing the compatibility dashboard with a canonical repository view.</p><a class="ri-button ri-button--quiet" data-preserve-context href="./dashboard/">Open Dashboard</a></div></section>'''
 
 
@@ -2421,20 +2502,14 @@ def now_body(snapshot: dict[str, Any] | None) -> str:
 
 
 def placeholder_body(route: str, label: str, prefix: str) -> str:
-    issue_routes = {
-        "roadmap": 31,
-        "decisions": 30,
-        "journey": 32,
-        "dependencies": 29,
-        "health": 29,
-        "releases": 33,
-        "work": 33,
-        "search": 33,
-        "compare": 33,
-    }
-    issue = issue_routes.get(route, 27)
-    return f'''<section class="ri-section ri-section--lead" aria-labelledby="placeholder-heading"><div class="ri-section-heading"><div><span class="ri-eyebrow">Shared shell ready</span><h2 id="placeholder-heading">{escaped(label)} is the next layer</h2></div><p>This route is reserved now so navigation, deep links, and page composition stay stable as the experience grows.</p></div>
-      <div class="ri-panel">{empty_state("View intentionally not materialized yet", "The shell is live; this evidence projection remains owned by its focused Relay issue.", "not_applicable")}<p><a class="ri-button" href="https://github.com/egohygiene/relay/issues/{issue}">Track Relay #{issue} <span aria-hidden="true">↗</span></a> <a class="ri-button ri-button--quiet" href="{escaped(prefix)}now/">Return to Now</a></p></div></section>'''
+    metadata = route_contract.route(route)
+    unsupported = route in route_contract.RESERVED_IDS
+    message = (route_contract.source_boundary(route) if unsupported else
+               "This route requires its focused renderer stage. A shell-only invocation does not establish an empty or passing domain.")
+    title = "Source projection unsupported" if unsupported else "Focused projection unavailable"
+    state = "unsupported" if unsupported else "unavailable"
+    return f'''<section class="ri-section ri-section--lead" aria-labelledby="placeholder-heading"><div class="ri-section-heading"><div><span class="ri-eyebrow">Repository evidence boundary</span><h2 id="placeholder-heading">{escaped(label)}</h2></div><p>{escaped(metadata['primary_question'])}</p></div>
+      <div class="ri-panel">{empty_state(title, message, state)}<p>Applicability, adoption, human acceptance and publication remain unknown until their own source evidence is supplied. Unsupported evidence cannot become success or a not-applicable disposition.</p><p><a class="ri-button" href="{escaped(metadata['owning_issue'])}">Track the owning implementation <span aria-hidden="true">↗</span></a> <a class="ri-button ri-button--quiet" data-preserve-context href="{escaped(prefix)}now/">Return to Now</a></p></div></section>'''
 
 
 def write_site(
@@ -2484,7 +2559,7 @@ def write_site(
         body = (
             roadmap_body(snapshot)
             if route == "roadmap"
-            else decisions_body(snapshot, require_object(provenance.get("adr_collection")).get("index", "DECISIONS.md"))
+            else decisions_body(snapshot, require_object(provenance.get("adr_collection") or require_object(require_object(provenance.get("source_collection")).get("domains")).get("decisions")).get("index", "DECISIONS.md"))
             if route == "decisions"
             else journey_body(snapshot)
             if route == "journey"
@@ -2500,6 +2575,8 @@ def write_site(
                 **{**shared, "freshness": projection_freshness(snapshot, route)},
             ),
         )
+    atomic_write(output_root / "routes.json", json.dumps(route_contract.manifest(repository, source_commit),
+                 ensure_ascii=False, indent=2, sort_keys=True) + "\n")
     atomic_write(output_root / "site.css", stylesheet_source.read_text(encoding="utf-8"))
     atomic_write(output_root / "site.js", script_source.read_text(encoding="utf-8"))
     assets = Path(__file__).resolve().parents[1] / "assets"

@@ -28,6 +28,11 @@ on:
         required: false
         default: false
         type: boolean
+      collect-roadmap:
+        description: Collect canonical public Roadmap, optionally composed with Decisions.
+        required: false
+        default: false
+        type: boolean
       adr-policy-owner:
         description: Explicit canonical Hygiene ADR policy-owner selection; requires collect-adrs.
         required: false
@@ -109,6 +114,11 @@ on:
         type: string
       collect-adrs:
         description: Collect and validate canonical public ADRs instead of accepting an external snapshot.
+        required: false
+        default: false
+        type: boolean
+      collect-roadmap:
+        description: Collect canonical public Roadmap, optionally composed with Decisions.
         required: false
         default: false
         type: boolean
@@ -210,6 +220,7 @@ jobs:
           work-directory: "${{ inputs.work-directory }}"
           reports-directory: "${{ inputs.reports-directory }}"
           collect-adrs: "${{ inputs.collect-adrs }}"
+          collect-roadmap: "${{ inputs.collect-roadmap }}"
           adr-policy-owner: "${{ inputs.adr-policy-owner }}"
           adr-known-external-decisions: "${{ inputs.adr-known-external-decisions }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
@@ -248,6 +259,7 @@ jobs:
           work-directory: "${{ inputs.work-directory }}"
           reports-directory: "${{ inputs.reports-directory }}"
           collect-adrs: "${{ inputs.collect-adrs }}"
+          collect-roadmap: "${{ inputs.collect-roadmap }}"
           adr-policy-owner: "${{ inputs.adr-policy-owner }}"
           adr-known-external-decisions: "${{ inputs.adr-known-external-decisions }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
@@ -332,6 +344,7 @@ jobs:
           work-directory: "${{ inputs.work-directory }}"
           reports-directory: "${{ inputs.reports-directory }}"
           collect-adrs: "${{ inputs.collect-adrs }}"
+          collect-roadmap: "${{ inputs.collect-roadmap }}"
           adr-policy-owner: "${{ inputs.adr-policy-owner }}"
           adr-known-external-decisions: "${{ inputs.adr-known-external-decisions }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"

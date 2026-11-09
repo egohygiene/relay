@@ -1,0 +1,114 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "visibility",
+    "organization",
+    "catalog_revision",
+    "review_reference",
+    "repositories"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.relay.public-fleet-plan/v1"
+    },
+    "visibility": {
+      "const": "public"
+    },
+    "organization": {
+      "const": "egohygiene"
+    },
+    "catalog_revision": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "review_reference": {
+      "type": "string",
+      "pattern": "^https://github\\.com/egohygiene/hygiene/(?:issues|pull)/[1-9][0-9]*(?:#issuecomment-[1-9][0-9]*)?$"
+    },
+    "repositories": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "$ref": "#/$defs/selection"
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/public-fleet-plan.v1.schema.json",
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "kind",
+        "represented_commit"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "kind": {
+          "enum": [
+            "projection",
+            "snapshot"
+          ]
+        },
+        "represented_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "represented_commit",
+        "candidate",
+        "last_known"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+        },
+        "represented_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "candidate": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/artifact"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "last_known": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/artifact"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "title": "Reviewed public selection and immutable local artifact transport; not a repository registry"
+}

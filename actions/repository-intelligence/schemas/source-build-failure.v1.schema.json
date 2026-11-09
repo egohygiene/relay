@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/source-build-failure.v1.schema.json",
+  "title": "Bounded failed source build evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "publication",
+    "stage",
+    "source",
+    "code"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.relay.source-build-failure/v1"
+    },
+    "status": {
+      "const": "denied"
+    },
+    "publication": {
+      "const": "denied"
+    },
+    "stage": {
+      "enum": [
+        "input",
+        "acquisition",
+        "collection-validation-normalization"
+      ]
+    },
+    "source": {
+      "enum": [
+        "decisions",
+        "roadmap",
+        "work",
+        "health",
+        null
+      ]
+    },
+    "code": {
+      "const": "SOURCE_BUILD_DENIED"
+    }
+  }
+}

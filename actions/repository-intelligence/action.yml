@@ -35,6 +35,34 @@ inputs:
       conflicts with observatory-snapshot and observatory-comparison.
     required: false
     default: "false"
+  collect-roadmap:
+    description: >-
+      Collect the canonical public ROADMAP.md through the pinned alpha.2 owners.
+      Combine with collect-adrs to preserve Decisions in one source snapshot.
+      Conflicts with external snapshot/comparison inputs.
+    required: false
+    default: "false"
+  source-captures:
+    description: >-
+      Optional repository-relative closed Work/Health transport capture plan.
+      Freshly evaluates its captures and composes them with selected canonical sources.
+      Conflicts with external snapshot/comparison inputs; never accepts review envelopes.
+    required: false
+    default: ""
+  source-capture-artifact-id:
+    description: Optional exact same-run public capture artifact ID; requires its digest and explicit as-of, and excludes source-captures.
+    required: false
+    default: ""
+  source-capture-artifact-digest:
+    description: SHA-256 returned by the caller's upload-artifact step for the exact capture ZIP.
+    required: false
+    default: ""
+  source-runtime:
+    description: >-
+      Optional trusted prepared ADR alpha.2 runtime for Roadmap or combined
+      source collection, outside the consumer checkout; requires collect-roadmap or a capture source.
+    required: false
+    default: ""
   adr-runtime:
     description: >-
       Optional trusted prepared ADR runtime outside the consumer checkout, for
@@ -170,6 +198,27 @@ outputs:
   dashboard:
     description: "Repository-relative path to the compatibility analytics dashboard."
     value: "${{ inputs.output-directory }}/dashboard/index.html"
+  route-registry:
+    description: "Repository-relative path to the pinned repository-profile route and alias handoff."
+    value: "${{ inputs.output-directory }}/routes.json"
+  audits:
+    description: "Repository-relative path to the Audits source-availability view."
+    value: "${{ inputs.output-directory }}/audits/index.html"
+  hygiene:
+    description: "Repository-relative path to the Hygiene source-availability view."
+    value: "${{ inputs.output-directory }}/hygiene/index.html"
+  sanity:
+    description: "Repository-relative path to the Sanity source-availability view."
+    value: "${{ inputs.output-directory }}/sanity/index.html"
+  diagnostics:
+    description: "Repository-relative path to the Diagnostics source-availability view."
+    value: "${{ inputs.output-directory }}/diagnostics/index.html"
+  distribution:
+    description: "Repository-relative path to the Distribution source-availability view."
+    value: "${{ inputs.output-directory }}/distribution/index.html"
+  identity:
+    description: "Repository-relative path to the Intelligence Identity source-availability view."
+    value: "${{ inputs.output-directory }}/identity/index.html"
   summary:
     description: "Repository-relative path to the aggregate dashboard projection."
     value: "${{ inputs.output-directory }}/summary.json"
@@ -196,6 +245,12 @@ outputs:
       Repository-relative directory containing private diagnostic activity data;
       contributor identity and commit messages may be present.
     value: "${{ inputs.work-directory }}/activity"
+  capture-intake-receipt:
+    description: Private same-run JSON admission receipt path, outside deterministic site output; empty without artifact intake.
+    value: "${{ steps.capture_intake.outputs.receipt-path }}"
+  capture-intake-receipt-sha256:
+    description: SHA-256 of the exact private capture intake receipt.
+    value: "${{ steps.capture_intake.outputs.receipt-sha256 }}"
 
 branding:
   icon: "activity"
@@ -213,9 +268,14 @@ runs:
         EVENT_REPOSITORY_VISIBILITY: "${{ github.event.repository.visibility }}"
         INPUT_ACTIVITY_REF: "${{ inputs.activity-ref }}"
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
+        INPUT_COLLECT_ROADMAP: "${{ inputs.collect-roadmap }}"
+        INPUT_SOURCE_CAPTURES: "${{ inputs.source-captures }}"
+        INPUT_SOURCE_CAPTURE_ARTIFACT_ID: "${{ inputs.source-capture-artifact-id }}"
+        INPUT_SOURCE_CAPTURE_ARTIFACT_DIGEST: "${{ inputs.source-capture-artifact-digest }}"
         INPUT_ADR_POLICY_OWNER: "${{ inputs.adr-policy-owner }}"
         INPUT_ADR_KNOWN_EXTERNAL_DECISIONS: "${{ inputs.adr-known-external-decisions }}"
         INPUT_ADR_RUNTIME: "${{ inputs.adr-runtime }}"
+        INPUT_SOURCE_RUNTIME: "${{ inputs.source-runtime }}"
         INPUT_AS_OF: "${{ inputs.as-of }}"
         INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
         INPUT_MAX_DEPTH: "${{ inputs.max-depth }}"
@@ -252,6 +312,14 @@ runs:
           true | false) ;;
           *) printf 'collect-adrs must be true or false\n' >&2; exit 2 ;;
         esac
+        case "${INPUT_COLLECT_ROADMAP}" in
+          true | false) ;;
+          *) printf 'collect-roadmap must be true or false\n' >&2; exit 2 ;;
+        esac
+        if [[ -n "${INPUT_SOURCE_RUNTIME}" && ( ( "${INPUT_COLLECT_ROADMAP}" != "true" && -z "${INPUT_SOURCE_CAPTURES}" && -z "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ) || -n "${INPUT_ADR_RUNTIME}" ) ]]; then
+          printf 'source-runtime requires a native source plan and excludes adr-runtime\n' >&2
+          exit 2
+        fi
         case "${INPUT_ADR_POLICY_OWNER}" in
           true | false) ;;
           *) printf 'adr-policy-owner must be true or false\n' >&2; exit 2 ;;
@@ -260,18 +328,45 @@ runs:
           printf 'adr-policy-owner requires collect-adrs\n' >&2
           exit 2
         fi
-        if [[ "${INPUT_COLLECT_ADRS}" == "true" && ( -n "${INPUT_OBSERVATORY_SNAPSHOT}" || -n "${INPUT_OBSERVATORY_COMPARISON}" ) ]]; then
-          printf 'collect-adrs conflicts with external snapshot/comparison inputs\n' >&2
+        if [[ ( "${INPUT_COLLECT_ADRS}" == "true" || "${INPUT_COLLECT_ROADMAP}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ) && ( -n "${INPUT_OBSERVATORY_SNAPSHOT}" || -n "${INPUT_OBSERVATORY_COMPARISON}" ) ]]; then
+          printf 'Native source collection conflicts with external snapshot/comparison inputs\n' >&2
           exit 2
         fi
         if [[ "${INPUT_COLLECT_ADRS}" == "false" && -n "${INPUT_ADR_RUNTIME}" ]]; then
           printf 'adr-runtime requires collect-adrs\n' >&2
           exit 2
         fi
+        if [[ -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
+          case "${GITHUB_EVENT_NAME:-}" in
+            push | workflow_dispatch) ;;
+            *) printf 'Capture artifact intake currently supports push and workflow_dispatch only\n' >&2; exit 2 ;;
+          esac
+          if [[ -n "${INPUT_SOURCE_CAPTURES}" || -z "${INPUT_AS_OF}" \
+            || ! "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" =~ ^[1-9][0-9]{0,19}$ \
+            || ! "${INPUT_SOURCE_CAPTURE_ARTIFACT_DIGEST}" =~ ^(sha256:)?[0-9a-f]{64}$ ]]; then
+            printf 'Capture artifact request requires exact ID/digest, explicit as-of and no local source-captures\n' >&2
+            exit 2
+          fi
+        elif [[ -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_DIGEST}" ]]; then
+          printf 'Capture artifact digest requires its exact ID\n' >&2
+          exit 2
+        fi
         python3 -I "${GITHUB_ACTION_PATH}/scripts/repository_adr_inputs.py"
         validate_relative_path "output-directory" "${INPUT_OUTPUT_DIRECTORY}"
         validate_relative_path "work-directory" "${INPUT_WORK_DIRECTORY}"
         validate_relative_path "reports-directory" "${INPUT_REPORTS_DIRECTORY}"
+        if [[ -n "${INPUT_SOURCE_CAPTURES}" ]]; then
+          if [[ -z "${INPUT_AS_OF}" ]]; then
+            printf 'source-captures requires explicit as-of matching the capture evaluation boundary\n' >&2
+            exit 2
+          fi
+          validate_relative_path "source-captures" "${INPUT_SOURCE_CAPTURES}"
+          if [[ "${INPUT_SOURCE_CAPTURES}/" == "${INPUT_OUTPUT_DIRECTORY}/"* \
+            || "${INPUT_OUTPUT_DIRECTORY}/" == "${INPUT_SOURCE_CAPTURES}/"* ]]; then
+            printf 'source-captures and output-directory must not overlap\n' >&2
+            exit 2
+          fi
+        fi
         if [[ -n "${INPUT_OBSERVATORY_SNAPSHOT}" ]]; then
           validate_relative_path "observatory-snapshot" "${INPUT_OBSERVATORY_SNAPSHOT}"
           if [[ "${INPUT_OBSERVATORY_SNAPSHOT}/" == "${INPUT_OUTPUT_DIRECTORY}/"* \
@@ -403,7 +498,8 @@ runs:
         generator_commit=""
         generator_immutable="false"
         if [[ "${RELAY_WORKFLOW_REPOSITORY}" == "egohygiene/relay" \
-          && "${RELAY_WORKFLOW_REF}" == egohygiene/relay/.github/workflows/repository-intelligence.yml@* \
+          && ( "${RELAY_WORKFLOW_REF}" == egohygiene/relay/.github/workflows/repository-intelligence.yml@* \
+            || "${RELAY_WORKFLOW_REF}" == egohygiene/relay/.github/workflows/repository-intelligence-captures.yml@* ) \
           && "${RELAY_WORKFLOW_SHA}" =~ ^[0-9a-f]{40}$ ]]; then
           generator_repository="${RELAY_WORKFLOW_REPOSITORY}"
           generator_ref="${RELAY_WORKFLOW_REF}"
@@ -481,29 +577,89 @@ runs:
         printf 'generator-immutable=%s\n' "${generator_immutable}" >> "${GITHUB_OUTPUT}"
         printf 'source-epoch=%s\n' "${source_epoch}" >> "${GITHUB_OUTPUT}"
 
-    - name: "📚 Collect validated canonical ADRs when requested"
+    - name: Admit exact same-run public JSON capture artifact
+      id: capture_intake
+      if: "${{ inputs.source-capture-artifact-id != '' }}"
+      shell: bash
+      env:
+        CAPTURE_GITHUB_TOKEN: "${{ github.token }}"
+        CAPTURE_ARTIFACT_ID: "${{ inputs.source-capture-artifact-id }}"
+        CAPTURE_ARTIFACT_DIGEST: "${{ inputs.source-capture-artifact-digest }}"
+        CAPTURE_REPOSITORY: "${{ steps.metadata.outputs.repository }}"
+        CAPTURE_REPOSITORY_ID: "${{ github.repository_id }}"
+        CAPTURE_SOURCE_COMMIT: "${{ steps.metadata.outputs.source-commit }}"
+        CAPTURE_AS_OF: "${{ steps.metadata.outputs.as-of }}"
+        CAPTURE_RUN_ID: "${{ github.run_id }}"
+        CAPTURE_RUN_ATTEMPT: "${{ github.run_attempt }}"
+        CAPTURE_EVENT_NAME: "${{ github.event_name }}"
+        CAPTURE_VISIBILITY: "${{ steps.metadata.outputs.repository-visibility }}"
+      run: |
+        set -euo pipefail
+        python3 -I "${GITHUB_ACTION_PATH}/scripts/repository_capture_artifact.py" admit \
+          --repository "${CAPTURE_REPOSITORY}" \
+          --repository-id "${CAPTURE_REPOSITORY_ID}" \
+          --source-commit "${CAPTURE_SOURCE_COMMIT}" \
+          --run-id "${CAPTURE_RUN_ID}" \
+          --run-attempt "${CAPTURE_RUN_ATTEMPT}" \
+          --event-name "${CAPTURE_EVENT_NAME}" \
+          --visibility "${CAPTURE_VISIBILITY}" \
+          --observed-at "${CAPTURE_AS_OF}" \
+          --artifact-id "${CAPTURE_ARTIFACT_ID}" \
+          --artifact-digest "${CAPTURE_ARTIFACT_DIGEST}" \
+          --runner-temp "${RUNNER_TEMP}" \
+          --repository-root "${GITHUB_WORKSPACE}" \
+          --github-output "${GITHUB_OUTPUT}"
+
+    - name: "📚 Collect validated canonical sources when requested"
       shell: bash
       env:
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
+        INPUT_COLLECT_ROADMAP: "${{ inputs.collect-roadmap }}"
+        INPUT_SOURCE_CAPTURES: "${{ inputs.source-captures }}"
+        INPUT_SOURCE_CAPTURE_ARTIFACT_ID: "${{ inputs.source-capture-artifact-id }}"
+        INPUT_SOURCE_CAPTURE_ARTIFACT_DIGEST: "${{ inputs.source-capture-artifact-digest }}"
         INPUT_ADR_POLICY_OWNER: "${{ inputs.adr-policy-owner }}"
         INPUT_ADR_KNOWN_EXTERNAL_DECISIONS: "${{ inputs.adr-known-external-decisions }}"
         INPUT_ADR_RUNTIME: "${{ inputs.adr-runtime }}"
+        INPUT_SOURCE_RUNTIME: "${{ inputs.source-runtime }}"
         INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
+        CAPTURE_INTAKE_PLAN: "${{ steps.capture_intake.outputs.plan-path }}"
+        CAPTURE_INTAKE_ROOT: "${{ steps.capture_intake.outputs.capture-root }}"
+        CAPTURE_INTAKE_RECEIPT: "${{ steps.capture_intake.outputs.receipt-path }}"
         RESOLVED_AS_OF: "${{ steps.metadata.outputs.as-of }}"
         RESOLVED_REPOSITORY: "${{ steps.metadata.outputs.repository }}"
         RESOLVED_REPOSITORY_VISIBILITY: "${{ steps.metadata.outputs.repository-visibility }}"
         RESOLVED_SOURCE_COMMIT: "${{ steps.metadata.outputs.source-commit }}"
       run: |
         set -euo pipefail
-        if [[ "${INPUT_COLLECT_ADRS}" == "true" ]]; then
+        if [[ "${INPUT_COLLECT_ADRS}" == "true" || "${INPUT_COLLECT_ROADMAP}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
           runtime_arguments=()
+          collector="${GITHUB_ACTION_PATH}/scripts/prepare_repository_adr_build.py"
+          if [[ "${INPUT_COLLECT_ROADMAP}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
+            collector="${GITHUB_ACTION_PATH}/scripts/prepare_repository_sources_build.py"
+            if [[ "${INPUT_COLLECT_ROADMAP}" == "true" ]]; then
+              runtime_arguments+=(--collect-roadmap)
+            fi
+            if [[ -n "${INPUT_SOURCE_CAPTURES}" ]]; then
+              runtime_arguments+=(--capture-plan "${GITHUB_WORKSPACE}/${INPUT_SOURCE_CAPTURES}")
+            fi
+            if [[ -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
+              runtime_arguments+=(--capture-plan "${CAPTURE_INTAKE_PLAN}" --capture-root "${CAPTURE_INTAKE_ROOT}" --capture-intake-receipt "${CAPTURE_INTAKE_RECEIPT}")
+            fi
+            if [[ "${INPUT_COLLECT_ADRS}" == "true" ]]; then
+              runtime_arguments+=(--collect-adrs)
+            fi
+            if [[ -n "${INPUT_SOURCE_RUNTIME}" ]]; then
+              runtime_arguments+=(--runtime "${INPUT_SOURCE_RUNTIME}")
+            fi
+          fi
           if [[ "${INPUT_ADR_POLICY_OWNER}" == "true" ]]; then
             runtime_arguments+=(--policy-owner)
           fi
           if [[ -n "${INPUT_ADR_RUNTIME}" ]]; then
             runtime_arguments+=(--runtime "${INPUT_ADR_RUNTIME}")
           fi
-          python3 -I "${GITHUB_ACTION_PATH}/scripts/prepare_repository_adr_build.py" \
+          python3 -I "${collector}" \
             --repository-root "${GITHUB_WORKSPACE}" \
             --work-directory "${INPUT_WORK_DIRECTORY}" \
             --repository "${RESOLVED_REPOSITORY}" \
@@ -581,6 +737,10 @@ runs:
       shell: bash
       env:
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
+        INPUT_COLLECT_ROADMAP: "${{ inputs.collect-roadmap }}"
+        INPUT_SOURCE_CAPTURES: "${{ inputs.source-captures }}"
+        INPUT_SOURCE_CAPTURE_ARTIFACT_ID: "${{ inputs.source-capture-artifact-id }}"
+        INPUT_SOURCE_CAPTURE_ARTIFACT_DIGEST: "${{ inputs.source-capture-artifact-digest }}"
         INPUT_OBSERVATORY_COMPARISON: "${{ inputs.observatory-comparison }}"
         INPUT_OBSERVATORY_SNAPSHOT: "${{ inputs.observatory-snapshot }}"
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
@@ -623,7 +783,13 @@ runs:
           --script-source "${GITHUB_ACTION_PATH}/assets/explorer.js" \
           --dashboard-subdirectory "dashboard"
         snapshot_arguments=()
-        if [[ "${INPUT_COLLECT_ADRS}" == "true" ]]; then
+        if [[ "${INPUT_COLLECT_ROADMAP}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
+          INPUT_OBSERVATORY_SNAPSHOT="${INPUT_WORK_DIRECTORY}/sources/snapshot.json"
+          python3 -I "${GITHUB_ACTION_PATH}/scripts/repository_sources_build_contract.py" \
+            --provenance "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/provenance.json" \
+            --receipt "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}/sources/receipt.json" \
+            --snapshot "${GITHUB_WORKSPACE}/${INPUT_OBSERVATORY_SNAPSHOT}"
+        elif [[ "${INPUT_COLLECT_ADRS}" == "true" ]]; then
           INPUT_OBSERVATORY_SNAPSHOT="${INPUT_WORK_DIRECTORY}/adr/snapshot.json"
           python3 -I "${GITHUB_ACTION_PATH}/scripts/repository_adr_build_contract.py" \
             --provenance "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/provenance.json" \
@@ -668,6 +834,15 @@ runs:
           --source-commit "${RESOLVED_SOURCE_COMMIT}" \
           "${snapshot_arguments[@]}" \
           "${comparison_arguments[@]}"
+        python3 "${GITHUB_ACTION_PATH}/scripts/render_repository_intelligence_graph.py" \
+          --repository-root "${GITHUB_WORKSPACE}" \
+          --output-root "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}" \
+          --summary "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/summary.json" \
+          --provenance "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/provenance.json" \
+          --repository "${RESOLVED_REPOSITORY}" \
+          --source-commit "${RESOLVED_SOURCE_COMMIT}" \
+          --target both \
+          "${snapshot_arguments[@]}"
 
     - name: "🧾 Create deterministic build manifest"
       id: build_manifest

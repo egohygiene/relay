@@ -1,0 +1,56 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+name: Repository Intelligence Capture Artifact
+description: Pack only referenced public JSON captures into an immutable same-run/head handoff; does not upload or execute consumer code.
+inputs:
+  source-directory:
+    description: Directory containing source-plan.json and its referenced public Work/Health JSON captures.
+    required: true
+  as-of:
+    description: Explicit UTC evaluation boundary; capture timestamps and source commits are preserved.
+    required: true
+outputs:
+  artifact-name:
+    description: Exact repository/head/run/attempt-bound name required by the reusable intake.
+    value: "${{ steps.pack.outputs.artifact-name }}"
+  artifact-directory:
+    description: New private runner-temporary directory containing only the admitted JSON bundle.
+    value: "${{ steps.pack.outputs.artifact-directory }}"
+  manifest-sha256:
+    description: SHA-256 of the exact capture-bundle.json bytes.
+    value: "${{ steps.pack.outputs.manifest-sha256 }}"
+  as-of:
+    description: The explicit evaluation boundary to pass unchanged to the reusable builder.
+    value: "${{ steps.pack.outputs.as-of }}"
+runs:
+  using: composite
+  steps:
+    - name: Pack bounded public JSON captures
+      id: pack
+      shell: bash
+      env:
+        CAPTURE_SOURCE_DIRECTORY: "${{ inputs.source-directory }}"
+        CAPTURE_AS_OF: "${{ inputs.as-of }}"
+        CAPTURE_REPOSITORY: "${{ github.repository }}"
+        CAPTURE_REPOSITORY_ID: "${{ github.repository_id }}"
+        CAPTURE_SOURCE_COMMIT: "${{ github.sha }}"
+        CAPTURE_RUN_ID: "${{ github.run_id }}"
+        CAPTURE_RUN_ATTEMPT: "${{ github.run_attempt }}"
+        CAPTURE_EVENT_NAME: "${{ github.event_name }}"
+        CAPTURE_VISIBILITY: "${{ github.event.repository.visibility }}"
+      run: |
+        set -euo pipefail
+        python3 -I "${GITHUB_ACTION_PATH}/../repository-intelligence/scripts/repository_capture_artifact.py" pack \
+          --source-directory "${CAPTURE_SOURCE_DIRECTORY}" \
+          --repository "${CAPTURE_REPOSITORY}" \
+          --repository-id "${CAPTURE_REPOSITORY_ID}" \
+          --source-commit "${CAPTURE_SOURCE_COMMIT}" \
+          --run-id "${CAPTURE_RUN_ID}" \
+          --run-attempt "${CAPTURE_RUN_ATTEMPT}" \
+          --event-name "${CAPTURE_EVENT_NAME}" \
+          --visibility "${CAPTURE_VISIBILITY}" \
+          --observed-at "${CAPTURE_AS_OF}" \
+          --runner-temp "${RUNNER_TEMP}" \
+          --repository-root "${GITHUB_WORKSPACE}" \
+          --github-output "${GITHUB_OUTPUT}"
