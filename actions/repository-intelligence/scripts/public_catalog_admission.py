@@ -128,7 +128,8 @@ def validate_selection(selected, metadata):
         require(isinstance(name, str) and name in permitted
             and encoded(row) == encoded(permitted[name]))
         names.append(name)
-    require(names == sorted(set(names)) and metadata.get("observed_at") == document["observed_at"])
+    require(names == sorted(set(names)) and isinstance(metadata, dict)
+        and metadata.get("observed_at") == document["observed_at"])
     return validate_metadata(metadata, selected)
 
 
