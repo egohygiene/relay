@@ -62,6 +62,16 @@ The helper is loaded only from the immutable Relay action directory:
   implementation with this exact lock and normalizer. It reuses the existing
   storage, lease, failure, freshness and coverage rules; no process-global
   legacy adapter is changed.
+- `upgrade(legacy_runtime, work)` returns a new runtime at `work/runtime`. It
+  first verifies the legacy ADR runtime and requires every non-Observatory pin
+  to match this profile exactly. Only verified required owner files and the
+  verified EgoLint executable are copied. A private bare Git fetch acquires
+  only the exact new public Observatory commit; its tree and every selected
+  blob digest must match the lock. The new runtime is verified again before
+  admission. The scratch directory must be fresh or empty, outside a Git
+  checkout and separate from the legacy runtime. No old file, compiler,
+  toolchain or Python environment is changed. Incompatible explicitly typed
+  runtimes can use `acquire(work)` separately.
 
 The helper performs no field attribution itself. Observatory's pinned schema
 and semantic implementation remain authoritative. Malformed or incompatible
