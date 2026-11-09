@@ -235,7 +235,7 @@
       "id": "repository-intelligence-compare-artifact",
       "path": "actions/repository-intelligence-compare-artifact",
       "name": "Repository Intelligence Compare Artifact",
-      "summary": "Admit an exact prior public projection/snapshot artifact, compute pinned comparisons and retain eligible current pairs as ordinary artifacts without deployment.",
+      "summary": "Admit an exact prior public projection/snapshot artifact, retain eligible current pairs and optionally compose Compare into the same native bundle without losing source receipts or deploying.",
       "status": "experimental",
       "runtime": [
         "bash",
