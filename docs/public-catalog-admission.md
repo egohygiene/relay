@@ -1,5 +1,13 @@
 # Public catalog admission
 
+`public_catalog_admission.acquire(work)` optionally fetches only the pinned public
+Hygiene revision into a fresh bare Git directory at `work/public-catalog` and
+returns that path. It uses only the standard library and Git, with an isolated
+Git environment and fixed HTTPS source. It does not install tools, execute source
+files, or change consumer/recovery configuration. Callers must place `work`
+outside the consumer checkout and native runtime; `load()` still authenticates
+the source and admits selected public rows after this transport completes.
+
 `public_catalog_admission.py` reads the reviewed public projection delivered by
 [Hygiene #97](https://github.com/egohygiene/hygiene/pull/97). It does not create a
 registry, discover repositories, infer roles, or promote proposed policy. Refs
