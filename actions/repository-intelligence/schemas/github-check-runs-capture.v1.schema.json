@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/github-check-runs-capture.v1.schema.json",
+  "title": "Bounded public GitHub check-runs transport with explicit collection outcome",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "total_count",
+    "check_runs",
+    "relay_capture"
+  ],
+  "properties": {
+    "total_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "check_runs": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "head_sha",
+          "status",
+          "conclusion",
+          "started_at",
+          "completed_at",
+          "html_url"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "head_sha": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "in_progress",
+              "completed"
+            ]
+          },
+          "conclusion": {
+            "enum": [
+              "success",
+              "failure",
+              "neutral",
+              "cancelled",
+              "skipped",
+              "timed_out",
+              "action_required",
+              "unknown",
+              null
+            ]
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "html_url": {
+            "type": "string",
+            "pattern": "^https://github\\.com/egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)/(?:runs/[1-9][0-9]*|actions/runs/[1-9][0-9]*(?:/job/[1-9][0-9]*)?)$"
+          }
+        }
+      }
+    },
+    "relay_capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "repository",
+        "source_commit",
+        "captured_at",
+        "outcome",
+        "pagination"
+      ],
+      "properties": {
+        "schema": {
+          "const": "egohygiene.relay.github-check-runs-capture/v1"
+        },
+        "repository": {
+          "type": "string",
+          "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "captured_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "outcome": {
+          "enum": [
+            "complete",
+            "rate_limited",
+            "access_denied",
+            "provider_unavailable",
+            "collection_failed"
+          ]
+        },
+        "pagination": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "pages_received",
+            "exhausted",
+            "truncated"
+          ],
+          "properties": {
+            "pages_received": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 64
+            },
+            "exhausted": {
+              "type": "boolean"
+            },
+            "truncated": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}
