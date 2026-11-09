@@ -7,23 +7,23 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-11-09T17:39:28Z'
+  updated_at: '2026-11-09T17:43:28Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Compose admitted Compare evidence into the completed native Intelligence bundle without replacing
-    its source receipts.
+  purpose: Produce bounded real GitHub Work, Health and Releases captures for the existing same-run native
+    source handoff.
   includes:
-  - actions/repository-intelligence-compare-artifact accepts an optional completed Intelligence directory at
-    the same immutable Relay revision as its native builder. compose_repository_intelligence_compare.py verifies
-    original source pairs and receipts, replaces only Compare and its deterministic manifest, and restores
-    both files on composition failure.
-  - Final manifest and bundle digest outputs supersede the earlier builder digests when composition is selected.
-    Malformed compressed archives and deeply nested baseline JSON use the honest unavailable, unchanged-retention
-    path. The consumer fragment defaults off; seed requires no invented baseline and compare requires the complete
-    exact retained selection.
+  - actions/repository-intelligence-github-sources captures public issue/PR inventories, exact-commit checks
+    and published releases through bounded read-only provider requests, then packs the existing immutable same-run
+    capture format. Source-selected URLs, bodies, comments, actors, emails and logs are excluded; titles remain
+    opt-in.
+  - Anonymous public admission runs before and after capture. Pagination, record/request/byte/time limits,
+    last-successful-page clocks, primary and secondary rate limits and partially received inventories remain
+    explicit. Health preserves partial empty captures instead of converting them to complete. Deployments remain
+    uncollected without an actual consumer run-attempt receipt.
   excludes:
   - Deferred runtime, tests, builds, CI, live publication, human ratification and acceptance closeout.
   precedence:
@@ -37,71 +37,73 @@ scope:
   - ARCHITECTURE.md
   - SYSTEM.md
   - DECISIONS.md
-  - docs/repository-intelligence-compare-artifact.md
-  - examples/workflows/repository-intelligence-native-compare.md
-  - https://github.com/egohygiene/relay/issues/152
+  - actions/repository-intelligence-github-sources/README.md
+  - docs/repository-source-capture-builds.md
+  - https://github.com/egohygiene/relay/issues/146
 work:
-  objective: Compose admitted Compare evidence into the completed native Intelligence bundle without replacing
-    its source receipts.
+  objective: Produce bounded real GitHub Work, Health and Releases captures for the existing same-run native
+    source handoff.
   success_conditions:
-  - The fresh native source receipt and all payload bytes outside Compare remain exact.
-  - Only a real admitted before/after pair supplies comparison evidence; seed and unavailable states remain
-    explicit.
-  - No deployment, publication, lifecycle or frozen recovery authority changes.
+  - Existing collectors receive real provider captures through their existing closed source plan and artifact
+    intake.
+  - Provider access cannot imply deployment, contract conformance, human approval or complete inventories beyond
+    received pages.
+  - Old collector locks/defaults, consumer publication gates and recovery bytes remain intact.
   active_issue:
     provider: github
-    id: egohygiene/relay#152
-    url: https://github.com/egohygiene/relay/issues/152
+    id: egohygiene/relay#146
+    url: https://github.com/egohygiene/relay/issues/146
   next:
     kind: action
-    id: adopt-manual-native-compare
-    description: Adopt the reviewed immutable Compare integration in the prepared Identity manual off/seed/compare
-      path, then retain two real compatible successful captures during the deferred qualification pass.
+    id: adopt-public-github-source-feeds
+    description: Adopt this exact producer and source-plan handoff in the prepared current consumer Pages paths,
+      then qualify actual provider, artifact, native and publication behavior in the deferred verification
+      pass.
     readiness: ready
     references:
-    - https://github.com/egohygiene/relay/issues/152
+    - https://github.com/egohygiene/relay/issues/146
     depends_on: []
 state:
   base:
-    revision: cb1027f73c5dab5f6608f6a0bac71008863d7df2
+    revision: d4e89c594c2428ff48407b4a29734bd59eda7def
     ref: refs/heads/main
-    verified_at: '2026-11-09T17:39:28Z'
+    verified_at: '2026-11-09T17:43:28Z'
   candidate:
-    branch: codex/intelligence-compare-delivery
+    branch: codex/intelligence-source-delivery
     revision: null
     pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-11-09T17:39:28Z'
-    default_branch_revision: cb1027f73c5dab5f6608f6a0bac71008863d7df2
+    observed_at: '2026-11-09T17:43:28Z'
+    default_branch_revision: d4e89c594c2428ff48407b4a29734bd59eda7def
     issue_state: open
     pull_request_state: not-applicable
-    notes: Relay main cb1027f and open issue 152 were verified. Original source slices 158 through 166 are
-      closed as superseded by merged 167; their source remains on main. Identity manual adoption and other
-      production Intelligence slices are separate candidates.
+    notes: Relay Compare composition is merged through PR 172; owning source issues 146, 149 and 150 remain
+      open. The Empathy source-feed consumer is separately prepared; no hosted capture or upload is claimed.
   parallel_changes: []
 review:
   status: partial
-  reviewed_at: '2026-11-09T17:39:28Z'
+  reviewed_at: '2026-11-09T17:43:28Z'
   reviewed_by: Codex
   evidence:
-  - command: Python AST, unique-key YAML, embedded Bash/Python syntax, catalog JSON, scoped whitespace, source/pair/manifest
-      preservation and independent static source review
+  - command: Python AST, unique-key YAML, embedded Bash/Python syntax, JSON schema definitions, action-catalog
+      shape, continuity schema/size, whitespace and independent static source review
     outcome: limited
-    observed_at: '2026-11-09T17:39:28Z'
+    observed_at: '2026-11-09T17:43:28Z'
     notes: Static source and metadata inspection only; no application execution.
   - command: Native/runtime execution, tests, builds, CI investigation, browser/provider/consumer/publication
       qualification
     outcome: not-run
-    observed_at: '2026-11-09T17:39:28Z'
+    observed_at: '2026-11-09T17:43:28Z'
     notes: Deferred at maintainer request; source merges do not establish acceptance.
   environment_limitations:
-  - Native and cross-profile replay, tests, builds, CI, provider intake and consumer publication were not executed.
-  - Two real compatible retained snapshots, actual artifact upload/run identities and hosted rollback qualification
-    remain required for acceptance.
-  - Hygiene human ADR approval and Akashic roadmap source holds remain separate; no baseline, approval, publication
-    or issue completion is invented.
+  - No actual GitHub provider requests, native normalization, tests, builds, CI, uploads, canaries or publication
+    were executed.
+  - Health producer-specific report gaps and consumer source-policy holds remain separate. Generic GitHub deployment
+    metadata cannot establish the exact required run-attempt evidence.
+  - Later acceptance must retain real run/artifact identities, public/private invariance, provider failure
+    behavior and consumer recovery proof.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -128,33 +130,33 @@ Read scoped instructions, canonical sources above and this checkpoint. Verify mu
 
 ## Current objective and success conditions
 
-Compose admitted Compare evidence into the completed native Intelligence bundle without replacing its source receipts. The fresh native source receipt and all payload bytes outside Compare remain exact. Only a real admitted before/after pair supplies comparison evidence; seed and unavailable states remain explicit. No deployment, publication, lifecycle or frozen recovery authority changes.
+Produce bounded real GitHub Work, Health and Releases captures for the existing same-run native source handoff. Existing collectors receive real provider captures through their existing closed source plan and artifact intake. Provider access cannot imply deployment, contract conformance, human approval or complete inventories beyond received pages. Old collector locks/defaults, consumer publication gates and recovery bytes remain intact.
 
 ## State snapshot
 
-Candidate `codex/intelligence-compare-delivery` is based on observed main `cb1027f73c5dab5f6608f6a0bac71008863d7df2`. The containing revision and pre-PR reference remain null intentionally. Relay main cb1027f and open issue 152 were verified. Original source slices 158 through 166 are closed as superseded by merged 167; their source remains on main. Identity manual adoption and other production Intelligence slices are separate candidates.
+Candidate `codex/intelligence-source-delivery` is based on observed main `d4e89c594c2428ff48407b4a29734bd59eda7def`. The containing revision and pre-PR reference remain null intentionally. Relay Compare composition is merged through PR 172; owning source issues 146, 149 and 150 remain open. The Empathy source-feed consumer is separately prepared; no hosted capture or upload is claimed.
 
 ## Completed and material changes
 
-actions/repository-intelligence-compare-artifact accepts an optional completed Intelligence directory at the same immutable Relay revision as its native builder. compose_repository_intelligence_compare.py verifies original source pairs and receipts, replaces only Compare and its deterministic manifest, and restores both files on composition failure.
+actions/repository-intelligence-github-sources captures public issue/PR inventories, exact-commit checks and published releases through bounded read-only provider requests, then packs the existing immutable same-run capture format. Source-selected URLs, bodies, comments, actors, emails and logs are excluded; titles remain opt-in.
 
-Final manifest and bundle digest outputs supersede the earlier builder digests when composition is selected. Malformed compressed archives and deeply nested baseline JSON use the honest unavailable, unchanged-retention path. The consumer fragment defaults off; seed requires no invented baseline and compare requires the complete exact retained selection.
+Anonymous public admission runs before and after capture. Pagination, record/request/byte/time limits, last-successful-page clocks, primary and secondary rate limits and partially received inventories remain explicit. Health preserves partial empty captures instead of converting them to complete. Deployments remain uncollected without an actual consumer run-attempt receipt.
 
 ## Validation and review evidence
 
-Python AST, unique-key YAML, embedded Bash/Python syntax, catalog JSON, scoped whitespace, source/pair/manifest preservation and independent static source review. Static inspection only. Native/runtime execution, tests, builds, CI investigation, browsers, provider reads and publication qualification were not run.
+Python AST, unique-key YAML, embedded Bash/Python syntax, JSON schema definitions, action-catalog shape, continuity schema/size, whitespace and independent static source review. Static inspection only. Native/runtime execution, tests, builds, CI investigation, browsers, provider reads and publication qualification were not run.
 
 ## Blockers, risks, unknowns, and deferred work
 
-Native and cross-profile replay, tests, builds, CI, provider intake and consumer publication were not executed. Two real compatible retained snapshots, actual artifact upload/run identities and hosted rollback qualification remain required for acceptance. Hygiene human ADR approval and Akashic roadmap source holds remain separate; no baseline, approval, publication or issue completion is invented.
+No actual GitHub provider requests, native normalization, tests, builds, CI, uploads, canaries or publication were executed. Health producer-specific report gaps and consumer source-policy holds remain separate. Generic GitHub deployment metadata cannot establish the exact required run-attempt evidence. Later acceptance must retain real run/artifact identities, public/private invariance, provider failure behavior and consumer recovery proof.
 
 ## Next dependency-ready work
 
-Adopt the reviewed immutable Compare integration in the prepared Identity manual off/seed/compare path, then retain two real compatible successful captures during the deferred qualification pass.
+Adopt this exact producer and source-plan handoff in the prepared current consumer Pages paths, then qualify actual provider, artifact, native and publication behavior in the deferred verification pass.
 
 ## Parallel changes and reconciliation
 
-The source producer, public catalog/dependency adapter, fleet handoff and owner-backed Hygiene model are separate slices. This checkpoint changes only Compare composition. Existing Search/Journey collector locks and all consumer historical recovery pins remain unchanged. Governing existing DECISIONS ADR-0007 and ADR-0010 are referenced; this bounded handoff introduces no new authority.
+Refs source issues 146, 149 and 150 and composition 151. Existing Compare composition in merged 172 is retained. Dependencies, fleet handoff and the separate owner-backed Hygiene model are parallel slices. ADR not required: this composes the existing bounded provider/capture design and adds no new ownership or publication authority.
 
 ## Privacy and redaction
 
