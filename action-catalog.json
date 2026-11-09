@@ -207,6 +207,30 @@
         "workspace-write"
       ],
       "consumer_ref": "egohygiene/relay/actions/repository-intelligence-capture-artifact@v1"
+    },
+    {
+      "id": "repository-intelligence-compare-artifact",
+      "path": "actions/repository-intelligence-compare-artifact",
+      "name": "Repository Intelligence Compare Artifact",
+      "summary": "Admit an exact prior public projection/snapshot artifact, compute pinned comparisons and retain eligible current pairs as ordinary artifacts without deployment.",
+      "status": "experimental",
+      "runtime": [
+        "bash",
+        "git",
+        "python3",
+        "cargo",
+        "rustup"
+      ],
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "side_effects": [
+        "network-read",
+        "artifact-write",
+        "workspace-write"
+      ],
+      "consumer_ref": "egohygiene/relay/actions/repository-intelligence-compare-artifact@v1"
     }
   ],
   "workflows": [
