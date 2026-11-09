@@ -147,6 +147,29 @@ def provider_capture(args: argparse.Namespace) -> tuple[list, list, dict, list]:
     if (type(total) is not int or total < 0 or not isinstance(runs, list)
             or len(runs) > base.MAX_RECORDS or total < len(runs)):
         base.fail("CHECKS")
+    # Existing raw REST captures retain their compatibility. The live producer
+    # adds a closed transport receipt so a truncated/failed paginated capture
+    # cannot claim completeness from total_count alone (including empty pages).
+    transport_complete = True
+    if "relay_capture" in value:
+        capture = value["relay_capture"]
+        if (set(value) != {"total_count", "check_runs", "relay_capture"}
+                or not isinstance(capture, dict)
+                or set(capture) != {"schema", "repository", "source_commit", "captured_at", "outcome", "pagination"}
+                or capture["schema"] != "egohygiene.relay.github-check-runs-capture/v1"
+                or capture["repository"] != args.repository or capture["source_commit"] != args.source_commit
+                or capture["captured_at"] != args.check_runs_observed_at
+                or capture["outcome"] not in {"complete", "rate_limited", "access_denied", "provider_unavailable", "collection_failed"}):
+            base.fail("CHECKS")
+        pagination = capture["pagination"]
+        if (not isinstance(pagination, dict) or set(pagination) != {"pages_received", "exhausted", "truncated"}
+                or type(pagination["pages_received"]) is not int or not 1 <= pagination["pages_received"] <= 64
+                or type(pagination["exhausted"]) is not bool or type(pagination["truncated"]) is not bool
+                or len(runs) > 100 * pagination["pages_received"]
+                or (pagination["exhausted"] and pagination["truncated"])):
+            base.fail("CHECKS")
+        transport_complete = (capture["outcome"] == "complete" and pagination["exhausted"]
+                              and not pagination["truncated"])
     freshness = "stale" if age > args.maximum_age_seconds else "current"
     diagnostics, sources, entities, identities = [], [], [], set()
     for run in runs:
@@ -187,7 +210,7 @@ def provider_capture(args: argparse.Namespace) -> tuple[list, list, dict, list]:
                                      "provider": "github", "check_run_id": identifier,
                                      "started_at": started, "completed_at": completed}))
         sources.append(evidence)
-    complete = total == len(runs) and not diagnostics
+    complete = total == len(runs) and not diagnostics and transport_complete
     if not complete:
         diagnostics.append(diagnostic("TRUNCATED", "github-check-runs"))
     retained.update(sha256=base.digest(raw), observed_at=args.check_runs_observed_at,

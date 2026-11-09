@@ -1,0 +1,114 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+name: Repository Intelligence GitHub Sources
+description: Capture bounded public Work, commit-matched Health and published Releases metadata, then pack an existing same-run artifact handoff without upload or publication.
+inputs:
+  github-token:
+    description: Optional read-only GitHub token for issue/PR/check reads. Public admission and release/asset reads always use unauthenticated public endpoints.
+    required: false
+    default: ""
+  sources:
+    description: Closed comma-separated selection of work,health,releases.
+    required: false
+    default: work,health,releases
+  maximum-pages:
+    description: Maximum pages per selected endpoint, from 1 through 20; global request/byte/time bounds also apply.
+    required: false
+    default: "3"
+  maximum-work-records:
+    description: Maximum records in each issue and PR inventory, from 1 through 2000.
+    required: false
+    default: "256"
+  maximum-age-seconds:
+    description: Source-plan freshness limit; does not change original capture timestamps.
+    required: false
+    default: "86400"
+  include-titles:
+    description: Opt into bounded public provider titles/check names; bodies, comments, actors, emails and logs are always excluded.
+    required: false
+    default: "false"
+outputs:
+  artifact-name:
+    description: Exact existing repository/head/run/attempt-bound capture artifact name.
+    value: "${{ steps.pack.outputs.artifact-name }}"
+  artifact-directory:
+    description: Private runner-temporary directory containing only the closed capture bundle.
+    value: "${{ steps.pack.outputs.artifact-directory }}"
+  manifest-sha256:
+    description: SHA-256 of the exact capture-bundle.json bytes.
+    value: "${{ steps.pack.outputs.manifest-sha256 }}"
+  producer-receipt:
+    description: Separate bounded public-safe producer receipt; contains no raw provider responses or credentials.
+    value: "${{ steps.capture.outputs.producer-receipt }}"
+  as-of:
+    description: Actual UTC evaluation boundary after captures and final public admission; pass unchanged to the builder.
+    value: "${{ steps.capture.outputs.as-of }}"
+runs:
+  using: composite
+  steps:
+    - name: Capture bounded public GitHub source metadata
+      id: capture
+      shell: bash
+      env:
+        RELAY_GITHUB_READ_TOKEN: "${{ inputs.github-token }}"
+        CAPTURE_REPOSITORY: "${{ github.repository }}"
+        CAPTURE_REPOSITORY_ID: "${{ github.repository_id }}"
+        CAPTURE_SOURCE_COMMIT: "${{ github.sha }}"
+        CAPTURE_EVENT_NAME: "${{ github.event_name }}"
+        CAPTURE_VISIBILITY: "${{ github.event.repository.visibility }}"
+        CAPTURE_SOURCES: "${{ inputs.sources }}"
+        CAPTURE_MAXIMUM_PAGES: "${{ inputs.maximum-pages }}"
+        CAPTURE_MAXIMUM_WORK_RECORDS: "${{ inputs.maximum-work-records }}"
+        CAPTURE_MAXIMUM_AGE_SECONDS: "${{ inputs.maximum-age-seconds }}"
+        CAPTURE_INCLUDE_TITLES: "${{ inputs.include-titles }}"
+      run: |
+        set -euo pipefail
+        if [[ "${CAPTURE_VISIBILITY}" != public ]] || [[ "${CAPTURE_EVENT_NAME}" != push && "${CAPTURE_EVENT_NAME}" != workflow_dispatch ]]; then
+          printf 'Public source artifact capture requires a public push or workflow_dispatch context\n' >&2
+          exit 3
+        fi
+        case "${CAPTURE_INCLUDE_TITLES}" in
+          true) title_args=(--include-titles) ;;
+          false) title_args=() ;;
+          *) printf 'include-titles must be true or false\n' >&2; exit 3 ;;
+        esac
+        python3 -I "${GITHUB_ACTION_PATH}/scripts/capture_github_sources.py" \
+          --repository "${CAPTURE_REPOSITORY}" \
+          --repository-id "${CAPTURE_REPOSITORY_ID}" \
+          --source-commit "${CAPTURE_SOURCE_COMMIT}" \
+          --repository-root "${GITHUB_WORKSPACE}" \
+          --runner-temp "${RUNNER_TEMP}" \
+          --sources "${CAPTURE_SOURCES}" \
+          --maximum-pages "${CAPTURE_MAXIMUM_PAGES}" \
+          --maximum-work-records "${CAPTURE_MAXIMUM_WORK_RECORDS}" \
+          --maximum-age-seconds "${CAPTURE_MAXIMUM_AGE_SECONDS}" \
+          --github-output "${GITHUB_OUTPUT}" "${title_args[@]}"
+    - name: Pack the existing same-run capture handoff
+      id: pack
+      shell: bash
+      env:
+        CAPTURE_SOURCE_DIRECTORY: "${{ steps.capture.outputs.source-directory }}"
+        CAPTURE_AS_OF: "${{ steps.capture.outputs.as-of }}"
+        CAPTURE_REPOSITORY: "${{ github.repository }}"
+        CAPTURE_REPOSITORY_ID: "${{ github.repository_id }}"
+        CAPTURE_SOURCE_COMMIT: "${{ github.sha }}"
+        CAPTURE_RUN_ID: "${{ github.run_id }}"
+        CAPTURE_RUN_ATTEMPT: "${{ github.run_attempt }}"
+        CAPTURE_EVENT_NAME: "${{ github.event_name }}"
+        CAPTURE_VISIBILITY: "${{ github.event.repository.visibility }}"
+      run: |
+        set -euo pipefail
+        python3 -I "${GITHUB_ACTION_PATH}/../repository-intelligence/scripts/repository_capture_artifact.py" pack \
+          --source-directory "${CAPTURE_SOURCE_DIRECTORY}" \
+          --repository "${CAPTURE_REPOSITORY}" \
+          --repository-id "${CAPTURE_REPOSITORY_ID}" \
+          --source-commit "${CAPTURE_SOURCE_COMMIT}" \
+          --run-id "${CAPTURE_RUN_ID}" \
+          --run-attempt "${CAPTURE_RUN_ATTEMPT}" \
+          --event-name "${CAPTURE_EVENT_NAME}" \
+          --visibility "${CAPTURE_VISIBILITY}" \
+          --observed-at "${CAPTURE_AS_OF}" \
+          --runner-temp "${RUNNER_TEMP}" \
+          --repository-root "${GITHUB_WORKSPACE}" \
+          --github-output "${GITHUB_OUTPUT}"

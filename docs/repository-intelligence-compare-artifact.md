@@ -4,8 +4,10 @@ The existing [offline retention CLI](repository-intelligence-snapshot-retention.
 already admits exact original projection/snapshot pairs, computes the pinned
 Observatory comparison and protects local pointer refresh with an explicit
 digest lease. `repository-intelligence-compare-artifact` adds the ordinary
-consumer artifact transport around that boundary. Existing builder/workflow
-inputs, no-baseline behavior, token contracts and deployers are unchanged.
+consumer artifact transport around that boundary. The optional native
+post-build composition preserves the source receipts of that same build.
+Existing builder/workflow inputs, no-baseline behavior, token contracts and
+deployers are unchanged.
 
 ## Exact source and transport boundary
 
@@ -60,8 +62,73 @@ handoff using their existing orchestration.
 
 ## Consumer composition
 
-Keep the existing capture, build and single deployment jobs. In an existing
-read-only source/build job, after actual source preparation:
+### Native sources: preserve the completed build
+
+Keep the existing capture, build and single deployment jobs. After the native
+Intelligence builder completes, select this action in that same read-only job
+with `intelligence-directory` naming its generated subtree. Point
+`source-directory` at the actual native `sources` directory containing
+`projection.json`, `snapshot.json` and its fresh `receipt.json`:
+
+```yaml
+# These steps belong inside the existing consumer-owned build job.
+# Preserve its source selections, exact pin, evaluation clock and single deployer.
+- id: intelligence
+  uses: egohygiene/relay/actions/repository-intelligence@FULL_REVIEWED_RELAY_SHA
+  with:
+    work-directory: .cache/repository-intelligence
+    output-directory: dist/intelligence
+    collect-journey: true
+    search-attribution: true
+    as-of: ${{ steps.source.outputs.as-of }}
+- id: compare
+  uses: egohygiene/relay/actions/repository-intelligence-compare-artifact@FULL_REVIEWED_RELAY_SHA
+  with:
+    source-directory: ${{ github.workspace }}/.cache/repository-intelligence/sources
+    intelligence-directory: dist/intelligence
+    as-of: ${{ steps.source.outputs.as-of }}
+    normalization-profile: search-attribution-v1
+    expected-baseline: none
+    retention-days: 30
+```
+
+Use the same full immutable Relay commit for both actions. A mismatch is denied,
+including a mutable tag or branch on the Compare action. The native bundle must
+have a validated `source_collection` receipt; old ADR-only paths without their
+original pair cannot use this seam. Existing consumer source selections such
+as canonical ADRs, Roadmap or provider captures must remain on the first step.
+The fragment's `steps.source.outputs.as-of` stands for the consumer's actual
+explicit evaluation clock; it is not a new producer or fabricated timestamp.
+
+The trusted intake admits the pair and computes the pinned owner comparison
+once. It passes those in-memory values directly to the composer, which verifies
+the native receipt, original pair hashes, consumer identity, selected
+normalization profile, immutable Relay generator and complete existing bundle.
+Only `compare/index.html` and `build-manifest.json` can change. Journey, Search,
+every other route, assets, provenance and the complete source receipt retain
+their exact bytes. The final complete bundle is validated again. Caught write
+or validation failures restore the prior two files; interruption can leave an
+invalid manifest and must fail the existing build rather than publish it.
+
+Use the **final** `steps.compare.outputs.manifest-sha256` and `bundle-digest`
+when composition was selected, or read the final manifest from the composed
+tree. The earlier builder outputs describe the earlier bundle. Existing
+consumer composition/non-clobber verification must run after this step and
+before the consumer's ordinary artifact or Pages upload. The Compare step has
+no deployment authority and introduces no deployment/recovery job dependency.
+
+Default consumers leave Compare unselected. A reviewed manual opt-in can seed
+with `expected-baseline: none`; Compare remains unavailable. For a later run,
+select all exact identity fields from a real successful prior upload as
+described below. The [manual opt-in fragment](../examples/workflows/repository-intelligence-native-compare.md)
+shows how to prepare that configuration without inventing a baseline.
+
+### External snapshots
+
+The following older staging pattern is for external-snapshot builds. Do not
+replace a completed native build with it: an external render does not carry
+the freshly collected native `source_collection` receipt. In a source/build job
+with actual separately prepared external inputs:
 
 ```yaml
 # Pin both uses to the same exact reviewed Relay commit before adoption.
@@ -145,6 +212,16 @@ Only the admitted snapshot and exact comparison belong in the site's normal
 provenance/rendering path. Manifest, original projection, ZIP/provider hashes,
 transport identity and operational receipts remain private ordinary evidence;
 they never become public bundle freshness or redaction-sensitive digests.
+
+## Native composition checkpoint
+
+The optional post-build seam implements source-preserving consumer wiring for
+#152. Consumers still need their real first/second compatible captures and the
+exact successful ordinary upload identities before selecting a baseline.
+Public provider execution, native replay, tests, builds, CI and browser/live
+qualification remain deferred at maintainer request. This change does not
+claim live comparison, deployment, retention delivery, upgrade or rollback
+acceptance.
 
 ## Review checkpoint
 
