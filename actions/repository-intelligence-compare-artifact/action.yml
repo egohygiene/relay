@@ -7,6 +7,9 @@ inputs:
   source-directory:
     description: Completed public source-build directory containing exact original projection.json and snapshot.json.
     required: true
+  intelligence-directory:
+    description: Optional repository-relative completed native Intelligence subtree; recompose only Compare and refresh its manifest while preserving source receipts. Requires this action and the native builder at the same immutable Relay commit.
+    default: ""
   as-of:
     description: Explicit UTC operational boundary; never substituted into historical snapshots.
     required: true
@@ -44,6 +47,15 @@ inputs:
     default: "30"
     description: Ordinary snapshot artifact retention, from1 through90 days.
 outputs:
+  composition-status:
+    value: "${{ steps.prepare.outputs.composition-status }}"
+    description: refreshed only after the optional native Compare composition and complete bundle validation.
+  manifest-sha256:
+    value: "${{ steps.prepare.outputs.manifest-sha256 }}"
+    description: Final deterministic manifest digest after optional native Compare composition; replaces the earlier builder output.
+  bundle-digest:
+    value: "${{ steps.prepare.outputs.bundle-digest }}"
+    description: Final deterministic payload digest after optional native Compare composition; excludes operational evidence.
   status:
     value: "${{ steps.prepare.outputs.status }}"
     description: ready, partial or unavailable comparison evidence; upload/deployment success stays separate.
@@ -89,6 +101,9 @@ runs:
       env:
         COMPARE_GITHUB_TOKEN: "${{ github.token }}"
         COMPARE_SOURCE_DIRECTORY: "${{ inputs.source-directory }}"
+        COMPARE_INTELLIGENCE_DIRECTORY: "${{ inputs.intelligence-directory }}"
+        COMPARE_GENERATOR_REPOSITORY: "${{ github.action_repository }}"
+        COMPARE_GENERATOR_REF: "${{ github.action_ref }}"
         COMPARE_AS_OF: "${{ inputs.as-of }}"
         COMPARE_EXPECTED: "${{ inputs.expected-baseline }}"
         COMPARE_ARTIFACT_ID: "${{ inputs.baseline-artifact-id }}"
@@ -116,6 +131,8 @@ runs:
         fi
         python3 -I "${GITHUB_ACTION_PATH}/../repository-intelligence/scripts/repository_compare_artifact.py" prepare \
           --source-directory "${COMPARE_SOURCE_DIRECTORY}" \
+          --intelligence-directory "${COMPARE_INTELLIGENCE_DIRECTORY}" \
+          --generator-repository "${COMPARE_GENERATOR_REPOSITORY}" --generator-ref "${COMPARE_GENERATOR_REF}" \
           --as-of "${COMPARE_AS_OF}" --expected-baseline "${COMPARE_EXPECTED}" \
           --baseline-artifact-id "${COMPARE_ARTIFACT_ID}" --baseline-artifact-digest "${COMPARE_ARTIFACT_DIGEST}" \
           --baseline-source-commit "${COMPARE_BASELINE_COMMIT}" --baseline-run-id "${COMPARE_BASELINE_RUN}" \

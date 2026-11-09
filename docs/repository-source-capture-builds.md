@@ -8,6 +8,15 @@ collectors' publication-denied review envelopes as build inputs.
 
 ## Capture plan and action use
 
+The read-only
+[`repository-intelligence-github-sources`](../actions/repository-intelligence-github-sources/README.md)
+producer now acquires bounded public issue/PR inventories, commit-matched check
+runs and published release metadata, writes this existing plan, and invokes the
+existing same-run capture packer. Consumers upload that ordinary immutable
+artifact and pass its exact ID/digest plus the producer's actual `as-of` into
+the builder. It introduces no provider reads inside native normalization and
+preserves the original no-capture path and consumer-owned publisher.
+
 The new optional composite `source-captures` input names a closed JSON
 transport plan relative to the consumer repository. It can select the Work and Health sources independently, with or without existing `collect-roadmap` and `collect-adrs` flags.
 
