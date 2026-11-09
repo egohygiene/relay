@@ -23,6 +23,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 LOCK_PATH = ROOT / "contracts/public-catalog-admission.v1.lock.json"
 SCHEMA = "egohygiene.relay.public-catalog-admission/v1"
+PUBLIC_ARTIFACT = ROOT / "contracts/public-repositories.hygiene-49639c1.json"
 HASH = re.compile(r"[0-9a-f]{64}")
 
 
@@ -105,6 +106,30 @@ def validate_metadata(value, selected=None):
     if selected is not None:
         require(value["selected_sha256"] == digest(encoded(selected)))
     return value
+
+
+def validate_selection(selected, metadata):
+    """Authenticate serialized public rows against the exact owner projection.
+
+    The mirrored bytes are the owner artifact, not a separately maintained
+    registry. This stdlib admission supports ordinary bundle verification.
+    """
+    pin = lock()
+    content = PUBLIC_ARTIFACT.read_bytes()
+    require(digest(content) == pin["files"][pin["artifact_path"]])
+    document = json.loads(content)
+    permitted = {row["full_name"]: row for row in document["repositories"]
+                 if row.get("visibility") == "public"}
+    require(isinstance(selected, list) and len(selected) <= 256)
+    names = []
+    for row in selected:
+        require(isinstance(row, dict) and row.get("visibility") == "public")
+        name = row.get("full_name")
+        require(isinstance(name, str) and name in permitted
+            and encoded(row) == encoded(permitted[name]))
+        names.append(name)
+    require(names == sorted(set(names)) and metadata.get("observed_at") == document["observed_at"])
+    return validate_metadata(metadata, selected)
 
 
 def load(catalog_root, requested=None):

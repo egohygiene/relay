@@ -1,5 +1,12 @@
 # Public catalog admission
 
+`validate_selection(rows, metadata)` also authenticates a serialized selected
+subset without loading Git or native tools. It compares public rows to the exact
+byte mirror `contracts/public-repositories.hygiene-49639c1.json`, whose SHA256 must
+match the owner artifact pin. The mirror remains owner-authored data; updates
+require a new reviewed source profile. Private wrappers are rejected before
+identity access. Metadata alone does not authenticate membership.
+
 `public_catalog_admission.acquire(work)` optionally fetches only the pinned public
 Hygiene revision into a fresh bare Git directory at `work/public-catalog` and
 returns that path. It uses only the standard library and Git, with an isolated
