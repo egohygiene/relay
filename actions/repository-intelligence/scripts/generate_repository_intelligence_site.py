@@ -793,8 +793,68 @@ def empty_state(title: str, message: str, state: str = "unknown") -> str:
     </div>'''
 
 
+def relationship_card(value: dict[str, Any], *, eyebrow: str) -> str:
+    """Present a supplied directed relationship without inventing an entity state."""
+    source = require_object(value.get("source"))
+    target = require_object(value.get("target"))
+    # Inspect both endpoint visibility declarations before identities or prose.
+    # Restricted endpoints never become named public cards or placeholders.
+    if any(endpoint.get("visibility") != "public" for endpoint in (source, target)):
+        return ""
+    endpoints = (source, target)
+    valid = (
+        value.get("type") in ("blocks", "depends-on")
+        and isinstance(value.get("id"), str) and bool(value["id"])
+        and isinstance(value.get("assertion"), str) and value["assertion"] in JOURNEY_ASSERTIONS
+        and isinstance(value.get("freshness"), str) and value["freshness"] in JOURNEY_FRESHNESS
+        and all(endpoint.get("visibility") == "public" for endpoint in endpoints)
+    )
+    for endpoint in endpoints:
+        valid &= all(isinstance(endpoint.get(key), str) and bool(endpoint[key])
+                     for key in ("id", "repository", "key", "kind", "state"))
+        valid &= isinstance(endpoint.get("assertion"), str) and endpoint["assertion"] in JOURNEY_ASSERTIONS
+        valid &= isinstance(endpoint.get("freshness"), str) and endpoint["freshness"] in JOURNEY_FRESHNESS
+        valid &= endpoint.get("title") is None or (
+            isinstance(endpoint.get("title"), str) and bool(endpoint["title"]))
+    provenance = value.get("provenance")
+    valid &= isinstance(provenance, list) and bool(provenance) and all(
+        isinstance(identifier, str) and bool(identifier) for identifier in provenance)
+    if not valid:
+        return empty_state(
+            "Relationship evidence unavailable",
+            "The directed relationship is incomplete or incompatible. No endpoint state is inferred.",
+        )
+    relation = "blocks" if value["type"] == "blocks" else "depends on"
+    labels = [str(endpoint.get("title") or endpoint["key"]) for endpoint in endpoints]
+    direction = f"{labels[0]} {relation} {labels[1]}"
+    endpoint_states = sorted({normalize_state(endpoint["state"]) for endpoint in endpoints})
+    endpoint_kinds = sorted({normalize_state(endpoint["kind"]) for endpoint in endpoints})
+    search = " ".join(str(item or "") for item in (
+        value["id"], value["type"], value["assertion"], value["freshness"],
+        *(endpoint[key] for endpoint in endpoints for key in ("key", "repository", "kind", "state")),
+        *labels,
+    )).lower()
+    rendered_endpoints = []
+    for label, endpoint in zip(("Source", "Target"), endpoints):
+        rendered_endpoints.append(f'''<section{source_repository_attribute(endpoint)}>
+          <h4>{escaped(label)}: {escaped(endpoint.get("title") or endpoint["key"])}</h4>
+          <p>{escaped(state_label(endpoint["kind"]))} · {escaped(endpoint["key"])} · {escaped(endpoint["repository"])}</p>
+          <dl class="ri-provenance"><div><dt>Canonical state</dt><dd>{status_pill(endpoint["state"])}</dd></div><div><dt>Assertion</dt><dd>{escaped(state_label(endpoint["assertion"]))}</dd></div><div><dt>Freshness</dt><dd>{escaped(state_label(endpoint["freshness"]))}</dd></div></dl>
+          {source_link(endpoint, f"Inspect {label.lower()} source")}
+        </section>''')
+    return f'''<article class="ri-record" data-entity-id="{escaped(value["id"])}" data-filter-item data-states="{escaped(" ".join(endpoint_states))}" data-kinds="{escaped(" ".join(endpoint_kinds))}" data-filter-relationship="{escaped(value["type"])}" data-filter-assertion="{escaped(value["assertion"])}" data-filter-freshness="{escaped(value["freshness"])}" data-search="{escaped(search)}">
+      <div class="ri-record__top"><span class="ri-eyebrow">{escaped(eyebrow)}</span>{status_pill(value["assertion"], f"Assertion: {state_label(value['assertion'])}")} {status_pill(value["freshness"], f"Freshness: {state_label(value['freshness'])}")}</div>
+      <h3>{escaped(direction)}</h3>
+      <p>Directed relationship: source → target. Endpoint states remain independent.</p>
+      <div class="ri-relationship-grid">{"".join(rendered_endpoints)}</div>
+      <details class="ri-evidence"><summary>Inspect relationship evidence</summary><dl class="ri-provenance"><div><dt>Relationship ID</dt><dd><code>{escaped(value["id"])}</code></dd></div><div><dt>Provenance source IDs</dt><dd>{escaped(", ".join(provenance))}</dd></div></dl></details>
+    </article>'''
+
+
 def record_card(item: Any, *, eyebrow: str = "Evidence") -> str:
     value = entity(item)
+    if value.get("type") in ("blocks", "depends-on"):
+        return relationship_card(value, eyebrow=eyebrow)
     title = value.get("title") or value.get("key") or "Untitled record"
     kind = state_label(value.get("kind"))
     state = normalize_state(value.get("state"))
@@ -829,11 +889,11 @@ def render_recent_change(now: dict[str, Any]) -> str:
 def render_collection(
     items: list[Any], *, empty_title: str, empty_message: str, eyebrow: str
 ) -> str:
-    if not items:
+    cards = [record_card(item, eyebrow=eyebrow) for item in items]
+    visible = [card for card in cards if card]
+    if not visible:
         return empty_state(empty_title, empty_message, "empty")
-    return '<div class="ri-record-list">' + "".join(
-        record_card(item, eyebrow=eyebrow) for item in items
-    ) + "</div>"
+    return '<div class="ri-record-list">' + "".join(visible) + "</div>"
 
 
 def newly_broken(now: dict[str, Any]) -> list[dict[str, Any]]:
