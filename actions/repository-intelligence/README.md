@@ -7,8 +7,10 @@ result with any existing GitHub Pages, documentation, or product-site artifact.
 The experimental [canonical roadmap collector](../../docs/repository-roadmap-collector.md)
 can prepare local review evidence from an immutable `ROADMAP.md`. Its
 publication-denied review envelope is **not** an `observatory-snapshot` input.
-The compatible upstream coverage contract is now available; the existing roadmap
-profile still needs reviewed repinning and #112 acceptance before #113 integration.
+The [native source-plan adapter](../../docs/repository-source-composition.md) uses
+the supported ADR alpha.2 owner set for `collect-roadmap`, and composes it with
+`collect-adrs` before normalization. The historical review profile stays pinned;
+consumer acceptance and publication remain separate.
 
 The [canonical ADR collector](../../docs/repository-adr-collector.md) implements
 #115's immutable source collection and opt-in Decisions build integration.
@@ -248,6 +250,8 @@ for provider proof and consumer adoption.
 | `output-directory`          | `dist/intelligence`              | Generated HTML, CSS, JavaScript, and aggregate JSON bundle               |
 | `work-directory`            | `.cache/repository-intelligence` | Private collection workspace; do not publish wholesale                  |
 | `reports-directory`         | `.reports`                       | Optional summaries; always excluded from tree and analytics              |
+| `collect-roadmap` | `false` | Collect canonical public Roadmap; combines with `collect-adrs` under one commit-bound source plan |
+| `source-runtime` | empty | Trusted prepared alpha.2 runtime for Roadmap/combined collection, outside consumer checkout; conflicts with `adr-runtime` |
 | `collect-adrs` | `false` | Collect standard-path canonical public ADRs; requires complete valid ADR coverage |
 | `adr-policy-owner` | `false` | Explicit canonical Hygiene policy-owner mode; requires `collect-adrs`; ordinary consumers keep inheritance |
 | `adr-known-external-decisions` | `[]` | JSON array of declared external ADR keys for native lineage checks; nonempty requires `collect-adrs`; no target acquisition |

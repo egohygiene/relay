@@ -35,6 +35,19 @@ inputs:
       conflicts with observatory-snapshot and observatory-comparison.
     required: false
     default: "false"
+  collect-roadmap:
+    description: >-
+      Collect the canonical public ROADMAP.md through the pinned alpha.2 owners.
+      Combine with collect-adrs to preserve Decisions in one source snapshot.
+      Conflicts with external snapshot/comparison inputs.
+    required: false
+    default: "false"
+  source-runtime:
+    description: >-
+      Optional trusted prepared ADR alpha.2 runtime for Roadmap or combined
+      source collection, outside the consumer checkout; requires collect-roadmap.
+    required: false
+    default: ""
   adr-runtime:
     description: >-
       Optional trusted prepared ADR runtime outside the consumer checkout, for
@@ -213,9 +226,11 @@ runs:
         EVENT_REPOSITORY_VISIBILITY: "${{ github.event.repository.visibility }}"
         INPUT_ACTIVITY_REF: "${{ inputs.activity-ref }}"
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
+        INPUT_COLLECT_ROADMAP: "${{ inputs.collect-roadmap }}"
         INPUT_ADR_POLICY_OWNER: "${{ inputs.adr-policy-owner }}"
         INPUT_ADR_KNOWN_EXTERNAL_DECISIONS: "${{ inputs.adr-known-external-decisions }}"
         INPUT_ADR_RUNTIME: "${{ inputs.adr-runtime }}"
+        INPUT_SOURCE_RUNTIME: "${{ inputs.source-runtime }}"
         INPUT_AS_OF: "${{ inputs.as-of }}"
         INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
         INPUT_MAX_DEPTH: "${{ inputs.max-depth }}"
@@ -252,6 +267,14 @@ runs:
           true | false) ;;
           *) printf 'collect-adrs must be true or false\n' >&2; exit 2 ;;
         esac
+        case "${INPUT_COLLECT_ROADMAP}" in
+          true | false) ;;
+          *) printf 'collect-roadmap must be true or false\n' >&2; exit 2 ;;
+        esac
+        if [[ -n "${INPUT_SOURCE_RUNTIME}" && ( "${INPUT_COLLECT_ROADMAP}" != "true" || -n "${INPUT_ADR_RUNTIME}" ) ]]; then
+          printf 'source-runtime requires collect-roadmap and excludes adr-runtime\n' >&2
+          exit 2
+        fi
         case "${INPUT_ADR_POLICY_OWNER}" in
           true | false) ;;
           *) printf 'adr-policy-owner must be true or false\n' >&2; exit 2 ;;
@@ -260,8 +283,8 @@ runs:
           printf 'adr-policy-owner requires collect-adrs\n' >&2
           exit 2
         fi
-        if [[ "${INPUT_COLLECT_ADRS}" == "true" && ( -n "${INPUT_OBSERVATORY_SNAPSHOT}" || -n "${INPUT_OBSERVATORY_COMPARISON}" ) ]]; then
-          printf 'collect-adrs conflicts with external snapshot/comparison inputs\n' >&2
+        if [[ ( "${INPUT_COLLECT_ADRS}" == "true" || "${INPUT_COLLECT_ROADMAP}" == "true" ) && ( -n "${INPUT_OBSERVATORY_SNAPSHOT}" || -n "${INPUT_OBSERVATORY_COMPARISON}" ) ]]; then
+          printf 'Native source collection conflicts with external snapshot/comparison inputs\n' >&2
           exit 2
         fi
         if [[ "${INPUT_COLLECT_ADRS}" == "false" && -n "${INPUT_ADR_RUNTIME}" ]]; then
@@ -481,13 +504,15 @@ runs:
         printf 'generator-immutable=%s\n' "${generator_immutable}" >> "${GITHUB_OUTPUT}"
         printf 'source-epoch=%s\n' "${source_epoch}" >> "${GITHUB_OUTPUT}"
 
-    - name: "📚 Collect validated canonical ADRs when requested"
+    - name: "📚 Collect validated canonical sources when requested"
       shell: bash
       env:
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
+        INPUT_COLLECT_ROADMAP: "${{ inputs.collect-roadmap }}"
         INPUT_ADR_POLICY_OWNER: "${{ inputs.adr-policy-owner }}"
         INPUT_ADR_KNOWN_EXTERNAL_DECISIONS: "${{ inputs.adr-known-external-decisions }}"
         INPUT_ADR_RUNTIME: "${{ inputs.adr-runtime }}"
+        INPUT_SOURCE_RUNTIME: "${{ inputs.source-runtime }}"
         INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
         RESOLVED_AS_OF: "${{ steps.metadata.outputs.as-of }}"
         RESOLVED_REPOSITORY: "${{ steps.metadata.outputs.repository }}"
@@ -495,15 +520,26 @@ runs:
         RESOLVED_SOURCE_COMMIT: "${{ steps.metadata.outputs.source-commit }}"
       run: |
         set -euo pipefail
-        if [[ "${INPUT_COLLECT_ADRS}" == "true" ]]; then
+        if [[ "${INPUT_COLLECT_ADRS}" == "true" || "${INPUT_COLLECT_ROADMAP}" == "true" ]]; then
           runtime_arguments=()
+          collector="${GITHUB_ACTION_PATH}/scripts/prepare_repository_adr_build.py"
+          if [[ "${INPUT_COLLECT_ROADMAP}" == "true" ]]; then
+            collector="${GITHUB_ACTION_PATH}/scripts/prepare_repository_sources_build.py"
+            runtime_arguments+=(--collect-roadmap)
+            if [[ "${INPUT_COLLECT_ADRS}" == "true" ]]; then
+              runtime_arguments+=(--collect-adrs)
+            fi
+            if [[ -n "${INPUT_SOURCE_RUNTIME}" ]]; then
+              runtime_arguments+=(--runtime "${INPUT_SOURCE_RUNTIME}")
+            fi
+          fi
           if [[ "${INPUT_ADR_POLICY_OWNER}" == "true" ]]; then
             runtime_arguments+=(--policy-owner)
           fi
           if [[ -n "${INPUT_ADR_RUNTIME}" ]]; then
             runtime_arguments+=(--runtime "${INPUT_ADR_RUNTIME}")
           fi
-          python3 -I "${GITHUB_ACTION_PATH}/scripts/prepare_repository_adr_build.py" \
+          python3 -I "${collector}" \
             --repository-root "${GITHUB_WORKSPACE}" \
             --work-directory "${INPUT_WORK_DIRECTORY}" \
             --repository "${RESOLVED_REPOSITORY}" \
@@ -581,6 +617,7 @@ runs:
       shell: bash
       env:
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
+        INPUT_COLLECT_ROADMAP: "${{ inputs.collect-roadmap }}"
         INPUT_OBSERVATORY_COMPARISON: "${{ inputs.observatory-comparison }}"
         INPUT_OBSERVATORY_SNAPSHOT: "${{ inputs.observatory-snapshot }}"
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
@@ -623,7 +660,13 @@ runs:
           --script-source "${GITHUB_ACTION_PATH}/assets/explorer.js" \
           --dashboard-subdirectory "dashboard"
         snapshot_arguments=()
-        if [[ "${INPUT_COLLECT_ADRS}" == "true" ]]; then
+        if [[ "${INPUT_COLLECT_ROADMAP}" == "true" ]]; then
+          INPUT_OBSERVATORY_SNAPSHOT="${INPUT_WORK_DIRECTORY}/sources/snapshot.json"
+          python3 -I "${GITHUB_ACTION_PATH}/scripts/repository_sources_build_contract.py" \
+            --provenance "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/provenance.json" \
+            --receipt "${GITHUB_WORKSPACE}/${INPUT_WORK_DIRECTORY}/sources/receipt.json" \
+            --snapshot "${GITHUB_WORKSPACE}/${INPUT_OBSERVATORY_SNAPSHOT}"
+        elif [[ "${INPUT_COLLECT_ADRS}" == "true" ]]; then
           INPUT_OBSERVATORY_SNAPSHOT="${INPUT_WORK_DIRECTORY}/adr/snapshot.json"
           python3 -I "${GITHUB_ACTION_PATH}/scripts/repository_adr_build_contract.py" \
             --provenance "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/provenance.json" \

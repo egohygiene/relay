@@ -146,6 +146,317 @@
         }
       }
     },
+    "source_collection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "repository",
+        "source_commit",
+        "observed_at",
+        "domains",
+        "coverage",
+        "candidate_digests",
+        "implementation"
+      ],
+      "properties": {
+        "schema": {
+          "const": "egohygiene.relay.source-build/v1"
+        },
+        "repository": {
+          "type": "string",
+          "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "domains": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "properties": {
+            "decisions": {
+              "$ref": "#/properties/adr_collection"
+            },
+            "roadmap": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "repository": {
+                  "type": "string",
+                  "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+                },
+                "source_commit": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "observed_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "roadmap_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "maximum_intent_age_days": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 3650
+                },
+                "intent_freshness": {
+                  "enum": [
+                    "current",
+                    "stale"
+                  ]
+                },
+                "reference_count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65536
+                },
+                "runtime": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "lock_sha256",
+                    "egolint_sha256",
+                    "pins"
+                  ],
+                  "properties": {
+                    "lock_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "egolint_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "pins": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "validation": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "egolint",
+                    "hygiene",
+                    "coverage",
+                    "observatory",
+                    "diagnostics_truncated"
+                  ],
+                  "properties": {
+                    "egolint": {
+                      "enum": [
+                        "valid",
+                        "invalid",
+                        "incomplete",
+                        "not_applicable"
+                      ]
+                    },
+                    "hygiene": {
+                      "enum": [
+                        "valid",
+                        "invalid"
+                      ]
+                    },
+                    "coverage": {
+                      "enum": [
+                        "valid",
+                        "not-run"
+                      ]
+                    },
+                    "observatory": {
+                      "enum": [
+                        "normalized",
+                        "not-run"
+                      ]
+                    },
+                    "diagnostics_truncated": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "coverage": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "roadmap",
+                    "decisions",
+                    "git",
+                    "issues",
+                    "pull_requests",
+                    "checks",
+                    "releases",
+                    "deployments",
+                    "history"
+                  ],
+                  "properties": {
+                    "roadmap": {
+                      "$ref": "#/$defs/adrCollectionClaim"
+                    },
+                    "decisions": {
+                      "$ref": "#/$defs/adrCollectionClaim"
+                    },
+                    "git": {
+                      "$ref": "#/$defs/adrCollectionClaim"
+                    },
+                    "issues": {
+                      "$ref": "#/$defs/adrCollectionClaim"
+                    },
+                    "pull_requests": {
+                      "$ref": "#/$defs/adrCollectionClaim"
+                    },
+                    "checks": {
+                      "$ref": "#/$defs/adrCollectionClaim"
+                    },
+                    "releases": {
+                      "$ref": "#/$defs/adrCollectionClaim"
+                    },
+                    "deployments": {
+                      "$ref": "#/$defs/adrCollectionClaim"
+                    },
+                    "history": {
+                      "$ref": "#/$defs/adrCollectionClaim"
+                    }
+                  }
+                },
+                "projection_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "snapshot_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "repository",
+                "source_commit",
+                "observed_at",
+                "roadmap_sha256",
+                "maximum_intent_age_days",
+                "intent_freshness",
+                "reference_count",
+                "runtime",
+                "validation",
+                "coverage",
+                "projection_sha256",
+                "snapshot_sha256"
+              ]
+            }
+          }
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "roadmap",
+            "decisions",
+            "git",
+            "issues",
+            "pull_requests",
+            "checks",
+            "releases",
+            "deployments",
+            "history"
+          ],
+          "properties": {
+            "roadmap": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "decisions": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "git": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "issues": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "pull_requests": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "checks": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "releases": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "deployments": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "history": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            }
+          }
+        },
+        "candidate_digests": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "projection_sha256",
+            "snapshot_sha256"
+          ],
+          "properties": {
+            "projection_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "snapshot_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "implementation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "collect_repository_roadmap_source.py",
+            "prepare_repository_sources_build.py",
+            "collect_repository_roadmap.py",
+            "collect_repository_adrs.py",
+            "repository_adr_inputs.py"
+          ],
+          "properties": {
+            "collect_repository_roadmap_source.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "prepare_repository_sources_build.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "collect_repository_roadmap.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "collect_repository_adrs.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "repository_adr_inputs.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
+    },
     "adr_collection": {
       "type": "object",
       "additionalProperties": false,

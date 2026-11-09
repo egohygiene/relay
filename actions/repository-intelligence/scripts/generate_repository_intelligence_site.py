@@ -1114,6 +1114,22 @@ def render_relationship_row(
     )
 
 
+def render_roadmap_issue_references(step: dict[str, Any]) -> str:
+    """Show authored references without assigning uncollected provider state."""
+
+    links = []
+    for value in require_list(step.get("issue_references")):
+        if not isinstance(value, str):
+            continue
+        href = safe_href(value)
+        if href:
+            links.append(f'<a class="ri-link-chip" href="{escaped(href)}">{escaped(value)}</a>')
+    if not links:
+        return ""
+    return ('<div class="ri-relationship-row"><strong>Authored issue references</strong><div>'
+            + "".join(links) + '</div><p>Provider state is not collected for these references.</p></div>')
+
+
 def render_quest_step(
     step: dict[str, Any],
     *,
@@ -1186,6 +1202,7 @@ def render_quest_step(
           {render_relationship_row("Unlocks", dependents.get(step_id, []), anchors)}
           {render_relationship_row("Blocked by", require_list(step.get("blocked_by")), anchors)}
           {render_relationship_row("Blocks", blocks.get(step_id, []), anchors)}
+          {render_roadmap_issue_references(step)}
         </div>
         <div class="ri-quest__source">{canonical}<span>Assertion: {escaped(state_label(step_entity.get("assertion")))} · Freshness: {escaped(state_label(step_entity.get("freshness")))}</span></div>
         <details class="ri-evidence" data-quest-evidence>
@@ -2484,7 +2501,7 @@ def write_site(
         body = (
             roadmap_body(snapshot)
             if route == "roadmap"
-            else decisions_body(snapshot, require_object(provenance.get("adr_collection")).get("index", "DECISIONS.md"))
+            else decisions_body(snapshot, require_object(provenance.get("adr_collection") or require_object(require_object(provenance.get("source_collection")).get("domains")).get("decisions")).get("index", "DECISIONS.md"))
             if route == "decisions"
             else journey_body(snapshot)
             if route == "journey"

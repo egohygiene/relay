@@ -828,6 +828,13 @@
           "description": "Collect and validate canonical public ADRs instead of accepting an external snapshot."
         },
         {
+          "name": "collect-roadmap",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Collect canonical public Roadmap, optionally composed with Decisions."
+        },
+        {
           "name": "adr-policy-owner",
           "type": "boolean",
           "required": false,

@@ -311,6 +311,7 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
     """Validate untrusted workflow inputs before checkout or generation."""
 
     collect_adrs = getattr(arguments, "collect_adrs", "false")
+    collect_roadmap = getattr(arguments, "collect_roadmap", "false")
     try:
         adr_inputs.selection(getattr(arguments, "adr_known_external_decisions", "[]"), collect_adrs)
     except ValueError:
@@ -318,9 +319,9 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
     policy_owner = getattr(arguments, "adr_policy_owner", "false")
     if policy_owner not in {"true", "false"} or (policy_owner == "true" and collect_adrs != "true"):
         raise ContractError("RIW-INPUT-ADR-MODE")
-    if collect_adrs not in {"true", "false"}:
+    if collect_adrs not in {"true", "false"} or collect_roadmap not in {"true", "false"}:
         raise ContractError("RIW-INPUT-ADR-MODE")
-    if collect_adrs == "true" and (arguments.observatory_snapshot or arguments.observatory_comparison):
+    if "true" in {collect_adrs, collect_roadmap} and (arguments.observatory_snapshot or arguments.observatory_comparison):
         raise ContractError("RIW-INPUT-ADR-CONFLICT")
     paths = {
         "output": arguments.output_directory,
@@ -347,7 +348,7 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
         f"{paths['reports']}/"
     ):
         raise ContractError("RIW-INPUT-WORK-REPORTS-OVERLAP")
-    for child in ("activity", "analytics", "tree", "visualization", "adr"):
+    for child in ("activity", "analytics", "tree", "visualization", "adr", "sources"):
         if paths_overlap(paths["reports"], f"{paths['work']}/{child}"):
             raise ContractError("RIW-INPUT-WORK-REPORTS-OVERLAP")
 
@@ -634,6 +635,7 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--work-directory", default=".cache/repository-intelligence")
     value.add_argument("--reports-directory", default=".reports")
     value.add_argument("--collect-adrs", default="false")
+    value.add_argument("--collect-roadmap", default="false")
     value.add_argument("--adr-policy-owner", default="false")
     value.add_argument("--adr-known-external-decisions", default="[]")
     value.add_argument("--observatory-snapshot", default="")
