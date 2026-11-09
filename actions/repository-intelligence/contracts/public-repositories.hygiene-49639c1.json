@@ -1,0 +1,1077 @@
+{
+  "observed_at": "2026-11-09T14:06:57Z",
+  "organization": "egohygiene",
+  "repositories": [
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/.github",
+      "name": ".github",
+      "next_gate": {
+        "description": "Reduce to org-facing defaults; delegate automation to Relay",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1196401336,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "reusable CI workflows",
+          "lint policy"
+        ],
+        "lifecycle": "incubating",
+        "maturity": "light-foundation",
+        "outputs": [
+          "organization-facing defaults"
+        ],
+        "owns": [
+          "organization profile",
+          "funding",
+          "public defaults",
+          "default community health"
+        ],
+        "plane": "architecture-control"
+      },
+      "source_url": "https://github.com/egohygiene/.github",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/aether",
+      "name": "aether",
+      "next_gate": {
+        "description": "Curate staged AI assets with provenance and lifecycle state",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1315637692,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "general repository policy",
+          "environment provisioning",
+          "CI orchestration"
+        ],
+        "lifecycle": "active",
+        "maturity": "active",
+        "outputs": [
+          "versioned AI artifact distributions",
+          "provenance catalogs"
+        ],
+        "owns": [
+          "first-party AI specifications",
+          "skills",
+          "agents",
+          "catalogs",
+          "validators",
+          "release projections"
+        ],
+        "plane": "architecture-control"
+      },
+      "source_url": "https://github.com/egohygiene/aether",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/akashic",
+      "name": "akashic",
+      "next_gate": {
+        "description": "Define optional export/import relationship with Mindgarden",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1320228396,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "raw archives",
+          "private personal knowledge"
+        ],
+        "lifecycle": "active",
+        "maturity": "active",
+        "outputs": [
+          "curated datasets",
+          "public knowledge site"
+        ],
+        "owns": [
+          "curated public knowledge lists",
+          "collection exploration site"
+        ],
+        "plane": "knowledge-research"
+      },
+      "source_url": "https://github.com/egohygiene/akashic",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/aniflow",
+      "name": "aniflow",
+      "next_gate": {
+        "description": "Stabilize versioned CLI/library contract for Flow",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1315637894,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "collection optimization",
+          "document transforms",
+          "suite-wide orchestration"
+        ],
+        "lifecycle": "active",
+        "maturity": "active",
+        "outputs": [
+          "standalone CLI and library",
+          "capability contract",
+          "run evidence"
+        ],
+        "owns": [
+          "temporal video decomposition",
+          "ordered media processing",
+          "reconstruction",
+          "checkpoints",
+          "temporal validation"
+        ],
+        "plane": "content-publishing"
+      },
+      "source_url": "https://github.com/egohygiene/aniflow",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/antidote",
+      "name": "antidote",
+      "next_gate": {
+        "description": "The MVP implementation sequence is paused after issue #16. After the issue #48 merge is verified at the custom domain, #70 begins the magazine and launch sequence in issue #69.",
+        "source_observed_at": "2026-09-07",
+        "source_url": "https://github.com/egohygiene/antidote/blob/34f7653469002c8f19c9adc87d4bfdcecc0eda33/ROADMAP.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1347532537,
+      "role": {
+        "evidence": [
+          "https://github.com/egohygiene/antidote/blob/34f7653469002c8f19c9adc87d4bfdcecc0eda33/README.md",
+          "https://github.com/egohygiene/antidote/blob/34f7653469002c8f19c9adc87d4bfdcecc0eda33/ARCHITECTURE.md"
+        ],
+        "excludes": [
+          "clinical efficacy claims without formal evidence",
+          "publication of private runtime state without explicit approval"
+        ],
+        "lifecycle": "unknown",
+        "maturity": "provisional-research-and-local-prototype",
+        "outputs": [
+          "research manuscript and publication artifacts",
+          "local synthetic research-instrument contracts"
+        ],
+        "owns": [
+          "provisional personalized adaptive generative-audio research",
+          "repository-owned manuscript and local research-instrument contracts"
+        ],
+        "plane": "knowledge-research"
+      },
+      "source_url": "https://github.com/egohygiene/antidote",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/athena",
+      "name": "athena",
+      "next_gate": {
+        "description": "Add inventory/licensing metadata and absorb raw visual archive",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1315681605,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "canonical architecture",
+          "runtime dependencies",
+          "opinionated knowledge products"
+        ],
+        "lifecycle": "active",
+        "maturity": "active-collection",
+        "outputs": [
+          "inventoried archives",
+          "provenance and licensing metadata"
+        ],
+        "owns": [
+          "preserved assets",
+          "raw references",
+          "external resources",
+          "large archival collections"
+        ],
+        "plane": "knowledge-research"
+      },
+      "source_url": "https://github.com/egohygiene/athena",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/beacon",
+      "name": "beacon",
+      "next_gate": {
+        "description": "Publish one artifact through a local/mock channel using Renderflow output",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1315637921,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "rendering engines",
+          "knowledge storage"
+        ],
+        "lifecycle": "seed",
+        "maturity": "seed",
+        "outputs": [
+          "publication manifests",
+          "distributed releases",
+          "channel receipts"
+        ],
+        "owns": [
+          "release assembly",
+          "validation",
+          "packaging",
+          "channel adapters",
+          "publication",
+          "distribution"
+        ],
+        "plane": "content-publishing"
+      },
+      "source_url": "https://github.com/egohygiene/beacon",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/civics",
+      "name": "civics",
+      "next_gate": {
+        "description": "Create the missing roadmap and issue backlog, then certify the 2026-09-01 dataset and evidence rules.",
+        "source_observed_at": "2026-08-24",
+        "source_url": "https://github.com/egohygiene/civics/blob/c95596afc206e38b3c5b1f80a3ccbae46326daa8/ROADMAP.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1344564036,
+      "role": {
+        "evidence": [
+          "https://github.com/egohygiene/civics/blob/c95596afc206e38b3c5b1f80a3ccbae46326daa8/README.md",
+          "https://github.com/egohygiene/civics/blob/c95596afc206e38b3c5b1f80a3ccbae46326daa8/ARCHITECTURE.md"
+        ],
+        "excludes": [
+          "candidate endorsements or voting instructions"
+        ],
+        "lifecycle": "unknown",
+        "maturity": "experimental-prototype",
+        "outputs": [
+          "static civic information portal",
+          "versioned civic knowledge-graph schemas"
+        ],
+        "owns": [
+          "experimental civic intelligence and ballot decision-support portal",
+          "versioned civic evidence and claim provenance"
+        ],
+        "plane": "knowledge-research"
+      },
+      "source_url": "https://github.com/egohygiene/civics",
+      "visibility": "public"
+    },
+    {
+      "aliases": [
+        "website"
+      ],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/egohygiene.io",
+      "name": "egohygiene.io",
+      "next_gate": {
+        "description": null,
+        "source_observed_at": null,
+        "source_url": null,
+        "state": "unknown"
+      },
+      "repository_id": 1318535423,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "store commerce logic",
+          "generic publishing engine"
+        ],
+        "lifecycle": "unknown",
+        "maturity": "unassessed-after-rename",
+        "outputs": [
+          "public website",
+          "documentation site",
+          "shared web packages"
+        ],
+        "owns": [
+          "public website",
+          "documentation application",
+          "playground",
+          "shared web packages"
+        ],
+        "plane": "identity-product-experience"
+      },
+      "source_url": "https://github.com/egohygiene/egohygiene.io",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/egolint",
+      "name": "egolint",
+      "next_gate": {
+        "description": "Make the CLI standalone and invoke it from Relay",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1315144197,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "workflow fleet distribution",
+          "unrelated project templates"
+        ],
+        "lifecycle": "incubating",
+        "maturity": "early-implementation",
+        "outputs": [
+          "quality reports",
+          "SARIF",
+          "bounded autofix patches"
+        ],
+        "owns": [
+          "lint CLI",
+          "lint profiles",
+          "rules",
+          "MegaLinter integration",
+          "report normalization",
+          "safe autofix policy"
+        ],
+        "plane": "developer-runtime"
+      },
+      "source_url": "https://github.com/egohygiene/egolint",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/empathy",
+      "name": "empathy",
+      "next_gate": {
+        "description": "Add migration ledger; consume released Mantle and Realm artifacts",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1315637648,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "permanent sibling component source",
+          "untracked staging",
+          "general incubation"
+        ],
+        "lifecycle": "transition",
+        "maturity": "transition",
+        "outputs": [
+          "integration evidence",
+          "reference-consumer feedback"
+        ],
+        "owns": [
+          "golden consumer",
+          "integration testbed",
+          "humane repository reference",
+          "strict baseline composition"
+        ],
+        "plane": "developer-runtime"
+      },
+      "source_url": "https://github.com/egohygiene/empathy",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/filament",
+      "name": "filament",
+      "next_gate": {
+        "description": "Select one bounded vertical slice and publish a stable contract with a disposable consumer fixture",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1340174644,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "product-specific deployment intent",
+          "credentials and secret custody",
+          "deployment approvals and budgets",
+          "production state backends",
+          "developer environment projections",
+          "CI and release workflow orchestration"
+        ],
+        "lifecycle": "architecture-first",
+        "maturity": "provisional-architecture",
+        "outputs": [
+          "versioned infrastructure modules",
+          "stack contracts",
+          "provider adapters",
+          "validation and compatibility evidence"
+        ],
+        "owns": [
+          "reusable infrastructure-as-code modules",
+          "reusable infrastructure stack contracts",
+          "infrastructure module metadata and schemas",
+          "provider and engine adapters",
+          "infrastructure validation semantics and examples"
+        ],
+        "plane": "infrastructure-deployment"
+      },
+      "source_url": "https://github.com/egohygiene/filament",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/flow",
+      "name": "flow",
+      "next_gate": {
+        "description": "Accept contracts and implement one vertical slice",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1333207724,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "specialized engine reimplementation"
+        ],
+        "lifecycle": "architecture-first",
+        "maturity": "architecture-first",
+        "outputs": [
+          "suite plans",
+          "execution manifests",
+          "diagnostics",
+          "provenance"
+        ],
+        "owns": [
+          "cross-holon planning",
+          "compatibility",
+          "execution state",
+          "provenance",
+          "validation",
+          "recovery",
+          "progress",
+          "suite experience"
+        ],
+        "plane": "content-publishing"
+      },
+      "source_url": "https://github.com/egohygiene/flow",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/holon",
+      "name": "holon",
+      "next_gate": {
+        "description": "Define one repository-class schema and generate a disposable fixture",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1315637967,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "ongoing fleet reconciliation"
+        ],
+        "lifecycle": "seed",
+        "maturity": "seed",
+        "outputs": [
+          "generated repository trees",
+          "bootstrap provenance"
+        ],
+        "owns": [
+          "repository and organization bootstrap",
+          "versioned blueprints"
+        ],
+        "plane": "architecture-control"
+      },
+      "source_url": "https://github.com/egohygiene/holon",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/hygiene",
+      "name": "hygiene",
+      "next_gate": {
+        "description": "Import and approve this architecture package",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1315637988,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "tool implementations",
+          "reusable workflows",
+          "product domain logic",
+          "portable repository continuity schema, template, and skill semantics"
+        ],
+        "lifecycle": "seed",
+        "maturity": "seed",
+        "outputs": [
+          "architecture releases",
+          "repository context projections",
+          "policy schemas",
+          "repository continuity policy profiles"
+        ],
+        "owns": [
+          "ecosystem architecture",
+          "repository registry",
+          "platform policy",
+          "cross-repository ADRs",
+          "maturity model",
+          "migration ledger",
+          "repository continuity applicability and migration"
+        ],
+        "plane": "architecture-control"
+      },
+      "source_url": "https://github.com/egohygiene/hygiene",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/identity",
+      "name": "identity",
+      "next_gate": {
+        "description": "Publish versioned token and metadata packages",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1315637826,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "product UI implementation",
+          "raw asset archives"
+        ],
+        "lifecycle": "seed",
+        "maturity": "seed",
+        "outputs": [
+          "token packages",
+          "brand assets",
+          "metadata and voice packages"
+        ],
+        "owns": [
+          "brand systems",
+          "design tokens",
+          "voice",
+          "public metadata",
+          "generated creative assets"
+        ],
+        "plane": "identity-product-experience"
+      },
+      "source_url": "https://github.com/egohygiene/identity",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/mantle",
+      "name": "mantle",
+      "next_gate": {
+        "description": "Reconcile Empathy copy, prove standalone install matrix, tag release",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1320127077,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "OS image lifecycle",
+          "Dev Container metadata",
+          "cloud infrastructure"
+        ],
+        "lifecycle": "active",
+        "maturity": "active",
+        "outputs": [
+          "checksummed release bundle",
+          "installer",
+          "compatibility evidence"
+        ],
+        "owns": [
+          "portable shell framework",
+          "startup integration",
+          "environment management",
+          "tool installers",
+          "shell compatibility tests"
+        ],
+        "plane": "developer-runtime"
+      },
+      "source_url": "https://github.com/egohygiene/mantle",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/mindcap",
+      "name": "mindcap",
+      "next_gate": {
+        "description": "Define stable capture manifest consumed by Mindgarden",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1315637844,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "semantic knowledge modeling",
+          "publication"
+        ],
+        "lifecycle": "active",
+        "maturity": "active",
+        "outputs": [
+          "capture manifest",
+          "verified source archive"
+        ],
+        "owns": [
+          "capture plugins",
+          "verified archives",
+          "canonical ingestion records",
+          "capture provenance"
+        ],
+        "plane": "knowledge-research"
+      },
+      "source_url": "https://github.com/egohygiene/mindcap",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/mindgarden",
+      "name": "mindgarden",
+      "next_gate": {
+        "description": "Define minimal local-first storage and import Mindcap manifest fixture",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1315637864,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "source capture mechanics",
+          "raw archival storage"
+        ],
+        "lifecycle": "seed",
+        "maturity": "seed",
+        "outputs": [
+          "knowledge graph or store",
+          "query and export contracts"
+        ],
+        "owns": [
+          "versioned semantic knowledge",
+          "relationships",
+          "query",
+          "curation",
+          "second-brain workflows"
+        ],
+        "plane": "knowledge-research"
+      },
+      "source_url": "https://github.com/egohygiene/mindgarden",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/observatory",
+      "name": "observatory",
+      "next_gate": {
+        "description": "Ingest the repository catalog and Relay/Egolint evidence",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1325309565,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "policy definition",
+          "silent remediation"
+        ],
+        "lifecycle": "seed",
+        "maturity": "seed",
+        "outputs": [
+          "dashboards",
+          "maturity reports",
+          "dependency maps"
+        ],
+        "owns": [
+          "portfolio inventory",
+          "maturity tracking",
+          "dependency visibility",
+          "conformance evidence",
+          "telemetry"
+        ],
+        "plane": "architecture-control"
+      },
+      "source_url": "https://github.com/egohygiene/observatory",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/optiflow",
+      "name": "optiflow",
+      "next_gate": {
+        "description": "Stabilize plan/schema contract before mutation features",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1324450169,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "temporal reconstruction",
+          "transform graphs",
+          "suite-wide orchestration"
+        ],
+        "lifecycle": "active",
+        "maturity": "active-read-only",
+        "outputs": [
+          "standalone CLI and library",
+          "plan schema",
+          "inventory evidence"
+        ],
+        "owns": [
+          "safe inventory",
+          "evidence-backed media relationships",
+          "immutable optimization plans",
+          "collection normalization"
+        ],
+        "plane": "content-publishing"
+      },
+      "source_url": "https://github.com/egohygiene/optiflow",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/pace",
+      "name": "pace",
+      "next_gate": {
+        "description": "Read Hygiene catalog and produce a dry-run projection diff",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1315637735,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "new repository bootstrap",
+          "direct default-branch mutation",
+          "CI primitives"
+        ],
+        "lifecycle": "seed",
+        "maturity": "seed",
+        "outputs": [
+          "projection diffs",
+          "upgrade pull requests",
+          "migration evidence"
+        ],
+        "owns": [
+          "fleet adoption",
+          "migrations",
+          "reconciliation",
+          "synchronization",
+          "pull request generation"
+        ],
+        "plane": "architecture-control"
+      },
+      "source_url": "https://github.com/egohygiene/pace",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/realm",
+      "name": "realm",
+      "next_gate": {
+        "description": "Publish `base`, one profile, and `full`; install pinned Mantle",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1315637781,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "shell semantics",
+          "CI workflows",
+          "cloud resource provisioning"
+        ],
+        "lifecycle": "seed",
+        "maturity": "seed-with-staged-source",
+        "outputs": [
+          "OCI images",
+          "SBOMs",
+          "provenance",
+          "Nix flake",
+          "Dev Container artifacts",
+          "capability manifest"
+        ],
+        "owns": [
+          "OCI image family",
+          "Dev Container templates and features",
+          "Nix modules and profiles",
+          "workstation projections",
+          "optional local runtime profiles"
+        ],
+        "plane": "developer-runtime"
+      },
+      "source_url": "https://github.com/egohygiene/realm",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/reflector",
+      "name": "reflector",
+      "next_gate": {
+        "description": "Publish its research contracts and report evidence to Observatory",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1247115338,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "generic fleet reconciliation",
+          "canonical platform policy"
+        ],
+        "lifecycle": "active",
+        "maturity": "active",
+        "outputs": [
+          "research publications",
+          "synchronization evidence",
+          "CLI releases"
+        ],
+        "owns": [
+          "reflective synchronization research",
+          "recursive engineering CLI",
+          "research publication evidence"
+        ],
+        "plane": "knowledge-research"
+      },
+      "source_url": "https://github.com/egohygiene/reflector",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/relay",
+      "name": "relay",
+      "next_gate": {
+        "description": "Extract one reusable test workflow and one release primitive",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1321918958,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "lint semantics",
+          "ecosystem architecture",
+          "product release policy"
+        ],
+        "lifecycle": "seed",
+        "maturity": "seed",
+        "outputs": [
+          "reusable workflow contracts",
+          "run evidence"
+        ],
+        "owns": [
+          "reusable GitHub workflows",
+          "composite actions",
+          "CI and release mechanics"
+        ],
+        "plane": "developer-runtime"
+      },
+      "source_url": "https://github.com/egohygiene/relay",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/renderflow",
+      "name": "renderflow",
+      "next_gate": {
+        "description": "Publish stable Flow-facing contract and retain standalone UX",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1187580231,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "collection policy",
+          "temporal reconstruction",
+          "release distribution"
+        ],
+        "lifecycle": "active",
+        "maturity": "active",
+        "outputs": [
+          "standalone CLI and library",
+          "derivative manifests",
+          "rendered artifacts"
+        ],
+        "owns": [
+          "spec-driven transform graphs",
+          "document derivatives",
+          "image derivatives",
+          "audio derivatives"
+        ],
+        "plane": "content-publishing"
+      },
+      "source_url": "https://github.com/egohygiene/renderflow",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/sanctuary",
+      "name": "sanctuary",
+      "next_gate": {
+        "description": "Prove one real incubation without broadening the local lifecycle into organization policy",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1341342928,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "canonical repository templates",
+          "organization-wide policy and canonical lifecycle semantics",
+          "durable specialist implementations after ownership decisions",
+          "stable repository dependencies",
+          "credentials, private data, production state, and generic artifact archives"
+        ],
+        "lifecycle": "incubating",
+        "maturity": "provisional-contract",
+        "outputs": [
+          "provisional incubation manifests",
+          "provenance and lifecycle records",
+          "reviewed ownership-decision evidence"
+        ],
+        "owns": [
+          "bounded incubation of unfinished or ownerless public work",
+          "incubation provenance and lifecycle evidence",
+          "graduation, archival, and rejection proposals"
+        ],
+        "plane": "architecture-control"
+      },
+      "source_url": "https://github.com/egohygiene/sanctuary",
+      "visibility": "public"
+    },
+    {
+      "aliases": [],
+      "archived": false,
+      "default_branch": "main",
+      "full_name": "egohygiene/store",
+      "name": "store",
+      "next_gate": {
+        "description": "Formalize integration contract and independent deployment with site",
+        "source_observed_at": "2026-08-21",
+        "source_url": "https://github.com/egohygiene/hygiene/blob/b6e6bc1d88be787ee7a8a0ca1010b46b98ba55fb/docs/ecosystem/REPOSITORY_CATALOG.md",
+        "state": "source-declared"
+      },
+      "repository_id": 1318861461,
+      "role": {
+        "evidence": [],
+        "excludes": [
+          "main website content",
+          "fulfillment",
+          "manufacturing",
+          "hosted checkout"
+        ],
+        "lifecycle": "active",
+        "maturity": "active",
+        "outputs": [
+          "storefront application",
+          "route and deployment contract"
+        ],
+        "owns": [
+          "provider-neutral storefront",
+          "commerce ports and adapters",
+          "store deployment"
+        ],
+        "plane": "identity-product-experience"
+      },
+      "source_url": "https://github.com/egohygiene/store",
+      "visibility": "public"
+    }
+  ],
+  "schema": "egohygiene.repository-public-catalog/v1",
+  "source": {
+    "completeness": "complete",
+    "provider": "github",
+    "scope": "public",
+    "url": "https://api.github.com/orgs/egohygiene/repos?type=public&per_page=100"
+  }
+}
