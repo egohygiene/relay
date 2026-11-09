@@ -14,8 +14,10 @@ from datetime import datetime, UTC
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
 import re
+import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -47,6 +49,39 @@ def digest(value):
 
 def lock():
     return json.loads(LOCK_PATH.read_bytes())
+
+
+def acquire(work):
+    """Fetch only the exact reviewed public owner revision into a fresh bare Git.
+
+    This stdlib-only transport neither installs dependencies nor executes owner
+    or consumer files. load() performs the subsequent public source admission.
+    """
+    work = Path(work).absolute()
+    require(".." not in work.parts and work.is_dir()
+        and not any(path.is_symlink() for path in (work, *work.parents)))
+    target = work / "public-catalog"
+    require(not target.exists() and not target.is_symlink())
+    environment = {"PATH": os.defpath, "LC_ALL": "C.UTF-8", "GIT_CONFIG_NOSYSTEM": "1",
+        "GIT_CONFIG_GLOBAL": os.devnull, "GIT_NO_REPLACE_OBJECTS": "1", "GIT_TERMINAL_PROMPT": "0"}
+    for key in ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "NO_PROXY", "http_proxy", "https_proxy",
+                "all_proxy", "no_proxy", "SSL_CERT_FILE", "SSL_CERT_DIR", "REQUESTS_CA_BUNDLE",
+                "CURL_CA_BUNDLE", "GIT_SSL_CAINFO"):
+        if key in os.environ:
+            environment[key] = os.environ[key]
+    pin = lock()
+    commands = (["init", "--bare", str(target)],
+        ["-C", str(target), "-c", "protocol.allow=never", "-c", "protocol.https.allow=always",
+         "fetch", "--no-tags", "--depth=1", "https://github.com/" + pin["owner"] + ".git", pin["revision"]])
+    try:
+        for command in commands:
+            with tempfile.TemporaryFile() as log:
+                completed = subprocess.run(["git", "-c", "core.hooksPath=/dev/null", *command],
+                    cwd=work, env=environment, stdout=log, stderr=log, timeout=180, check=False)
+                require(completed.returncode == 0 and log.tell() <= 32 * 1024 * 1024)
+    except (OSError, subprocess.SubprocessError):
+        raise ValueError("Public catalog acquisition is unavailable") from None
+    return target
 
 
 def validate_metadata(value, selected=None):
