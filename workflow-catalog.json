@@ -896,6 +896,13 @@
           "description": "Validated 1-90 day retention for the generated public dashboard artifact; sanitized run evidence always uses a fixed 30 days."
         },
         {
+          "name": "search-attribution",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Opt into pinned owner-defined Search field attribution for a selected native source plan."
+        },
+        {
           "name": "collect-journey",
           "type": "boolean",
           "required": false,
@@ -1462,6 +1469,13 @@
           "required": false,
           "default": "",
           "description": "Explicit UTC source evaluation boundary; required with capture intake."
+        },
+        {
+          "name": "search-attribution",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Opt into pinned owner-defined Search field attribution for a selected native source plan."
         },
         {
           "name": "collect-journey",

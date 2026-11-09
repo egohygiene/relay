@@ -6,7 +6,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
+import json
 from collections import Counter
 from pathlib import Path
 from types import ModuleType
@@ -30,6 +32,50 @@ def load_site_module() -> ModuleType:
 
 
 site = load_site_module()
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def load_search_contract() -> ModuleType:
+    """Consume the exact versioned owner implementation, never infer an index."""
+
+    lock = json.loads((ROOT / "contracts/search-fields.v1.lock.json").read_bytes())
+    if (lock.get("schema") != "egohygiene.relay.observatory-search-fields-lock/v1"
+            or lock.get("owner") != "egohygiene/observatory"
+            or not site.FULL_SHA.fullmatch(str(lock.get("source_commit", "")))):
+        raise SearchViewError("Search owner contract is incompatible")
+    selected = None
+    browser = None
+    expected = {"src/observatory/search_fields.py": "search_fields.py",
+                "contracts/search-fields.v1.js": "search-fields.v1.js"}
+    if set(lock.get("files", {})) != set(expected):
+        raise SearchViewError("Search owner file inventory is incompatible")
+    for upstream, entry in lock["files"].items():
+        if entry.get("vendored") != "contracts/observatory/" + expected[upstream]:
+            raise SearchViewError("Search owner path is incompatible")
+        path = ROOT / entry["vendored"]
+        if (path.is_symlink() or not path.is_file() or path.stat().st_size > 262144
+                or hashlib.sha256(path.read_bytes()).hexdigest() != entry["sha256"]):
+            raise SearchViewError("Search owner bytes do not match the pinned contract")
+        if upstream == "src/observatory/search_fields.py":
+            selected = path
+        if upstream == "contracts/search-fields.v1.js":
+            browser = path.read_bytes()
+    if selected is None or browser is None:
+        raise SearchViewError("Search owner contract is unavailable")
+    prefix = b"/* BEGIN PINNED OBSERVATORY SEARCH FIELDS V1 */\n" + browser + b"\n/* END PINNED OBSERVATORY SEARCH FIELDS V1 */\n"
+    if not (ROOT / "assets/site.js").read_bytes().startswith(prefix):
+        raise SearchViewError("Search browser contract differs from its pinned owner")
+    spec = importlib.util.spec_from_file_location("relay_pinned_observatory_search_fields", selected)
+    if spec is None or spec.loader is None:
+        raise SearchViewError("Search owner contract is unavailable")
+    contract = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(contract)
+    if lock.get("contract", {}).get("schema") != contract.SEARCH_FIELDS_SCHEMA or lock.get("contract", {}).get("version") != contract.SEARCH_FIELDS_VERSION:
+        raise SearchViewError("Search owner version differs from its pinned contract")
+    return contract
+
+
+search_contract = load_search_contract()
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -81,6 +127,10 @@ def validate_search_record(value: Any, label: str) -> dict[str, Any]:
     title = record.get("title")
     if title is not None and (not isinstance(title, str) or not title):
         raise SearchViewError(f"{label}.title must be null or a non-empty string")
+    try:
+        search_contract.validate_search_record(record)
+    except (ValueError, TypeError, KeyError) as error:
+        raise SearchViewError("Search field attribution is incompatible") from error
     return record
 
 
@@ -94,14 +144,19 @@ def validate_search_view(value: Any) -> dict[str, Any]:
     if not isinstance(records, list):
         raise SearchViewError("snapshot views.search.records must be an array")
     identifiers: set[str] = set()
+    admitted = []
     for index, candidate in enumerate(records):
+        # Visibility is checked before IDs, attributed fields, text or counts.
+        if not isinstance(candidate, dict) or candidate.get("visibility") != "public":
+            continue
         record = validate_search_record(
             candidate, f"snapshot views.search.records[{index}]"
         )
         if record["id"] in identifiers:
             raise SearchViewError("snapshot views.search record IDs must be unique")
         identifiers.add(record["id"])
-    return search_view
+        admitted.append(record)
+    return {**search_view, "records": admitted}
 
 
 def render_freshness_filter(records: list[dict[str, Any]]) -> str:
@@ -134,11 +189,18 @@ def render_search_record(record: dict[str, Any]) -> str:
     kind = site.normalize_state(record.get("kind"))
     freshness = site.normalize_state(record.get("freshness"))
     title = record.get("title") or record.get("key") or record.get("id")
-    return f'''<li><article class="ri-record" data-entity-id="{site.escaped(record.get("id"))}" data-filter-item{site.source_repository_attribute(record)} data-state="{site.escaped(state)}" data-kind="{site.escaped(kind)}" data-filter-freshness="{site.escaped(freshness)}" data-search="{site.escaped(record["search_text"])}">
+    query_record = {name: record.get(name) for name in ("title", "key", "kind", "state", "repository", "search_text")}
+    if "search_fields" in record:
+        query_record["search_fields"] = record["search_fields"]
+    encoded = json.dumps(query_record, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+    availability = ("Field attribution is available when filtering by text."
+                    if "search_fields" in record else "Field attribution unavailable in this snapshot.")
+    return f'''<li><article class="ri-record" data-entity-id="{site.escaped(record.get("id"))}" data-filter-item{site.source_repository_attribute(record)} data-state="{site.escaped(state)}" data-kind="{site.escaped(kind)}" data-filter-freshness="{site.escaped(freshness)}" data-search="{site.escaped(record["search_text"])}" data-search-record="{site.escaped(encoded)}">
       <div class="ri-record__top"><span class="ri-eyebrow">{site.escaped(site.state_label(kind))}</span><span>{site.status_pill(state)} {site.status_pill(freshness, f"Freshness: {site.state_label(freshness)}")}</span></div>
       <h3>{site.escaped(title)}</h3>
       <p>{site.escaped(record.get("repository"))} · {site.escaped(record.get("key"))}</p>
       <dl class="ri-provenance"><div><dt>Assertion</dt><dd>{site.escaped(site.state_label(record.get("assertion")))}</dd></div><div><dt>Freshness</dt><dd>{site.escaped(site.state_label(record.get("freshness")))}</dd></div></dl>
+      <p class="ri-muted" data-search-attribution>{availability}</p>
       <p>{site.source_link(record, "Open canonical source")}</p>
     </article></li>'''
 
@@ -161,7 +223,9 @@ def search_body(snapshot: dict[str, Any] | None) -> str:
     return f'''<section class="ri-section ri-section--lead" aria-labelledby="search-heading">
       <div class="ri-section-heading"><div><span class="ri-eyebrow">Evidence discovery</span><h2 id="search-heading">Find a normalized repository object</h2></div><p>Search the accepted Repository Intelligence entity index, then follow the canonical source to inspect or act.</p></div>
       <div class="ri-roadmap-metrics" aria-label="Search index summary"><article><strong>{len(records)}</strong><span>searchable records</span></article>{render_kind_summary(records)}</div>
-      <details class="ri-progress-rules"><summary>What this search can match</summary><p>Observatory supplies each record's normalized <code>search_text</code> from title, key, kind, state, and repository. Relay filters that supplied string exactly; it does not search issue bodies, commit diffs, source files, ADR prose, or external providers, and the current contract does not identify which individual field matched.</p></details>
+      <details class="ri-progress-rules"><summary>What this search can match</summary><p>Observatory supplies each record's normalized <code>search_text</code> from title, key, kind, state, and repository. Its optional versioned field representation explains every participating field using the same complete-query substring semantics, including matches across fields. Older records explicitly retain unavailable attribution. No ranking, provider lookup or additional source indexing is introduced.</p></details>
+      <noscript><p>All admitted records and their canonical sources are available below. Query-specific matched-field details require JavaScript.</p></noscript>
+      <p class="ri-muted" data-search-contract-error role="status" hidden>Some records could not be searched with this browser's contract. Their static evidence remains available without JavaScript.</p>
       {render_freshness_filter(records)}
     </section>
     <section class="ri-section" aria-labelledby="search-results-heading"><div class="ri-section-heading"><div><span class="ri-eyebrow">Normalized index</span><h2 id="search-results-heading">Searchable evidence</h2></div><p>Result order is the deterministic Observatory projection order; Relay does not rank by activity or inferred relevance.</p></div><ol class="ri-record-list" aria-label="Normalized Repository Intelligence search records">{"".join(render_search_record(record) for record in records)}</ol></section>'''

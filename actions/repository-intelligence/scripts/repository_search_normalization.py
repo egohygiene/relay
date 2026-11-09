@@ -14,9 +14,11 @@ import argparse
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
 import re
 import sys
+import tempfile
 from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -108,6 +110,82 @@ def acquire(work):
     """Acquire only this trusted profile through the existing isolated preparer."""
     acquisition = module("relay_search_runtime_acquisition", "prepare_repository_adr_build.py")
     return acquisition.acquire(Path(work), normalization_profile=PROFILE)
+
+
+def upgrade(legacy_runtime, work):
+    """Reuse a verified legacy executable and fetch only the new owner bytes.
+
+    The caller supplies a fresh trusted scratch directory outside any checkout.
+    No legacy file is changed, and no Rust toolchain or Python environment is
+    rebuilt. An incompatible typed runtime must use the separate acquire path.
+    """
+    native = module("relay_search_upgrade_native", "collect_repository_adrs.py")
+    base = native.base
+    original = base.safe_path(Path(legacy_runtime))
+    work = base.safe_path(Path(work))
+    require(not work.is_relative_to(original) and not original.is_relative_to(work)
+        and not any((parent / ".git").exists() for parent in (work, *work.parents)))
+    require(not work.exists() or work.is_dir() and not any(work.iterdir()))
+    old_lock, old_receipt = base.runtime_files(original, lock_path=native.LOCK_PATH)
+    new_lock = base.load_json(base.read_file(LOCK_PATH))
+    require(set(new_lock["sources"]) == set(old_lock["sources"]))
+    for name, pin in new_lock["sources"].items():
+        if name != "observatory":
+            require(pin == old_lock["sources"][name])
+    owner = new_lock["sources"]["observatory"]
+    require(owner["repository"] == "egohygiene/observatory"
+        and re.fullmatch(r"[0-9a-f]{40}", owner["revision"])
+        and re.fullmatch(r"[0-9a-f]{40}", owner["tree"]))
+    work.mkdir(parents=True, exist_ok=True)
+    destination = work / "runtime"
+    acquisition = module("relay_search_upgrade_acquisition", "prepare_repository_adr_build.py")
+    environment = base.environment()
+    # Preserve managed routing and CA trust without inheriting Git credentials,
+    # consumer configuration, Python hooks or executable source from a capture.
+    for key in ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "NO_PROXY", "http_proxy", "https_proxy",
+                "all_proxy", "no_proxy", "SSL_CERT_FILE", "SSL_CERT_DIR", "REQUESTS_CA_BUNDLE",
+                "CURL_CA_BUNDLE", "GIT_SSL_CAINFO"):
+        if key in os.environ:
+            environment[key] = os.environ[key]
+    with tempfile.TemporaryDirectory(prefix="search-profile-upgrade-", dir=work) as temporary:
+        stage = Path(temporary) / "runtime"
+        stage.mkdir(mode=0o700)
+        for name, pin in new_lock["sources"].items():
+            if name == "observatory":
+                continue
+            for relative, expected in pin["files"].items():
+                relative = native.relative(relative)
+                content = base.read_file(original / name / relative, base.MAX_OUTPUT)
+                require(digest(content) == expected)
+                target = stage / name / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(content)
+        executable = base.read_file(original / "egolint-bin", 128 * base.MAX_JSON)
+        require(digest(executable) == old_receipt["egolint_sha256"])
+        (stage / "egolint-bin").write_bytes(executable)
+        (stage / "egolint-bin").chmod(0o700)
+        repository = Path(temporary) / "observatory.git"
+        command = ["git", "--no-optional-locks", "-c", "core.hooksPath=/dev/null",
+                   "-c", "core.fsmonitor=false", "-c", "protocol.allow=never",
+                   "-c", "protocol.https.allow=always"]
+        acquisition.execute([*command, "init", "--bare", str(repository)], work, environment)
+        acquisition.execute([*command, "-C", str(repository), "fetch", "--no-tags", "--depth=1",
+            "https://github.com/egohygiene/observatory.git", owner["revision"]], work, environment)
+        require(base.git(repository, "rev-parse", owner["revision"] + "^{tree}").decode().strip() == owner["tree"])
+        for relative, expected in owner["files"].items():
+            relative = native.relative(relative)
+            content = base.git_blob(repository, owner["revision"], relative, base.MAX_OUTPUT)
+            require(digest(content) == expected)
+            target = stage / "observatory" / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(content)
+        receipt = {"lock_sha256": digest(LOCK_PATH.read_bytes()),
+                   "egolint_sha256": old_receipt["egolint_sha256"]}
+        (stage / "runtime.json").write_bytes(base.json_bytes(receipt))
+        base.runtime_files(stage, lock_path=LOCK_PATH)
+        require(not destination.exists())
+        stage.rename(destination)
+    return destination
 
 
 def retention_adapter():

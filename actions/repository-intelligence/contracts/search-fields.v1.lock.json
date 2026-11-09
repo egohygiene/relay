@@ -1,0 +1,21 @@
+{
+  "contract": {
+    "normalization": "unicode-14.0.0-default-lowercase-fixed-outer-whitespace-v1",
+    "schema": "egohygiene.observatory.repository-intelligence-search-fields/v1",
+    "version": "1.0.0-alpha.1"
+  },
+  "files": {
+    "contracts/search-fields.v1.js": {
+      "sha256": "73a59057ded90ad87f5273e6d62db52af42bec3d3828bb0c532cb6cfa587a735",
+      "vendored": "contracts/observatory/search-fields.v1.js"
+    },
+    "src/observatory/search_fields.py": {
+      "sha256": "19f370893ef7dd9fa0814922f3c47ef65db0414193e61d1e9154515a521f23ca",
+      "vendored": "contracts/observatory/search_fields.py"
+    }
+  },
+  "owner": "egohygiene/observatory",
+  "schema": "egohygiene.relay.observatory-search-fields-lock/v1",
+  "source_commit": "49a8031f2a5124ff7ab09adbda50a9a5dbe6dec2",
+  "tree": "8eaeb62a3ce58056093df77cc7a6327322aaeaf2"
+}
