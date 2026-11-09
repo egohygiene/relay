@@ -30,6 +30,7 @@ PLAN = "egohygiene.relay.public-fleet-artifact-plan/v1"
 MAX_PLAN = 262144
 MAX_FLEET = 64 * 1024 * 1024
 MAX_HOST_FLEET = 16 * 1024 * 1024
+MAX_ACQUISITION_SECONDS = 240
 STATES = {"missing", "available", "expired", "inaccessible", "incompatible", "malformed", "wrong_repository"}
 HASH = re.compile(r"[0-9a-f]{64}")
 
@@ -113,7 +114,8 @@ def captured(args, repository, choice, slot):
                 transport.read(folder / "artifact.zip", snapshot.MAX_ARCHIVE))
     token = os.environ.get("FLEET_GITHUB_TOKEN", "")
     require(len(token) <= 4096 and not any(ord(char) < 32 for char in token), "inaccessible")
-    deadline = time.monotonic() + 60
+    deadline = min(args.deadline, time.monotonic() + 60)
+    require(time.monotonic() < deadline, "inaccessible")
     api = "https://api.github.com/repos/" + repository + "/actions/"
     run = document(api + f"runs/{choice['run_id']}/attempts/{choice['run_attempt']}", token, deadline)
     artifact = document(api + f"artifacts/{choice['artifact_id']}", token, deadline)
@@ -239,6 +241,10 @@ def prepare(args):
     args.capture_root = args.output / "captures"
     args.artifact_root = args.output / "repository-inputs"
     args.artifact_root.mkdir()
+    # This budget covers the entire fleet, rather than multiplying a fresh
+    # timeout by every repository. Unattempted selections stay inaccessible;
+    # already acquired public evidence still reaches the partial handoff.
+    args.deadline = time.monotonic() + MAX_ACQUISITION_SECONDS
     local, availability = [], []
     for index, row in enumerate(selected):
         current = {"repository": row["repository"], "represented_commit": row["represented_commit"],

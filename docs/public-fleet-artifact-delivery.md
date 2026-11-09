@@ -54,8 +54,11 @@ each requiring its exact selected runtime lock identity. Fleet normalization
 keeps its own older owner intersection and does not claim an equivalent original
 snapshot digest or attributed Search migration.
 
-Acquisition is bounded to three requests per selected artifact and a 60-second
-deadline, with one allowlisted storage redirect and no credential forwarding to
+Acquisition is bounded to three API requests per selected artifact and a60-second
+per-selection deadline within a shared240-second fleet budget (plus at most one
+in-flight15-second transport timeout). Selections not reached in that budget
+remain inaccessible, while already acquired evidence still produces a partial
+handoff. There is one allowlisted storage redirect and no credential forwarding to
 storage. Up to64 public repositories, two explicit selections each, and the
 existing bounded snapshot ZIP size are supported. The site-compatible fleet
 file is capped at16MiB and its handoff manifest at1MiB; the offline review
