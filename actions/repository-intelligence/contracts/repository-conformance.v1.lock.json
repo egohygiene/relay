@@ -1,0 +1,27 @@
+{
+  "schema": "egohygiene.relay.observatory-conformance-lock/v1",
+  "owner": "egohygiene/observatory",
+  "revision": "a1884942e953bb371499b2822b52f6865ecdae9d",
+  "contract": {
+    "schema": "egohygiene.observatory.repository-conformance/v1",
+    "version": "1.0.0-alpha.1"
+  },
+  "files": {
+    "src/observatory/conformance_contract.py": {
+      "vendored": "contracts/observatory-conformance/conformance_contract.py",
+      "sha256": "cff878b9d112ee2f9aa948a9f38b382f44a081acf1a5da18616bf21977085f13"
+    },
+    "src/observatory/data/hygiene.public-repositories.v1.json": {
+      "vendored": "contracts/observatory-conformance/hygiene.public-repositories.v1.json",
+      "sha256": "af9c7186ded0bb57b18741eaa5905314b96d6adb03736946c868e0fc4aa50b26"
+    },
+    "contracts/hygiene.public-conformance.v1.lock.json": {
+      "vendored": "contracts/observatory-conformance/hygiene.public-conformance.v1.lock.json",
+      "sha256": "d3b55cd731a9c4e8e657f3dbbf331fd3f4c7899d54b854255ce13f71857fad4e"
+    },
+    "schemas/repository-conformance.v1.schema.json": {
+      "vendored": "contracts/observatory-conformance/repository-conformance.v1.schema.json",
+      "sha256": "e423ea93945a9b7803f57f8402d431c9bf93259a5f95f121959cc2723e3ca61e"
+    }
+  }
+}
