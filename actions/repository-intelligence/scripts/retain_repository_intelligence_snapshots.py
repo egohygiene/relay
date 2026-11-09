@@ -84,22 +84,11 @@ def atomic(path, content):
         Path(name).unlink(missing_ok=True)
 
 
-def projection(snapshot):
-    upstream = snapshot["upstream"]
-    result = {**snapshot["graph"], "schema": upstream["schema"],
-              "contract_version": upstream["contract_version"],
-              "projection_id": upstream["projection_id"],
-              "repository": snapshot["repository"]["repository"],
-              "represented_commit": snapshot["represented_commit"],
-              "observed_at": snapshot["observed_at"], "visibility": snapshot["visibility"]}
-    if upstream["contract_version"] == "1.0.0-alpha.2":
-        result["collection_coverage"] = snapshot["coverage"]["domains"]
-    return result
-
-
-def accepted_snapshot(path, args, observatory, *, current=False):
+def accepted_snapshot(path, projection_path, args, *, current=False):
     raw = read(path)
+    projection_raw = read(projection_path)
     value = base.load_json(raw)
+    projected = base.load_json(projection_raw)
     schema = load(args.runtime / "observatory/schemas/repository-intelligence-read-model.v1.schema.json")
     if not jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker()).is_valid(value):
         fail("INCOMPATIBLE")
@@ -116,9 +105,11 @@ def accepted_snapshot(path, args, observatory, *, current=False):
         fail("VISIBILITY")
     # Captures must already be reviewed public projections. Reject obvious
     # credentials, emails and machine paths without echoing their contents.
-    if base.SECRET.search(raw.decode("utf-8")):
+    if base.SECRET.search(raw.decode("utf-8")) or base.SECRET.search(projection_raw.decode("utf-8")):
         fail("VISIBILITY")
-    projected = projection(value)
+    # The original projection is required: the read model intentionally omits
+    # its upstream generator, which is nevertheless part of upstream.digest.
+    # Reconstructing a generator here would manufacture original provenance.
     normalized, validation = adr.normalize(args.runtime, projected)
     if normalized is None or validation["coverage"] != "valid" or normalized != value:
         fail("INCOMPATIBLE")
@@ -126,15 +117,22 @@ def accepted_snapshot(path, args, observatory, *, current=False):
     if age < 0:
         fail("INPUT")
     content = base.json_bytes(value)
-    return value, content, base.digest(content), age, base.digest(raw)
+    projection_content = base.json_bytes(projected)
+    return {"snapshot": value, "snapshot_bytes": content,
+            "snapshot_sha256": base.digest(content), "snapshot_input_sha256": base.digest(raw),
+            "projection_bytes": projection_content, "projection_sha256": base.digest(projection_content),
+            "projection_input_sha256": base.digest(projection_raw), "age": age}
 
 
-def boundary(value, digest, input_digest):
+def boundary(captured):
+    value = captured["snapshot"]
     return {"repository": value["repository"]["repository"],
             "represented_commit": value["represented_commit"],
             "snapshot_id": value["snapshot_id"], "observed_at": value["observed_at"],
-            "contract_version": value["contract_version"], "snapshot_sha256": digest,
-            "input_sha256": input_digest,
+            "contract_version": value["contract_version"], "snapshot_sha256": captured["snapshot_sha256"],
+            "input_sha256": captured["snapshot_input_sha256"],
+            "projection_sha256": captured["projection_sha256"],
+            "projection_input_sha256": captured["projection_input_sha256"],
             "upstream_digest": value["upstream"]["digest"],
             "collection_coverage": value["coverage"]["domains"]}
 
@@ -169,10 +167,12 @@ def pointer(root, repository):
         return None
     try:
         value = load(path)
-        if (set(value) != {"schema", "repository", "snapshot_sha256", "retained_at", "runtime_lock_sha256"}
+        if (set(value) != {"schema", "repository", "snapshot_sha256", "projection_sha256", "retained_at", "runtime_lock_sha256"}
                 or value["schema"] != POINTER_SCHEMA or value["repository"] != repository
                 or not isinstance(value["snapshot_sha256"], str)
                 or not SHA256.fullmatch(value["snapshot_sha256"])
+                or not isinstance(value["projection_sha256"], str)
+                or not SHA256.fullmatch(value["projection_sha256"])
                 or not isinstance(value["runtime_lock_sha256"], str)
                 or not SHA256.fullmatch(value["runtime_lock_sha256"])):
             fail("STORAGE")
@@ -182,20 +182,23 @@ def pointer(root, repository):
         fail("STORAGE")
 
 
-def baseline(args, root, observatory, selected):
+def baseline(args, root, selected):
     if args.baseline is None and selected is None:
         return None, "missing", None
     path = args.baseline if args.baseline is not None else root / "snapshots" / (selected["snapshot_sha256"] + ".json")
-    if not path.exists():
+    projection_path = args.baseline_projection if args.baseline is not None else root / "projections" / (selected["projection_sha256"] + ".json")
+    if not path.exists() or not projection_path.exists():
         return None, "missing" if args.baseline is not None else "inaccessible", None
     try:
-        value, content, digest, age, input_digest = accepted_snapshot(path, args, observatory)
-        if selected is not None and args.baseline is None and digest != selected["snapshot_sha256"]:
+        captured = accepted_snapshot(path, projection_path, args)
+        value = captured["snapshot"]
+        if selected is not None and args.baseline is None and any(
+                captured[name] != selected[name] for name in ("snapshot_sha256", "projection_sha256")):
             fail("STORAGE")
         if base.utc(value["observed_at"]) > base.utc(args.current_observed_at):
             fail("INPUT")
-        status = "expired" if age > args.maximum_baseline_age_seconds else "available"
-        return (value, digest, input_digest), status, None
+        status = "expired" if captured["age"] > args.maximum_baseline_age_seconds else "available"
+        return captured, status, None
     except RetentionError as error:
         code = str(error)
         state = {"REPOSITORY": "wrong_repository", "INCOMPATIBLE": "incompatible",
@@ -218,7 +221,7 @@ def retainable(before, current):
                for claim in claims.values()) or any(claim["collection"] == "failed" for claim in claims.values()):
         return False
     if before is not None:
-        for name, prior in before[0]["coverage"]["domains"].items():
+        for name, prior in before["snapshot"]["coverage"]["domains"].items():
             state = claims[name]["collection"]
             if prior["collection"] in {"observed", "observed_empty", "partial", "not_applicable"} and state in {
                     "uncollected", "failed", "unavailable"}:
@@ -235,11 +238,13 @@ def execute(args):
     for value in (args.maximum_baseline_age_seconds, args.maximum_current_age_seconds):
         if not 1 <= value <= MAX_AGE:
             fail("INPUT")
-    if args.command == "refresh" and args.baseline is not None:
+    if bool(args.baseline) != bool(args.baseline_projection) or (args.command == "refresh" and args.baseline is not None):
         fail("INPUT")
     lock, runtime = base.runtime_files(args.runtime, lock_path=adr.LOCK_PATH)
     observatory = base.module(args.runtime / "observatory/src/observatory/intelligence.py", "pinned_retention_observatory")
-    current, content, digest, age, input_digest = accepted_snapshot(args.snapshot, args, observatory, current=True)
+    captured = accepted_snapshot(args.snapshot, args.projection, args, current=True)
+    current = captured["snapshot"]
+    content, digest, age = captured["snapshot_bytes"], captured["snapshot_sha256"], captured["age"]
     args.current_observed_at = current["observed_at"]
     # Age is operational evidence and never changes the immutable snapshot.
     if age > args.maximum_current_age_seconds or current["coverage"]["record_status"] == "stale" or any(
@@ -249,19 +254,21 @@ def execute(args):
     selected = pointer(root, args.repository)
     if selected is not None and base.utc(selected["retained_at"]) > base.utc(args.observed_at):
         fail("INPUT")
+    if args.command == "refresh" and selected is not None and selected["runtime_lock_sha256"] != runtime["lock_sha256"]:
+        fail("PIN")
     expected = selected["snapshot_sha256"] if selected else "none"
     if args.command == "refresh" and args.expected_baseline != expected:
         fail("LEASE")
-    before, state, code = baseline(args, root, observatory, selected)
+    before, state, code = baseline(args, root, selected)
     comparison = None
     status = "unavailable"
     usable = retainable(before, current)
     if before is not None and state == "available" and usable:
-        comparison = observatory.compare_snapshots(before[0], current)
-        status = "partial" if partial(before[0]) or partial(current) else "ready"
+        comparison = observatory.compare_snapshots(before["snapshot"], current)
+        status = "partial" if partial(before["snapshot"]) or partial(current) else "ready"
     receipt = {"schema": SCHEMA, "publication": "denied", "status": status,
                "observed_at": args.observed_at, "repository": args.repository,
-               "current": boundary(current, digest, input_digest), "baseline": boundary(*before) if before else None,
+               "current": boundary(captured), "baseline": boundary(before) if before else None,
                "baseline_state": state, "diagnostics": ([code] if code else []) + ([] if usable else ["COVERAGE"]),
                "baseline_retention_lock_sha256": selected["runtime_lock_sha256"] if selected else None,
                "limits": {"maximum_baseline_age_seconds": args.maximum_baseline_age_seconds,
@@ -283,17 +290,24 @@ def execute(args):
             return receipt, comparison
         with lease(root):
             latest = pointer(root, args.repository)
-            if (latest["snapshot_sha256"] if latest else "none") != args.expected_baseline:
+            if (latest != selected or (latest["snapshot_sha256"] if latest else "none") != args.expected_baseline):
                 fail("LEASE")
-            target = base.safe_path(root / "snapshots" / (digest + ".json"))
-            if target.exists():
-                if read(target) != content:
-                    fail("STORAGE")
-            else:
-                atomic(target, content)
+            for directory, identity, data in (("snapshots", digest, content),
+                    ("projections", captured["projection_sha256"], captured["projection_bytes"])):
+                target = base.safe_path(root / directory / (identity + ".json"))
+                if target.exists():
+                    if read(target) != data:
+                        fail("STORAGE")
+                else:
+                    atomic(target, data)
+            # A write error/cancellation may occur after os.replace commits the
+            # pointer. Failure receipts must never claim it stayed unchanged.
+            args.retention_state = "unknown"
             atomic(root / "baseline.json", base.json_bytes({"schema": POINTER_SCHEMA,
                    "repository": args.repository, "snapshot_sha256": digest,
+                   "projection_sha256": captured["projection_sha256"],
                    "retained_at": args.observed_at, "runtime_lock_sha256": runtime["lock_sha256"]}))
+            args.retention_state = "retained"
             receipt["retention"] = "retained"
     return receipt, comparison
 
@@ -325,12 +339,13 @@ def parser():
     setup.add_argument("--output", type=Path, required=True)
     for name in ("compare", "refresh"):
         command = commands.add_parser(name, allow_abbrev=False)
-        for field in ("runtime", "snapshot", "store", "output"):
+        for field in ("runtime", "snapshot", "projection", "store", "output"):
             command.add_argument("--" + field, type=Path, required=True)
         command.add_argument("--repository-root", type=Path, required=True)
         for field in ("repository", "source-commit", "observed-at"):
             command.add_argument("--" + field, required=True)
         command.add_argument("--baseline", type=Path)
+        command.add_argument("--baseline-projection", type=Path)
         command.add_argument("--maximum-baseline-age-seconds", type=int, default=2592000)
         command.add_argument("--maximum-current-age-seconds", type=int, default=86400)
         if name == "refresh":
@@ -340,6 +355,7 @@ def parser():
 
 def main(argv=None):
     args = parser().parse_args(argv)
+    args.retention_state = "unchanged"
     can_write_receipt = False
     try:
         if args.command == "prepare":
@@ -365,7 +381,7 @@ def main(argv=None):
             try:
                 write_attempt(args.output, {"schema": SCHEMA, "publication": "denied", "status": "denied",
                                            "diagnostics": [code], "remediation": MESSAGES[code],
-                                           "retention": "unchanged"})
+                                           "retention": args.retention_state})
             except (RetentionError, base.CollectorError, OSError):
                 pass
         print("snapshot retention: " + code, file=sys.stderr)

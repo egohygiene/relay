@@ -4,7 +4,8 @@ Refs [Relay #152](https://github.com/egohygiene/relay/issues/152).
 
 `retain_repository_intelligence_snapshots.py` supplies the existing Compare
 renderer with the locked Observatory comparison, plus a separate operational
-receipt. It accepts already reviewed public Observatory alpha.2 snapshots.
+receipt. It accepts already reviewed public Observatory alpha.2 snapshots paired
+with their exact original upstream projections.
 It does not collect evidence, refresh a snapshot's observation time, publish a
 site, choose a cloud retention provider, or change canonical source history.
 
@@ -19,12 +20,20 @@ lock, upstream revisions, native executable and adapter digests.
 
 Admission requires a public alpha.2 snapshot and alpha.2 upstream projection,
 the declared repository and (for the current input) full source revision. The
-adapter reconstructs the existing upstream projection from the snapshot graph,
-normalizes it with the locked owners and requires exact structural equality
-with the supplied read model. An edited view, contradictory coverage or
+adapter requires the original upstream projection, normalizes it with the
+locked owners and requires exact structural equality with the supplied read
+model, including its upstream digest. An edited view, contradictory coverage or
 unsupported generator cannot become an accepted baseline. Alpha.1 comparison
 rendering remains supported; this new retention adapter deliberately requires
 the explicit alpha.2 domain boundary.
+
+The snapshot graph intentionally does not retain its upstream generator. A
+snapshot alone therefore cannot reconstruct the exact original projection or
+prove its upstream digest. Preserve both collector outputs; do not fabricate a
+generator from the read model's different Observatory generator. Existing local
+collector review envelopes retain both `projection_candidate` and
+`snapshot_candidate`; source-build preparation must retain its original
+projection alongside its snapshot before using this adapter.
 
 Snapshots must already have received their public projection review. This is
 not a redaction engine: it rejects non-public records, redaction summaries,
@@ -66,6 +75,7 @@ python actions/repository-intelligence/scripts/retain_repository_intelligence_sn
   --repository egohygiene/identity \
   --source-commit "$CONSUMER_SOURCE_COMMIT" \
   --snapshot /artifacts/current/observatory.snapshot.json \
+  --projection /artifacts/current/repository.projection.json \
   --observed-at "$OBSERVED_AT" \
   --store /artifacts/retained-intelligence \
   --expected-baseline none \
@@ -84,11 +94,14 @@ The repository's local store contains:
 ```text
 egohygiene--identity/
   snapshots/<canonical-snapshot-sha256>.json
+  projections/<canonical-projection-sha256>.json
   baseline.json
   .baseline.lock
 ```
 
-Snapshot objects contain canonical JSON bytes and are immutable by digest.
+Snapshot and original projection objects contain canonical JSON bytes and are
+immutable by digest. The pointer binds both digests, and admission always
+validates the original pair together.
 `baseline.json` is a local operational pointer, not a canonical source record.
 Its retention clock stays outside the snapshot and rendered bundle. Existing
 objects are never pruned by this tool, so operators can retain a previous
@@ -99,9 +112,9 @@ artifact expiry and access policy remain the consumer's decisions.
 ## Compare without advancing
 
 Use `compare` with the same inputs and a new attempt directory to inspect the
-retained baseline without updating it. An explicit `--baseline PATH` can select
-a reviewed immutable snapshot instead of the pointer; it is accepted only by
-`compare`, never by `refresh`.
+retained baseline without updating it. Explicit `--baseline PATH` and
+`--baseline-projection PATH` together can select a reviewed immutable pair
+instead of the pointer; they are accepted only by `compare`, never by `refresh`.
 
 Each attempt produces `retention.receipt.json`. When there is a compatible,
 unexpired baseline with usable coverage it also produces `comparison.json`,
@@ -112,8 +125,8 @@ and binds its version, after revision, observation boundary and snapshot ID to
 the supplied current snapshot. The comparison describes structural changes;
 it does not infer causality, acceptance or semantic completion.
 
-Input artifact SHA-256 and retained canonical snapshot SHA-256 are recorded
-separately. Two differently formatted copies of equivalent input produce the
+Input artifact SHA-256 and retained canonical SHA-256 are recorded separately
+for both the snapshot and projection. Two differently formatted copies of equivalent input produce the
 same retained bytes and normalized comparison; their receipt's input-byte hash
 can differ. Operational receipt clocks and retention policy are never inserted
 into the comparison or snapshot.
@@ -136,9 +149,19 @@ into the comparison or snapshot.
 - A corrupt/missing retained object, unreadable pointer, mismatched digest or
   incompatible baseline requires explicit operator recovery; a refresh does
   not silently discard the recovery evidence.
+- An automatic refresh requires the baseline's recorded runtime lock to match
+  the current lock. Upgrading owners is an explicit migration: validate the old
+  pair with `compare`, then seed a separately reviewed new store. Preserve the
+  old store and rollback evidence.
 - Each attempt has a new directory, so a failed retry cannot reuse a previous
   successful comparison file. Diagnostics use closed codes and omit captured
   text, exceptions and local paths.
+- Promotion checks the complete pointer again under its lock, so a concurrent
+  refresh of identical snapshot bytes cannot silently move a newer retention
+  clock backwards. If output writing fails after a pointer write, a failure
+  receipt reports retention as `retained` or `unknown`; it never asserts
+  `unchanged` after a possible committed promotion. Inspect the pointer before
+  retrying an interrupted attempt.
 
 Exit `0` means a comparison is available and any requested promotion succeeded.
 Exit `2` means there is useful operational evidence but comparison/promotion is
