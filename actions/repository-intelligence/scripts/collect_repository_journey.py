@@ -57,7 +57,8 @@ def public_subject(message: str, revision: str, enabled: bool) -> str:
         return fallback
     value = message.split("\n", 1)[0]
     value = "".join(c for c in value if unicodedata.category(c)[0] != "C")
-    if base.SECRET.search(value):
+    if (base.SECRET.search(value)
+            or re.search(r"(?i)(?:[a-z]:[\\/]|\\\\[^\\\s]+\\)", value)):
         return fallback
     value = re.sub(r"(?i)(?:https?://|www\.)\S+", "[link omitted]", value)
     # Subject disclosure is caller opt-in. Keep names of referenced repositories
@@ -173,7 +174,11 @@ def source_validate(args: argparse.Namespace, objects: dict[str, bytes]) -> dict
     if (not jsonschema.Draft202012Validator(schema).is_valid(report)
             or report["repository"] != args.repository
             or report["represented_commit"]["revision"] != args.source_commit
-            or report["catalog_version"] != catalog["catalog-version"] or report["contracts"] != pins):
+            or report["catalog_version"] != catalog["catalog-version"] or report["contracts"] != pins
+            or report["summary"]["commits_inspected"] != len(objects)):
+        # A shallow merge boundary can hide its captured parent branch as well
+        # as an omitted parent. Never admit messages the native owner did not
+        # inspect; acquire a larger complete ancestry and retry instead.
         base.fail("RUNTIME")
     return report
 
