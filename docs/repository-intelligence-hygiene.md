@@ -26,8 +26,8 @@ not determine the current assessment.
 
 Only supplied current-revision conformance assessments determine the displayed
 required-check rollup. Advisory rows remain visible. Expired observations stay
-stale even if the historical producer reported pass. No evidence remains
-unavailable/unknown. Complete contract inventory and applicability remain
+stale even if the historical producer reported pass. Without supplied evidence,
+the assessment remains unavailable/unknown. Complete contract inventory and applicability remain
 unknown, including when all supplied checks pass. No exemption, migration
 completion, ratification, percentage or universal obligation is invented.
 
