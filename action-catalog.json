@@ -231,6 +231,30 @@
         "workspace-write"
       ],
       "consumer_ref": "egohygiene/relay/actions/repository-intelligence-compare-artifact@v1"
+    },
+    {
+      "id": "repository-intelligence-fleet-artifact",
+      "path": "actions/repository-intelligence-fleet-artifact",
+      "name": "Repository Intelligence Fleet Artifact",
+      "summary": "Admit exact public repository snapshot artifacts through the reviewed Hygiene catalog and retain an Observatory fleet handoff without deploying.",
+      "status": "experimental",
+      "runtime": [
+        "bash",
+        "git",
+        "python3",
+        "cargo",
+        "rustup"
+      ],
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "side_effects": [
+        "network-read",
+        "artifact-write",
+        "workspace-write"
+      ],
+      "consumer_ref": "egohygiene/relay/actions/repository-intelligence-fleet-artifact@v1"
     }
   ],
   "workflows": [

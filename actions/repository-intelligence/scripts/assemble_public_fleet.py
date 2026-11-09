@@ -151,6 +151,8 @@ def public_graph(projection: dict, allowed: set[str]) -> None:
 
 def public_selection(args: argparse.Namespace, plan: dict) -> tuple[list, list, dict]:
     """Filter catalog visibility before inspecting a selection's artifact data."""
+    if getattr(args, "catalog_profile", "legacy-review") == "public-catalog-v1":
+        return admitted_public_selection(args, plan)
     if (plan.get("visibility") != "public" or not isinstance(plan.get("repositories"), list)
             or not isinstance(plan.get("catalog_revision"), str)
             or not base.SHA.fullmatch(plan["catalog_revision"])):
@@ -214,6 +216,28 @@ def public_selection(args: argparse.Namespace, plan: dict) -> tuple[list, list, 
                     "lifecycle": public[item["repository"]]["lifecycle"],
                     "source_url": public[item["repository"]]["source_url"]} for item in selected]
     return selected, public_rows, metadata
+
+
+def admitted_public_selection(args: argparse.Namespace, plan: dict) -> tuple[list, list, dict]:
+    """Opt into Hygiene's separately locked, public-only catalog projection."""
+    helper = base.module(Path(__file__).with_name("public_catalog_admission.py"), "relay_fleet_public_catalog")
+    requests = plan.get("repositories")
+    if not isinstance(requests, list):
+        base.fail("SELECTION")
+    wanted = {item.get("repository") for item in requests
+              if isinstance(item, dict) and isinstance(item.get("repository"), str)}
+    rows, metadata = helper.load(args.catalog_root, wanted)
+    public = {item["full_name"] for item in rows}
+    selected = [item for item in requests if isinstance(item, dict) and item.get("repository") in public]
+    visible = {**plan, "repositories": selected}
+    if (len(selected) > 64 or len({item["repository"] for item in selected}) != len(selected)
+            or not validator(PLAN_PATH).is_valid(visible)):
+        base.fail("SELECTION")
+    # The public artifact/profile is independently immutable. A caller cannot
+    # use the new shape to reinterpret a historical raw-catalog revision.
+    if plan["catalog_revision"] != metadata["revision"]:
+        base.fail("CATALOG")
+    return sorted(selected, key=lambda item: item["repository"]), rows, metadata
 
 
 def artifact_projection(raw: dict, selection: dict, repository: str) -> dict:
@@ -352,7 +376,12 @@ def assemble(args: argparse.Namespace) -> dict:
         if not validator(schema).is_valid(fleet):
             base.fail("PIN")
     catalog_date = catalog_metadata.get("observed_at")
-    catalog_age = (observed - base.utc(str(catalog_date) + "T00:00:00Z")).days
+    catalog_instant = str(catalog_date)
+    if len(catalog_instant) == 10:
+        catalog_instant += "T00:00:00Z"
+    catalog_age = ((observed - base.utc(catalog_instant)).total_seconds() / 86400
+                   if getattr(args, "catalog_profile", "legacy-review") == "public-catalog-v1"
+                   else (observed - base.utc(catalog_instant)).days)
     if catalog_age < 0:
         base.fail("CATALOG")
     catalog_stale = catalog_age > args.maximum_catalog_age_days
@@ -413,6 +442,7 @@ def parser() -> argparse.ArgumentParser:
     command.add_argument("--maximum-age-seconds", type=int, default=86400)
     command.add_argument("--maximum-last-known-age-seconds", type=int, default=2678400)
     command.add_argument("--maximum-catalog-age-days", type=int, default=31)
+    command.add_argument("--catalog-profile", choices=("legacy-review", "public-catalog-v1"), default="legacy-review")
     return result
 
 

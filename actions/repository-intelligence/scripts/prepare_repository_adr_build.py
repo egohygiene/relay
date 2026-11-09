@@ -47,7 +47,10 @@ def execute(argv, cwd, env, timeout=180):
 def acquire(work, *, normalization_profile="legacy-adr"):
     lock_path = LOCK
     prepare_script = SCRIPTS / "collect_repository_adrs.py"
-    if normalization_profile != "legacy-adr":
+    if normalization_profile == "public-fleet-v1":
+        lock_path = ROOT / "contracts/public-fleet.v1.lock.json"
+        prepare_script = SCRIPTS / "assemble_public_fleet.py"
+    elif normalization_profile != "legacy-adr":
         if normalization_profile != "search-attribution-v1":
             raise ValueError("acquisition-profile")
         search = module("relay_acquisition_search_profile", SCRIPTS / "repository_search_normalization.py")

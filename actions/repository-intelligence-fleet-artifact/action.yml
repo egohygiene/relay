@@ -1,0 +1,108 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+name: Repository Intelligence Fleet Artifact
+description: Admit explicitly selected public repository snapshot artifacts and retain an exact Observatory fleet handoff without deploying.
+inputs:
+  plan:
+    description: Closed data-only plan with exact repository source commits, successful runs/attempts, artifact IDs and ZIP digests.
+    required: true
+  catalog-root:
+    description: Optional trusted Hygiene Git object store containing the separately locked public catalog revision; otherwise acquire exact public Git objects privately.
+    default: ""
+  as-of:
+    description: Explicit UTC observation/evaluation boundary.
+    required: true
+  runtime:
+    description: Optional trusted prepared fleet runtime outside consumer checkout; otherwise acquire exact pinned owner sources privately.
+    default: ""
+  github-token:
+    description: Read-only public Actions artifact credential; acquisition failures stay isolated per admitted repository.
+    default: "${{ github.token }}"
+  maximum-age-seconds:
+    description: Maximum current source observation age before stale presentation.
+    default: "86400"
+  maximum-last-known-age-seconds:
+    description: Maximum original observation age for an explicitly selected recovery pair.
+    default: "2678400"
+  retention-days:
+    description: Ordinary artifact retention and maximum handoff lifetime, from1 through90 days.
+    default: "30"
+outputs:
+  status:
+    value: "${{ steps.prepare.outputs.status }}"
+    description: ready, partial or unavailable assembly state; upload/deployment are separate.
+  fleet-path:
+    value: "${{ steps.prepare.outputs.fleet-path }}"
+    description: Private path to the exact canonical fleet JSON; empty when no repository is available.
+  fleet-sha256:
+    value: "${{ steps.prepare.outputs.fleet-sha256 }}"
+    description: Exact fleet JSON byte digest, not the uploaded ZIP digest.
+  manifest-path:
+    value: "${{ steps.prepare.outputs.manifest-path }}"
+    description: Private manifest path binding source admission, availability, freshness and fleet bytes.
+  manifest-sha256:
+    value: "${{ steps.prepare.outputs.manifest-sha256 }}"
+    description: Exact handoff manifest byte digest for the consumer's review packet.
+  as-of:
+    value: "${{ inputs.as-of }}"
+    description: Explicit observation boundary to pass into the host's deterministic loader.
+  artifact-id:
+    value: "${{ steps.upload.outputs.artifact-id }}"
+    description: Actual ordinary artifact ID after successful upload.
+  artifact-digest:
+    value: "${{ steps.upload.outputs.artifact-digest }}"
+    description: Actual uploaded ZIP SHA-256; select with exact producing run and attempt.
+runs:
+  using: composite
+  steps:
+    - name: Assemble exact admitted public repository artifacts
+      id: prepare
+      shell: bash
+      env:
+        FLEET_GITHUB_TOKEN: "${{ inputs.github-token }}"
+        FLEET_PLAN: "${{ inputs.plan }}"
+        FLEET_CATALOG: "${{ inputs.catalog-root }}"
+        FLEET_AS_OF: "${{ inputs.as-of }}"
+        FLEET_RUNTIME: "${{ inputs.runtime }}"
+        FLEET_MAXIMUM_AGE: "${{ inputs.maximum-age-seconds }}"
+        FLEET_RECOVERY_AGE: "${{ inputs.maximum-last-known-age-seconds }}"
+        FLEET_RETENTION: "${{ inputs.retention-days }}"
+        FLEET_GENERATOR_REF: "${{ github.action_ref }}"
+        FLEET_VISIBILITY: "${{ github.event.repository.visibility }}"
+        FLEET_REPOSITORY: "${{ github.repository }}"
+        FLEET_REPOSITORY_ID: "${{ github.repository_id }}"
+        FLEET_SOURCE_COMMIT: "${{ github.sha }}"
+        FLEET_RUN_ID: "${{ github.run_id }}"
+        FLEET_RUN_ATTEMPT: "${{ github.run_attempt }}"
+        FLEET_EVENT: "${{ github.event_name }}"
+      run: |
+        set -euo pipefail
+        [[ "${FLEET_GENERATOR_REF}" =~ ^[0-9a-f]{40}$ ]] || { echo "Fleet action requires an immutable full commit pin" >&2; exit 2; }
+        fleet_output="$(mktemp -d "${RUNNER_TEMP}/relay-fleet-output-XXXXXXXX")"
+        rmdir "${fleet_output}"
+        runtime_arguments=()
+        if [[ -n "${FLEET_CATALOG}" ]]; then
+          runtime_arguments+=(--catalog-root "${FLEET_CATALOG}")
+        fi
+        if [[ -n "${FLEET_RUNTIME}" ]]; then
+          runtime_arguments+=(--runtime "${FLEET_RUNTIME}")
+        fi
+        python3 -I "${GITHUB_ACTION_PATH}/../repository-intelligence/scripts/repository_fleet_artifact.py" \
+          --plan "${FLEET_PLAN}" --as-of "${FLEET_AS_OF}" \
+          --generator-commit "${FLEET_GENERATOR_REF}" --visibility "${FLEET_VISIBILITY}" --retention-days "${FLEET_RETENTION}" \
+          --repository "${FLEET_REPOSITORY}" --repository-id "${FLEET_REPOSITORY_ID}" --source-commit "${FLEET_SOURCE_COMMIT}" \
+          --run-id "${FLEET_RUN_ID}" --run-attempt "${FLEET_RUN_ATTEMPT}" --event-name "${FLEET_EVENT}" \
+          --maximum-age-seconds "${FLEET_MAXIMUM_AGE}" --maximum-last-known-age-seconds "${FLEET_RECOVERY_AGE}" \
+          --runner-temp "${RUNNER_TEMP}" --repository-root "${GITHUB_WORKSPACE}" \
+          --output "${fleet_output}" --github-output "${GITHUB_OUTPUT}" "${runtime_arguments[@]}"
+    - name: Retain fleet handoff as an ordinary artifact
+      id: upload
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: "public-repository-intelligence-fleet-v1-${{ github.run_id }}-${{ github.run_attempt }}"
+        path: "${{ steps.prepare.outputs.artifact-directory }}"
+        if-no-files-found: error
+        overwrite: false
+        retention-days: "${{ inputs.retention-days }}"
+        compression-level: 9
