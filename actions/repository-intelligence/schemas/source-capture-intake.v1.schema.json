@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/source-capture-intake.v1.schema.json",
+  "title": "Private same-run JSON capture admission receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "repository",
+    "repository_id",
+    "source_commit",
+    "run_id",
+    "run_attempt",
+    "observed_at",
+    "event_name",
+    "artifact",
+    "manifest_sha256",
+    "plan_sha256",
+    "intake"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.relay.source-capture-intake/v1"
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+    },
+    "repository_id": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "run_id": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "run_attempt": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000000
+    },
+    "observed_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+      "format": "date-time"
+    },
+    "event_name": {
+      "enum": [
+        "push",
+        "workflow_dispatch"
+      ]
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "sha256",
+        "size_bytes"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^repository-intelligence-captures-v1-[0-9]+-[0-9a-f]{40}-[0-9]+-[0-9]+$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8388608
+        }
+      }
+    },
+    "manifest_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "plan_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "intake": {
+      "const": "same-run-attempt-head-json-only"
+    }
+  }
+}

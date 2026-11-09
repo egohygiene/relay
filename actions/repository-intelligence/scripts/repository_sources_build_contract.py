@@ -19,7 +19,7 @@ SHA256 = re.compile(r"[0-9a-f]{64}")
 FILES = ("collect_repository_roadmap_source.py", "prepare_repository_sources_build.py",
          "collect_repository_roadmap.py", "collect_repository_adrs.py", "repository_adr_inputs.py",
          "collect_repository_work.py", "collect_repository_health.py", "repository_capture_build_contract.py",
-         "repository_source_capture_inputs.py")
+         "repository_source_capture_inputs.py", "repository_capture_artifact.py")
 SOURCE_DOMAINS = {"decisions": ("decisions",), "roadmap": ("roadmap",),
                   "work": ("issues", "pull_requests"), "health": ("checks",)}
 

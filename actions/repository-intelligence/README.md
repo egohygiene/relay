@@ -26,6 +26,13 @@ accepts one closed `source-captures` manifest and freshly evaluates its transpor
 captures alongside any selected canonical sources. Partial/stale/unavailable
 coverage remains explicit; collector review envelopes are never promoted.
 
+The optional [same-run artifact handoff](../../docs/repository-capture-artifact-intake.md)
+uses a separate `repository-intelligence-captures.yml` reusable entrypoint, exact
+artifact ID/digest and explicit evaluation boundary. The original reusable
+workflow keeps its existing permission contract. Capture intake and its producer
+preparation action remain implementation candidates pending actual API/native
+acceptance.
+
 The [canonical ADR collector](../../docs/repository-adr-collector.md) implements
 #115's immutable source collection and opt-in Decisions build integration.
 Set `collect-adrs: "true"` for a fresh validated canonical corpus; it conflicts
@@ -266,6 +273,8 @@ for provider proof and consumer adoption.
 | `reports-directory`         | `.reports`                       | Optional summaries; always excluded from tree and analytics              |
 | `collect-roadmap` | `false` | Collect canonical public Roadmap; combines with `collect-adrs` under one commit-bound source plan |
 | `source-captures` | empty | Repository-relative closed Work/Health transport capture plan; freshly invokes collectors and conflicts with external snapshot/comparison inputs |
+| `source-capture-artifact-id` | empty | Exact current-run/attempt/head public JSON artifact ID; excludes local `source-captures` and requires digest plus explicit `as-of` |
+| `source-capture-artifact-digest` | empty | Upload SHA-256 of the exact immutable capture ZIP; artifact mode additionally requires `actions: read` |
 | `source-runtime` | empty | Trusted prepared ADR alpha.2 runtime for native source plans, outside consumer checkout; conflicts with `adr-runtime` |
 | `collect-adrs` | `false` | Collect standard-path canonical public ADRs; requires complete valid ADR coverage |
 | `adr-policy-owner` | `false` | Explicit canonical Hygiene policy-owner mode; requires `collect-adrs`; ordinary consumers keep inheritance |

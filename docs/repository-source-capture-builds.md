@@ -199,9 +199,11 @@ external-snapshot surface. It does not expose `source-captures` in this slice:
 a file committed at the represented head cannot embed that same head's final
 SHA, and a later Health capture cannot use a commit-time evaluation clock.
 
-The next bounded #151 checkpoint needs an ordinary immutable capture artifact
+The [next bounded #151 implementation](repository-capture-artifact-intake.md)
+adds a separate capture-enabled reusable entrypoint for an ordinary immutable capture artifact
 from the caller's same-revision producer job, an explicit matching evaluation
 boundary, private extraction that preserves consumer files, input digests and
 failure reporting. It must validate artifact/run/revision identity before fresh
-collection. This is a concrete transport/integration gap, not CI evidence debt
-or permission to relabel captured commits and timestamps.
+collection. Its implementation preserves the original workflow token contract;
+actual transport/API acceptance remains unrun. No captured commit or timestamp
+may be relabeled to satisfy admission.

@@ -463,7 +463,8 @@
             "collect_repository_work.py",
             "collect_repository_health.py",
             "repository_capture_build_contract.py",
-            "repository_source_capture_inputs.py"
+            "repository_source_capture_inputs.py",
+            "repository_capture_artifact.py"
           ],
           "properties": {
             "collect_repository_roadmap_source.py": {
@@ -499,6 +500,10 @@
               "pattern": "^[0-9a-f]{64}$"
             },
             "repository_source_capture_inputs.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "repository_capture_artifact.py": {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$"
             }

@@ -188,6 +188,79 @@
             "status": {"const": "prepared"},
             "retention_days": {"const": 30}
           }
+        },
+        "capture_input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "id",
+            "name",
+            "sha256",
+            "observed_at",
+            "manifest_sha256",
+            "plan_sha256",
+            "receipt_sha256"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "requested",
+                "admitted",
+                "unavailable"
+              ]
+            },
+            "id": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "name": {
+              "type": "string",
+              "pattern": "^repository-intelligence-captures-v1-[0-9]+-[0-9a-f]{40}-[0-9]+-[0-9]+$"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "observed_at": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "format": "date-time"
+            },
+            "manifest_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "plan_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "receipt_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
         }
       }
     },
@@ -306,15 +379,61 @@
         }
       },
       "else": {
-        "properties": {
-          "artifacts": {
+        "anyOf": [
+          {
             "properties": {
-              "site": {
-                "properties": {"status": {"const": "not-uploaded"}}
+              "artifacts": {
+                "properties": {
+                  "site": {
+                    "properties": {
+                      "status": {
+                        "const": "not-uploaded"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": [
+              "stage",
+              "artifacts"
+            ],
+            "properties": {
+              "stage": {
+                "const": "provenance-verification"
+              },
+              "artifacts": {
+                "required": [
+                  "capture_input"
+                ],
+                "properties": {
+                  "site": {
+                    "properties": {
+                      "status": {
+                        "const": "uploaded"
+                      }
+                    }
+                  },
+                  "capture_input": {
+                    "required": [
+                      "status"
+                    ],
+                    "properties": {
+                      "status": {
+                        "enum": [
+                          "requested",
+                          "unavailable"
+                        ]
+                      }
+                    }
+                  }
+                }
               }
             }
           }
-        }
+        ]
       }
     },
     {

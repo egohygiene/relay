@@ -1283,6 +1283,192 @@
         }
       ],
       "consumer_ref": "egohygiene/relay/.github/workflows/repository-architecture-validation.yml@v1"
+    },
+    {
+      "id": "repository-intelligence-captures",
+      "path": ".github/workflows/repository-intelligence-captures.yml",
+      "owner": "egohygiene/relay",
+      "purpose": "Admit exact same-run/head public JSON capture artifacts and build Repository Intelligence through existing read-only generation/report stages; consumer owns deployment.",
+      "audience": "reusable",
+      "status": "experimental",
+      "triggers": [
+        "workflow_call",
+        "workflow_dispatch"
+      ],
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "timeout_minutes": 15,
+      "concurrency": {
+        "group": "relay-intelligence-v1-${{ github.repository }}-${{ github.workflow_ref }}-${{ github.ref }}",
+        "cancel_in_progress": true
+      },
+      "failure_semantics": {
+        "mode": "fail-closed",
+        "partial_success": false,
+        "retry": "fresh-run",
+        "description": "Unsupported event trust, invalid inputs, checkout, generation, provenance, or site-upload failures suppress partial site bytes; the workflow attempts a fixed-retention sanitized run report before reasserting failure. Cancellation and artifact-service outages cannot guarantee preservation."
+      },
+      "inputs": [
+        {
+          "name": "output-directory",
+          "type": "string",
+          "required": false,
+          "default": "dist/intelligence",
+          "description": "Generated Repository Intelligence site directory within the checked-out caller repository."
+        },
+        {
+          "name": "work-directory",
+          "type": "string",
+          "required": false,
+          "default": ".cache/repository-intelligence",
+          "description": "Private collection workspace within the caller repository."
+        },
+        {
+          "name": "reports-directory",
+          "type": "string",
+          "required": false,
+          "default": ".reports",
+          "description": "Optional normalized report-summary root."
+        },
+        {
+          "name": "collect-adrs",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Collect and validate canonical public ADRs instead of accepting an external snapshot."
+        },
+        {
+          "name": "collect-roadmap",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Collect canonical public Roadmap, optionally composed with Decisions."
+        },
+        {
+          "name": "adr-policy-owner",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Explicit canonical Hygiene ADR policy-owner selection; requires collect-adrs."
+        },
+        {
+          "name": "adr-known-external-decisions",
+          "type": "string",
+          "required": false,
+          "default": "[]",
+          "description": "JSON array of declared external ADR keys; requires collect-adrs when nonempty."
+        },
+        {
+          "name": "observatory-snapshot",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional public-safe Observatory read model for the represented commit."
+        },
+        {
+          "name": "observatory-comparison",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional public-safe Observatory comparison whose after boundary matches the snapshot and represented commit."
+        },
+        {
+          "name": "default-branch",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional caller default-branch override."
+        },
+        {
+          "name": "activity-since",
+          "type": "string",
+          "required": false,
+          "default": "1 year ago",
+          "description": "Deterministic Git history window."
+        },
+        {
+          "name": "max-depth",
+          "type": "string",
+          "required": false,
+          "default": "10",
+          "description": "Maximum repository tree depth."
+        },
+        {
+          "name": "artifact-retention-days",
+          "type": "number",
+          "required": false,
+          "default": 30,
+          "description": "Validated 1-90 day retention for the generated public dashboard artifact; sanitized run evidence always uses a fixed 30 days."
+        },
+        {
+          "name": "source-capture-artifact-id",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Exact ordinary public capture artifact ID from this run and attempt."
+        },
+        {
+          "name": "source-capture-artifact-digest",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "SHA-256 returned by upload-artifact for the exact capture ZIP."
+        },
+        {
+          "name": "as-of",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Explicit UTC source evaluation boundary; required with capture intake."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "artifact-name",
+          "type": "string",
+          "required": true,
+          "description": "Contract-, repository-, revision-, run-, and attempt-isolated name of the Repository Intelligence site artifact."
+        },
+        {
+          "name": "artifact-digest",
+          "type": "string",
+          "required": true,
+          "description": "GitHub SHA-256 digest for the uploaded Repository Intelligence site artifact."
+        },
+        {
+          "name": "report-artifact-name",
+          "type": "string",
+          "required": true,
+          "description": "Run-bound name of the preserved sanitized Repository Intelligence report artifact."
+        },
+        {
+          "name": "report-artifact-digest",
+          "type": "string",
+          "required": true,
+          "description": "GitHub SHA-256 digest for the preserved sanitized run-report artifact."
+        },
+        {
+          "name": "report-manifest-sha256",
+          "type": "string",
+          "required": true,
+          "description": "SHA-256 of the exact generic report manifest bound to this run."
+        },
+        {
+          "name": "build-manifest-sha256",
+          "type": "string",
+          "required": true,
+          "description": "Tagged SHA-256 of the deterministic build manifest."
+        },
+        {
+          "name": "bundle-digest",
+          "type": "string",
+          "required": true,
+          "description": "Deterministic digest of the Repository Intelligence payload inventory."
+        }
+      ],
+      "consumer_ref": "egohygiene/relay/.github/workflows/repository-intelligence-captures.yml@v1"
     }
   ]
 }

@@ -5,6 +5,8 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, UTC
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -195,7 +197,7 @@ def validate_identity(
         raise ContractError("RIW-IDENTITY-WORKFLOW-REF") from error
     if (
         workflow_repository.lower() != "egohygiene/relay"
-        or workflow_filename != "repository-intelligence.yml"
+        or workflow_filename not in {"repository-intelligence.yml", "repository-intelligence-captures.yml"}
     ):
         raise ContractError("RIW-IDENTITY-WORKFLOW-REF")
     if REVISION.fullmatch(workflow_pin):
@@ -312,6 +314,23 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
 
     collect_adrs = getattr(arguments, "collect_adrs", "false")
     collect_roadmap = getattr(arguments, "collect_roadmap", "false")
+    capture_id = getattr(arguments, "source_capture_artifact_id", "")
+    capture_digest = getattr(arguments, "source_capture_artifact_digest", "")
+    observed_at = getattr(arguments, "as_of", "")
+    if bool(capture_id) != bool(capture_digest):
+        raise ContractError("RIW-INPUT-CAPTURE-REQUEST")
+    if observed_at:
+        try:
+            if not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", observed_at):
+                raise ValueError()
+            datetime.strptime(observed_at, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
+        except ValueError:
+            raise ContractError("RIW-INPUT-CAPTURE-BOUNDARY") from None
+    if capture_id:
+        if (not re.fullmatch(r"[1-9][0-9]{0,19}", capture_id) or not DIGEST.fullmatch(capture_digest)
+                or not observed_at or arguments.event_name not in {"push", "workflow_dispatch"}
+                or arguments.observatory_snapshot or arguments.observatory_comparison):
+            raise ContractError("RIW-INPUT-CAPTURE-REQUEST")
     try:
         adr_inputs.selection(getattr(arguments, "adr_known_external_decisions", "[]"), collect_adrs)
     except ValueError:
@@ -377,6 +396,67 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
     return positive_integer(
         arguments.artifact_retention_days, "RIW-INPUT-RETENTION", 90
     )
+
+
+def capture_summary(arguments, identity, configuration_valid, report_directory):
+    """Retain bounded intake evidence beside the run report, outside site bytes."""
+    capture_id = getattr(arguments, "source_capture_artifact_id", "")
+    if not configuration_valid or not capture_id:
+        return None
+    checksum = DIGEST.fullmatch(arguments.source_capture_artifact_digest).group(1)
+    name = ("repository-intelligence-captures-v1-" + str(identity["repository_id"]) + "-"
+        + arguments.represented_revision + "-" + str(identity["run_id"]) + "-" + str(identity["run_attempt"]))
+    summary = {"status": "requested", "id": int(capture_id), "name": name, "sha256": "sha256:" + checksum,
+        "observed_at": arguments.as_of, "manifest_sha256": None, "plan_sha256": None, "receipt_sha256": None}
+    requested = getattr(arguments, "capture_intake_receipt", "")
+    if not requested:
+        return summary
+    try:
+        path = Path(requested).absolute()
+        root = Path(arguments.runner_temp).resolve(strict=True)
+        if (".." in path.parts or not path.is_relative_to(root) or not path.parent.name.startswith("relay-capture-intake-")
+                or any(parent.is_symlink() for parent in (path, *path.parents))
+                or not path.resolve(strict=True).is_relative_to(root)
+                or not path.is_file() or path.stat().st_size > 65536):
+            raise ValueError()
+        content = path.read_bytes()
+        def closed_pairs(items):
+            values = {}
+            for key, value in items:
+                if key in values:
+                    raise ValueError()
+                values[key] = value
+            return values
+        receipt = json.loads(content, object_pairs_hook=closed_pairs,
+            parse_constant=lambda _value: (_ for _ in ()).throw(ValueError()))
+        expected_hash = getattr(arguments, "capture_intake_receipt_sha256", "")
+        if not re.fullmatch(r"[0-9a-f]{64}", expected_hash) or hashlib.sha256(content).hexdigest() != expected_hash:
+            raise ValueError()
+        artifact = receipt["artifact"]
+        if (not isinstance(receipt, dict) or set(receipt) != {"schema", "repository", "repository_id", "source_commit",
+                "run_id", "run_attempt", "observed_at", "event_name", "artifact", "manifest_sha256", "plan_sha256", "intake"}
+                or set(artifact) != {"id", "name", "sha256", "size_bytes"}
+                or not all(type(receipt[key]) is int for key in ("repository_id", "run_id", "run_attempt"))
+                or type(artifact["id"]) is not int or type(artifact["size_bytes"]) is not int
+                or not 0 < artifact["size_bytes"] <= 8388608
+                or receipt["schema"] != "egohygiene.relay.source-capture-intake/v1"
+                or receipt["repository"] != arguments.repository
+                or receipt["repository_id"] != identity["repository_id"]
+                or receipt["source_commit"] != arguments.represented_revision
+                or receipt["run_id"] != identity["run_id"] or receipt["run_attempt"] != identity["run_attempt"]
+                or receipt["observed_at"] != arguments.as_of or receipt["event_name"] != arguments.event_name
+                or receipt["intake"] != "same-run-attempt-head-json-only"
+                or artifact["id"] != int(capture_id) or artifact["name"] != name or artifact["sha256"] != checksum
+                or not all(re.fullmatch(r"[0-9a-f]{64}", receipt[key]) for key in ("manifest_sha256", "plan_sha256"))):
+            raise ValueError()
+        summary.update(status="admitted", manifest_sha256=receipt["manifest_sha256"],
+            plan_sha256=receipt["plan_sha256"], receipt_sha256=expected_hash)
+        retained = report_directory / "source-capture-intake.receipt.json"
+        retained.write_bytes(content)
+        retained.chmod(0o600)
+    except Exception:
+        summary["status"] = "unavailable"
+    return summary
 
 
 def artifact_name(arguments: argparse.Namespace, identity: dict[str, object]) -> str:
@@ -589,6 +669,16 @@ def finalize(arguments: argparse.Namespace, action_path: Path) -> dict[str, str]
         "sanitization": "allowlisted-metadata-only",
     }
     report_path = report_directory / REPORT_FILENAME
+    capture = capture_summary(arguments, identity, configuration_valid, report_directory)
+    if capture is not None:
+        report["artifacts"]["capture_input"] = capture
+        if result == "success" and capture["status"] != "admitted":
+            # The ordinary site artifact may already exist if private proof was
+            # lost after the pre-upload check. Retain that true upload fact, but
+            # never finish green without inspectable capture admission evidence.
+            result, stage, code, rule = ("failure", "provenance-verification", "RIW-005",
+                "repository-intelligence.workflow.provenance-verification")
+            report.update(result=result, stage=stage, code=code, rule=rule)
     report_path.write_text(
         json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
@@ -636,6 +726,11 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--reports-directory", default=".reports")
     value.add_argument("--collect-adrs", default="false")
     value.add_argument("--collect-roadmap", default="false")
+    value.add_argument("--source-capture-artifact-id", default="")
+    value.add_argument("--source-capture-artifact-digest", default="")
+    value.add_argument("--as-of", default="")
+    value.add_argument("--capture-intake-receipt", default="")
+    value.add_argument("--capture-intake-receipt-sha256", default="")
     value.add_argument("--adr-policy-owner", default="false")
     value.add_argument("--adr-known-external-decisions", default="[]")
     value.add_argument("--observatory-snapshot", default="")

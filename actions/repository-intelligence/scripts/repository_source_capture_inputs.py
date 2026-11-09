@@ -49,7 +49,9 @@ def apply(args):
     plan = json.loads(content, object_pairs_hook=pairs, parse_constant=lambda _value: require(False))
     require(isinstance(plan, dict) and set(plan) <= {"schema", "work", "health"}
         and plan.get("schema") == SCHEMA and bool(set(plan) & {"work", "health"}))
-    root = args.repository_root
+    root = getattr(args, "capture_root", None) or args.repository_root
+    root = root.absolute()
+    require(root.is_dir() and not any(part.is_symlink() for part in (root, *root.parents)))
     if "work" in plan:
         work = plan["work"]
         require(isinstance(work, dict) and set(work) == {"provider_evidence", "maximum_age_seconds"}

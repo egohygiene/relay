@@ -244,6 +244,10 @@ def parser():
     value.add_argument("--runtime", type=Path)
     value.add_argument("--capture-plan", type=Path,
         help="Closed Work/Health transport capture plan; paths are relative to the consumer root.")
+    value.add_argument("--capture-root", type=Path,
+        help="Optional separately admitted data root for capture-plan paths; never an executable runtime.")
+    value.add_argument("--capture-intake-receipt", type=Path,
+        help="Reverify exact same-run artifact admission before evaluating its private capture tree.")
     value.add_argument("--repository-root", type=Path, required=True)
     value.add_argument("--work-directory", default=".cache/repository-intelligence")
     for name in ("repository", "visibility", "source-commit", "observed-at"):
@@ -286,6 +290,9 @@ def replay_arguments(args, runtime):
         # Reparse the same immutable plan in the acquired interpreter. Do not
         # replay its expanded selections as duplicate explicit source inputs.
         values.extend(["--capture-plan", str(args.capture_plan)])
+    for name in ("capture_root", "capture_intake_receipt"):
+        if getattr(args, name) is not None:
+            values.extend(["--" + name.replace("_", "-"), str(getattr(args, name))])
     for name in ("collect_adrs", "collect_roadmap", "collect_work", "collect_health", "policy_owner"):
         if name in {"collect_work", "collect_health"} and name.removeprefix("collect_") in plan:
             continue
@@ -330,7 +337,7 @@ def write_failure(target, stage, source):
 def main():
     args = parser().parse_args()
     args.repository_root = args.repository_root.absolute()
-    for name in ("runtime", "work_runtime", "health_runtime", "work_capture", "health_check_runs"):
+    for name in ("runtime", "work_runtime", "health_runtime", "work_capture", "health_check_runs", "capture_root", "capture_intake_receipt"):
         if getattr(args, name) is not None:
             setattr(args, name, getattr(args, name).absolute())
     normalized_reports = []
@@ -360,6 +367,14 @@ def main():
         if args.capture_plan is not None:
             args.capture_plan = args.capture_plan.absolute()
             args.input_plan_sha256 = module("relay_sources_plan_inputs", "repository_source_capture_inputs.py").apply(args)
+        elif args.capture_root is not None or args.capture_intake_receipt is not None:
+            raise ValueError("capture-plan-required")
+        if args.capture_intake_receipt is not None:
+            if args.capture_root is None or args.capture_root.is_relative_to(args.repository_root):
+                raise ValueError("private-intake-root")
+            module("relay_sources_intake", "repository_capture_artifact.py").verify_receipt(
+                args.capture_intake_receipt, args.capture_root, args.repository,
+                args.source_commit, args.observed_at, args.input_plan_sha256)
         if bool(args.work_capture) != args.collect_work or (args.work_runtime is not None and not args.collect_work):
             raise ValueError("work-selection")
         if (not args.collect_health and (args.health_runtime is not None or args.health_expect_report or args.health_report

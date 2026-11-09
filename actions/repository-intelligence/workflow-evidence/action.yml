@@ -74,6 +74,26 @@ inputs:
     description: Opt in to canonical public Roadmap source collection.
     required: false
     default: "false"
+  source-capture-artifact-id:
+    description: Optional exact current-run capture artifact ID.
+    required: false
+    default: ""
+  source-capture-artifact-digest:
+    description: Expected SHA-256 of the exact capture artifact ZIP.
+    required: false
+    default: ""
+  as-of:
+    description: Explicit UTC source evaluation boundary; required for capture intake.
+    required: false
+    default: ""
+  capture-intake-receipt:
+    description: Private trusted intake receipt path for bounded run evidence.
+    required: false
+    default: ""
+  capture-intake-receipt-sha256:
+    description: Exact digest of the private intake receipt.
+    required: false
+    default: ""
   adr-policy-owner:
     description: Explicit canonical Hygiene ADR policy-owner selection; requires collect-adrs.
     required: false
@@ -196,6 +216,11 @@ runs:
         INPUT_CHECKOUT_OUTCOME: "${{ inputs.checkout-outcome }}"
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
         INPUT_COLLECT_ROADMAP: "${{ inputs.collect-roadmap }}"
+        INPUT_SOURCE_CAPTURE_ARTIFACT_ID: "${{ inputs.source-capture-artifact-id }}"
+        INPUT_SOURCE_CAPTURE_ARTIFACT_DIGEST: "${{ inputs.source-capture-artifact-digest }}"
+        INPUT_AS_OF: "${{ inputs.as-of }}"
+        INPUT_CAPTURE_INTAKE_RECEIPT: "${{ inputs.capture-intake-receipt }}"
+        INPUT_CAPTURE_INTAKE_RECEIPT_SHA256: "${{ inputs.capture-intake-receipt-sha256 }}"
         INPUT_ADR_POLICY_OWNER: "${{ inputs.adr-policy-owner }}"
         INPUT_ADR_KNOWN_EXTERNAL_DECISIONS: "${{ inputs.adr-known-external-decisions }}"
         INPUT_DEFAULT_BRANCH: "${{ inputs.default-branch }}"
@@ -246,6 +271,11 @@ runs:
           --reports-directory="${INPUT_REPORTS_DIRECTORY}" \
           --collect-adrs="${INPUT_COLLECT_ADRS}" \
           --collect-roadmap="${INPUT_COLLECT_ROADMAP}" \
+          --source-capture-artifact-id="${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" \
+          --source-capture-artifact-digest="${INPUT_SOURCE_CAPTURE_ARTIFACT_DIGEST}" \
+          --as-of="${INPUT_AS_OF}" \
+          --capture-intake-receipt="${INPUT_CAPTURE_INTAKE_RECEIPT}" \
+          --capture-intake-receipt-sha256="${INPUT_CAPTURE_INTAKE_RECEIPT_SHA256}" \
           --adr-policy-owner="${INPUT_ADR_POLICY_OWNER}" \
           --adr-known-external-decisions="${INPUT_ADR_KNOWN_EXTERNAL_DECISIONS}" \
           --observatory-snapshot="${INPUT_OBSERVATORY_SNAPSHOT}" \
