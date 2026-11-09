@@ -1,0 +1,124 @@
+#!/usr/bin/env python3
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+
+"""Admit a selected public slice of Hygiene's exact reviewed projection.
+
+The Git source supplies immutable owner bytes, never consumer executable code.
+Public selection precedes identity, duplicate, schema and digest operations.
+"""
+
+from __future__ import annotations
+
+from datetime import datetime, UTC
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import re
+import tempfile
+
+ROOT = Path(__file__).resolve().parents[1]
+LOCK_PATH = ROOT / "contracts/public-catalog-admission.v1.lock.json"
+SCHEMA = "egohygiene.relay.public-catalog-admission/v1"
+HASH = re.compile(r"[0-9a-f]{64}")
+
+
+def require(condition):
+    if not condition:
+        raise ValueError("Public catalog admission is incompatible")
+
+
+def module(name, path):
+    specification = importlib.util.spec_from_file_location(name, path)
+    require(specification is not None and specification.loader is not None)
+    result = importlib.util.module_from_spec(specification)
+    specification.loader.exec_module(result)
+    return result
+
+
+def encoded(value):
+    return (json.dumps(value, indent=2, sort_keys=True, ensure_ascii=False, allow_nan=False) + "\n").encode()
+
+
+def digest(value):
+    return hashlib.sha256(value).hexdigest()
+
+
+def lock():
+    return json.loads(LOCK_PATH.read_bytes())
+
+
+def validate_metadata(value, selected=None):
+    """Check execution receipt structure; a digest alone cannot prove membership.
+
+    Untrusted serialized rows still require the pinned owner public artifact.
+    Only load() authenticates that source and selects canonical public members.
+    """
+    require(isinstance(value, dict) and set(value) == {"schema", "owner", "revision", "artifact_path",
+        "artifact_sha256", "schema_sha256", "helper_sha256", "observed_at", "selected_sha256"})
+    pin = lock()
+    require(value["schema"] == SCHEMA and value["owner"] == pin["owner"]
+        and value["revision"] == pin["revision"] and value["artifact_path"] == pin["artifact_path"]
+        and value["artifact_sha256"] == pin["files"][pin["artifact_path"]]
+        and value["schema_sha256"] == pin["files"][pin["schema_path"]]
+        and value["helper_sha256"] == pin["files"][pin["helper_path"]])
+    require(isinstance(value["observed_at"], str)
+        and re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", value["observed_at"]))
+    datetime.strptime(value["observed_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
+    require(isinstance(value["selected_sha256"], str) and HASH.fullmatch(value["selected_sha256"]))
+    if selected is not None:
+        require(value["selected_sha256"] == digest(encoded(selected)))
+    return value
+
+
+def load(catalog_root, requested=None):
+    """Return (selected owner rows, public metadata), silently omitting exclusions.
+
+    Unknown and historical-alias selectors do not create guessed identities.
+    Passing no selector admits all explicitly public owner projection rows.
+    """
+    import jsonschema
+
+    base = module("relay_public_catalog_git", ROOT / "scripts/collect_repository_roadmap.py")
+    source_root = base.safe_path(Path(catalog_root))
+    pin = lock()
+    require(base.git(source_root, "rev-parse", pin["revision"] + "^{tree}").decode().strip() == pin["tree"])
+    contents = {}
+    for path, checksum in pin["files"].items():
+        content = base.git_blob(source_root, pin["revision"], path, base.MAX_OUTPUT)
+        require(digest(content) == checksum)
+        contents[path] = content
+    if requested is not None:
+        require(isinstance(requested, (list, tuple, set)) and len(requested) <= 100000)
+        requested = {value for value in requested if isinstance(value, str)}
+    with tempfile.TemporaryDirectory(prefix="relay-public-catalog-owner-") as temporary:
+        helper_path = Path(temporary) / "public_inventory.py"
+        helper_path.write_bytes(contents[pin["helper_path"]])
+        owner = module("relay_pinned_public_catalog", helper_path)
+        # Use the owner's ambiguity-preserving parser. Exact source hashes
+        # authenticate this public artifact without reading the mixed catalog.
+        artifact = Path(temporary) / "public-repositories.json"
+        artifact.write_bytes(contents[pin["artifact_path"]])
+        document = owner.read(artifact)
+        public = owner.selected_public_rows(document.get("repositories"))
+        selected = [row for row in public if requested is None or row.get("full_name") in requested]
+        admitted = {**document, "repositories": selected}
+        schema = json.loads(contents[pin["schema_path"]])
+        require(jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker()).is_valid(admitted)
+            and document.get("schema") == pin["contract"])
+        for row in selected:
+            owner.plain(row)
+            identity = owner.identity(row)
+            require(row["name"] == identity["name"] and row["source_url"] == identity["source_url"])
+        owner.uniqueness(selected)
+        names = {row["name"] for row in selected}
+        aliases = [alias for row in selected for alias in row["aliases"]]
+        require(len(aliases) == len(set(aliases)) and not names.intersection(aliases))
+        selected = json.loads(encoded(sorted(selected, key=lambda row: row["full_name"])))
+        observed = document["observed_at"]
+    metadata = {"schema": SCHEMA, "owner": pin["owner"], "revision": pin["revision"],
+        "artifact_path": pin["artifact_path"], "artifact_sha256": pin["files"][pin["artifact_path"]],
+        "schema_sha256": pin["files"][pin["schema_path"]], "helper_sha256": pin["files"][pin["helper_path"]],
+        "observed_at": observed, "selected_sha256": digest(encoded(selected))}
+    return selected, validate_metadata(metadata, selected)
