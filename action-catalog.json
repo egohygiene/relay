@@ -65,6 +65,29 @@
       "consumer_ref": "egohygiene/relay/actions/repository-intelligence@v1"
     },
     {
+      "id": "repository-intelligence-github-sources",
+      "path": "actions/repository-intelligence-github-sources",
+      "name": "Repository Intelligence GitHub Sources",
+      "summary": "Capture bounded public Work, commit-matched check and published release metadata into the existing same-run capture artifact handoff without upload or publication.",
+      "status": "experimental",
+      "runtime": [
+        "bash",
+        "git",
+        "python3"
+      ],
+      "permissions": {
+        "contents": "read",
+        "issues": "read",
+        "pull-requests": "read",
+        "checks": "read"
+      },
+      "side_effects": [
+        "network-read",
+        "workspace-write"
+      ],
+      "consumer_ref": "egohygiene/relay/actions/repository-intelligence-github-sources@v1"
+    },
+    {
       "id": "repository-intelligence-deployment-provenance",
       "path": "actions/repository-intelligence-deployment-provenance",
       "name": "Repository Intelligence Deployment Provenance",
