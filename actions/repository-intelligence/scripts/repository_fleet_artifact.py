@@ -22,12 +22,14 @@ import tempfile
 import time
 from types import SimpleNamespace
 import zipfile
+import zlib
 
 SCRIPTS = Path(__file__).resolve().parent
 SCHEMA = "egohygiene.relay.public-fleet-artifact/v1"
 PLAN = "egohygiene.relay.public-fleet-artifact-plan/v1"
 MAX_PLAN = 262144
 MAX_FLEET = 64 * 1024 * 1024
+MAX_HOST_FLEET = 16 * 1024 * 1024
 STATES = {"missing", "available", "expired", "inaccessible", "incompatible", "malformed", "wrong_repository"}
 HASH = re.compile(r"[0-9a-f]{64}")
 
@@ -251,7 +253,8 @@ def prepare(args):
                         require(choice["source_commit"] == row["represented_commit"])
                     current[key] = admit(args, row["repository"], choice, f"{index:02d}-{key}")
                     state = "available"
-                except (snapshot.ArtifactError, OSError, ValueError, KeyError, TypeError, zipfile.BadZipFile) as error:
+                except (snapshot.ArtifactError, OSError, ValueError, KeyError, TypeError, RecursionError,
+                        zipfile.BadZipFile, zlib.error) as error:
                     state = str(error) if isinstance(error, snapshot.ArtifactError) and str(error) in STATES else "malformed"
             states[key] = state
         local.append(current)
@@ -281,11 +284,13 @@ def prepare(args):
         "files": []}
     if fleet is not None:
         content = transport.encoded(fleet)
-        require(snapshot.digest(content) == result["candidate_sha256"])
+        require(len(content) <= MAX_HOST_FLEET and snapshot.digest(content) == result["candidate_sha256"])
         write(bundle / "fleet.json", content)
         manifest["files"] = [{"path": "fleet.json", "sha256": snapshot.digest(content), "size_bytes": len(content)}]
     require(assembler.validator(SCRIPTS.parent / "schemas/public-fleet-artifact.v1.schema.json").is_valid(manifest))
-    write(bundle / "fleet-artifact.json", transport.encoded(manifest))
+    manifest_content = transport.encoded(manifest)
+    require(len(manifest_content) <= 1024 * 1024)
+    write(bundle / "fleet-artifact.json", manifest_content)
     snapshot.output(args, {"status": state, "artifact-directory": str(bundle),
         "manifest-path": str(bundle / "fleet-artifact.json"), "as-of": args.as_of,
         "manifest-sha256": snapshot.digest(transport.read(bundle / "fleet-artifact.json", MAX_FLEET)),
@@ -320,7 +325,7 @@ def main():
         require(transport.SHA.fullmatch(args.generator_commit))
         return prepare(args)
     except (snapshot.ArtifactError, OSError, ValueError, KeyError, TypeError, ImportError,
-            RecursionError, subprocess.SubprocessError):
+            RecursionError, zlib.error, subprocess.SubprocessError):
         print("Public fleet artifact: catalog, source or artifact admission denied", file=sys.stderr)
         return 3
 

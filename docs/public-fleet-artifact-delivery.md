@@ -57,7 +57,9 @@ snapshot digest or attributed Search migration.
 Acquisition is bounded to three requests per selected artifact and a 60-second
 deadline, with one allowlisted storage redirect and no credential forwarding to
 storage. Up to64 public repositories, two explicit selections each, and the
-existing bounded snapshot ZIP size are supported. Cross-repository artifact
+existing bounded snapshot ZIP size are supported. The site-compatible fleet
+file is capped at16MiB and its handoff manifest at1MiB; the offline review
+assembler retains its independent64MiB review bound. Cross-repository artifact
 permissions are not assumed: use a credential authorized for read-only public
 Actions artifacts; inaccessible input remains isolated. Private/internal caller
 visibility and unsupported producer events are denied without public output.
