@@ -7,16 +7,17 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-11-09T03:49:46Z'
+  updated_at: '2026-11-09T04:02:21Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Compose native Roadmap and Decisions under one commit-bound source plan.
+  purpose: Review the combined Repository Intelligence source implementation candidates.
   includes:
-  - Adds the supported alpha.2 roadmap source adapter, canonical graph composition, provenance admission
-    and matching composite/reusable-workflow opt-in while retaining ADR-only and external inputs.
+  - Combines native Roadmap and Decisions composition, Work, Journey, Health, Releases, declared Dependencies,
+    public fleet assembly and Compare retention implementation commits while preserving independent review
+    drafts.
   - Static peer review and syntax inspection only; implementation remains a review candidate.
   excludes:
   - Runtime, test, CI, live canary and release acceptance; human decisions, consumer adoption and publication.
@@ -30,41 +31,42 @@ scope:
   - AGENTS.md
   - ARCHITECTURE.md
   - DECISIONS.md
-  - docs/repository-source-composition.md
-  - https://github.com/egohygiene/relay/issues/151
+  - docs/repository-intelligence-review-batch.md
+  - https://github.com/egohygiene/relay/issues/27
   - https://github.com/egohygiene/.github/issues/41
 work:
-  objective: Compose native Roadmap and Decisions under one commit-bound source plan.
+  objective: Review the combined Repository Intelligence source implementation candidates.
   success_conditions:
-  - Adds the supported alpha.2 roadmap source adapter, canonical graph composition, provenance admission
-    and matching composite/reusable-workflow opt-in while retaining ADR-only and external inputs.
+  - Combines native Roadmap and Decisions composition, Work, Journey, Health, Releases, declared Dependencies,
+    public fleet assembly and Compare retention implementation commits while preserving independent review
+    drafts.
   - Exact owner pins, source identity, coverage and public privacy boundaries remain explicit.
   active_issue:
     provider: github
-    id: egohygiene/relay#151
-    url: https://github.com/egohygiene/relay/issues/151
+    id: egohygiene/relay#27
+    url: https://github.com/egohygiene/relay/issues/27
   next:
     kind: action
-    id: review-native-source-151
+    id: review-native-source-27
     description: Review this candidate, then run the deferred pinned runtime and focused acceptance checks
       before consumer adoption.
     readiness: ready
     references:
-    - https://github.com/egohygiene/relay/issues/151
+    - https://github.com/egohygiene/relay/issues/27
     depends_on: []
 state:
   base:
     revision: b4a88db20bc26f9ddefbee174baa8162cbe94ff2
     ref: refs/heads/main
-    verified_at: '2026-11-09T03:49:46Z'
+    verified_at: '2026-11-09T04:02:21Z'
   candidate:
-    branch: codex/intelligence-roadmap-build
+    branch: codex/intelligence-review-all
     revision: null
     pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-11-09T03:49:46Z'
+    observed_at: '2026-11-09T04:02:21Z'
     default_branch_revision: b4a88db20bc26f9ddefbee174baa8162cbe94ff2
     issue_state: open
     pull_request_state: not-applicable
@@ -87,6 +89,9 @@ state:
     id: egohygiene/relay#150
     url: https://github.com/egohygiene/relay/issues/150
   - provider: github
+    id: egohygiene/relay#151
+    url: https://github.com/egohygiene/relay/issues/151
+  - provider: github
     id: egohygiene/relay#152
     url: https://github.com/egohygiene/relay/issues/152
   - provider: github
@@ -94,18 +99,18 @@ state:
     url: https://github.com/egohygiene/relay/issues/153
 review:
   status: partial
-  reviewed_at: '2026-11-09T03:49:46Z'
+  reviewed_at: '2026-11-09T04:02:21Z'
   reviewed_by: Codex
   evidence:
   - command: Python AST and JSON parsing; applicable YAML/bash syntax inspection; git diff --check; static
       peer review
     outcome: limited
-    observed_at: '2026-11-09T03:49:46Z'
+    observed_at: '2026-11-09T04:02:21Z'
     notes: Syntax and source inspection only. No collector, native runtime, tests, build, browser or CI
       execution.
   - command: Native runtime replay, focused tests, CI, consumer canaries, publication and release acceptance
     outcome: not-run
-    observed_at: '2026-11-09T03:49:46Z'
+    observed_at: '2026-11-09T04:02:21Z'
     notes: Deferred implementation review pass; no acceptance checklist advanced.
   environment_limitations:
   - Pinned runtime acquisition/execution, reproducibility, privacy regression, consumer composition, hosted
@@ -132,19 +137,19 @@ User/runtime and repository instructions, live evidence and canonical sources ou
 
 ## Resume protocol
 
-Read AGENTS, this checkpoint, docs/repository-source-composition.md, canonical architecture and the live owning issue. Refresh main and overlapping branches before resuming.
+Read AGENTS, this checkpoint, docs/repository-intelligence-review-batch.md, canonical architecture and the live owning issue. Refresh main and overlapping branches before resuming.
 
 ## Current objective and success conditions
 
-Compose native Roadmap and Decisions under one commit-bound source plan. Exact source revisions, owner pins and honest coverage remain required.
+Review the combined Repository Intelligence source implementation candidates. Exact source revisions, owner pins and honest coverage remain required.
 
 ## State snapshot
 
-Candidate `codex/intelligence-roadmap-build` is based on `b4a88db20bc26f9ddefbee174baa8162cbe94ff2`. It is prepared for implementation review, with runtime and acceptance work deferred. The containing revision and pre-PR reference intentionally remain null.
+Candidate `codex/intelligence-review-all` is based on `b4a88db20bc26f9ddefbee174baa8162cbe94ff2`. It is prepared for implementation review, with runtime and acceptance work deferred. The containing revision and pre-PR reference intentionally remain null.
 
 ## Completed and material changes
 
-Adds the supported alpha.2 roadmap source adapter, canonical graph composition, provenance admission and matching composite/reusable-workflow opt-in while retaining ADR-only and external inputs. The mapping and entry points are documented in [docs/repository-source-composition.md](docs/repository-source-composition.md). Owner contracts remain canonical; generated views do not author strategy or human decisions.
+Combines native Roadmap and Decisions composition, Work, Journey, Health, Releases, declared Dependencies, public fleet assembly and Compare retention implementation commits while preserving independent review drafts. The mapping and entry points are documented in [docs/repository-intelligence-review-batch.md](docs/repository-intelligence-review-batch.md). Owner contracts remain canonical; generated views do not author strategy or human decisions.
 
 ## Validation and review evidence
 
