@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-11-09T17:48:06Z'
+  updated_at: '2026-11-09T17:48:27Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -40,7 +40,7 @@ scope:
   - ARCHITECTURE.md
   - SYSTEM.md
   - DECISIONS.md
-  - docs/repository-dependency-source-builds.md
+  - docs/dependency-source-build.md
   - actions/repository-intelligence/contracts/public-catalog-admission.v1.lock.json
   - https://github.com/egohygiene/relay/issues/148
 work:
@@ -70,7 +70,7 @@ state:
   base:
     revision: 0ccf44ca495c3874ecb5f264bb674e66ced9262e
     ref: refs/heads/main
-    verified_at: '2026-11-09T17:48:06Z'
+    verified_at: '2026-11-09T17:48:27Z'
   candidate:
     branch: codex/intelligence-dependency-admission
     revision: null
@@ -78,7 +78,7 @@ state:
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-11-09T17:48:06Z'
+    observed_at: '2026-11-09T17:48:27Z'
     default_branch_revision: 0ccf44ca495c3874ecb5f264bb674e66ced9262e
     issue_state: open
     pull_request_state: not-applicable
@@ -88,19 +88,19 @@ state:
   parallel_changes: []
 review:
   status: partial
-  reviewed_at: '2026-11-09T17:48:06Z'
+  reviewed_at: '2026-11-09T17:48:27Z'
   reviewed_by: Codex
   evidence:
   - command: Python AST, JSON schema definitions/local references, exact owner Git/blob and public-reference
       hashes, closed receipt/source inspection, continuity schema/size, whitespace and independent static peer
       review
     outcome: limited
-    observed_at: '2026-11-09T17:48:06Z'
+    observed_at: '2026-11-09T17:48:27Z'
     notes: Static source and metadata inspection only; no application execution.
   - command: Native/runtime execution, tests, builds, CI investigation, browser/provider/consumer/publication
       qualification
     outcome: not-run
-    observed_at: '2026-11-09T17:48:06Z'
+    observed_at: '2026-11-09T17:48:27Z'
     notes: Deferred at maintainer request; source merges do not establish acceptance.
   environment_limitations:
   - No collector/native application, tests, builds, CI, actual artifact/provider intake or consumer/publication
