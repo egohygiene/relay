@@ -1,0 +1,67 @@
+/* Copyright 2026 Ego Hygiene */
+/* SPDX-License-Identifier: MIT */
+
+.ri-repository-graph {
+  --ri-graph-background: var(--ri-canvas, #0b1020);
+  --ri-graph-surface: var(--ri-surface-strong, #171d32);
+  --ri-graph-text: var(--ri-text, #f7f8ff);
+  --ri-graph-muted: var(--ri-muted, #aeb7d2);
+  --ri-graph-border: var(--ri-border-strong, #48516a);
+  --ri-graph-focus: var(--ri-caution, #ffd166);
+  display: grid; gap: 1rem; min-width: 0; margin-block: 1.2rem 2rem;
+  color: var(--ri-graph-text); font-family: inherit;
+}
+.ri-repository-graph :where(h2, h3, p, ul) { margin-block: 0; }
+.ri-repository-graph [hidden] { display: none !important; }
+.ri-repository-graph :where(a, p, li, summary) { overflow-wrap: anywhere; }
+.ri-repository-graph :where(a, button, select, input, summary, svg):focus-visible { outline: 3px solid var(--ri-graph-focus); outline-offset: 4px; }
+.ri-repository-graph .ri-section-heading { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: 0.8rem 1.5rem; }
+.ri-repository-graph .ri-section-heading p { max-width: 52ch; }
+.ri-graph-note { color: var(--ri-graph-muted); line-height: 1.6; }
+.ri-graph-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 0.8rem; }
+.ri-graph-controls label { display: grid; gap: 0.4rem; min-width: 0; }
+.ri-graph-controls label:first-child { flex: 1 1 18rem; }
+.ri-graph-controls label:nth-child(2) { display: flex; align-items: center; min-height: 2.75rem; }
+.ri-graph-controls > div { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.ri-repository-graph :where(button, select) { min-height: 2.75rem; max-width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--ri-graph-border); border-radius: 0.5rem; background: var(--ri-graph-surface); color: var(--ri-graph-text); font: inherit; }
+.ri-repository-graph button { cursor: pointer; }
+.ri-repository-graph :disabled { cursor: default; opacity: 0.65; }
+.ri-graph-canvas { overflow: hidden; border: 1px solid var(--ri-graph-border); border-radius: 0.8rem; background: var(--ri-graph-background); }
+.ri-graph-canvas svg { display: block; width: 100%; height: clamp(22rem, 55vw, 37.5rem); }
+.ri-graph--enhanced .ri-graph-canvas svg { touch-action: none; cursor: grab; }
+.ri-graph--enhanced .ri-graph-canvas svg:active { cursor: grabbing; }
+.ri-graph-canvas defs path { fill: var(--ri-graph-text); }
+.ri-graph-edge path { fill: none; stroke: var(--ri-graph-text); stroke-width: 1.6; vector-effect: non-scaling-stroke; }
+.ri-graph-edge[data-kind="navigation"] path { stroke: var(--ri-graph-muted); stroke-dasharray: 7 5; }
+.ri-graph-edge[data-ri-graph-connected] path { stroke-width: 3; }
+.ri-graph-node rect { fill: var(--ri-graph-surface); stroke: var(--ri-graph-border); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.ri-graph-node[data-ri-graph-kind="repository"] rect { stroke-dasharray: 8 3; }
+.ri-graph-node[data-ri-graph-selected] rect, .ri-graph-node a:focus-visible rect { stroke: var(--ri-graph-focus); stroke-width: 4; }
+.ri-graph-node a { cursor: pointer; }
+.ri-graph-node a:focus-visible { outline: none; }
+.ri-graph-node text { fill: var(--ri-graph-text); pointer-events: none; unicode-bidi: plaintext; }
+.ri-graph-node-kind { font-size: 11px; }
+.ri-graph-node-label { font-size: 15px; font-weight: 650; }
+.ri-graph-inspector { display: grid; gap: 0.8rem; padding: 1.2rem; border: 1px solid var(--ri-graph-border); border-radius: 0.8rem; background: var(--ri-graph-surface); }
+.ri-graph-inspector ul { display: grid; gap: 0.7rem; padding-inline-start: 1.3rem; }
+.ri-graph-directories { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.ri-graph-directories > details { min-width: 0; border: 1px solid var(--ri-graph-border); border-radius: 0.6rem; padding: 0.8rem 1rem; }
+.ri-graph-directories summary { padding-block: 0.4rem 0.8rem; min-height: 2.75rem; cursor: pointer; font-weight: 650; }
+.ri-graph-directories > details > ul { display: grid; gap: 1rem; max-height: 30rem; overflow: auto; padding: 0.3rem 0.7rem 0.3rem 1.4rem; scrollbar-gutter: stable; }
+.ri-graph-directories li + li { border-block-start: 1px solid var(--ri-graph-border); padding-block-start: 1rem; }
+.ri-graph-directories p { margin-block: 0.4rem; font-size: 0.85rem; line-height: 1.6; color: var(--ri-graph-muted); }
+.ri-graph-directories button { margin-block-start: 0.6rem; }
+@media (max-width: 46rem) { .ri-graph-directories { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) {
+  .ri-repository-graph *, .ri-repository-graph *::before, .ri-repository-graph *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+@media (forced-colors: active) {
+  .ri-repository-graph { --ri-graph-background: Canvas; --ri-graph-surface: Canvas; --ri-graph-text: CanvasText; --ri-graph-muted: CanvasText; --ri-graph-border: CanvasText; --ri-graph-focus: Highlight; }
+  .ri-repository-graph :disabled { color: GrayText; opacity: 1; }
+}
+@media print {
+  .ri-graph-controls, .ri-graph-canvas, .ri-graph-inspector, [data-ri-graph-inspect] { display: none !important; }
+  .ri-graph-directories { display: block; }
+  .ri-graph-directories > details { margin-block-end: 1rem; break-inside: auto; }
+  .ri-graph-directories > details > ul { max-height: none; overflow: visible; }
+}
