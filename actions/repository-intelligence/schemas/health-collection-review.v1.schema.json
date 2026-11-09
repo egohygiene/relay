@@ -1,0 +1,421 @@
+{
+  "$defs": {
+    "claim": {
+      "additionalProperties": false,
+      "properties": {
+        "collection": {
+          "enum": [
+            "uncollected",
+            "unavailable",
+            "partial",
+            "observed_empty",
+            "observed",
+            "failed",
+            "not_applicable"
+          ]
+        },
+        "freshness": {
+          "enum": [
+            "current",
+            "stale",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "observed_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "collection",
+        "freshness",
+        "reason",
+        "observed_at"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://egohygiene.github.io/relay/contracts/health-collection-review.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "else": {
+        "required": [
+          "schema",
+          "status",
+          "publication",
+          "diagnostics",
+          "repository",
+          "represented_commit",
+          "observed_at",
+          "inputs",
+          "runtime",
+          "validation",
+          "coverage",
+          "projection_candidate",
+          "snapshot_candidate",
+          "candidate_digests"
+        ]
+      },
+      "if": {
+        "properties": {
+          "status": {
+            "const": "denied"
+          }
+        }
+      },
+      "then": {
+        "maxProperties": 4
+      }
+    }
+  ],
+  "properties": {
+    "candidate_digests": {
+      "additionalProperties": false,
+      "properties": {
+        "projection_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "snapshot_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "projection_sha256",
+        "snapshot_sha256"
+      ],
+      "type": "object"
+    },
+    "coverage": {
+      "additionalProperties": false,
+      "properties": {
+        "checks": {
+          "$ref": "#/$defs/claim"
+        },
+        "decisions": {
+          "$ref": "#/$defs/claim"
+        },
+        "deployments": {
+          "$ref": "#/$defs/claim"
+        },
+        "git": {
+          "$ref": "#/$defs/claim"
+        },
+        "history": {
+          "$ref": "#/$defs/claim"
+        },
+        "issues": {
+          "$ref": "#/$defs/claim"
+        },
+        "pull_requests": {
+          "$ref": "#/$defs/claim"
+        },
+        "releases": {
+          "$ref": "#/$defs/claim"
+        },
+        "roadmap": {
+          "$ref": "#/$defs/claim"
+        }
+      },
+      "required": [
+        "roadmap",
+        "decisions",
+        "git",
+        "issues",
+        "pull_requests",
+        "checks",
+        "releases",
+        "deployments",
+        "history"
+      ],
+      "type": "object"
+    },
+    "diagnostics": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "maxLength": 64,
+            "pattern": "^(?:[A-Z_]+|EGO-INTEL-[A-Z-]+-[0-9]{3})$",
+            "type": "string"
+          },
+          "owner": {
+            "enum": [
+              "relay",
+              "hygiene",
+              "egolint",
+              "observatory"
+            ]
+          },
+          "producer": {
+            "enum": [
+              "osv",
+              "megalinter",
+              "scorecard",
+              "github-check-runs",
+              null
+            ]
+          },
+          "remediation": {
+            "maxLength": 300,
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "owner",
+          "producer",
+          "remediation"
+        ],
+        "type": "object"
+      },
+      "maxItems": 1024,
+      "type": "array"
+    },
+    "inputs": {
+      "additionalProperties": false,
+      "properties": {
+        "captures": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "execution": {
+                "enum": [
+                  "success",
+                  "failure",
+                  "cancelled",
+                  "unknown"
+                ]
+              },
+              "expires_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "findings": {
+                "enum": [
+                  "clear",
+                  "attention",
+                  "blocked",
+                  "unknown"
+                ]
+              },
+              "freshness": {
+                "enum": [
+                  "current",
+                  "stale"
+                ]
+              },
+              "generated_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "observed_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "producer": {
+                "enum": [
+                  "osv",
+                  "megalinter",
+                  "scorecard",
+                  "github-check-runs"
+                ]
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "enum": [
+                  "admitted",
+                  "partial",
+                  "missing",
+                  "rejected",
+                  "not-requested",
+                  "unavailable",
+                  "failed"
+                ]
+              }
+            },
+            "required": [
+              "producer",
+              "status",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "maxItems": 4,
+          "type": "array"
+        },
+        "inventory": {
+          "enum": [
+            "partial",
+            "complete",
+            "not-applicable"
+          ]
+        },
+        "maximum_age_seconds": {
+          "maximum": 2678400,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "requested_reports": {
+          "items": {
+            "enum": [
+              "osv",
+              "megalinter",
+              "scorecard"
+            ]
+          },
+          "maxItems": 3,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "inventory",
+        "requested_reports",
+        "maximum_age_seconds",
+        "captures"
+      ],
+      "type": "object"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "projection_candidate": {
+      "type": "object"
+    },
+    "publication": {
+      "const": "denied"
+    },
+    "repository": {
+      "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$",
+      "type": "string"
+    },
+    "represented_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+    },
+    "runtime": {
+      "additionalProperties": false,
+      "properties": {
+        "collector_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "egolint_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "lock_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "normalization_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "pins": {
+          "type": "object"
+        },
+        "shared_runtime_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "lock_sha256",
+        "egolint_sha256",
+        "pins",
+        "collector_sha256",
+        "shared_runtime_sha256",
+        "normalization_sha256"
+      ],
+      "type": "object"
+    },
+    "schema": {
+      "const": "egohygiene.relay.health-collection-review/v1"
+    },
+    "snapshot_candidate": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "partial",
+        "invalid",
+        "unavailable",
+        "uncollected",
+        "failed",
+        "not_applicable",
+        "denied"
+      ]
+    },
+    "validation": {
+      "additionalProperties": false,
+      "properties": {
+        "coverage": {
+          "enum": [
+            "valid",
+            "not-run"
+          ]
+        },
+        "hygiene": {
+          "enum": [
+            "valid",
+            "invalid"
+          ]
+        },
+        "observatory": {
+          "enum": [
+            "normalized",
+            "not-run"
+          ]
+        }
+      },
+      "required": [
+        "hygiene",
+        "coverage",
+        "observatory"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "publication",
+    "diagnostics"
+  ],
+  "title": "Health captured-evidence review envelope; publication denied",
+  "type": "object"
+}
