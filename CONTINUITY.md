@@ -7,26 +7,29 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-11-09T17:54:03Z'
+  updated_at: '2026-11-09T17:57:20Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Acquire exact admitted repository snapshot artifacts and retain a bounded public fleet handoff for
-    the organization overview.
+  purpose: Connect admitted dependency sources and the owner-backed Hygiene view to normal repository Intelligence
+    builds.
   includes:
-  - repository-intelligence-fleet-artifact uses the separately reviewed public-catalog-v1 admission seam and
-    exact repository/run/attempt/artifact selections. It binds public numeric identities, successful producer
-    attempts, original projection/snapshot manifests, ZIP/file digests, expiry and normalization profile before
-    the existing pinned fleet assembler revalidates each projection.
-  - Failed candidate and explicit last-known selections remain isolated by repository. Corrupt archives and
-    deeply nested JSON cannot abort healthy inputs. A shared 240-second acquisition budget preserves honest
-    unavailable states; emitted fleet/manifest limits match the central host. The ordinary fleet handoff remains
-    separate from publication-denied review evidence and adds no publisher.
-  - Automatic acquisition reuses the existing exact fleet owner runtime profile and the shared immutable public
-    catalog loader. Legacy review-only assembler locks/defaults remain unchanged; the central host and manual
-    operator workflow are prepared separately.
+  - The composite action and both reusable workflows expose collect-dependencies and observatory-hygiene with
+    matching closed preflight/catalog metadata. Fresh declared dependency graphs compose through the existing
+    runtime and optional final Search normalizer; all nine source coverage keys retain their original owners.
+  - The existing Hygiene page consumes the exact Observatory a1884942e953bb371499b2822b52f6865ecdae9d validator/model.
+    Its optional same-repository, represented-commit and evaluation-boundary input yields a closed provenance
+    receipt, conditional implemented route metadata and exact DOM/model bindings. Only assessed supplied contracts
+    are shown; applicability and whole contract inventory remain unknown.
+  - Schema definitions remain self-contained, conditional route validation preserves the absent-input shell,
+    the graph receives freshness only from validated owner proof, and supported URLs intersect the unchanged
+    host boundary. Full owner JSON is not added to the published subtree; the complete 30-file inventory and
+    fixed manifest contracts remain intact.
+  - Recent-work provider ordering and accepted artifact-digest guide forms are reconciled. The production-path
+    guide records superseded review drafts and queues the organization sanity sweep after the separate Audits
+    and Sanity owner foundations.
   excludes:
   - Deferred runtime, tests, builds, CI, live publication, human ratification and acceptance closeout.
   precedence:
@@ -40,75 +43,81 @@ scope:
   - ARCHITECTURE.md
   - SYSTEM.md
   - DECISIONS.md
+  - docs/repository-intelligence-production-paths.md
+  - docs/repository-intelligence-hygiene.md
+  - docs/dependency-source-build.md
   - docs/public-fleet-artifact-delivery.md
-  - docs/public-fleet-assembler.md
-  - docs/public-catalog-admission.md
-  - https://github.com/egohygiene/relay/issues/153
+  - https://github.com/egohygiene/relay/issues/75
 work:
-  objective: Acquire exact admitted repository snapshot artifacts and retain a bounded public fleet handoff
-    for the organization overview.
+  objective: Connect admitted dependency sources and the owner-backed Hygiene view to normal repository Intelligence
+    builds.
   success_conditions:
-  - Only reviewed public members and exact retained artifact identities enter fleet processing.
-  - Malformed, stale, expired, missing and inaccessible sources remain explicit without relabeling the fleet
-    fully available.
-  - The handoff is an ordinary artifact for the existing central overview and preserves consumer-owned Pages
-    publication.
+  - Normal action/reusable paths can consume admitted dependency declarations and a separately validated owner
+    conformance model.
+  - Only exact public owner receipts enable supported Hygiene state; unsupported domains, unknown applicability
+    and human ratification remain distinct.
+  - Existing source locks, default inputs, immutable recovery selections, consumer deployment gates and published
+    bundle inventory stay compatible.
   active_issue:
     provider: github
-    id: egohygiene/relay#153
-    url: https://github.com/egohygiene/relay/issues/153
+    id: egohygiene/relay#75
+    url: https://github.com/egohygiene/relay/issues/75
   next:
     kind: action
-    id: connect-manual-fleet-refresh-host
-    description: Integrate the prepared central-site manifest-bound loader and manual read-only refresh workflow
-      at the final reviewed Relay pin, then supply real successful repository snapshot artifact selections
-      during deferred qualification.
+    id: adopt-integrated-production-sources
+    description: Adopt the exact reviewed integrated Relay revision in the prepared five current consumer capture
+      paths and central fleet refresh/host. Then implement the structured Audits and Sanity owner chains before
+      the separately queued organization sanity sweep; retain the deferred qualification pass before acceptance
+      closeout.
     readiness: ready
     references:
-    - https://github.com/egohygiene/relay/issues/153
+    - https://github.com/egohygiene/relay/issues/75
     depends_on: []
 state:
   base:
-    revision: 58a2ee55bef383c543d81ef463979d4d9ba1fdd1
+    revision: 2e6430e885283ea662206fe5f7929bb57002ebab
     ref: refs/heads/main
-    verified_at: '2026-11-09T17:54:03Z'
+    verified_at: '2026-11-09T17:57:20Z'
   candidate:
-    branch: codex/intelligence-fleet-delivery
+    branch: codex/intelligence-production-integration
     revision: null
     pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-11-09T17:54:03Z'
-    default_branch_revision: 58a2ee55bef383c543d81ef463979d4d9ba1fdd1
+    observed_at: '2026-11-09T17:57:20Z'
+    default_branch_revision: 2e6430e885283ea662206fe5f7929bb57002ebab
     issue_state: open
     pull_request_state: not-applicable
-    notes: Relay Dependencies admission is merged through PR 174 at 58a2ee5. Compare and public GitHub sources
-      are merged through 172 and 173. Issue 153 remains open; the central-site consumer and common owner-backed
-      Hygiene wiring are separate candidates.
+    notes: Relay Compare 172, GitHub sources 173, Dependencies 174 and fleet artifact 175 are merged. Observatory
+      conformance 30 is merged; its functional literal a188 pin is retained. Owning feature and acceptance
+      issues remain open. Five consumer and central-host adoption candidates are prepared separately.
   parallel_changes: []
 review:
   status: partial
-  reviewed_at: '2026-11-09T17:54:03Z'
+  reviewed_at: '2026-11-09T17:57:20Z'
   reviewed_by: Codex
   evidence:
-  - command: Python AST, JSON schema definitions, unique-key YAML, embedded Bash, action metadata, exact public
-      admission reconciliation, continuity schema/size, whitespace and independent static peer review
+  - command: Python AST, unique-key YAML and embedded Bash syntax, closed JSON schema definitions with resolved
+      local pointers, reusable input/type/default/catalog parity, exact owner vendored bytes, bundle inventory
+      source inspection, continuity schema/size/links, whitespace and independent static peer review
     outcome: limited
-    observed_at: '2026-11-09T17:54:03Z'
+    observed_at: '2026-11-09T17:57:20Z'
     notes: Static source and metadata inspection only; no application execution.
   - command: Native/runtime execution, tests, builds, CI investigation, browser/provider/consumer/publication
       qualification
     outcome: not-run
-    observed_at: '2026-11-09T17:54:03Z'
+    observed_at: '2026-11-09T17:57:20Z'
     notes: Deferred at maintainer request; source merges do not establish acceptance.
   environment_limitations:
-  - No artifact/provider downloads, native assembler execution, tests, builds, CI, real canaries, uploads or
-    publication were executed.
-  - Real exact artifact/run selections and provider acceptance remain required. No latest-run fallback, synthetic
-    successful run, baseline selection or verified deployment is invented.
-  - Global provider intake is bounded independently from deferred native dependency acquisition and consumer
-    runtime budgets.
+  - Native/application execution, tests, builds, actual API/artifact transport, CI, browsers, consumer publication
+    and recovery qualification were not run.
+  - A valid conformance input still requires real supplied owner evidence; missing input remains unsupported
+    and missing assessments never become a pass or not-applicable disposition.
+  - Real Compare pairs and fleet artifact identities, public/private invariance, runtime budgets and representative
+    canaries remain later acceptance work.
+  - Hygiene ADR-0001 metadata/human approval and Akashic roadmap source holds remain unchanged. No implementation
+    merge supplies ratification, successful deployment or issue completion.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -135,35 +144,37 @@ Read scoped instructions, canonical sources above and this checkpoint. Verify mu
 
 ## Current objective and success conditions
 
-Acquire exact admitted repository snapshot artifacts and retain a bounded public fleet handoff for the organization overview. Only reviewed public members and exact retained artifact identities enter fleet processing. Malformed, stale, expired, missing and inaccessible sources remain explicit without relabeling the fleet fully available. The handoff is an ordinary artifact for the existing central overview and preserves consumer-owned Pages publication.
+Connect admitted dependency sources and the owner-backed Hygiene view to normal repository Intelligence builds. Normal action/reusable paths can consume admitted dependency declarations and a separately validated owner conformance model. Only exact public owner receipts enable supported Hygiene state; unsupported domains, unknown applicability and human ratification remain distinct. Existing source locks, default inputs, immutable recovery selections, consumer deployment gates and published bundle inventory stay compatible.
 
 ## State snapshot
 
-Candidate `codex/intelligence-fleet-delivery` is based on observed main `58a2ee55bef383c543d81ef463979d4d9ba1fdd1`. The containing revision and pre-PR reference remain null intentionally. Relay Dependencies admission is merged through PR 174 at 58a2ee5. Compare and public GitHub sources are merged through 172 and 173. Issue 153 remains open; the central-site consumer and common owner-backed Hygiene wiring are separate candidates.
+Candidate `codex/intelligence-production-integration` is based on observed main `2e6430e885283ea662206fe5f7929bb57002ebab`. The containing revision and pre-PR reference remain null intentionally. Relay Compare 172, GitHub sources 173, Dependencies 174 and fleet artifact 175 are merged. Observatory conformance 30 is merged; its functional literal a188 pin is retained. Owning feature and acceptance issues remain open. Five consumer and central-host adoption candidates are prepared separately.
 
 ## Completed and material changes
 
-repository-intelligence-fleet-artifact uses the separately reviewed public-catalog-v1 admission seam and exact repository/run/attempt/artifact selections. It binds public numeric identities, successful producer attempts, original projection/snapshot manifests, ZIP/file digests, expiry and normalization profile before the existing pinned fleet assembler revalidates each projection.
+The composite action and both reusable workflows expose collect-dependencies and observatory-hygiene with matching closed preflight/catalog metadata. Fresh declared dependency graphs compose through the existing runtime and optional final Search normalizer; all nine source coverage keys retain their original owners.
 
-Failed candidate and explicit last-known selections remain isolated by repository. Corrupt archives and deeply nested JSON cannot abort healthy inputs. A shared 240-second acquisition budget preserves honest unavailable states; emitted fleet/manifest limits match the central host. The ordinary fleet handoff remains separate from publication-denied review evidence and adds no publisher.
+The existing Hygiene page consumes the exact Observatory a1884942e953bb371499b2822b52f6865ecdae9d validator/model. Its optional same-repository, represented-commit and evaluation-boundary input yields a closed provenance receipt, conditional implemented route metadata and exact DOM/model bindings. Only assessed supplied contracts are shown; applicability and whole contract inventory remain unknown.
 
-Automatic acquisition reuses the existing exact fleet owner runtime profile and the shared immutable public catalog loader. Legacy review-only assembler locks/defaults remain unchanged; the central host and manual operator workflow are prepared separately.
+Schema definitions remain self-contained, conditional route validation preserves the absent-input shell, the graph receives freshness only from validated owner proof, and supported URLs intersect the unchanged host boundary. Full owner JSON is not added to the published subtree; the complete 30-file inventory and fixed manifest contracts remain intact.
+
+Recent-work provider ordering and accepted artifact-digest guide forms are reconciled. The production-path guide records superseded review drafts and queues the organization sanity sweep after the separate Audits and Sanity owner foundations.
 
 ## Validation and review evidence
 
-Python AST, JSON schema definitions, unique-key YAML, embedded Bash, action metadata, exact public admission reconciliation, continuity schema/size, whitespace and independent static peer review. Static inspection only. Native/runtime execution, tests, builds, CI investigation, browsers, provider reads and publication qualification were not run.
+Python AST, unique-key YAML and embedded Bash syntax, closed JSON schema definitions with resolved local pointers, reusable input/type/default/catalog parity, exact owner vendored bytes, bundle inventory source inspection, continuity schema/size/links, whitespace and independent static peer review. Static inspection only. Native/runtime execution, tests, builds, CI investigation, browsers, provider reads and publication qualification were not run.
 
 ## Blockers, risks, unknowns, and deferred work
 
-No artifact/provider downloads, native assembler execution, tests, builds, CI, real canaries, uploads or publication were executed. Real exact artifact/run selections and provider acceptance remain required. No latest-run fallback, synthetic successful run, baseline selection or verified deployment is invented. Global provider intake is bounded independently from deferred native dependency acquisition and consumer runtime budgets.
+Native/application execution, tests, builds, actual API/artifact transport, CI, browsers, consumer publication and recovery qualification were not run. A valid conformance input still requires real supplied owner evidence; missing input remains unsupported and missing assessments never become a pass or not-applicable disposition. Real Compare pairs and fleet artifact identities, public/private invariance, runtime budgets and representative canaries remain later acceptance work. Hygiene ADR-0001 metadata/human approval and Akashic roadmap source holds remain unchanged. No implementation merge supplies ratification, successful deployment or issue completion.
 
 ## Next dependency-ready work
 
-Integrate the prepared central-site manifest-bound loader and manual read-only refresh workflow at the final reviewed Relay pin, then supply real successful repository snapshot artifact selections during deferred qualification.
+Adopt the exact reviewed integrated Relay revision in the prepared five current consumer capture paths and central fleet refresh/host. Then implement the structured Audits and Sanity owner chains before the separately queued organization sanity sweep; retain the deferred qualification pass before acceptance closeout.
 
 ## Parallel changes and reconciliation
 
-The shared public admission helper and guide were reconciled to the merged Dependencies source proof, preserving its exact public mirrors/reference validation. Existing operator and publication authority remains with consumers. This implements the existing bounded fleet design without adding canonical policy or release authority.
+Each source/transport slice was merged independently before this shared integration. The source helper, conditional route metadata and closed receipt schemas were peer-reviewed together. Current consumer adoption uses fresh actual capture clocks; historical/no-capture/recovery paths retain their original behavior. Proposed Observatory ADR-0006 and existing Relay authority decisions govern this implementation without creating a duplicate policy owner.
 
 ## Privacy and redaction
 
