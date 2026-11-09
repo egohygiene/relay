@@ -1,0 +1,165 @@
+---
+# Copyright 2026 Ego Hygiene
+# SPDX-License-Identifier: MIT
+name: Repository Intelligence Compare Artifact
+description: Compare an exact retained public projection/snapshot artifact and retain the eligible current pair as an ordinary artifact without deploying.
+inputs:
+  source-directory:
+    description: Completed public source-build directory containing exact original projection.json and snapshot.json.
+    required: true
+  as-of:
+    description: Explicit UTC operational boundary; never substituted into historical snapshots.
+    required: true
+  expected-baseline:
+    description: Explicit none for initial seeding, otherwise snapshot-sha256:projection-sha256 for the exact selected baseline.
+    required: true
+  baseline-artifact-id:
+    description: Exact prior ordinary artifact ID; all baseline identity inputs must be supplied together.
+    default: ""
+  baseline-artifact-digest:
+    description: SHA-256 returned by the prior upload-artifact step for its exact ZIP.
+    default: ""
+  baseline-source-commit:
+    description: Full consumer source commit represented by the baseline artifact.
+    default: ""
+  baseline-run-id:
+    description: Exact successful producer workflow run, never latest or a name lookup.
+    default: ""
+  baseline-run-attempt:
+    description: Exact producer attempt bound to the retained manifest and provider metadata.
+    default: ""
+  runtime:
+    description: Optional trusted prepared matching runtime outside the checkout; otherwise acquire the exact selected profile privately.
+    default: ""
+  normalization-profile:
+    description: Exact normalization profile discriminator; legacy-adr or the separately installed search-attribution-v1 helper, never mixed.
+    default: legacy-adr
+  maximum-baseline-age-seconds:
+    default: "2592000"
+    description: Maximum original baseline observation age at as-of.
+  maximum-current-age-seconds:
+    default: "86400"
+    description: Maximum original current observation age at as-of.
+  retention-days:
+    default: "30"
+    description: Ordinary snapshot artifact retention, from1 through90 days.
+outputs:
+  status:
+    value: "${{ steps.prepare.outputs.status }}"
+    description: ready, partial or unavailable comparison evidence; upload/deployment success stays separate.
+  baseline-state:
+    value: "${{ steps.prepare.outputs.baseline-state }}"
+    description: Exact baseline admission/age state.
+  snapshot-path:
+    value: "${{ steps.prepare.outputs.snapshot-path }}"
+    description: Private absolute path to the admitted canonical current snapshot.
+  projection-path:
+    value: "${{ steps.prepare.outputs.projection-path }}"
+    description: Private absolute path to its exact canonical original projection.
+  comparison-path:
+    value: "${{ steps.prepare.outputs.comparison-path }}"
+    description: Private absolute pinned comparison path, empty when unavailable.
+  receipt-path:
+    value: "${{ steps.prepare.outputs.receipt-path }}"
+    description: Separate operational artifact receipt, finalized after ordinary upload.
+  retention-receipt-path:
+    value: "${{ steps.prepare.outputs.retention-receipt-path }}"
+    description: Private existing-retention-CLI receipt; never include it in the public bundle.
+  artifact-id:
+    value: "${{ steps.upload.outputs.artifact-id }}"
+    description: Exact ordinary retained artifact ID when eligible upload succeeded.
+  artifact-digest:
+    value: "${{ steps.upload.outputs.artifact-digest }}"
+    description: Exact uploaded ZIP digest, distinct from canonical pair digests.
+  next-baseline-lease:
+    value: "${{ steps.prepare.outputs.next-baseline-lease }}"
+    description: Canonical current snapshot:projection digests; select only with a successful upload and its exact identity.
+  receipt-artifact-id:
+    value: "${{ steps.evidence.outputs.artifact-id }}"
+    description: Separate ordinary operational receipt artifact ID.
+  receipt-artifact-digest:
+    value: "${{ steps.evidence.outputs.artifact-digest }}"
+    description: Exact operational receipt ZIP digest, separate from the snapshot artifact.
+runs:
+  using: composite
+  steps:
+    - name: Admit selected baseline and prepare current comparison
+      id: prepare
+      shell: bash
+      env:
+        COMPARE_GITHUB_TOKEN: "${{ github.token }}"
+        COMPARE_SOURCE_DIRECTORY: "${{ inputs.source-directory }}"
+        COMPARE_AS_OF: "${{ inputs.as-of }}"
+        COMPARE_EXPECTED: "${{ inputs.expected-baseline }}"
+        COMPARE_ARTIFACT_ID: "${{ inputs.baseline-artifact-id }}"
+        COMPARE_ARTIFACT_DIGEST: "${{ inputs.baseline-artifact-digest }}"
+        COMPARE_BASELINE_COMMIT: "${{ inputs.baseline-source-commit }}"
+        COMPARE_BASELINE_RUN: "${{ inputs.baseline-run-id }}"
+        COMPARE_BASELINE_ATTEMPT: "${{ inputs.baseline-run-attempt }}"
+        COMPARE_RUNTIME: "${{ inputs.runtime }}"
+        COMPARE_PROFILE: "${{ inputs.normalization-profile }}"
+        COMPARE_BASELINE_AGE: "${{ inputs.maximum-baseline-age-seconds }}"
+        COMPARE_CURRENT_AGE: "${{ inputs.maximum-current-age-seconds }}"
+        COMPARE_RETENTION_DAYS: "${{ inputs.retention-days }}"
+        COMPARE_REPOSITORY: "${{ github.repository }}"
+        COMPARE_REPOSITORY_ID: "${{ github.repository_id }}"
+        COMPARE_SOURCE_COMMIT: "${{ github.sha }}"
+        COMPARE_RUN_ID: "${{ github.run_id }}"
+        COMPARE_RUN_ATTEMPT: "${{ github.run_attempt }}"
+        COMPARE_EVENT: "${{ github.event_name }}"
+        COMPARE_VISIBILITY: "${{ github.event.repository.visibility }}"
+      run: |
+        set -euo pipefail
+        runtime_arguments=()
+        if [[ -n "${COMPARE_RUNTIME}" ]]; then
+          runtime_arguments+=(--runtime "${COMPARE_RUNTIME}")
+        fi
+        python3 -I "${GITHUB_ACTION_PATH}/../repository-intelligence/scripts/repository_compare_artifact.py" prepare \
+          --source-directory "${COMPARE_SOURCE_DIRECTORY}" \
+          --as-of "${COMPARE_AS_OF}" --expected-baseline "${COMPARE_EXPECTED}" \
+          --baseline-artifact-id "${COMPARE_ARTIFACT_ID}" --baseline-artifact-digest "${COMPARE_ARTIFACT_DIGEST}" \
+          --baseline-source-commit "${COMPARE_BASELINE_COMMIT}" --baseline-run-id "${COMPARE_BASELINE_RUN}" \
+          --baseline-run-attempt "${COMPARE_BASELINE_ATTEMPT}" --normalization-profile "${COMPARE_PROFILE}" \
+          --maximum-baseline-age-seconds "${COMPARE_BASELINE_AGE}" --maximum-current-age-seconds "${COMPARE_CURRENT_AGE}" \
+          --retention-days "${COMPARE_RETENTION_DAYS}" --repository "${COMPARE_REPOSITORY}" \
+          --repository-id "${COMPARE_REPOSITORY_ID}" --source-commit "${COMPARE_SOURCE_COMMIT}" \
+          --run-id "${COMPARE_RUN_ID}" --run-attempt "${COMPARE_RUN_ATTEMPT}" \
+          --event-name "${COMPARE_EVENT}" --visibility "${COMPARE_VISIBILITY}" \
+          --runner-temp "${RUNNER_TEMP}" --repository-root "${GITHUB_WORKSPACE}" \
+          --github-output "${GITHUB_OUTPUT}" "${runtime_arguments[@]}"
+    - name: Retain eligible exact current pair as an ordinary artifact
+      id: upload
+      if: "${{ steps.prepare.outputs.retention-eligible == 'true' }}"
+      # actions/upload-artifact v7.0.1; no Pages artifact or second deployer.
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: "${{ steps.prepare.outputs.artifact-name }}"
+        path: "${{ steps.prepare.outputs.artifact-directory }}"
+        if-no-files-found: error
+        overwrite: false
+        retention-days: "${{ inputs.retention-days }}"
+        compression-level: 9
+    - name: Record actual ordinary upload outcome separately
+      if: "${{ always() && steps.prepare.outputs.receipt-path != '' }}"
+      shell: bash
+      env:
+        COMPARE_RECEIPT: "${{ steps.prepare.outputs.receipt-path }}"
+        COMPARE_UPLOAD_OUTCOME: "${{ steps.upload.outcome }}"
+        COMPARE_UPLOAD_ID: "${{ steps.upload.outputs.artifact-id }}"
+        COMPARE_UPLOAD_DIGEST: "${{ steps.upload.outputs.artifact-digest }}"
+      run: |
+        set -euo pipefail
+        python3 -I "${GITHUB_ACTION_PATH}/../repository-intelligence/scripts/repository_compare_artifact.py" finalize \
+          --receipt "${COMPARE_RECEIPT}" --upload-outcome "${COMPARE_UPLOAD_OUTCOME}" \
+          --upload-id "${COMPARE_UPLOAD_ID}" --upload-digest "${COMPARE_UPLOAD_DIGEST}"
+    - name: Retain bounded operational evidence independently of snapshot upload
+      id: evidence
+      if: "${{ always() && steps.prepare.outputs.receipt-path != '' }}"
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: "repository-intelligence-compare-receipt-v1-${{ github.repository_id }}-${{ github.run_id }}-${{ github.run_attempt }}"
+        path: "${{ steps.prepare.outputs.receipt-path }}"
+        if-no-files-found: error
+        overwrite: false
+        retention-days: 30
+        compression-level: 9
