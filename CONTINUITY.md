@@ -7,26 +7,26 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-11-09T17:48:27Z'
+  updated_at: '2026-11-09T17:54:03Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Admit exact public owner declarations into fresh bounded dependency evidence for native Intelligence
-    source plans.
+  purpose: Acquire exact admitted repository snapshot artifacts and retain a bounded public fleet handoff for
+    the organization overview.
   includes:
-  - public_catalog_admission.py loads and optionally acquires the exact reviewed Hygiene public artifact at
-    49639c1, authenticates selected identity rows before lookup/traversal and provides the shared fleet admission
-    seam. Exact mirrored public bytes remain an owner projection, never an independent registry.
-  - collect_repository_dependency_source.py reuses the existing mapping and ADR normalization runtime over
-    separately pinned current authored declarations. The closed source-dependency receipt authenticates public
-    membership, selected authorization, bounded traversal and exact edges/policies including omissions through
-    a public-only immutable declaration reference. Private/nonselected raw source digests are excluded from
-    public proof.
-  - Existing review collector locks, defaults and all nine source coverage domains remain unchanged. Declared
-    consumption stays distinct from runtime/package adoption, and authored lifecycle remains architectural
-    context rather than execution success.
+  - repository-intelligence-fleet-artifact uses the separately reviewed public-catalog-v1 admission seam and
+    exact repository/run/attempt/artifact selections. It binds public numeric identities, successful producer
+    attempts, original projection/snapshot manifests, ZIP/file digests, expiry and normalization profile before
+    the existing pinned fleet assembler revalidates each projection.
+  - Failed candidate and explicit last-known selections remain isolated by repository. Corrupt archives and
+    deeply nested JSON cannot abort healthy inputs. A shared 240-second acquisition budget preserves honest
+    unavailable states; emitted fleet/manifest limits match the central host. The ordinary fleet handoff remains
+    separate from publication-denied review evidence and adds no publisher.
+  - Automatic acquisition reuses the existing exact fleet owner runtime profile and the shared immutable public
+    catalog loader. Legacy review-only assembler locks/defaults remain unchanged; the central host and manual
+    operator workflow are prepared separately.
   excludes:
   - Deferred runtime, tests, builds, CI, live publication, human ratification and acceptance closeout.
   precedence:
@@ -40,75 +40,75 @@ scope:
   - ARCHITECTURE.md
   - SYSTEM.md
   - DECISIONS.md
-  - docs/dependency-source-build.md
-  - actions/repository-intelligence/contracts/public-catalog-admission.v1.lock.json
-  - https://github.com/egohygiene/relay/issues/148
+  - docs/public-fleet-artifact-delivery.md
+  - docs/public-fleet-assembler.md
+  - docs/public-catalog-admission.md
+  - https://github.com/egohygiene/relay/issues/153
 work:
-  objective: Admit exact public owner declarations into fresh bounded dependency evidence for native Intelligence
-    source plans.
+  objective: Acquire exact admitted repository snapshot artifacts and retain a bounded public fleet handoff
+    for the organization overview.
   success_conditions:
-  - Fresh owner declarations, original projection/snapshot and bounded public receipt are available without
-    promoting review envelopes.
-  - Receipt verification detects invented or omitted selected relationships and preserves the public boundary
-    before identifiers and hashes.
-  - The existing native runtime and closed nine-domain coverage contract remain compatible.
+  - Only reviewed public members and exact retained artifact identities enter fleet processing.
+  - Malformed, stale, expired, missing and inaccessible sources remain explicit without relabeling the fleet
+    fully available.
+  - The handoff is an ordinary artifact for the existing central overview and preserves consumer-owned Pages
+    publication.
   active_issue:
     provider: github
-    id: egohygiene/relay#148
-    url: https://github.com/egohygiene/relay/issues/148
+    id: egohygiene/relay#153
+    url: https://github.com/egohygiene/relay/issues/153
   next:
     kind: action
-    id: integrate-public-dependency-source-plan
-    description: Integrate the prepared collect-dependencies opt-in into the common native action/reusables,
-      adopt it only on fresh current consumer capture clocks, and qualify real provider/native/privacy/consumer
-      behavior in the deferred verification pass.
+    id: connect-manual-fleet-refresh-host
+    description: Integrate the prepared central-site manifest-bound loader and manual read-only refresh workflow
+      at the final reviewed Relay pin, then supply real successful repository snapshot artifact selections
+      during deferred qualification.
     readiness: ready
     references:
-    - https://github.com/egohygiene/relay/issues/148
+    - https://github.com/egohygiene/relay/issues/153
     depends_on: []
 state:
   base:
-    revision: 0ccf44ca495c3874ecb5f264bb674e66ced9262e
+    revision: 58a2ee55bef383c543d81ef463979d4d9ba1fdd1
     ref: refs/heads/main
-    verified_at: '2026-11-09T17:48:27Z'
+    verified_at: '2026-11-09T17:54:03Z'
   candidate:
-    branch: codex/intelligence-dependency-admission
+    branch: codex/intelligence-fleet-delivery
     revision: null
     pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-11-09T17:48:27Z'
-    default_branch_revision: 0ccf44ca495c3874ecb5f264bb674e66ced9262e
+    observed_at: '2026-11-09T17:54:03Z'
+    default_branch_revision: 58a2ee55bef383c543d81ef463979d4d9ba1fdd1
     issue_state: open
     pull_request_state: not-applicable
-    notes: Hygiene public catalog reconciliation is merged through PR 97. Relay Compare and public provider
-      source feeds are merged through PRs 172 and 173. Issue 148 remains open; shared composition and fleet
-      integration are separate prepared slices.
+    notes: Relay Dependencies admission is merged through PR 174 at 58a2ee5. Compare and public GitHub sources
+      are merged through 172 and 173. Issue 153 remains open; the central-site consumer and common owner-backed
+      Hygiene wiring are separate candidates.
   parallel_changes: []
 review:
   status: partial
-  reviewed_at: '2026-11-09T17:48:27Z'
+  reviewed_at: '2026-11-09T17:54:03Z'
   reviewed_by: Codex
   evidence:
-  - command: Python AST, JSON schema definitions/local references, exact owner Git/blob and public-reference
-      hashes, closed receipt/source inspection, continuity schema/size, whitespace and independent static peer
-      review
+  - command: Python AST, JSON schema definitions, unique-key YAML, embedded Bash, action metadata, exact public
+      admission reconciliation, continuity schema/size, whitespace and independent static peer review
     outcome: limited
-    observed_at: '2026-11-09T17:48:27Z'
+    observed_at: '2026-11-09T17:54:03Z'
     notes: Static source and metadata inspection only; no application execution.
   - command: Native/runtime execution, tests, builds, CI investigation, browser/provider/consumer/publication
       qualification
     outcome: not-run
-    observed_at: '2026-11-09T17:48:27Z'
+    observed_at: '2026-11-09T17:54:03Z'
     notes: Deferred at maintainer request; source merges do not establish acceptance.
   environment_limitations:
-  - No collector/native application, tests, builds, CI, actual artifact/provider intake or consumer/publication
-    qualification was executed.
-  - The public-only declaration reference proves a bounded authored consumption projection; it does not establish
-    installed/runtime dependency adoption, complete reverse topology or policy acceptance.
-  - Later acceptance must verify public/private invariance, source compatibility, multi-source composition
-    and current consumer clocks without altering historical recovery.
+  - No artifact/provider downloads, native assembler execution, tests, builds, CI, real canaries, uploads or
+    publication were executed.
+  - Real exact artifact/run selections and provider acceptance remain required. No latest-run fallback, synthetic
+    successful run, baseline selection or verified deployment is invented.
+  - Global provider intake is bounded independently from deferred native dependency acquisition and consumer
+    runtime budgets.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -135,35 +135,35 @@ Read scoped instructions, canonical sources above and this checkpoint. Verify mu
 
 ## Current objective and success conditions
 
-Admit exact public owner declarations into fresh bounded dependency evidence for native Intelligence source plans. Fresh owner declarations, original projection/snapshot and bounded public receipt are available without promoting review envelopes. Receipt verification detects invented or omitted selected relationships and preserves the public boundary before identifiers and hashes. The existing native runtime and closed nine-domain coverage contract remain compatible.
+Acquire exact admitted repository snapshot artifacts and retain a bounded public fleet handoff for the organization overview. Only reviewed public members and exact retained artifact identities enter fleet processing. Malformed, stale, expired, missing and inaccessible sources remain explicit without relabeling the fleet fully available. The handoff is an ordinary artifact for the existing central overview and preserves consumer-owned Pages publication.
 
 ## State snapshot
 
-Candidate `codex/intelligence-dependency-admission` is based on observed main `0ccf44ca495c3874ecb5f264bb674e66ced9262e`. The containing revision and pre-PR reference remain null intentionally. Hygiene public catalog reconciliation is merged through PR 97. Relay Compare and public provider source feeds are merged through PRs 172 and 173. Issue 148 remains open; shared composition and fleet integration are separate prepared slices.
+Candidate `codex/intelligence-fleet-delivery` is based on observed main `58a2ee55bef383c543d81ef463979d4d9ba1fdd1`. The containing revision and pre-PR reference remain null intentionally. Relay Dependencies admission is merged through PR 174 at 58a2ee5. Compare and public GitHub sources are merged through 172 and 173. Issue 153 remains open; the central-site consumer and common owner-backed Hygiene wiring are separate candidates.
 
 ## Completed and material changes
 
-public_catalog_admission.py loads and optionally acquires the exact reviewed Hygiene public artifact at 49639c1, authenticates selected identity rows before lookup/traversal and provides the shared fleet admission seam. Exact mirrored public bytes remain an owner projection, never an independent registry.
+repository-intelligence-fleet-artifact uses the separately reviewed public-catalog-v1 admission seam and exact repository/run/attempt/artifact selections. It binds public numeric identities, successful producer attempts, original projection/snapshot manifests, ZIP/file digests, expiry and normalization profile before the existing pinned fleet assembler revalidates each projection.
 
-collect_repository_dependency_source.py reuses the existing mapping and ADR normalization runtime over separately pinned current authored declarations. The closed source-dependency receipt authenticates public membership, selected authorization, bounded traversal and exact edges/policies including omissions through a public-only immutable declaration reference. Private/nonselected raw source digests are excluded from public proof.
+Failed candidate and explicit last-known selections remain isolated by repository. Corrupt archives and deeply nested JSON cannot abort healthy inputs. A shared 240-second acquisition budget preserves honest unavailable states; emitted fleet/manifest limits match the central host. The ordinary fleet handoff remains separate from publication-denied review evidence and adds no publisher.
 
-Existing review collector locks, defaults and all nine source coverage domains remain unchanged. Declared consumption stays distinct from runtime/package adoption, and authored lifecycle remains architectural context rather than execution success.
+Automatic acquisition reuses the existing exact fleet owner runtime profile and the shared immutable public catalog loader. Legacy review-only assembler locks/defaults remain unchanged; the central host and manual operator workflow are prepared separately.
 
 ## Validation and review evidence
 
-Python AST, JSON schema definitions/local references, exact owner Git/blob and public-reference hashes, closed receipt/source inspection, continuity schema/size, whitespace and independent static peer review. Static inspection only. Native/runtime execution, tests, builds, CI investigation, browsers, provider reads and publication qualification were not run.
+Python AST, JSON schema definitions, unique-key YAML, embedded Bash, action metadata, exact public admission reconciliation, continuity schema/size, whitespace and independent static peer review. Static inspection only. Native/runtime execution, tests, builds, CI investigation, browsers, provider reads and publication qualification were not run.
 
 ## Blockers, risks, unknowns, and deferred work
 
-No collector/native application, tests, builds, CI, actual artifact/provider intake or consumer/publication qualification was executed. The public-only declaration reference proves a bounded authored consumption projection; it does not establish installed/runtime dependency adoption, complete reverse topology or policy acceptance. Later acceptance must verify public/private invariance, source compatibility, multi-source composition and current consumer clocks without altering historical recovery.
+No artifact/provider downloads, native assembler execution, tests, builds, CI, real canaries, uploads or publication were executed. Real exact artifact/run selections and provider acceptance remain required. No latest-run fallback, synthetic successful run, baseline selection or verified deployment is invented. Global provider intake is bounded independently from deferred native dependency acquisition and consumer runtime budgets.
 
 ## Next dependency-ready work
 
-Integrate the prepared collect-dependencies opt-in into the common native action/reusables, adopt it only on fresh current consumer capture clocks, and qualify real provider/native/privacy/consumer behavior in the deferred verification pass.
+Integrate the prepared central-site manifest-bound loader and manual read-only refresh workflow at the final reviewed Relay pin, then supply real successful repository snapshot artifact selections during deferred qualification.
 
 ## Parallel changes and reconciliation
 
-The shared catalog helper is consumed by the prepared fleet artifact slice. Common source-plan glue will preserve root identity neutrality, exact receipt validation and no added dependency coverage key. Existing governing bounded collector and ownership decisions are referenced; no new policy authority is created.
+The shared public admission helper and guide were reconciled to the merged Dependencies source proof, preserving its exact public mirrors/reference validation. Existing operator and publication authority remains with consumers. This implements the existing bounded fleet design without adding canonical policy or release authority.
 
 ## Privacy and redaction
 
