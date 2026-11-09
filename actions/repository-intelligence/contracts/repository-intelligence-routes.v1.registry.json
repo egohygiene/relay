@@ -1,0 +1,1480 @@
+{
+  "schema": "egohygiene.public-site-surface-registry/v1",
+  "version": "1.0.0-alpha.1",
+  "status": "proposed",
+  "owner": "egohygiene/hygiene",
+  "updated": "2026-09-21",
+  "purpose": "Define stable public-site surface identities, scope-specific canonical routes, aliases, applicability, ownership, evidence, and truthful publication state without copying implementations.",
+  "requirements": [
+    "required",
+    "recommended",
+    "optional"
+  ],
+  "applicability_states": [
+    "applicable",
+    "not_applicable",
+    "unknown"
+  ],
+  "applicability_rules": [
+    "always",
+    "site-declared"
+  ],
+  "implementation_states": [
+    "unknown",
+    "missing",
+    "planned",
+    "blocked",
+    "implemented",
+    "unsupported",
+    "not_applicable"
+  ],
+  "publication_states": [
+    "unknown",
+    "unpublished",
+    "preview",
+    "published",
+    "withdrawn",
+    "not_applicable"
+  ],
+  "freshness_states": [
+    "current",
+    "stale",
+    "unknown",
+    "not_applicable"
+  ],
+  "assertions": [
+    "authoritative",
+    "inferred",
+    "unknown"
+  ],
+  "visibilities": [
+    "public",
+    "internal",
+    "private"
+  ],
+  "dispositions": [
+    "owned",
+    "inherited",
+    "omitted"
+  ],
+  "site_classes": [
+    "application",
+    "commerce",
+    "content",
+    "documentation",
+    "hybrid"
+  ],
+  "route_profiles": [
+    {
+      "id": "organization",
+      "description": "Organization-wide site whose control-plane modules use first-class top-level routes."
+    },
+    {
+      "id": "repository",
+      "description": "Repository-owned site whose Repository Intelligence modules remain nested under /intelligence/."
+    }
+  ],
+  "dependency_policy": {
+    "meaning": "publication-prerequisite",
+    "binding": "route-profile",
+    "published_requires_published_dependencies": true
+  },
+  "route_policy": {
+    "canonical_routes_are_absolute": true,
+    "directory_routes_use_trailing_slash": true,
+    "aliases_are_redirects_only": true,
+    "aliases_must_not_publish_duplicate_canonical_content": true,
+    "query_and_fragment_routes_forbidden": true
+  },
+  "surfaces": [
+    {
+      "id": "accessibility",
+      "title": "Accessibility",
+      "description": "Accessibility statement, supported accommodations, known limitations, and contact path.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/accessibility/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/accessibility/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "recommended",
+      "site_class_overrides": {
+        "application": "recommended",
+        "commerce": "recommended",
+        "content": "recommended",
+        "documentation": "recommended",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-policy",
+      "renderer_contract": "site-owned",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": [
+        "egohygiene.agent-ready-web-profile/v1",
+        "egohygiene.repository-presentation-profile/v1"
+      ]
+    },
+    {
+      "id": "audits",
+      "title": "Audits",
+      "description": "Audit runs, findings, evidence, and bounded disposition without collapsing independent domains into one score.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/audits/",
+          "aliases": [
+            "/intelligence/audits/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/intelligence/audits/",
+          "aliases": [
+            "/audits/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "operational-evidence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [],
+        "repository": [
+          "intelligence"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.repository-intelligence/v1"
+      ]
+    },
+    {
+      "id": "blog",
+      "title": "Blog",
+      "description": "Repository- or organization-owned chronological articles with canonical URLs and explicit provenance.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/blog/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/blog/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "recommended",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-content",
+      "renderer_contract": "site-owned",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": [
+        "egohygiene.agent-ready-web-profile/v1"
+      ]
+    },
+    {
+      "id": "community",
+      "title": "Community",
+      "description": "Community participation paths and conduct boundaries that do not fabricate an active community.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/community/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/community/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "optional"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-policy",
+      "renderer_contract": "site-owned",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": [
+        "egohygiene.repository-presentation-profile/v1"
+      ]
+    },
+    {
+      "id": "compare",
+      "title": "Compare",
+      "description": "Scoped comparison of compatible Repository Intelligence snapshots with uncertainty preserved.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/intelligence/compare/",
+          "aliases": [
+            "/compare/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/intelligence/compare/",
+          "aliases": [
+            "/compare/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "optional"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-intelligence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [
+          "intelligence"
+        ],
+        "repository": [
+          "intelligence"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.repository-intelligence/v1"
+      ]
+    },
+    {
+      "id": "dashboard",
+      "title": "Dashboard",
+      "description": "Legacy Repository Intelligence analytics compatibility view retained as a distinct, evidence-backed surface.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/intelligence/dashboard/",
+          "aliases": [
+            "/dashboard/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/intelligence/dashboard/",
+          "aliases": [
+            "/dashboard/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "optional"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-intelligence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [
+          "intelligence"
+        ],
+        "repository": [
+          "intelligence"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.repository-intelligence/v1"
+      ]
+    },
+    {
+      "id": "decisions",
+      "title": "Decisions",
+      "description": "Architecture-decision lineage, status, approval, impact, and evidence derived from canonical ADR sources.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/decisions/",
+          "aliases": [
+            "/adr/",
+            "/intelligence/decisions/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/intelligence/decisions/",
+          "aliases": [
+            "/adr/",
+            "/decisions/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "recommended",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-intelligence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [],
+        "repository": [
+          "intelligence"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.architecture-decision/v1",
+        "egohygiene.repository-intelligence/v1"
+      ]
+    },
+    {
+      "id": "dependencies",
+      "title": "Dependencies",
+      "description": "Versioned dependency direction, ownership, compatibility, and impact evidence.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/dependencies/",
+          "aliases": [
+            "/intelligence/dependencies/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/intelligence/dependencies/",
+          "aliases": [
+            "/dependencies/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "recommended",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-intelligence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [],
+        "repository": [
+          "intelligence"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.dependency-boundary-register/v1",
+        "egohygiene.repository-intelligence/v1"
+      ]
+    },
+    {
+      "id": "diagnostics",
+      "title": "Diagnostics",
+      "description": "Actionable diagnostics tied to exact rules, evidence, represented revisions, and responsible owners.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/intelligence/diagnostics/",
+          "aliases": [
+            "/diagnostics/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/intelligence/diagnostics/",
+          "aliases": [
+            "/diagnostics/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "recommended",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "operational-evidence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [
+          "intelligence"
+        ],
+        "repository": [
+          "intelligence"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.repository-intelligence/v1"
+      ]
+    },
+    {
+      "id": "distribution",
+      "title": "Distribution",
+      "description": "Supported channels, packages, installability, and current distribution evidence.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/distribution/",
+          "aliases": [
+            "/intelligence/distribution/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/intelligence/distribution/",
+          "aliases": [
+            "/distribution/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "recommended",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "operational-evidence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [
+          "releases"
+        ],
+        "repository": [
+          "releases"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.repository-intelligence/v1"
+      ]
+    },
+    {
+      "id": "documentation",
+      "title": "Documentation",
+      "description": "Canonical user, operator, contributor, or reference documentation entry point.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/docs/",
+          "aliases": [
+            "/documentation/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/docs/",
+          "aliases": [
+            "/documentation/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "required",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-content",
+      "renderer_contract": "site-owned",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": [
+        "egohygiene.agent-ready-web-profile/v1",
+        "egohygiene.repository-presentation-profile/v1"
+      ]
+    },
+    {
+      "id": "donate",
+      "title": "Donate",
+      "description": "Optional support or donation information that never implies a transaction capability without a separate owner contract.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/donate/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/donate/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "optional"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-policy",
+      "renderer_contract": "site-owned",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": [
+        "egohygiene.agent-ready-web-profile/v1"
+      ]
+    },
+    {
+      "id": "feed",
+      "title": "Feed",
+      "description": "Canonical machine-readable content feed; additional formats are typed representations rather than route aliases.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/feed.xml",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/feed.xml",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "recommended",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "generated-index",
+      "renderer_contract": "site-owned",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": [
+        "egohygiene.agent-ready-web-profile/v1"
+      ]
+    },
+    {
+      "id": "garden",
+      "title": "Garden",
+      "description": "Curated knowledge-garden navigation backed by repository-owned content and provenance.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/garden/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/garden/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "optional"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-content",
+      "renderer_contract": "site-owned",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": []
+    },
+    {
+      "id": "health",
+      "title": "Health",
+      "description": "A composition of specialized operational domains with direct evidence links, never a universal score.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/health/",
+          "aliases": [
+            "/intelligence/health/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/intelligence/health/",
+          "aliases": [
+            "/health/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "recommended",
+        "commerce": "recommended",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "operational-evidence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [],
+        "repository": [
+          "intelligence"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.repository-intelligence/v1"
+      ]
+    },
+    {
+      "id": "help",
+      "title": "Help",
+      "description": "Supported help paths, limitations, and escalation routes.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/help/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/help/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "recommended",
+        "commerce": "recommended",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-policy",
+      "renderer_contract": "site-owned",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": [
+        "egohygiene.repository-presentation-profile/v1"
+      ]
+    },
+    {
+      "id": "hygiene",
+      "title": "Hygiene",
+      "description": "Repository conformance posture with rule-level evidence and explicit unknown, exempt, and not-applicable states.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/hygiene/",
+          "aliases": [
+            "/intelligence/hygiene/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/intelligence/hygiene/",
+          "aliases": [
+            "/hygiene/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "operational-evidence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [],
+        "repository": [
+          "intelligence"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.repository-intelligence/v1"
+      ]
+    },
+    {
+      "id": "identity",
+      "title": "Identity",
+      "description": "Identity product experience, approved brand assets, voice, visual system, and provenance under Identity's canonical authority.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/identity/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/identity/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "recommended",
+      "site_class_overrides": {
+        "application": "recommended",
+        "commerce": "recommended",
+        "content": "recommended",
+        "documentation": "recommended",
+        "hybrid": "recommended"
+      },
+      "default_owner": "egohygiene/identity",
+      "source_artifact_kind": "identity-artifact",
+      "renderer_contract": "identity-compatible",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": [
+        "egohygiene.repository-presentation-profile/v1"
+      ]
+    },
+    {
+      "id": "identity_intelligence",
+      "title": "Identity intelligence",
+      "description": "Repository or organization Identity adoption and provenance module; it remains distinct from the canonical Identity product experience.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/intelligence/identity/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/intelligence/identity/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "identity-artifact",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [
+          "intelligence"
+        ],
+        "repository": [
+          "intelligence"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.repository-intelligence/v1",
+        "egohygiene.repository-presentation-profile/v1"
+      ]
+    },
+    {
+      "id": "intelligence",
+      "title": "Intelligence",
+      "description": "Repository or organization intelligence entry point composed from versioned, provenance-aware read models.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/intelligence/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/intelligence/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-intelligence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": [
+        "egohygiene.repository-intelligence/v1"
+      ]
+    },
+    {
+      "id": "journey",
+      "title": "Journey",
+      "description": "Evidence-backed chronology connecting intent, decisions, delivery, release, and deployment.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/intelligence/journey/",
+          "aliases": [
+            "/activity/",
+            "/intelligence/activity/",
+            "/journey/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/intelligence/journey/",
+          "aliases": [
+            "/activity/",
+            "/intelligence/activity/",
+            "/journey/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "optional"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-intelligence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [
+          "intelligence"
+        ],
+        "repository": [
+          "intelligence"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.repository-intelligence/v1"
+      ]
+    },
+    {
+      "id": "landing",
+      "title": "Landing",
+      "description": "Canonical human-facing product, repository, or organization entry point.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "always",
+      "default_requirement": "required",
+      "site_class_overrides": {
+        "application": "required",
+        "commerce": "required",
+        "content": "required",
+        "documentation": "required",
+        "hybrid": "required"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-content",
+      "renderer_contract": "site-owned",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": [
+        "egohygiene.agent-ready-web-profile/v1",
+        "egohygiene.repository-presentation-profile/v1"
+      ]
+    },
+    {
+      "id": "legal",
+      "title": "Legal",
+      "description": "Applicable legal terms, notices, and jurisdiction-specific disclosures without fabricated obligations.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/legal/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/legal/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "recommended",
+      "site_class_overrides": {
+        "application": "recommended",
+        "commerce": "required",
+        "content": "recommended",
+        "documentation": "recommended",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-policy",
+      "renderer_contract": "site-owned",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": [
+        "egohygiene.agent-ready-web-profile/v1"
+      ]
+    },
+    {
+      "id": "magazine",
+      "title": "Magazine",
+      "description": "Publication catalog or reader surface whose artifacts retain exact edition and source provenance.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/magazine/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/magazine/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "optional"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "publication-artifact",
+      "renderer_contract": "renderflow-compatible",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": []
+    },
+    {
+      "id": "now",
+      "title": "Now",
+      "description": "Current focus and near-term state derived from canonical roadmap and work evidence.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/intelligence/now/",
+          "aliases": [
+            "/now/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/intelligence/now/",
+          "aliases": [
+            "/now/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-intelligence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [
+          "intelligence"
+        ],
+        "repository": [
+          "intelligence"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.repository-intelligence/v1"
+      ]
+    },
+    {
+      "id": "presentation",
+      "title": "Presentation",
+      "description": "Canonical slideshow or presentation surface backed by versioned source and rendered artifacts.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/presentation/",
+          "aliases": [
+            "/slideshow/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/presentation/",
+          "aliases": [
+            "/slideshow/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "optional"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "publication-artifact",
+      "renderer_contract": "renderflow-compatible",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": []
+    },
+    {
+      "id": "privacy",
+      "title": "Privacy",
+      "description": "Current privacy practices, data boundaries, retention, and contact information.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/privacy/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/privacy/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "recommended",
+      "site_class_overrides": {
+        "application": "required",
+        "commerce": "required",
+        "content": "recommended",
+        "documentation": "recommended",
+        "hybrid": "required"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-policy",
+      "renderer_contract": "site-owned",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": [
+        "egohygiene.agent-ready-web-profile/v1"
+      ]
+    },
+    {
+      "id": "privacy_choices",
+      "title": "Privacy choices",
+      "description": "Applicable consent and privacy-choice controls; absence remains explicit when no interactive choice applies.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/privacy/choices/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/privacy/choices/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "recommended",
+        "commerce": "recommended",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-policy",
+      "renderer_contract": "site-owned",
+      "dependencies": {
+        "organization": [
+          "privacy"
+        ],
+        "repository": [
+          "privacy"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.agent-ready-web-profile/v1"
+      ]
+    },
+    {
+      "id": "releases",
+      "title": "Releases",
+      "description": "Released versions and their immutable delivery evidence.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/releases/",
+          "aliases": [
+            "/intelligence/releases/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/intelligence/releases/",
+          "aliases": [
+            "/releases/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "recommended",
+        "commerce": "recommended",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-intelligence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [],
+        "repository": [
+          "intelligence"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.repository-intelligence/v1",
+        "egohygiene.repository-release-policy/v1"
+      ]
+    },
+    {
+      "id": "roadmap",
+      "title": "Roadmap",
+      "description": "Dependency-aware intent, state, evidence, and completion semantics rooted in the canonical roadmap source.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/roadmap/",
+          "aliases": [
+            "/intelligence/roadmap/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/intelligence/roadmap/",
+          "aliases": [
+            "/roadmap/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "recommended",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "recommended",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-intelligence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [],
+        "repository": [
+          "intelligence"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.repository-intelligence/v1"
+      ]
+    },
+    {
+      "id": "sanity",
+      "title": "Sanity",
+      "description": "Human-ratified architecture coherence and review posture with retained uncertainty and evidence.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/sanity/",
+          "aliases": [
+            "/intelligence/sanity/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/intelligence/sanity/",
+          "aliases": [
+            "/sanity/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "operational-evidence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [],
+        "repository": [
+          "intelligence"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.repository-intelligence/v1"
+      ]
+    },
+    {
+      "id": "search",
+      "title": "Search",
+      "description": "Scoped search over intentionally public, indexed, source-backed content and evidence.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/search/",
+          "aliases": [
+            "/intelligence/search/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/intelligence/search/",
+          "aliases": [
+            "/search/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "recommended",
+        "documentation": "recommended",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "generated-index",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [],
+        "repository": [
+          "intelligence"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.agent-ready-web-profile/v1",
+        "egohygiene.repository-intelligence/v1"
+      ]
+    },
+    {
+      "id": "status",
+      "title": "Status",
+      "description": "Truthful service or system status and incident history with explicit applicability and freshness.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/status/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/status/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "recommended",
+        "commerce": "recommended",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "operational-evidence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": []
+    },
+    {
+      "id": "support",
+      "title": "Support",
+      "description": "Support channels, response boundaries, security-reporting separation, and availability expectations.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/support/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/support/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "recommended",
+        "commerce": "recommended",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-policy",
+      "renderer_contract": "site-owned",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": [
+        "egohygiene.repository-presentation-profile/v1"
+      ]
+    },
+    {
+      "id": "trust",
+      "title": "Trust",
+      "description": "Security, privacy, provenance, policy, and operational evidence linked without a universal trust score.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/trust/",
+          "aliases": []
+        },
+        "repository": {
+          "canonical_route": "/trust/",
+          "aliases": []
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "recommended",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "recommended"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "operational-evidence",
+      "renderer_contract": "site-owned",
+      "dependencies": {
+        "organization": [],
+        "repository": []
+      },
+      "related_contracts": [
+        "egohygiene.agent-ready-web-profile/v1",
+        "egohygiene.repository-presentation-profile/v1"
+      ]
+    },
+    {
+      "id": "work",
+      "title": "Work",
+      "description": "Current and completed issue and pull-request work derived from pinned Repository Intelligence evidence.",
+      "route_bindings": {
+        "organization": {
+          "canonical_route": "/intelligence/work/",
+          "aliases": [
+            "/work/"
+          ]
+        },
+        "repository": {
+          "canonical_route": "/intelligence/work/",
+          "aliases": [
+            "/work/"
+          ]
+        }
+      },
+      "applicability_rule": "site-declared",
+      "default_requirement": "optional",
+      "site_class_overrides": {
+        "application": "optional",
+        "commerce": "optional",
+        "content": "optional",
+        "documentation": "optional",
+        "hybrid": "optional"
+      },
+      "default_owner": "repository",
+      "source_artifact_kind": "repository-intelligence",
+      "renderer_contract": "relay-compatible",
+      "dependencies": {
+        "organization": [
+          "intelligence"
+        ],
+        "repository": [
+          "intelligence"
+        ]
+      },
+      "related_contracts": [
+        "egohygiene.repository-intelligence/v1"
+      ]
+    }
+  ],
+  "compatibility": {
+    "consumer_pin": "exact-version-or-immutable-revision",
+    "unknown_surface_behavior": "fail-closed",
+    "declaration_coverage": "complete",
+    "breaking_changes": [
+      "adding, removing, or renaming a surface id",
+      "changing a canonical route, route profile, or alias meaning",
+      "changing requirement, ownership, state, visibility, freshness, or evidence semantics",
+      "adding a required declaration field",
+      "weakening privacy or provenance requirements"
+    ]
+  },
+  "composition": {
+    "agent_ready_web": "Site class is shared; this registry identifies product routes while Agent-Ready Web owns discovery, representation, capability, commerce, and conformance policy.",
+    "public_site_policy": "The proposed contract tracked by https://github.com/egohygiene/hygiene/issues/17 owns legal, policy, trust, disclosure, review, and jurisdiction semantics; this registry owns only the corresponding route identities and declaration state.",
+    "repository_intelligence": "Intelligence-backed routes consume versioned projections and never replace canonical roadmap, ADR, Git, GitHub, release, deployment, or provider sources.",
+    "repository_presentation": "The presentation profile owns README and orientation semantics; this registry owns routable public-site surface identity and declaration state.",
+    "identity": "Identity owns the /identity/ product experience and released assets. The distinct Identity Intelligence adoption module uses /intelligence/identity/ until the organization route conflict is explicitly reconciled; neither owns site publication.",
+    "renderflow": "Renderflow may produce magazine and presentation artifacts; consuming sites retain route composition and publication authority.",
+    "status": "The status surface reserves route identity only; the separately reviewed System Status contract owns incident and operational semantics."
+  },
+  "ownership": {
+    "hygiene": "Own the registry, declaration schema, route identity, state semantics, compatibility, and privacy boundary.",
+    "subject_repository": "Own truthful facts, applicability decisions, represented revision, source artifacts, and the semantics of surfaces whose registry owner is repository.",
+    "publication_repository": "Own publication configuration, final route composition, and deploy authority without taking ownership of subject facts or globally named surface semantics.",
+    "identity": "Publish versioned brand and identity assets without taking ownership of site facts or routes.",
+    "holon": "Scaffold new repositories from an eligible immutable pin without inventing declarations or evidence.",
+    "relay": "Provide reusable validation, rendering, and publication workflows without redefining registry semantics or publishing without repository authority.",
+    "observatory": "Normalize privacy-safe declarations and freshness evidence without silent remediation or private-topology disclosure.",
+    "pace": "Propose reviewed existing-repository adoption and reconciliation without direct default-branch mutation.",
+    "egohygiene_io": "Compose and host the organization site while consuming canonical contracts and organization-owned facts."
+  }
+}

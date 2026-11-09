@@ -10,10 +10,20 @@
     const commit = body.dataset.riCommit;
     if (!repository || !route || !commit) return;
 
-    const knownRoutes = new Set([
+    const legacyRoutes = [
         "intelligence", "now", "roadmap", "decisions", "journey", "dependencies", "health",
         "releases", "work", "search", "compare",
-    ]);
+    ];
+    let declaredRoutes = legacyRoutes;
+    try {
+        const value = JSON.parse(body.dataset.riRoutes || "null");
+        if (Array.isArray(value) && value.length <= 64 && value.every((item) => (
+            typeof item === "string" && /^[a-z][a-z_]*$/u.test(item)
+        ))) declaredRoutes = value;
+    } catch {
+        // Older bundles retain their original bounded route set.
+    }
+    const knownRoutes = new Set(declaredRoutes);
     const transferableContext = new Set([
         "q", "state", "kind", "from", "to", "entity",
         "compare-left", "compare-right", "journey-left", "journey-right",
