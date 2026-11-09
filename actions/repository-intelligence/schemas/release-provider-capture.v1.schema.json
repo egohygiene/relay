@@ -1,0 +1,318 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "repository",
+    "visibility",
+    "scope",
+    "represented_commit",
+    "releases",
+    "deployments"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.relay.release-provider-capture/v1"
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+    },
+    "visibility": {
+      "const": "public"
+    },
+    "scope": {
+      "const": "public-only"
+    },
+    "represented_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "releases": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "observed_at",
+        "pages_captured",
+        "pagination_complete",
+        "records"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "truncated",
+            "filtered",
+            "incomplete",
+            "denied",
+            "unavailable",
+            "failed",
+            "uncollected",
+            "not_applicable"
+          ]
+        },
+        "observed_at": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pages_captured": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "pagination_complete": {
+          "type": "boolean"
+        },
+        "records": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "visibility",
+              "tag_name",
+              "title",
+              "source_commit",
+              "draft",
+              "prerelease",
+              "state",
+              "published_at",
+              "assets"
+            ],
+            "properties": {
+              "id": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "visibility": {
+                "const": "public"
+              },
+              "tag_name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "title": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 240
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "source_commit": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{40}$"
+              },
+              "draft": {
+                "const": false
+              },
+              "prerelease": {
+                "type": "boolean"
+              },
+              "state": {
+                "enum": [
+                  "published",
+                  "retracted"
+                ]
+              },
+              "published_at": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+                "format": "date-time"
+              },
+              "assets": {
+                "type": "array",
+                "maxItems": 64,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "size",
+                    "sha256"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    "size": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1099511627776
+                    },
+                    "sha256": {
+                      "oneOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "deployments": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "observed_at",
+        "pages_captured",
+        "pagination_complete",
+        "records"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "truncated",
+            "filtered",
+            "incomplete",
+            "denied",
+            "unavailable",
+            "failed",
+            "uncollected",
+            "not_applicable"
+          ]
+        },
+        "observed_at": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pages_captured": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "pagination_complete": {
+          "type": "boolean"
+        },
+        "records": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "visibility",
+              "run_id",
+              "run_attempt",
+              "environment",
+              "source_commit",
+              "status",
+              "recorded_at",
+              "release_id",
+              "receipt_sha256"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "visibility": {
+                "const": "public"
+              },
+              "run_id": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "run_attempt": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "environment": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "source_commit": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{40}$"
+              },
+              "status": {
+                "enum": [
+                  "pending",
+                  "in_progress",
+                  "success",
+                  "failure",
+                  "inactive",
+                  "unknown"
+                ]
+              },
+              "recorded_at": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+                "format": "date-time"
+              },
+              "release_id": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "receipt_sha256": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/release-provider-capture/v1/schema.json",
+  "title": "Bounded public release and deployment provider capture"
+}
