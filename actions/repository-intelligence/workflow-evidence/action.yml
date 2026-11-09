@@ -78,6 +78,10 @@ inputs:
     description: Collect bounded immutable public Git Journey evidence; cross-domain history stays partial.
     required: false
     default: "false"
+  search-attribution:
+    description: Opt into pinned owner-defined Search field attribution for a selected native source plan.
+    required: false
+    default: "false"
   journey-maximum-commits:
     description: Maximum Git commits privately inspected and projected, from 1 through 256.
     required: false
@@ -233,6 +237,7 @@ runs:
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
         INPUT_COLLECT_ROADMAP: "${{ inputs.collect-roadmap }}"
         INPUT_COLLECT_JOURNEY: "${{ inputs.collect-journey }}"
+        INPUT_SEARCH_ATTRIBUTION: "${{ inputs.search-attribution }}"
         INPUT_JOURNEY_MAXIMUM_COMMITS: "${{ inputs.journey-maximum-commits }}"
         INPUT_JOURNEY_SINCE: "${{ inputs.journey-since }}"
         INPUT_JOURNEY_UNTIL: "${{ inputs.journey-until }}"
@@ -292,6 +297,7 @@ runs:
           --collect-adrs="${INPUT_COLLECT_ADRS}" \
           --collect-roadmap="${INPUT_COLLECT_ROADMAP}" \
           --collect-journey="${INPUT_COLLECT_JOURNEY}" \
+          --search-attribution="${INPUT_SEARCH_ATTRIBUTION}" \
           --journey-maximum-commits="${INPUT_JOURNEY_MAXIMUM_COMMITS}" \
           --journey-since="${INPUT_JOURNEY_SINCE}" \
           --journey-until="${INPUT_JOURNEY_UNTIL}" \

@@ -196,7 +196,7 @@ def captured_sources(args, base, projections, receipts, temporary):
 def collect(args, target):
     roadmap = module("relay_sources_roadmap", "collect_repository_roadmap_source.py")
     adrs, base = roadmap.adrs, roadmap.base
-    for runtime in (args.runtime, args.work_runtime, args.health_runtime, args.release_runtime):
+    for runtime in (args.runtime, args.work_runtime, args.health_runtime, args.release_runtime, args.search_runtime):
         if runtime is not None and base.safe_path(runtime).is_relative_to(base.safe_path(args.repository_root)):
             raise ValueError("runtime-must-be-outside-consumer")
     if args.runtime is not None:
@@ -254,7 +254,19 @@ def collect(args, target):
         captured_sources(args, base, projections, receipts, temporary)
         normalizer_runtime = args.runtime or args.work_runtime or args.health_runtime or args.release_runtime
         contract = module("relay_sources_contract", "repository_sources_build_contract.py")
-        projection, snapshot = compose(projections, adrs.normalize, normalizer_runtime, contract.combined_coverage(receipts))
+        normalization_profile = None
+        normalizer = adrs.normalize
+        if args.search_attribution:
+            search = module("relay_sources_search_normalization", "repository_search_normalization.py")
+            if args.search_runtime is None:
+                if args.runtime is None:
+                    raise ValueError("search-runtime-required")
+                selected_runtime = search.upgrade(args.runtime, temporary / "search-normalization")
+            else:
+                selected_runtime = args.search_runtime
+            normalization_profile = search.metadata(selected_runtime)
+            normalizer, normalizer_runtime = search.normalize, selected_runtime
+        projection, snapshot = compose(projections, normalizer, normalizer_runtime, contract.combined_coverage(receipts))
     args.active_source = None
     contract = module("relay_sources_contract", "repository_sources_build_contract.py")
     receipt = {"schema": contract.SCHEMA, "repository": args.repository, "source_commit": args.source_commit,
@@ -262,6 +274,8 @@ def collect(args, target):
         "candidate_digests": {"projection_sha256": base.digest(base.json_bytes(projection)),
             "snapshot_sha256": base.digest(base.json_bytes(snapshot))},
         "implementation": contract.implementation(), "input_plan_sha256": args.input_plan_sha256}
+    if normalization_profile is not None:
+        receipt["normalization_profile"] = normalization_profile
     contract.validate(receipt, args.repository, args.source_commit)
     # A receipt is the completion marker. On a failed write neither candidate
     # survives, and a retry cannot promote a previous invocation's snapshot.
@@ -286,6 +300,10 @@ def collect(args, target):
 def parser():
     value = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     value.add_argument("--runtime", type=Path)
+    value.add_argument("--search-attribution", action="store_true",
+        help="Opt into the pinned owner field-attribution normalization profile after source composition.")
+    value.add_argument("--search-runtime", type=Path,
+        help="Optional trusted prepared Search profile outside the consumer checkout.")
     value.add_argument("--capture-plan", type=Path,
         help="Closed Work/Health transport capture plan; paths are relative to the consumer root.")
     value.add_argument("--capture-root", type=Path,
@@ -350,10 +368,10 @@ def replay_arguments(args, runtime):
         # Reparse the same immutable plan in the acquired interpreter. Do not
         # replay its expanded selections as duplicate explicit source inputs.
         values.extend(["--capture-plan", str(args.capture_plan)])
-    for name in ("capture_root", "capture_intake_receipt", "generator_repository_root", "journey_since", "journey_until"):
+    for name in ("capture_root", "capture_intake_receipt", "generator_repository_root", "journey_since", "journey_until", "search_runtime"):
         if getattr(args, name) is not None:
             values.extend(["--" + name.replace("_", "-"), str(getattr(args, name))])
-    for name in ("collect_adrs", "collect_roadmap", "collect_work", "collect_health", "collect_journey", "collect_releases", "policy_owner"):
+    for name in ("collect_adrs", "collect_roadmap", "collect_work", "collect_health", "collect_journey", "collect_releases", "policy_owner", "search_attribution"):
         if name in {"collect_work", "collect_health", "collect_releases"} and name.removeprefix("collect_") in plan:
             continue
         if getattr(args, name):
@@ -403,7 +421,7 @@ def main():
     args = parser().parse_args()
     args.repository_root = args.repository_root.absolute()
     for name in ("runtime", "work_runtime", "health_runtime", "work_capture", "health_check_runs", "capture_root", "capture_intake_receipt",
-            "release_runtime", "release_capture", "generator_repository_root"):
+            "release_runtime", "release_capture", "generator_repository_root", "search_runtime"):
         if getattr(args, name) is not None:
             setattr(args, name, getattr(args, name).absolute())
     args.release_deployment_receipt = [path.absolute() for path in args.release_deployment_receipt]
@@ -416,6 +434,8 @@ def main():
     target = None
     try:
         args.input_plan_sha256 = None
+        if args.search_runtime is not None and not args.search_attribution:
+            raise ValueError("search-runtime-selection")
         if not any((args.collect_roadmap, args.collect_adrs, args.collect_work, args.collect_health, args.collect_journey,
                 args.collect_releases, args.capture_plan is not None)):
             raise ValueError("empty-source-plan")

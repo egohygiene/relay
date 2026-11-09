@@ -26,6 +26,13 @@ accepts one closed `source-captures` manifest and freshly evaluates its transpor
 captures alongside any selected canonical sources. Partial/stale/unavailable
 coverage remains explicit; collector review envelopes are never promoted.
 
+The [Search attribution integration](../../docs/repository-search-attribution.md)
+adds `search-attribution: "true"` to a selected native plan. Pinned Observatory
+helpers explain participating fields; older opaque records retain unavailable
+attribution. Native tools are reused in a separate verified normalization
+profile. Historical locks and defaults remain unchanged; Compare selects the
+same profile explicitly.
+
 The optional [same-run artifact handoff](../../docs/repository-capture-artifact-intake.md)
 uses a separate `repository-intelligence-captures.yml` reusable entrypoint, exact
 artifact ID/digest and explicit evaluation boundary. The original reusable

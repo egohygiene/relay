@@ -20,7 +20,8 @@ FILES = ("collect_repository_roadmap_source.py", "prepare_repository_sources_bui
          "collect_repository_roadmap.py", "collect_repository_adrs.py", "repository_adr_inputs.py",
          "collect_repository_work.py", "collect_repository_health.py", "repository_capture_build_contract.py",
          "repository_source_capture_inputs.py", "repository_capture_artifact.py", "collect_repository_journey.py",
-         "repository_journey_build_contract.py", "collect_repository_releases.py", "repository_release_build_contract.py")
+         "repository_journey_build_contract.py", "collect_repository_releases.py", "repository_release_build_contract.py",
+         "repository_search_normalization.py")
 SOURCE_DOMAINS = {"decisions": ("decisions",), "roadmap": ("roadmap",),
                   "work": ("issues", "pull_requests"), "health": ("checks",),
                   "journey": ("git", "history"), "releases": ("releases", "deployments")}
@@ -77,8 +78,9 @@ def require(condition):
 
 
 def validate(value, repository, source_commit):
-    require(isinstance(value, dict) and set(value) == {"schema", "repository", "source_commit", "observed_at",
-        "domains", "coverage", "candidate_digests", "implementation", "input_plan_sha256"})
+    expected = {"schema", "repository", "source_commit", "observed_at", "domains", "coverage",
+        "candidate_digests", "implementation", "input_plan_sha256"}
+    require(isinstance(value, dict) and set(value) in (expected, expected | {"normalization_profile"}))
     require(value["schema"] == SCHEMA and value["repository"] == repository and value["source_commit"] == source_commit)
     require(isinstance(value["observed_at"], str)
         and re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", value["observed_at"]))
@@ -142,6 +144,11 @@ def validate(value, repository, source_commit):
         runtimes.append({name: runtime["pins"]["sources"][name]
                          for name in ("egolint", "hygiene", "observatory")})
     require(all(runtime == runtimes[0] for runtime in runtimes))
+    if "normalization_profile" in value:
+        search = module("relay_sources_search_receipt", "repository_search_normalization.py")
+        profile = search.validate_metadata(value["normalization_profile"])
+        require(all(profile["runtime"]["pins"]["sources"][name] == runtimes[0][name]
+                    for name in ("hygiene", "egolint")))
     require(value["coverage"] == combined_coverage(value["domains"]))
     digests = value["candidate_digests"]
     require(isinstance(digests, dict) and set(digests) == {"snapshot_sha256", "projection_sha256"}

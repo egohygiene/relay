@@ -315,6 +315,7 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
     collect_adrs = getattr(arguments, "collect_adrs", "false")
     collect_roadmap = getattr(arguments, "collect_roadmap", "false")
     collect_journey = getattr(arguments, "collect_journey", "false")
+    search_attribution = getattr(arguments, "search_attribution", "false")
     maximum_commits = getattr(arguments, "journey_maximum_commits", "256")
     journey_since = getattr(arguments, "journey_since", "")
     journey_until = getattr(arguments, "journey_until", "")
@@ -344,6 +345,9 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
         raise ContractError("RIW-INPUT-ADR-MODE")
     if collect_adrs not in {"true", "false"} or collect_roadmap not in {"true", "false"}:
         raise ContractError("RIW-INPUT-ADR-MODE")
+    if (search_attribution not in {"true", "false"}
+            or search_attribution == "true" and "true" not in {collect_adrs, collect_roadmap, collect_journey} and not capture_id):
+        raise ContractError("RIW-INPUT-SEARCH-MODE")
     if collect_journey not in {"true", "false"}:
         raise ContractError("RIW-INPUT-JOURNEY-MODE")
     positive_integer(maximum_commits, "RIW-INPUT-JOURNEY-LIMIT", 256)
@@ -748,6 +752,7 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--collect-adrs", default="false")
     value.add_argument("--collect-roadmap", default="false")
     value.add_argument("--collect-journey", default="false")
+    value.add_argument("--search-attribution", default="false")
     value.add_argument("--journey-maximum-commits", default="256")
     value.add_argument("--journey-since", default="")
     value.add_argument("--journey-until", default="")

@@ -474,7 +474,8 @@
             "collect_repository_journey.py",
             "repository_journey_build_contract.py",
             "collect_repository_releases.py",
-            "repository_release_build_contract.py"
+            "repository_release_build_contract.py",
+            "repository_search_normalization.py"
           ],
           "properties": {
             "collect_repository_roadmap_source.py": {
@@ -532,6 +533,10 @@
             "repository_release_build_contract.py": {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$"
+            },
+            "repository_search_normalization.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
             }
           }
         },
@@ -545,6 +550,89 @@
               "type": "null"
             }
           ]
+        },
+        "normalization_profile": {
+          "title": "Relay opt-in Search normalization execution profile",
+          "$comment": "The trusted repository_search_normalization.validate_metadata verifier additionally requires exact lock and implementation bytes. This is execution provenance, not a new Search model or source authority.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema",
+            "profile",
+            "feature_kwargs",
+            "runtime",
+            "implementation"
+          ],
+          "properties": {
+            "schema": {
+              "const": "egohygiene.relay.search-normalization-profile/v1"
+            },
+            "profile": {
+              "const": "search-attribution-v1"
+            },
+            "feature_kwargs": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "search_attribution"
+              ],
+              "properties": {
+                "search_attribution": {
+                  "const": true
+                }
+              }
+            },
+            "runtime": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "lock_sha256",
+                "egolint_sha256",
+                "pins"
+              ],
+              "properties": {
+                "lock_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "egolint_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "pins": {
+                  "type": "object"
+                }
+              }
+            },
+            "implementation": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "repository_search_normalization.py",
+                "collect_repository_adrs.py",
+                "collect_repository_roadmap.py",
+                "prepare_repository_adr_build.py"
+              ],
+              "properties": {
+                "repository_search_normalization.py": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "collect_repository_adrs.py": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "collect_repository_roadmap.py": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "prepare_repository_adr_build.py": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              }
+            }
+          }
         }
       }
     },

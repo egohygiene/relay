@@ -38,6 +38,11 @@ on:
         required: false
         default: false
         type: boolean
+      search-attribution:
+        description: Opt into pinned owner-defined Search field attribution for a selected native source plan.
+        required: false
+        default: false
+        type: boolean
       journey-maximum-commits:
         description: Maximum privately inspected Git commits from 1 through 256.
         required: false
@@ -149,6 +154,11 @@ on:
         type: boolean
       collect-journey:
         description: Collect bounded immutable public Git Journey evidence; semantic history remains partial.
+        required: false
+        default: false
+        type: boolean
+      search-attribution:
+        description: Opt into pinned owner-defined Search field attribution for a selected native source plan.
         required: false
         default: false
         type: boolean
@@ -272,6 +282,7 @@ jobs:
           collect-adrs: "${{ inputs.collect-adrs }}"
           collect-roadmap: "${{ inputs.collect-roadmap }}"
           collect-journey: "${{ inputs.collect-journey }}"
+          search-attribution: "${{ inputs.search-attribution }}"
           journey-maximum-commits: "${{ inputs.journey-maximum-commits }}"
           journey-since: "${{ inputs.journey-since }}"
           journey-until: "${{ inputs.journey-until }}"
@@ -316,6 +327,7 @@ jobs:
           collect-adrs: "${{ inputs.collect-adrs }}"
           collect-roadmap: "${{ inputs.collect-roadmap }}"
           collect-journey: "${{ inputs.collect-journey }}"
+          search-attribution: "${{ inputs.search-attribution }}"
           journey-maximum-commits: "${{ inputs.journey-maximum-commits }}"
           journey-since: "${{ inputs.journey-since }}"
           journey-until: "${{ inputs.journey-until }}"
@@ -406,6 +418,7 @@ jobs:
           collect-adrs: "${{ inputs.collect-adrs }}"
           collect-roadmap: "${{ inputs.collect-roadmap }}"
           collect-journey: "${{ inputs.collect-journey }}"
+          search-attribution: "${{ inputs.search-attribution }}"
           journey-maximum-commits: "${{ inputs.journey-maximum-commits }}"
           journey-since: "${{ inputs.journey-since }}"
           journey-until: "${{ inputs.journey-until }}"
