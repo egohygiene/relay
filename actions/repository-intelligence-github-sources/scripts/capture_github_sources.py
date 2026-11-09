@@ -126,7 +126,8 @@ class Client:
                 require(len(link) <= 8192, "PROVIDER")
         except HTTPError as error:
             # Never read or print provider error bodies/headers.
-            if error.code == 429 or (error.code == 403 and error.headers.get("X-RateLimit-Remaining") == "0"):
+            if error.code == 429 or (error.code == 403 and (error.headers.get("X-RateLimit-Remaining") == "0"
+                    or error.headers.get("Retry-After") is not None)):
                 raise CaptureError("rate_limited") from None
             if error.code in {401, 403, 404}:
                 raise CaptureError("access_denied") from None
@@ -153,6 +154,7 @@ class Client:
 
 def paginate(client, endpoint, transform, maximum_pages, maximum_records, *, parameters=None, list_key=None, public_only=False):
     records, pages, exhausted, truncated, outcome, total, skipped = [], 0, False, False, "complete", None, False
+    captured_at = None
     identities = set()
     for page in range(1, maximum_pages + 1):
         query = {**(parameters or {}), "per_page": 100, "page": page}
@@ -169,6 +171,8 @@ def paginate(client, endpoint, transform, maximum_pages, maximum_records, *, par
             require(total is None or total >= len(items), "PROVIDER")
             # The received page counts even when every item is ineligible.
             pages += 1
+            # A later failed request must not refresh the last usable page.
+            captured_at = now()
             for item in items:
                 try:
                     result = transform(item)
@@ -203,7 +207,7 @@ def paginate(client, endpoint, transform, maximum_pages, maximum_records, *, par
     if pages and not exhausted:
         truncated = True
     return {"records": records, "pages": pages, "exhausted": exhausted, "truncated": truncated,
-        "outcome": outcome, "total": total, "skipped": skipped, "captured_at": now() if pages else None}
+        "outcome": outcome, "total": total, "skipped": skipped, "captured_at": captured_at}
 
 
 def work_record(item, kind, include_titles):
