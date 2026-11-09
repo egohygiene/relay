@@ -58,9 +58,11 @@
                         const path = url.pathname.slice(base.pathname.length);
                         if (!/^(?:[a-z0-9-]+\/)*$/u.test(path)) return null;
                         for (const [name] of url.searchParams) if (!contextKeys.has(name)) return null;
+                        url.search = "";
                         for (const [name, value] of new URL(location.href).searchParams) {
                             if (contextKeys.has(name) && value.length <= 2048 && !url.searchParams.has(name)) url.searchParams.set(name, value);
                         }
+                        if (node.entity) url.searchParams.set("entity", node.entity);
                         return url.href;
                     }
                     if (url.protocol !== "https:" || url.hostname !== "github.com" || url.port || url.search || /[%\\]/u.test(url.pathname)) return null;
@@ -160,7 +162,19 @@
                 button.hidden = false;
                 button.addEventListener("click", () => inspect(button.dataset.riGraphInspect));
             }
-            for (const node of nodes.values()) node.link?.addEventListener("focus", () => inspect(node.id));
+            for (const node of nodes.values()) {
+                if (!node.link) continue;
+                for (const link of new Set([node.link, node.directory.querySelector("strong a")])) {
+                    if (!link) continue;
+                    const updateDestination = () => {
+                        const href = destination(node);
+                        if (href) link.href = href;
+                    };
+                    link.addEventListener("focus", () => { updateDestination(); inspect(node.id); });
+                    link.addEventListener("pointerdown", updateDestination);
+                    link.addEventListener("click", updateDestination);
+                }
+            }
             svg.setAttribute("tabindex", "0");
             svg.addEventListener("keydown", (event) => {
                 if (event.target !== svg) return;
