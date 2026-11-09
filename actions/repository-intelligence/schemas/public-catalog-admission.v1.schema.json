@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/public-catalog-admission.v1.schema.json",
+  "title": "Relay exact owner public catalog admission receipt",
+  "$comment": "The trusted loader verifies exact owner Git/blob/schema/helper bytes. A serialized selected digest alone does not prove that its rows belong to the canonical roster.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "owner", "revision", "artifact_path", "artifact_sha256", "schema_sha256", "helper_sha256", "observed_at", "selected_sha256"],
+  "properties": {
+    "schema": {"const": "egohygiene.relay.public-catalog-admission/v1"},
+    "owner": {"const": "egohygiene/hygiene"},
+    "revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "artifact_path": {"const": "catalog/public-repositories.json"},
+    "artifact_sha256": {"$ref": "#/$defs/hash"},
+    "schema_sha256": {"$ref": "#/$defs/hash"},
+    "helper_sha256": {"$ref": "#/$defs/hash"},
+    "observed_at": {"type": "string", "format": "date-time", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"},
+    "selected_sha256": {"$ref": "#/$defs/hash"}
+  },
+  "$defs": {"hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+}

@@ -1,0 +1,512 @@
+{
+  "declarations": [
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-029",
+          "pinning": "immutable"
+        }
+      ],
+      "source": "egohygiene/antidote",
+      "target": "egohygiene/beacon"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-003",
+          "pinning": "versioned"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-028",
+          "pinning": "immutable"
+        }
+      ],
+      "source": "egohygiene/antidote",
+      "target": "egohygiene/holon"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-014",
+          "pinning": "versioned"
+        }
+      ],
+      "source": "egohygiene/beacon",
+      "target": "egohygiene/flow"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-016",
+          "pinning": "versioned"
+        }
+      ],
+      "source": "egohygiene/beacon",
+      "target": "egohygiene/identity"
+    },
+    {
+      "forbidden": false,
+      "policies": [],
+      "source": "egohygiene/beacon",
+      "target": "egohygiene/renderflow"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-016",
+          "pinning": "versioned"
+        }
+      ],
+      "source": "egohygiene/egohygiene.io",
+      "target": "egohygiene/identity"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-017",
+          "pinning": "versioned"
+        }
+      ],
+      "source": "egohygiene/egohygiene.io",
+      "target": "egohygiene/store"
+    },
+    {
+      "forbidden": false,
+      "policies": [],
+      "source": "egohygiene/empathy",
+      "target": "egohygiene/egolint"
+    },
+    {
+      "forbidden": false,
+      "policies": [],
+      "source": "egohygiene/empathy",
+      "target": "egohygiene/mantle"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-005",
+          "pinning": "immutable-or-versioned"
+        }
+      ],
+      "source": "egohygiene/empathy",
+      "target": "egohygiene/realm"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-007",
+          "pinning": "immutable"
+        }
+      ],
+      "source": "egohygiene/empathy",
+      "target": "egohygiene/relay"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-001",
+          "pinning": "versioned"
+        }
+      ],
+      "source": "egohygiene/filament",
+      "target": "egohygiene/hygiene"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-005",
+          "pinning": "immutable-or-versioned"
+        }
+      ],
+      "source": "egohygiene/filament",
+      "target": "egohygiene/realm"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-007",
+          "pinning": "immutable"
+        }
+      ],
+      "source": "egohygiene/filament",
+      "target": "egohygiene/relay"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-011",
+          "pinning": "immutable-or-versioned"
+        }
+      ],
+      "source": "egohygiene/flow",
+      "target": "egohygiene/aniflow"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-012",
+          "pinning": "immutable-or-versioned"
+        }
+      ],
+      "source": "egohygiene/flow",
+      "target": "egohygiene/optiflow"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-013",
+          "pinning": "immutable-or-versioned"
+        }
+      ],
+      "source": "egohygiene/flow",
+      "target": "egohygiene/renderflow"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-002",
+          "pinning": "versioned"
+        }
+      ],
+      "source": "egohygiene/holon",
+      "target": "egohygiene/aether"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-001",
+          "pinning": "versioned"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-021",
+          "pinning": "versioned"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-023",
+          "pinning": "versioned"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-025",
+          "pinning": "versioned"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-026",
+          "pinning": "immutable-or-versioned"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-027",
+          "pinning": "immutable-or-versioned"
+        }
+      ],
+      "source": "egohygiene/holon",
+      "target": "egohygiene/hygiene"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-002",
+          "pinning": "versioned"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-022",
+          "pinning": "immutable"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-024",
+          "pinning": "immutable"
+        }
+      ],
+      "source": "egohygiene/hygiene",
+      "target": "egohygiene/aether"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-015",
+          "pinning": "versioned"
+        }
+      ],
+      "source": "egohygiene/mindgarden",
+      "target": "egohygiene/mindcap"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-010",
+          "pinning": "versioned"
+        }
+      ],
+      "source": "egohygiene/observatory",
+      "target": "egohygiene/egolint"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-001",
+          "pinning": "versioned"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-021",
+          "pinning": "versioned"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-025",
+          "pinning": "versioned"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-026",
+          "pinning": "immutable-or-versioned"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-027",
+          "pinning": "immutable-or-versioned"
+        }
+      ],
+      "source": "egohygiene/observatory",
+      "target": "egohygiene/hygiene"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-007",
+          "pinning": "immutable"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-009",
+          "pinning": "versioned"
+        }
+      ],
+      "source": "egohygiene/observatory",
+      "target": "egohygiene/relay"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-002",
+          "pinning": "versioned"
+        }
+      ],
+      "source": "egohygiene/pace",
+      "target": "egohygiene/aether"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-003",
+          "pinning": "versioned"
+        }
+      ],
+      "source": "egohygiene/pace",
+      "target": "egohygiene/holon"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-001",
+          "pinning": "versioned"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-021",
+          "pinning": "versioned"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-023",
+          "pinning": "versioned"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-025",
+          "pinning": "versioned"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-026",
+          "pinning": "immutable-or-versioned"
+        },
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-027",
+          "pinning": "immutable-or-versioned"
+        }
+      ],
+      "source": "egohygiene/pace",
+      "target": "egohygiene/hygiene"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-006",
+          "pinning": "immutable-or-versioned"
+        }
+      ],
+      "source": "egohygiene/realm",
+      "target": "egohygiene/mantle"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-008",
+          "pinning": "immutable-or-versioned"
+        }
+      ],
+      "source": "egohygiene/relay",
+      "target": "egohygiene/egolint"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-019",
+          "pinning": "versioned"
+        }
+      ],
+      "source": "egohygiene/sanctuary",
+      "target": "egohygiene/.github"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-001",
+          "pinning": "versioned"
+        }
+      ],
+      "source": "egohygiene/sanctuary",
+      "target": "egohygiene/hygiene"
+    },
+    {
+      "forbidden": false,
+      "policies": [
+        {
+          "contract": null,
+          "contract_status": "required",
+          "id": "RELATIONSHIP-016",
+          "pinning": "versioned"
+        }
+      ],
+      "source": "egohygiene/store",
+      "target": "egohygiene/identity"
+    }
+  ],
+  "declarations_observed_at": "2026-11-09",
+  "owner": "egohygiene/hygiene",
+  "public_catalog_sha256": "af9c7186ded0bb57b18741eaa5905314b96d6adb03736946c868e0fc4aa50b26",
+  "revision": "49639c1845cdfd08fbd5a768261a8b3cf515f80f",
+  "schema": "egohygiene.relay.public-dependency-declarations/v1"
+}

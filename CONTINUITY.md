@@ -7,23 +7,26 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-11-09T17:43:28Z'
+  updated_at: '2026-11-09T17:48:27Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Produce bounded real GitHub Work, Health and Releases captures for the existing same-run native
-    source handoff.
+  purpose: Admit exact public owner declarations into fresh bounded dependency evidence for native Intelligence
+    source plans.
   includes:
-  - actions/repository-intelligence-github-sources captures public issue/PR inventories, exact-commit checks
-    and published releases through bounded read-only provider requests, then packs the existing immutable same-run
-    capture format. Source-selected URLs, bodies, comments, actors, emails and logs are excluded; titles remain
-    opt-in.
-  - Anonymous public admission runs before and after capture. Pagination, record/request/byte/time limits,
-    last-successful-page clocks, primary and secondary rate limits and partially received inventories remain
-    explicit. Health preserves partial empty captures instead of converting them to complete. Deployments remain
-    uncollected without an actual consumer run-attempt receipt.
+  - public_catalog_admission.py loads and optionally acquires the exact reviewed Hygiene public artifact at
+    49639c1, authenticates selected identity rows before lookup/traversal and provides the shared fleet admission
+    seam. Exact mirrored public bytes remain an owner projection, never an independent registry.
+  - collect_repository_dependency_source.py reuses the existing mapping and ADR normalization runtime over
+    separately pinned current authored declarations. The closed source-dependency receipt authenticates public
+    membership, selected authorization, bounded traversal and exact edges/policies including omissions through
+    a public-only immutable declaration reference. Private/nonselected raw source digests are excluded from
+    public proof.
+  - Existing review collector locks, defaults and all nine source coverage domains remain unchanged. Declared
+    consumption stays distinct from runtime/package adoption, and authored lifecycle remains architectural
+    context rather than execution success.
   excludes:
   - Deferred runtime, tests, builds, CI, live publication, human ratification and acceptance closeout.
   precedence:
@@ -37,73 +40,75 @@ scope:
   - ARCHITECTURE.md
   - SYSTEM.md
   - DECISIONS.md
-  - actions/repository-intelligence-github-sources/README.md
-  - docs/repository-source-capture-builds.md
-  - https://github.com/egohygiene/relay/issues/146
+  - docs/dependency-source-build.md
+  - actions/repository-intelligence/contracts/public-catalog-admission.v1.lock.json
+  - https://github.com/egohygiene/relay/issues/148
 work:
-  objective: Produce bounded real GitHub Work, Health and Releases captures for the existing same-run native
-    source handoff.
+  objective: Admit exact public owner declarations into fresh bounded dependency evidence for native Intelligence
+    source plans.
   success_conditions:
-  - Existing collectors receive real provider captures through their existing closed source plan and artifact
-    intake.
-  - Provider access cannot imply deployment, contract conformance, human approval or complete inventories beyond
-    received pages.
-  - Old collector locks/defaults, consumer publication gates and recovery bytes remain intact.
+  - Fresh owner declarations, original projection/snapshot and bounded public receipt are available without
+    promoting review envelopes.
+  - Receipt verification detects invented or omitted selected relationships and preserves the public boundary
+    before identifiers and hashes.
+  - The existing native runtime and closed nine-domain coverage contract remain compatible.
   active_issue:
     provider: github
-    id: egohygiene/relay#146
-    url: https://github.com/egohygiene/relay/issues/146
+    id: egohygiene/relay#148
+    url: https://github.com/egohygiene/relay/issues/148
   next:
     kind: action
-    id: adopt-public-github-source-feeds
-    description: Adopt this exact producer and source-plan handoff in the prepared current consumer Pages paths,
-      then qualify actual provider, artifact, native and publication behavior in the deferred verification
-      pass.
+    id: integrate-public-dependency-source-plan
+    description: Integrate the prepared collect-dependencies opt-in into the common native action/reusables,
+      adopt it only on fresh current consumer capture clocks, and qualify real provider/native/privacy/consumer
+      behavior in the deferred verification pass.
     readiness: ready
     references:
-    - https://github.com/egohygiene/relay/issues/146
+    - https://github.com/egohygiene/relay/issues/148
     depends_on: []
 state:
   base:
-    revision: d4e89c594c2428ff48407b4a29734bd59eda7def
+    revision: 0ccf44ca495c3874ecb5f264bb674e66ced9262e
     ref: refs/heads/main
-    verified_at: '2026-11-09T17:43:28Z'
+    verified_at: '2026-11-09T17:48:27Z'
   candidate:
-    branch: codex/intelligence-source-delivery
+    branch: codex/intelligence-dependency-admission
     revision: null
     pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-11-09T17:43:28Z'
-    default_branch_revision: d4e89c594c2428ff48407b4a29734bd59eda7def
+    observed_at: '2026-11-09T17:48:27Z'
+    default_branch_revision: 0ccf44ca495c3874ecb5f264bb674e66ced9262e
     issue_state: open
     pull_request_state: not-applicable
-    notes: Relay Compare composition is merged through PR 172; owning source issues 146, 149 and 150 remain
-      open. The Empathy source-feed consumer is separately prepared; no hosted capture or upload is claimed.
+    notes: Hygiene public catalog reconciliation is merged through PR 97. Relay Compare and public provider
+      source feeds are merged through PRs 172 and 173. Issue 148 remains open; shared composition and fleet
+      integration are separate prepared slices.
   parallel_changes: []
 review:
   status: partial
-  reviewed_at: '2026-11-09T17:43:28Z'
+  reviewed_at: '2026-11-09T17:48:27Z'
   reviewed_by: Codex
   evidence:
-  - command: Python AST, unique-key YAML, embedded Bash/Python syntax, JSON schema definitions, action-catalog
-      shape, continuity schema/size, whitespace and independent static source review
+  - command: Python AST, JSON schema definitions/local references, exact owner Git/blob and public-reference
+      hashes, closed receipt/source inspection, continuity schema/size, whitespace and independent static peer
+      review
     outcome: limited
-    observed_at: '2026-11-09T17:43:28Z'
+    observed_at: '2026-11-09T17:48:27Z'
     notes: Static source and metadata inspection only; no application execution.
   - command: Native/runtime execution, tests, builds, CI investigation, browser/provider/consumer/publication
       qualification
     outcome: not-run
-    observed_at: '2026-11-09T17:43:28Z'
+    observed_at: '2026-11-09T17:48:27Z'
     notes: Deferred at maintainer request; source merges do not establish acceptance.
   environment_limitations:
-  - No actual GitHub provider requests, native normalization, tests, builds, CI, uploads, canaries or publication
-    were executed.
-  - Health producer-specific report gaps and consumer source-policy holds remain separate. Generic GitHub deployment
-    metadata cannot establish the exact required run-attempt evidence.
-  - Later acceptance must retain real run/artifact identities, public/private invariance, provider failure
-    behavior and consumer recovery proof.
+  - No collector/native application, tests, builds, CI, actual artifact/provider intake or consumer/publication
+    qualification was executed.
+  - The public-only declaration reference proves a bounded authored consumption projection; it does not establish
+    installed/runtime dependency adoption, complete reverse topology or policy acceptance.
+  - Later acceptance must verify public/private invariance, source compatibility, multi-source composition
+    and current consumer clocks without altering historical recovery.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -130,33 +135,35 @@ Read scoped instructions, canonical sources above and this checkpoint. Verify mu
 
 ## Current objective and success conditions
 
-Produce bounded real GitHub Work, Health and Releases captures for the existing same-run native source handoff. Existing collectors receive real provider captures through their existing closed source plan and artifact intake. Provider access cannot imply deployment, contract conformance, human approval or complete inventories beyond received pages. Old collector locks/defaults, consumer publication gates and recovery bytes remain intact.
+Admit exact public owner declarations into fresh bounded dependency evidence for native Intelligence source plans. Fresh owner declarations, original projection/snapshot and bounded public receipt are available without promoting review envelopes. Receipt verification detects invented or omitted selected relationships and preserves the public boundary before identifiers and hashes. The existing native runtime and closed nine-domain coverage contract remain compatible.
 
 ## State snapshot
 
-Candidate `codex/intelligence-source-delivery` is based on observed main `d4e89c594c2428ff48407b4a29734bd59eda7def`. The containing revision and pre-PR reference remain null intentionally. Relay Compare composition is merged through PR 172; owning source issues 146, 149 and 150 remain open. The Empathy source-feed consumer is separately prepared; no hosted capture or upload is claimed.
+Candidate `codex/intelligence-dependency-admission` is based on observed main `0ccf44ca495c3874ecb5f264bb674e66ced9262e`. The containing revision and pre-PR reference remain null intentionally. Hygiene public catalog reconciliation is merged through PR 97. Relay Compare and public provider source feeds are merged through PRs 172 and 173. Issue 148 remains open; shared composition and fleet integration are separate prepared slices.
 
 ## Completed and material changes
 
-actions/repository-intelligence-github-sources captures public issue/PR inventories, exact-commit checks and published releases through bounded read-only provider requests, then packs the existing immutable same-run capture format. Source-selected URLs, bodies, comments, actors, emails and logs are excluded; titles remain opt-in.
+public_catalog_admission.py loads and optionally acquires the exact reviewed Hygiene public artifact at 49639c1, authenticates selected identity rows before lookup/traversal and provides the shared fleet admission seam. Exact mirrored public bytes remain an owner projection, never an independent registry.
 
-Anonymous public admission runs before and after capture. Pagination, record/request/byte/time limits, last-successful-page clocks, primary and secondary rate limits and partially received inventories remain explicit. Health preserves partial empty captures instead of converting them to complete. Deployments remain uncollected without an actual consumer run-attempt receipt.
+collect_repository_dependency_source.py reuses the existing mapping and ADR normalization runtime over separately pinned current authored declarations. The closed source-dependency receipt authenticates public membership, selected authorization, bounded traversal and exact edges/policies including omissions through a public-only immutable declaration reference. Private/nonselected raw source digests are excluded from public proof.
+
+Existing review collector locks, defaults and all nine source coverage domains remain unchanged. Declared consumption stays distinct from runtime/package adoption, and authored lifecycle remains architectural context rather than execution success.
 
 ## Validation and review evidence
 
-Python AST, unique-key YAML, embedded Bash/Python syntax, JSON schema definitions, action-catalog shape, continuity schema/size, whitespace and independent static source review. Static inspection only. Native/runtime execution, tests, builds, CI investigation, browsers, provider reads and publication qualification were not run.
+Python AST, JSON schema definitions/local references, exact owner Git/blob and public-reference hashes, closed receipt/source inspection, continuity schema/size, whitespace and independent static peer review. Static inspection only. Native/runtime execution, tests, builds, CI investigation, browsers, provider reads and publication qualification were not run.
 
 ## Blockers, risks, unknowns, and deferred work
 
-No actual GitHub provider requests, native normalization, tests, builds, CI, uploads, canaries or publication were executed. Health producer-specific report gaps and consumer source-policy holds remain separate. Generic GitHub deployment metadata cannot establish the exact required run-attempt evidence. Later acceptance must retain real run/artifact identities, public/private invariance, provider failure behavior and consumer recovery proof.
+No collector/native application, tests, builds, CI, actual artifact/provider intake or consumer/publication qualification was executed. The public-only declaration reference proves a bounded authored consumption projection; it does not establish installed/runtime dependency adoption, complete reverse topology or policy acceptance. Later acceptance must verify public/private invariance, source compatibility, multi-source composition and current consumer clocks without altering historical recovery.
 
 ## Next dependency-ready work
 
-Adopt this exact producer and source-plan handoff in the prepared current consumer Pages paths, then qualify actual provider, artifact, native and publication behavior in the deferred verification pass.
+Integrate the prepared collect-dependencies opt-in into the common native action/reusables, adopt it only on fresh current consumer capture clocks, and qualify real provider/native/privacy/consumer behavior in the deferred verification pass.
 
 ## Parallel changes and reconciliation
 
-Refs source issues 146, 149 and 150 and composition 151. Existing Compare composition in merged 172 is retained. Dependencies, fleet handoff and the separate owner-backed Hygiene model are parallel slices. ADR not required: this composes the existing bounded provider/capture design and adds no new ownership or publication authority.
+The shared catalog helper is consumed by the prepared fleet artifact slice. Common source-plan glue will preserve root identity neutrality, exact receipt validation and no added dependency coverage key. Existing governing bounded collector and ownership decisions are referenced; no new policy authority is created.
 
 ## Privacy and redaction
 
