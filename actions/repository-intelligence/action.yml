@@ -88,7 +88,7 @@ inputs:
   source-runtime:
     description: >-
       Optional trusted prepared ADR alpha.2 runtime for Roadmap or combined
-      source collection, outside the consumer checkout; requires collect-roadmap, collect-journey or a capture source.
+      source collection, outside the consumer checkout; requires collect-roadmap, collect-journey, collect-dependencies or a capture source.
     required: false
     default: ""
   adr-runtime:
