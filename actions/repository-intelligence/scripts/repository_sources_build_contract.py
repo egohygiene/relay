@@ -44,6 +44,8 @@ def validate(value, repository, source_commit):
     require(isinstance(value, dict) and set(value) == {"schema", "repository", "source_commit", "observed_at",
         "domains", "coverage", "candidate_digests", "implementation"})
     require(value["schema"] == SCHEMA and value["repository"] == repository and value["source_commit"] == source_commit)
+    require(isinstance(value["observed_at"], str)
+        and re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", value["observed_at"]))
     require(value["implementation"] == implementation())
     require(isinstance(value["domains"], dict) and bool(value["domains"])
         and set(value["domains"]) <= {"decisions", "roadmap"})
