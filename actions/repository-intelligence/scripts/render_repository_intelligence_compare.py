@@ -15,6 +15,7 @@ from typing import Any
 
 COMPARE_SCHEMA = "egohygiene.observatory.repository-intelligence-compare/v1"
 COMPARE_CONTRACT_VERSION = "1.0.0-alpha.1"
+COMPARE_CONTRACT_VERSIONS = {COMPARE_CONTRACT_VERSION, "1.0.0-alpha.2"}
 COMPARE_VIEW_NAMES = (
     "roadmap",
     "decisions",
@@ -298,10 +299,10 @@ def validate_comparison(
         raise CompareViewError(
             f"unsupported comparison schema: {comparison.get('schema')!r}; expected {COMPARE_SCHEMA!r}"
         )
-    if comparison.get("contract_version") != COMPARE_CONTRACT_VERSION:
+    if comparison.get("contract_version") not in COMPARE_CONTRACT_VERSIONS:
         raise CompareViewError(
             "unsupported comparison contract version: "
-            f"{comparison.get('contract_version')!r}; expected {COMPARE_CONTRACT_VERSION!r}"
+            f"{comparison.get('contract_version')!r}; expected a supported alpha.1 or alpha.2 comparison"
         )
     if comparison.get("repository") != repository:
         raise CompareViewError("comparison repository must match the rendered repository")
@@ -321,6 +322,10 @@ def validate_comparison(
         )
     if snapshot.get("represented_commit") != source_commit:
         raise CompareViewError("after snapshot represented_commit must match source commit")
+    if snapshot.get("contract_version") != comparison.get("contract_version"):
+        raise CompareViewError("comparison and after snapshot contract versions must match")
+    if after["observed_at"] != snapshot.get("observed_at"):
+        raise CompareViewError("comparison after.observed_at must match the supplied snapshot")
     if after["snapshot_id"] != snapshot.get("snapshot_id"):
         raise CompareViewError(
             "comparison after.snapshot_id must match the supplied Observatory snapshot"
