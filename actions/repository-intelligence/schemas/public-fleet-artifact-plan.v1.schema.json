@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/public-fleet-artifact-plan.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "organization",
+    "visibility",
+    "catalog_revision",
+    "repositories"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.relay.public-fleet-artifact-plan/v1"
+    },
+    "organization": {
+      "const": "egohygiene"
+    },
+    "visibility": {
+      "const": "public"
+    },
+    "catalog_revision": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "repositories": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "repository",
+          "represented_commit",
+          "candidate",
+          "last_known"
+        ],
+        "properties": {
+          "repository": {
+            "type": "string",
+            "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+          },
+          "represented_commit": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "candidate": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "artifact_id",
+                  "artifact_sha256",
+                  "source_commit",
+                  "run_id",
+                  "run_attempt"
+                ],
+                "properties": {
+                  "artifact_id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "artifact_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "source_commit": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{40}$"
+                  },
+                  "run_id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "run_attempt": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000000
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "last_known": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "artifact_id",
+                  "artifact_sha256",
+                  "source_commit",
+                  "run_id",
+                  "run_attempt"
+                ],
+                "properties": {
+                  "artifact_id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "artifact_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "source_commit": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{40}$"
+                  },
+                  "run_id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "run_attempt": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000000
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

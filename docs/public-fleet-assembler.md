@@ -13,6 +13,11 @@ mistaken for an approved production artifact.
 
 ## Current dependency boundary
 
+This section describes the preserved `legacy-review` profile. The additive
+`public-catalog-v1` profile and ordinary artifact transport consume Hygiene #97's
+reviewed public projection; see [public fleet artifact delivery](public-fleet-artifact-delivery.md).
+Their existence does not establish real producer/host publication acceptance.
+
 Hygiene #36 still owns the reviewed catalog-minimum and public allowlist. Its
 October 20 checkpoint records a historical 27-record catalog, the legacy
 `website` identity and an August observation boundary. This implementation does

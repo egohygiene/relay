@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/public-fleet-artifact.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "visibility",
+    "organization",
+    "status",
+    "observed_at",
+    "expires_at",
+    "catalog",
+    "generator",
+    "acquisition",
+    "repositories",
+    "files",
+    "producer",
+    "runtime"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.relay.public-fleet-artifact/v1"
+    },
+    "visibility": {
+      "const": "public"
+    },
+    "organization": {
+      "const": "egohygiene"
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "partial",
+        "unavailable"
+      ]
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "catalog": {
+      "type": "object"
+    },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "revision",
+        "implementation_sha256"
+      ],
+      "properties": {
+        "repository": {
+          "const": "egohygiene/relay"
+        },
+        "revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "implementation_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "acquisition": {
+      "enum": [
+        "captured-inputs",
+        "github-read-only"
+      ]
+    },
+    "repositories": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object"
+      }
+    },
+    "files": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "sha256",
+          "size_bytes"
+        ],
+        "properties": {
+          "path": {
+            "const": "fleet.json"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 16777216
+          }
+        }
+      }
+    },
+    "producer": {
+      "type": "object"
+    },
+    "runtime": {
+      "type": "object"
+    }
+  }
+}
