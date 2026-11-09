@@ -377,9 +377,9 @@ def capture(args):
     files, plan, inventories = {}, {"schema": "egohygiene.relay.source-capture-plan/v1"}, {}
     if "work" in selected:
         issues = paginate(client, client.prefix + "/issues", lambda item: work_record(item, "issue", args.include_titles),
-            args.maximum_pages, args.maximum_work_records, parameters={"state": "all", "sort": "created", "direction": "asc"})
+            args.maximum_pages, args.maximum_work_records, parameters={"state": "all", "sort": "updated", "direction": "desc"})
         pulls = paginate(client, client.prefix + "/pulls", lambda item: work_record(item, "pull_request", args.include_titles),
-            args.maximum_pages, args.maximum_work_records, parameters={"state": "all", "sort": "created", "direction": "asc"})
+            args.maximum_pages, args.maximum_work_records, parameters={"state": "all", "sort": "updated", "direction": "desc"})
         # The independent issue and PR inventories can move while read. A shared
         # native number is contradictory; let the collector deny rather than
         # manufacturing a new identity or silently reclassifying it.

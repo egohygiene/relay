@@ -103,6 +103,9 @@ native source plan performs all schema, semantic and normalized admission.
   excluded from issue records before selecting IDs, counts or titles. Provider
   numbers/IDs, states, closure reasons and timestamps remain separate. No
   relationships are inferred from bodies, closure, merge or commit messages.
+  Both inventories request all states in most-recently-updated order, keeping
+  bounded captures useful for current work. Repeated records in a moving paged
+  inventory are deduplicated and leave the inventory explicitly incomplete.
 - Health calls `commits/<exact-sha>/check-runs?filter=all`, keeps each matching
   head SHA, execution state and conclusion, and admits only canonical
   same-repository GitHub run URLs. Its optional closed `relay_capture` receipt
