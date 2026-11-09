@@ -272,7 +272,9 @@ def project(args: argparse.Namespace, files: dict, records: list, claim: dict) -
     return projection
 
 
-def normalize(runtime: Path, projection: dict) -> tuple[dict | None, dict]:
+def normalize(runtime: Path, projection: dict, *, search_attribution: bool = False) -> tuple[dict | None, dict]:
+    if type(search_attribution) is not bool:
+        base.fail("INPUT")
     hygiene = base.module(runtime / "hygiene/tools/intelligence.py", "pinned_adr_hygiene")
     vocabulary = base.load_json(base.read_file(runtime / "hygiene/catalog/repository-intelligence-vocabulary.json"))
     schema = base.load_json(base.read_file(runtime / "hygiene/schemas/repository-intelligence.alpha2.schema.json"))
@@ -291,7 +293,8 @@ def normalize(runtime: Path, projection: dict) -> tuple[dict | None, dict]:
             or report["domains"] != projection["collection_coverage"]):
         base.fail("RUNTIME")
     observatory = base.module(runtime / "observatory/src/observatory/intelligence.py", "pinned_adr_observatory")
-    snapshot = observatory.build_repository_snapshot(projection)
+    snapshot = (observatory.build_repository_snapshot(projection, search_attribution=True)
+                if search_attribution else observatory.build_repository_snapshot(projection))
     schema = base.load_json(base.read_file(runtime / "observatory/schemas/repository-intelligence-read-model.v1.schema.json"))
     if (not jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker()).is_valid(snapshot)
             or snapshot["coverage"]["domains"] != projection["collection_coverage"]):
