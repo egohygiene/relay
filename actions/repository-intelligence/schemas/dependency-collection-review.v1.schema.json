@@ -1,0 +1,459 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/dependency-collection-review.v1.schema.json",
+  "title": "Allowlisted declared dependency collection review envelope; publication denied",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "publication",
+    "diagnostics"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.relay.dependency-collection-review/v1"
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "invalid",
+        "denied"
+      ]
+    },
+    "publication": {
+      "const": "denied"
+    },
+    "diagnostics": {
+      "type": "array",
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "owner",
+          "remediation"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^(?:[A-Z_]+|EGO-INTEL-[A-Z-]+-[0-9]{3})$",
+            "maxLength": 64
+          },
+          "owner": {
+            "enum": [
+              "relay",
+              "hygiene",
+              "egolint",
+              "observatory"
+            ]
+          },
+          "remediation": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
+      }
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+    },
+    "represented_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "collected_at",
+        "maximum_depth",
+        "maximum_catalog_age_days",
+        "maximum_age_seconds",
+        "catalog_revision",
+        "catalog_observed_at",
+        "catalog_freshness",
+        "public_projection_sha256"
+      ],
+      "properties": {
+        "collected_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "maximum_depth": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "maximum_catalog_age_days": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3650
+        },
+        "maximum_age_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2678400
+        },
+        "catalog_revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "catalog_observed_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "catalog_freshness": {
+          "enum": [
+            "current",
+            "stale"
+          ]
+        },
+        "public_projection_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lock_sha256",
+        "egolint_sha256",
+        "collector_sha256",
+        "shared_runtime_sha256",
+        "pins",
+        "normalizer_adapter_sha256"
+      ],
+      "properties": {
+        "lock_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "egolint_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "collector_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "shared_runtime_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "pins": {
+          "type": "object"
+        },
+        "normalizer_adapter_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "catalog",
+        "context",
+        "boundaries",
+        "hygiene",
+        "coverage",
+        "observatory"
+      ],
+      "properties": {
+        "catalog": {
+          "const": "valid"
+        },
+        "context": {
+          "const": "valid"
+        },
+        "boundaries": {
+          "const": "valid"
+        },
+        "hygiene": {
+          "enum": [
+            "valid",
+            "invalid"
+          ]
+        },
+        "coverage": {
+          "enum": [
+            "valid",
+            "not-run"
+          ]
+        },
+        "observatory": {
+          "enum": [
+            "normalized",
+            "not-run"
+          ]
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roadmap",
+        "decisions",
+        "git",
+        "issues",
+        "pull_requests",
+        "checks",
+        "releases",
+        "deployments",
+        "history"
+      ],
+      "properties": {
+        "roadmap": {
+          "$ref": "#/$defs/claim"
+        },
+        "decisions": {
+          "$ref": "#/$defs/claim"
+        },
+        "git": {
+          "$ref": "#/$defs/claim"
+        },
+        "issues": {
+          "$ref": "#/$defs/claim"
+        },
+        "pull_requests": {
+          "$ref": "#/$defs/claim"
+        },
+        "checks": {
+          "$ref": "#/$defs/claim"
+        },
+        "releases": {
+          "$ref": "#/$defs/claim"
+        },
+        "deployments": {
+          "$ref": "#/$defs/claim"
+        },
+        "history": {
+          "$ref": "#/$defs/claim"
+        }
+      }
+    },
+    "projection_candidate": {
+      "type": "object"
+    },
+    "snapshot_candidate": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "candidate_digests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "projection_sha256",
+        "snapshot_sha256"
+      ],
+      "properties": {
+        "projection_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "snapshot_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "authority",
+        "bounded",
+        "runtime_adoption",
+        "package_dependencies",
+        "excluded_topology"
+      ],
+      "properties": {
+        "kind": {
+          "const": "declared_consumption"
+        },
+        "authority": {
+          "const": "egohygiene/hygiene"
+        },
+        "bounded": {
+          "const": true
+        },
+        "runtime_adoption": {
+          "const": "uncollected"
+        },
+        "package_dependencies": {
+          "const": "uncollected"
+        },
+        "excluded_topology": {
+          "const": "uncollected"
+        }
+      }
+    },
+    "boundary_evidence": {
+      "type": "array",
+      "maxItems": 2048,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "target",
+          "policies"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+          },
+          "target": {
+            "type": "string",
+            "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+          },
+          "policies": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 256,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "contract",
+                "contract_status",
+                "pinning"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^RELATIONSHIP-[0-9]{3}$"
+                },
+                "contract": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 240
+                },
+                "contract_status": {
+                  "enum": [
+                    "active",
+                    "required"
+                  ]
+                },
+                "pinning": {
+                  "enum": [
+                    "immutable",
+                    "versioned",
+                    "immutable-or-versioned"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "denied"
+          }
+        }
+      },
+      "then": {
+        "maxProperties": 4
+      },
+      "else": {
+        "required": [
+          "schema",
+          "status",
+          "publication",
+          "diagnostics",
+          "repository",
+          "represented_commit",
+          "observed_at",
+          "inputs",
+          "runtime",
+          "validation",
+          "coverage",
+          "projection_candidate",
+          "snapshot_candidate",
+          "candidate_digests",
+          "scope",
+          "boundary_evidence"
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "collection",
+        "freshness",
+        "reason",
+        "observed_at"
+      ],
+      "properties": {
+        "collection": {
+          "enum": [
+            "uncollected",
+            "unavailable",
+            "partial",
+            "observed_empty",
+            "observed",
+            "failed",
+            "not_applicable"
+          ]
+        },
+        "freshness": {
+          "enum": [
+            "current",
+            "stale",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "observed_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
