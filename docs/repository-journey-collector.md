@@ -87,6 +87,12 @@ withheld malformed/future timestamps also keeps Git coverage partial. No
 filtered empty set proves that the repository has no commits. The Git scan
 remains bounded independently of the time window.
 
+Every captured object must be inspected by native EgoLint. At a truncated merge,
+Git's shallow marker can also hide an otherwise captured parent branch. If the
+native inspected count differs, collection denies admission with bounded runtime
+evidence; acquire more complete ancestry and retry. Such a boundary cannot
+silently receive successful native validation.
+
 `--collected-at` defaults to the explicit observation time. Replaying a previous
 capture must keep its capture time; `--maximum-age-seconds` defaults to 86,400
 and accepts 1–2,678,400. Capture freshness remains separate from the immutable
