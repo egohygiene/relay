@@ -233,6 +233,13 @@ def retention_adapter(profile):
     raise ArtifactError("incompatible")
 
 
+def compose_native(args, current, comparison, runtime_identity):
+    if not getattr(args, "intelligence_directory", ""):
+        return
+    composer = module("relay_artifact_compare_composer", "compose_repository_intelligence_compare.py")
+    output(args, composer.compose(args, current, comparison, runtime_identity))
+
+
 def prepare(args, root):
     expected, observed = identity(args)
     choice = selected(args)
@@ -296,6 +303,7 @@ def prepare(args, root):
                           "baseline-state": state, "retention-eligible": "false", "comparison-path": ""})
             output(args, {"snapshot-path": str(current_directory / "snapshot.json"),
                           "projection-path": str(current_directory / "projection.json")})
+            compose_native(args, current, None, runtime_identity)
             return 0
     receipt, comparison = retention.execute(native)
     retention.write_attempt(native.output, receipt, comparison)
@@ -315,6 +323,7 @@ def prepare(args, root):
         "baseline_artifact": baseline_receipt, "current": retention.boundary(current),
         "retention": "candidate" if eligible else "unchanged", "retention_days": args.retention_days, "artifact": None}
     write(root / "artifact.receipt.json", operational)
+    compose_native(args, current, comparison, runtime_identity)
     output(args, {"receipt-path": str(root / "artifact.receipt.json"), "status": receipt["status"],
         "baseline-state": receipt["baseline_state"], "retention-eligible": str(eligible).lower(),
         "artifact-name": artifact_name(expected) if eligible else "", "artifact-directory": str(current_directory) if eligible else "",
@@ -354,6 +363,9 @@ def parser():
         prepare_command.add_argument("--" + name, required=True, type=Path)
     prepare_command.add_argument("--runtime", type=Path)
     prepare_command.add_argument("--normalization-profile", default="legacy-adr")
+    prepare_command.add_argument("--intelligence-directory", default="")
+    prepare_command.add_argument("--generator-repository", default="")
+    prepare_command.add_argument("--generator-ref", default="")
     for name in ("baseline-artifact-id", "baseline-artifact-digest", "baseline-source-commit", "baseline-run-id", "baseline-run-attempt"):
         prepare_command.add_argument("--" + name, default="")
     prepare_command.add_argument("--maximum-baseline-age-seconds", type=int, default=2592000)
