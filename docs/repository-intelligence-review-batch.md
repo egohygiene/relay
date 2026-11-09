@@ -38,13 +38,13 @@ semantically in the chosen merge order; do not concatenate eight current
 objectives. The canonical guides remain with their owning code:
 
 - [Native source composition](repository-source-composition.md).
-- [Work collection](repository-work-collector.md).
-- [Journey collection](repository-journey-collector.md).
-- [Health collection](repository-health-collector.md).
-- [Releases collection](repository-release-collector.md).
-- [Declared Dependencies](repository-dependency-collector.md).
-- [Public fleet assembly](public-fleet-assembler.md).
-- [Compare retention](repository-intelligence-snapshot-retention.md).
+- [Work collection](https://github.com/egohygiene/relay/blob/codex/intelligence-work-source/docs/repository-work-collector.md).
+- [Journey collection](https://github.com/egohygiene/relay/blob/codex/intelligence-journey-source/docs/repository-journey-collector.md).
+- [Health collection](https://github.com/egohygiene/relay/blob/codex/intelligence-health-evidence/docs/repository-health-collector.md).
+- [Releases collection](https://github.com/egohygiene/relay/blob/codex/intelligence-release-source/docs/repository-release-collector.md).
+- [Declared Dependencies](https://github.com/egohygiene/relay/blob/codex/intelligence-dependency-source/docs/repository-dependency-collector.md).
+- [Public fleet assembly](https://github.com/egohygiene/relay/blob/codex/intelligence-public-fleet/docs/public-fleet-assembler.md).
+- [Compare retention](https://github.com/egohygiene/relay/blob/codex/intelligence-compare-retention/docs/repository-intelligence-snapshot-retention.md).
 
 The peer guides exist on their owning branches and the combined checkout; they
 are intentionally not copied into #158's bounded source-composition patch.
