@@ -22,6 +22,7 @@ import tempfile
 import time
 from types import SimpleNamespace
 import zipfile
+import zlib
 
 SCRIPTS = Path(__file__).resolve().parent
 MANIFEST = "snapshot-bundle.json"
@@ -291,7 +292,8 @@ def prepare(args, root):
                 "runtime_lock_sha256": manifest["runtime_lock_sha256"]}))
             native.expected_baseline = before["snapshot_sha256"]
             state = "available"
-        except (ArtifactError, OSError, ValueError, KeyError, TypeError, zipfile.BadZipFile) as error:
+        except (ArtifactError, OSError, ValueError, KeyError, TypeError, RecursionError,
+                zipfile.BadZipFile, zlib.error) as error:
             state = str(error) if isinstance(error, ArtifactError) and str(error) in STATES else "malformed"
             receipt = {"schema": RECEIPT, "repository": args.repository, "source_commit": args.source_commit,
                 "observed_at": args.as_of, "status": "unavailable", "baseline_state": state,
