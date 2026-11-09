@@ -7,6 +7,11 @@ match the owner artifact pin. The mirror remains owner-authored data; updates
 require a new reviewed source profile. Private wrappers are rejected before
 identity access. Metadata alone does not authenticate membership.
 
+`validate_rows(rows)` authenticates sorted canonical public rows before a caller
+hashes their content. `validate_identities(names, metadata)` authenticates a
+compact sorted public selection and returns its exact owner rows. Both use the
+same mirrored owner artifact, and neither resolves historical aliases.
+
 `public_catalog_admission.acquire(work)` optionally fetches only the pinned public
 Hygiene revision into a fresh bare Git directory at `work/public-catalog` and
 returns that path. It uses only the standard library and Git, with an isolated
