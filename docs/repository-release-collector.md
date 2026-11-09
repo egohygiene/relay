@@ -21,9 +21,9 @@ bind preparation. There is no new canonical release or asset schema in Relay.
 | Captured input | Existing projection |
 | --- | --- |
 | Repository identity, represented full commit, observation UTC | Root identity; exact Git commit must exist; no checkout-path identity |
-| Public release ID, tag, published time, target full commit, prerelease/retracted state | Existing `release` entity; canonical GitHub release URL; exact source revision retained separately |
+| Public release ID, tag, published time, target full commit, prerelease/retracted state | Existing `release` entity keyed by stable provider ID; tag retained in title/attributes; canonical GitHub release URL; exact source revision retained separately |
 | Explicit released commit | Existing `commit` entity and `release → releases → commit`; no inferred issue/PR membership |
-| Release publication observation | Existing `release.published` event; historical event time differs from capture time |
+| Release publication observation | Existing `release.published` event from the explicit publication timestamp, including a formerly published release now retracted; no retraction event or inferred transition is created; historical event time differs from capture time |
 | Public asset name, size, optional SHA-256 | Closed release attributes; canonical unsigned download URL derived from repository/tag/name; no invented asset entity kind |
 | Public deployment ID, run/attempt, revision, environment, status | Existing `deployment` entity; run URL and explicit status; only allowlisted public environments enter output |
 | Explicit deployment release ID | Existing `deployment → deploys → release`; represented release/deployment commits must match; missing targets stay unlinked with a generic partial diagnostic |

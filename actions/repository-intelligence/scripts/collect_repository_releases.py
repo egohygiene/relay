@@ -204,9 +204,8 @@ def projection(args: argparse.Namespace, captured: dict | None, selected_receipt
         result["sources"].append(value)
         return value
 
-    def entity(kind, key, title, canonical, state, provenance, attributes, identity=None):
-        identity = key if identity is None else identity
-        return {**deepcopy(root), "id": f"ri:{args.repository}:{kind}:{identity}", "kind": kind, "key": key,
+    def entity(kind, key, title, canonical, state, provenance, attributes):
+        return {**deepcopy(root), "id": f"ri:{args.repository}:{kind}:{key}", "kind": kind, "key": key,
                 "title": title, "canonical_url": canonical, "state": {"value": state, "assertion": "authoritative"},
                 "freshness": provenance["freshness"], "provenance": [provenance["id"]], "attributes": attributes}
 
@@ -257,7 +256,7 @@ def projection(args: argparse.Namespace, captured: dict | None, selected_receipt
                       "provider_id": number, "draft": False, "prerelease": record["prerelease"],
                       "assets": sorted(assets, key=lambda asset: asset["name"]), "install_verification": "uncollected"}
         state = "retracted" if record["state"] == "retracted" else "prerelease" if record["prerelease"] else "published"
-        value = entity("release", tag, title, canonical, state, provenance, attributes, identity=str(number))
+        value = entity("release", str(number), title or tag, canonical, state, provenance, attributes)
         result["entities"].append(value)
         release_ids[number] = value["id"]
         release_revisions[number] = record["source_commit"]
