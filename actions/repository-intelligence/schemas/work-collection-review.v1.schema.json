@@ -1,0 +1,484 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/work-collection-review.v1.schema.json",
+  "title": "Captured Work collection review envelope; publication denied",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "publication",
+    "diagnostics"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.relay.work-collection-review/v1"
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "partial",
+        "stale",
+        "invalid",
+        "unavailable",
+        "uncollected",
+        "failed",
+        "denied"
+      ]
+    },
+    "publication": {
+      "const": "denied"
+    },
+    "diagnostics": {
+      "type": "array",
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "owner",
+          "path",
+          "line",
+          "remediation"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^(?:[A-Z_]+|EGO-INTEL-[A-Z-]+-[0-9]{3})$",
+            "maxLength": 64
+          },
+          "owner": {
+            "enum": [
+              "relay",
+              "hygiene",
+              "egolint",
+              "observatory"
+            ]
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240,
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[A-Za-z0-9._/-]+$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "line": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "remediation": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
+      }
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+    },
+    "represented_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_sha256",
+        "provider_schema_sha256",
+        "maximum_age_seconds",
+        "inventories"
+      ],
+      "properties": {
+        "provider_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "provider_schema_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "maximum_age_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2678400
+        },
+        "inventories": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "issues",
+            "pull_requests"
+          ],
+          "properties": {
+            "issues": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "captured_at",
+                "scope",
+                "outcome",
+                "pagination"
+              ],
+              "properties": {
+                "captured_at": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+                      "format": "date-time"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "scope": {
+                  "enum": [
+                    "all",
+                    "open",
+                    "closed",
+                    "references"
+                  ]
+                },
+                "outcome": {
+                  "enum": [
+                    "complete",
+                    "rate_limited",
+                    "access_denied",
+                    "provider_unavailable",
+                    "collection_failed",
+                    "not_requested"
+                  ]
+                },
+                "pagination": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "pages_received",
+                    "exhausted",
+                    "truncated"
+                  ],
+                  "properties": {
+                    "pages_received": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 64
+                    },
+                    "exhausted": {
+                      "type": "boolean"
+                    },
+                    "truncated": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "pull_requests": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "captured_at",
+                "scope",
+                "outcome",
+                "pagination"
+              ],
+              "properties": {
+                "captured_at": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+                      "format": "date-time"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "scope": {
+                  "enum": [
+                    "all",
+                    "open",
+                    "closed",
+                    "references"
+                  ]
+                },
+                "outcome": {
+                  "enum": [
+                    "complete",
+                    "rate_limited",
+                    "access_denied",
+                    "provider_unavailable",
+                    "collection_failed",
+                    "not_requested"
+                  ]
+                },
+                "pagination": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "pages_received",
+                    "exhausted",
+                    "truncated"
+                  ],
+                  "properties": {
+                    "pages_received": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 64
+                    },
+                    "exhausted": {
+                      "type": "boolean"
+                    },
+                    "truncated": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lock_sha256",
+        "egolint_sha256",
+        "collector_sha256",
+        "shared_runtime_sha256",
+        "pins",
+        "normalizer_adapter_sha256"
+      ],
+      "properties": {
+        "lock_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "egolint_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "collector_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "shared_runtime_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "pins": {
+          "type": "object"
+        },
+        "normalizer_adapter_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hygiene",
+        "coverage",
+        "observatory"
+      ],
+      "properties": {
+        "hygiene": {
+          "enum": [
+            "valid",
+            "invalid"
+          ]
+        },
+        "coverage": {
+          "enum": [
+            "valid",
+            "not-run"
+          ]
+        },
+        "observatory": {
+          "enum": [
+            "normalized",
+            "not-run"
+          ]
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roadmap",
+        "decisions",
+        "git",
+        "issues",
+        "pull_requests",
+        "checks",
+        "releases",
+        "deployments",
+        "history"
+      ],
+      "properties": {
+        "roadmap": {
+          "$ref": "#/$defs/claim"
+        },
+        "decisions": {
+          "$ref": "#/$defs/claim"
+        },
+        "git": {
+          "$ref": "#/$defs/claim"
+        },
+        "issues": {
+          "$ref": "#/$defs/claim"
+        },
+        "pull_requests": {
+          "$ref": "#/$defs/claim"
+        },
+        "checks": {
+          "$ref": "#/$defs/claim"
+        },
+        "releases": {
+          "$ref": "#/$defs/claim"
+        },
+        "deployments": {
+          "$ref": "#/$defs/claim"
+        },
+        "history": {
+          "$ref": "#/$defs/claim"
+        }
+      }
+    },
+    "projection_candidate": {
+      "type": "object"
+    },
+    "snapshot_candidate": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "candidate_digests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "projection_sha256",
+        "snapshot_sha256"
+      ],
+      "properties": {
+        "projection_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "snapshot_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "denied"
+          }
+        }
+      },
+      "then": {
+        "maxProperties": 4
+      },
+      "else": {
+        "required": [
+          "schema",
+          "status",
+          "publication",
+          "diagnostics",
+          "repository",
+          "represented_commit",
+          "observed_at",
+          "inputs",
+          "runtime",
+          "validation",
+          "coverage",
+          "projection_candidate",
+          "snapshot_candidate",
+          "candidate_digests"
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "collection",
+        "freshness",
+        "reason",
+        "observed_at"
+      ],
+      "properties": {
+        "collection": {
+          "enum": [
+            "uncollected",
+            "unavailable",
+            "partial",
+            "observed_empty",
+            "observed",
+            "failed",
+            "not_applicable"
+          ]
+        },
+        "freshness": {
+          "enum": [
+            "current",
+            "stale",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "observed_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
