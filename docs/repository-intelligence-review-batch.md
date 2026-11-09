@@ -7,7 +7,25 @@ investigation, browser verification, consumer canaries, publication and stable
 release acceptance remain deferred. Existing automated repository workflows may
 run on these branches; no result from them is claimed here.
 
-## Review queue
+## Repository-hosted product and fleet overview
+
+The primary continuation is now
+[`codex/repository-intelligence-completion`](https://github.com/egohygiene/relay/tree/codex/repository-intelligence-completion),
+stacked on [Relay #166](https://github.com/egohygiene/relay/pull/166).
+Read the [shared completion guide](repository-intelligence-completion.md) first:
+each repository owns its Pages Intelligence subtree, and the organization site
+provides the fleet overview and drill-down links. The existing ten repository
+renderers have already shipped; this continuation addresses shared route,
+graph, evidence-intake and consumer-adoption gaps.
+
+The central endpoint exploration is preserved in
+[site #125](https://github.com/egohygiene/egohygiene.io/pull/125), with independent
+slices #119–#124. Those drafts are fleet exploration and do not establish
+completion of repository-hosted views or unsupported upstream source models.
+[Site #126](https://github.com/egohygiene/egohygiene.io/pull/126) makes declared
+repository Pages destinations primary while retaining canonical GitHub evidence.
+
+## Earlier sliced review queue
 
 | Review | Draft | Scope and practical limit |
 | --- | --- | --- |
