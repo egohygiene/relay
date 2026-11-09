@@ -142,6 +142,10 @@ With no requested source the domain is uncollected. An explicit owner declaratio
 `--inventory not-applicable` requires no requested captures and retains
 `not_applicable` collection/freshness with its observation time; it does not claim
 that a skipped native check is inapplicable.
+An admitted empty provider page still counts as an observation: selected or
+truncated empty scope remains partial at its original capture time. Domain
+coverage uses the earliest admitted capture/generation time conservatively when
+producers have different clocks; the later evaluation boundary cannot refresh it.
 All other eight alpha.2 collection domains remain uncollected.
 
 Report and provider identities occupy separate namespaces; a native check run

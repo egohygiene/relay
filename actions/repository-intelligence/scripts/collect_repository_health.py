@@ -276,16 +276,23 @@ def collect(args: argparse.Namespace) -> dict:
     requested_any = bool(requested) or args.check_runs_state != "not-requested"
     incomplete = any(item["status"] in {"missing", "rejected", "partial", "unavailable", "failed"} for item in retained)
     freshness = "stale" if any(item.get("freshness") == "stale" for item in retained) else "current"
+    # A successfully captured empty page is still an observation. Neither the
+    # presence of check entities nor the later evaluation clock determines its
+    # inventory scope. Use the oldest admitted capture conservatively when
+    # multiple producers have different capture/generation boundaries.
+    observations = [item.get("observed_at") or item.get("generated_at") for item in retained
+                    if item["status"] in {"admitted", "partial"}]
+    captured_at = min(observations) if observations else None
     if args.inventory == "not-applicable":
         claim = {"collection": "not_applicable", "freshness": "not_applicable",
                  "reason": "explicit_not_applicable", "observed_at": args.observed_at}
     elif not requested_any:
         claim = {"collection": "uncollected", "freshness": "unknown", "reason": "not_requested", "observed_at": None}
-    elif checks or (not incomplete and args.inventory == "complete"):
+    elif observations:
         partial = incomplete or args.inventory != "complete"
         claim = {"collection": "partial" if partial else "observed" if checks else "observed_empty",
                  "freshness": freshness, "reason": "incomplete" if incomplete else "filtered" if partial else "complete",
-                 "observed_at": args.observed_at}
+                 "observed_at": captured_at}
     else:
         failed = any(item["status"] in {"failed", "rejected"} for item in retained)
         claim = {"collection": "failed" if failed else "unavailable", "freshness": "unknown",
