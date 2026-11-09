@@ -19,6 +19,7 @@ run on these branches; no result from them is claimed here.
 | 3 | [Relay #164](https://github.com/egohygiene/relay/pull/164) | Declared Dependencies through exact public Hygiene catalog/context/boundaries. Initial profile accepts a fixed public owner corpus. |
 | 3 | [Relay #165](https://github.com/egohygiene/relay/pull/165) | Public fleet assembly using the existing Observatory model. Reviewed production catalog/public selection remains Hygiene #36's acceptance. |
 | 4 | [Relay #163](https://github.com/egohygiene/relay/pull/163) | Exact projection/snapshot retention and Compare, including leases and truthful failed refresh state. Hosted retention and real two-revision proof remain open. |
+| 5 | [Site #118](https://github.com/egohygiene/egohygiene.io/pull/118) | Content-first `/intelligence/` host, build-time fleet admission, directory/Now/coverage/source drilldowns and canonical static routing. Stacked on the existing site #117 draft; no live artifact or publication. |
 
 The source collector drafts retain publication-denied review artifacts. They are
 not automatically admitted by #158's two-domain native build. Expanding that
@@ -49,11 +50,27 @@ objectives. The canonical guides remain with their owning code:
 The peer guides exist on their owning branches and the combined checkout; they
 are intentionally not copied into #158's bounded source-composition patch.
 
+## Organization host checkout
+
+The ninth candidate is [egohygiene.io #118](https://github.com/egohygiene/egohygiene.io/pull/118),
+branch `codex/organization-intelligence-host`, based on the existing
+[#117](https://github.com/egohygiene/egohygiene.io/pull/117) head
+`a7e15c7b1543dcba01647ec8ff358aab5126c817`. Its PR targets that draft branch,
+`docs/sprint-closeout-roadmap-2026-11-09`, to preserve the active website stack.
+It is a separate repository and is not part of the combined Relay checkout.
+
+The [site operator guide](https://github.com/egohygiene/egohygiene.io/blob/codex/organization-intelligence-host/docs/development/organization-intelligence-27.md)
+describes the reviewed standalone fleet artifact, checksum and explicit
+observation boundary. No artifact is connected by default. The host does not
+promote Relay's publication-denied review envelope into a deployment approval.
+Future modules remain labeled navigation anchors, rather than claimed route
+implementations. Existing store behavior stays in its owning stack.
+
 ## Validation boundary
 
 Static peer review found and corrected contract, source-binding, capture-time,
 URL, checksum and failure-isolation defects. Python/JSON syntax, applicable
-YAML/bash syntax, whitespace and continuity metadata were inspected. These are
+YAML/bash syntax, site Node syntax, whitespace and continuity metadata were inspected. These are
 source inspections, not native runtime, privacy regression, accessibility,
 performance or end-to-end proof.
 
@@ -71,6 +88,6 @@ Upstream-dependent Search attribution, Diagnostics, Audits, Hygiene and Sanity
 remain separate work; this set introduces no competing canonical models for them.
 
 No parent or route acceptance issue is advanced to complete by this draft set.
-The organization host's own route, static rendering and deployment acceptance
+The organization host's own runtime route, static rendering and deployment acceptance
 remain distinct from a local fleet artifact. Consumer-owned rollback bytes and
 historical receipts are preserved.
