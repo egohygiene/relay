@@ -314,6 +314,10 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
 
     collect_adrs = getattr(arguments, "collect_adrs", "false")
     collect_roadmap = getattr(arguments, "collect_roadmap", "false")
+    collect_journey = getattr(arguments, "collect_journey", "false")
+    maximum_commits = getattr(arguments, "journey_maximum_commits", "256")
+    journey_since = getattr(arguments, "journey_since", "")
+    journey_until = getattr(arguments, "journey_until", "")
     capture_id = getattr(arguments, "source_capture_artifact_id", "")
     capture_digest = getattr(arguments, "source_capture_artifact_digest", "")
     observed_at = getattr(arguments, "as_of", "")
@@ -340,7 +344,24 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
         raise ContractError("RIW-INPUT-ADR-MODE")
     if collect_adrs not in {"true", "false"} or collect_roadmap not in {"true", "false"}:
         raise ContractError("RIW-INPUT-ADR-MODE")
-    if "true" in {collect_adrs, collect_roadmap} and (arguments.observatory_snapshot or arguments.observatory_comparison):
+    if collect_journey not in {"true", "false"}:
+        raise ContractError("RIW-INPUT-JOURNEY-MODE")
+    positive_integer(maximum_commits, "RIW-INPUT-JOURNEY-LIMIT", 256)
+    if collect_journey != "true" and (maximum_commits != "256" or journey_since or journey_until):
+        raise ContractError("RIW-INPUT-JOURNEY-MODE")
+    try:
+        for value in (journey_since, journey_until):
+            if value:
+                if not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", value):
+                    raise ValueError()
+                datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")
+        if journey_since and journey_until and journey_since > journey_until:
+            raise ValueError()
+        if observed_at and ((journey_until and journey_until > observed_at) or (journey_since and journey_since > (journey_until or observed_at))):
+            raise ValueError()
+    except ValueError:
+        raise ContractError("RIW-INPUT-JOURNEY-BOUNDARY") from None
+    if "true" in {collect_adrs, collect_roadmap, collect_journey} and (arguments.observatory_snapshot or arguments.observatory_comparison):
         raise ContractError("RIW-INPUT-ADR-CONFLICT")
     paths = {
         "output": arguments.output_directory,
@@ -438,7 +459,7 @@ def capture_summary(arguments, identity, configuration_valid, report_directory):
                 or set(artifact) != {"id", "name", "sha256", "size_bytes"}
                 or not all(type(receipt[key]) is int for key in ("repository_id", "run_id", "run_attempt"))
                 or type(artifact["id"]) is not int or type(artifact["size_bytes"]) is not int
-                or not 0 < artifact["size_bytes"] <= 8388608
+                or not 0 < artifact["size_bytes"] <= 20971520
                 or receipt["schema"] != "egohygiene.relay.source-capture-intake/v1"
                 or receipt["repository"] != arguments.repository
                 or receipt["repository_id"] != identity["repository_id"]
@@ -726,6 +747,10 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--reports-directory", default=".reports")
     value.add_argument("--collect-adrs", default="false")
     value.add_argument("--collect-roadmap", default="false")
+    value.add_argument("--collect-journey", default="false")
+    value.add_argument("--journey-maximum-commits", default="256")
+    value.add_argument("--journey-since", default="")
+    value.add_argument("--journey-until", default="")
     value.add_argument("--source-capture-artifact-id", default="")
     value.add_argument("--source-capture-artifact-digest", default="")
     value.add_argument("--as-of", default="")

@@ -7,7 +7,7 @@ capture provider data, upload artifacts, execute consumer code or deploy a site.
 Inputs:
 
 - `source-directory`: directory containing `source-plan.json` and referenced
-  Work/Health JSON captures.
+  Work/Health/Releases JSON captures.
 - `as-of`: explicit UTC evaluation boundary, preserving original capture times
   and source revisions.
 

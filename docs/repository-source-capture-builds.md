@@ -1,7 +1,7 @@
-# Native Work and Health source composition — Relay #151
+# Native Work, Health and Releases source composition — Relay #151
 
 This checkpoint extends the existing Roadmap/Decisions source plan with fresh
-Work and Health collection. The local CLI and composite action
+Work and Health collection; the [Journey/Releases continuation](repository-journey-release-builds.md) joins the same source boundary. The local CLI and composite action
 select explicit transport captures, invoke the trusted collectors, and
 normalize one repository/commit/evaluation-bound graph. They do not accept the
 collectors' publication-denied review envelopes as build inputs.
@@ -9,8 +9,7 @@ collectors' publication-denied review envelopes as build inputs.
 ## Capture plan and action use
 
 The new optional composite `source-captures` input names a closed JSON
-transport plan relative to the consumer repository. It can select either source
-or both, with or without existing `collect-roadmap` and `collect-adrs` flags.
+transport plan relative to the consumer repository. It can select the Work and Health sources independently, with or without existing `collect-roadmap` and `collect-adrs` flags.
 
 ```json
 {
@@ -184,7 +183,7 @@ verification in this pass. Native acquisition, collectors, renderers, tests, CI,
 real canaries and publication were not executed, as requested.
 
 Next, review the source plan and run its deferred exact-pin cases: canonical
-sources plus Work/Health; captured-only sources; complete/partial/empty/stale
+sources plus Work/Health/Releases; captured-only sources; complete/partial/empty/stale
 and unavailable inventories; mismatched reports; duplicate/conflicting inputs;
 mixed pins; retained failure evidence; deterministic checkout-independent
 bundles; and consumer-owned artifact preservation. Then adopt through the

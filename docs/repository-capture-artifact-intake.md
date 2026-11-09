@@ -3,12 +3,12 @@
 The new `repository-intelligence-captures.yml` reusable entrypoint admits an
 ordinary immutable public JSON capture artifact from the caller's current
 repository, run, attempt and represented head. It then invokes the existing
-fresh Work/Health collectors and repository site builder. The consumer still
+fresh Work/Health/Releases collectors and repository site builder. The consumer still
 owns its one Pages/site artifact, route composition, deployment and rollback.
 The organization website remains a separate fleet overview.
 
-The original `repository-intelligence.yml` remains byte-identical, including
-its `contents: read` token contract. The capture-enabled entrypoint additionally
+The original `repository-intelligence.yml` retains its `contents: read` token
+contract; its optional Journey/evaluation inputs share the production source plan. The capture-enabled entrypoint additionally
 requires `actions: read` for exact artifact/run metadata and archive reads. It
 adds no write permission, secret inheritance, Pages operation, provider mutation
 or consumer-code execution. Intake runs inside the existing composite generation
@@ -17,7 +17,7 @@ stage; generation/provenance/upload/report sequencing is preserved.
 ## Caller-owned producer handoff
 
 After selecting the source commit, the caller's producer steps write public
-Work/Health transport captures and `source-plan.json` into one private directory.
+Work/Health/Releases transport captures and `source-plan.json` into one private directory.
 Plan paths are relative to that directory. Preserve each original `source_commit`,
 report `commit`, generation/capture time and provider record. Choose an explicit
 UTC evaluation boundary after those observations; do not use a commit-time
@@ -93,16 +93,16 @@ scope.
 
 The bundle manifest binds repository/head/run/attempt/event/evaluation identity
 and a sorted exact file/hash/size inventory. Admission allows only that manifest,
-the closed plan and referenced JSON files: at most six payload files, 1 MiB per
-capture, 64 KiB for plan/manifest, 6 MiB expanded and 8 MiB archived. ZIP members
+the closed plan and referenced JSON files: at most fifteen payload files, 1 MiB per
+capture, 64 KiB for plan/manifest, 16 MiB expanded and 20 MiB archived. ZIP members
 cannot contain traversal, symlinks, executable files, case collisions, encrypted
 or unsupported compression, unreferenced files, duplicate entries or excessive
 expansion. Extraction never calls `ZipFile.extract`.
 
-Every admitted Work/report/check-run source keeps its represented revision.
+Every admitted Work/report/check-run/release source keeps its represented revision.
 Original timestamps remain unchanged and cannot exceed the declared evaluation
 boundary. Full schema/semantic validation still belongs to the existing fresh
-collectors; transport admission does not imply complete inventory or healthy
+collectors; release captures must declare public-only scope and deployment records/receipts must name explicitly allowlisted public environments. Historical receipt times and source/generator identities remain unchanged. Transport admission does not imply complete inventory or healthy
 checks. Partial, stale, failed and unavailable coverage stays explicit.
 
 Only verified files enter a new private runner-temporary directory outside the

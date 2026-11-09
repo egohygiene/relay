@@ -5,7 +5,7 @@ name: Repository Intelligence Capture Artifact
 description: Pack only referenced public JSON captures into an immutable same-run/head handoff; does not upload or execute consumer code.
 inputs:
   source-directory:
-    description: Directory containing source-plan.json and its referenced public Work/Health JSON captures.
+    description: Directory containing source-plan.json and its referenced public Work/Health/Releases JSON captures.
     required: true
   as-of:
     description: Explicit UTC evaluation boundary; capture timestamps and source commits are preserved.

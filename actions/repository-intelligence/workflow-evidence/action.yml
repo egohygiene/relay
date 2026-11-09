@@ -74,6 +74,22 @@ inputs:
     description: Opt in to canonical public Roadmap source collection.
     required: false
     default: "false"
+  collect-journey:
+    description: Collect bounded immutable public Git Journey evidence; cross-domain history stays partial.
+    required: false
+    default: "false"
+  journey-maximum-commits:
+    description: Maximum Git commits privately inspected and projected, from 1 through 256.
+    required: false
+    default: "256"
+  journey-since:
+    description: Optional inclusive UTC lower Git event bound; requires collect-journey.
+    required: false
+    default: ""
+  journey-until:
+    description: Optional inclusive UTC upper Git event bound; requires collect-journey and cannot exceed as-of.
+    required: false
+    default: ""
   source-capture-artifact-id:
     description: Optional exact current-run capture artifact ID.
     required: false
@@ -216,6 +232,10 @@ runs:
         INPUT_CHECKOUT_OUTCOME: "${{ inputs.checkout-outcome }}"
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
         INPUT_COLLECT_ROADMAP: "${{ inputs.collect-roadmap }}"
+        INPUT_COLLECT_JOURNEY: "${{ inputs.collect-journey }}"
+        INPUT_JOURNEY_MAXIMUM_COMMITS: "${{ inputs.journey-maximum-commits }}"
+        INPUT_JOURNEY_SINCE: "${{ inputs.journey-since }}"
+        INPUT_JOURNEY_UNTIL: "${{ inputs.journey-until }}"
         INPUT_SOURCE_CAPTURE_ARTIFACT_ID: "${{ inputs.source-capture-artifact-id }}"
         INPUT_SOURCE_CAPTURE_ARTIFACT_DIGEST: "${{ inputs.source-capture-artifact-digest }}"
         INPUT_AS_OF: "${{ inputs.as-of }}"
@@ -271,6 +291,10 @@ runs:
           --reports-directory="${INPUT_REPORTS_DIRECTORY}" \
           --collect-adrs="${INPUT_COLLECT_ADRS}" \
           --collect-roadmap="${INPUT_COLLECT_ROADMAP}" \
+          --collect-journey="${INPUT_COLLECT_JOURNEY}" \
+          --journey-maximum-commits="${INPUT_JOURNEY_MAXIMUM_COMMITS}" \
+          --journey-since="${INPUT_JOURNEY_SINCE}" \
+          --journey-until="${INPUT_JOURNEY_UNTIL}" \
           --source-capture-artifact-id="${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" \
           --source-capture-artifact-digest="${INPUT_SOURCE_CAPTURE_ARTIFACT_DIGEST}" \
           --as-of="${INPUT_AS_OF}" \

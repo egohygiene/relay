@@ -21,7 +21,7 @@ the supported ADR alpha.2 owner set for `collect-roadmap`, and composes it with
 `collect-adrs` before normalization. The historical review profile stays pinned;
 consumer acceptance and publication remain separate.
 
-The [Work/Health source-plan continuation](../../docs/repository-source-capture-builds.md)
+The [Work/Health/Releases source-plan continuation](../../docs/repository-source-capture-builds.md)
 accepts one closed `source-captures` manifest and freshly evaluates its transport
 captures alongside any selected canonical sources. Partial/stale/unavailable
 coverage remains explicit; collector review envelopes are never promoted.
@@ -264,6 +264,8 @@ env expressions; it does not simulate GitHub scheduling or establish deployment
 success. Follow the [publication evidence procedure](../../docs/repository-intelligence-publication.md#acceptance-evidence-by-stage)
 for provider proof and consumer adoption.
 
+See [production Journey/Releases composition](../../docs/repository-journey-release-builds.md) for Git scope, public capture admission and generator-source proof.
+
 ## Inputs
 
 | Input                       | Default                          | Purpose                                                                 |
@@ -272,7 +274,10 @@ for provider proof and consumer adoption.
 | `work-directory`            | `.cache/repository-intelligence` | Private collection workspace; do not publish wholesale                  |
 | `reports-directory`         | `.reports`                       | Optional summaries; always excluded from tree and analytics              |
 | `collect-roadmap` | `false` | Collect canonical public Roadmap; combines with `collect-adrs` under one commit-bound source plan |
-| `source-captures` | empty | Repository-relative closed Work/Health transport capture plan; freshly invokes collectors and conflicts with external snapshot/comparison inputs |
+| `collect-journey` | `false` | Fresh bounded public Git commit events; generic titles and partial semantic history |
+| `journey-maximum-commits` | `256` | Private Git inspection limit from 1 through 256 |
+| `journey-since` / `journey-until` | empty | Optional inclusive UTC event bounds; require Journey selection |
+| `source-captures` | empty | Repository-relative closed Work/Health/Releases transport capture plan; freshly invokes collectors and conflicts with external snapshot/comparison inputs |
 | `source-capture-artifact-id` | empty | Exact current-run/attempt/head public JSON artifact ID; excludes local `source-captures` and requires digest plus explicit `as-of` |
 | `source-capture-artifact-digest` | empty | Upload SHA-256 of the exact immutable capture ZIP; artifact mode additionally requires `actions: read` |
 | `source-runtime` | empty | Trusted prepared ADR alpha.2 runtime for native source plans, outside consumer checkout; conflicts with `adr-runtime` |

@@ -42,9 +42,25 @@ inputs:
       Conflicts with external snapshot/comparison inputs.
     required: false
     default: "false"
+  collect-journey:
+    description: Collect bounded immutable public Git Journey evidence; cross-domain history stays partial.
+    required: false
+    default: "false"
+  journey-maximum-commits:
+    description: Maximum Git commits privately inspected and projected, from 1 through 256.
+    required: false
+    default: "256"
+  journey-since:
+    description: Optional inclusive UTC lower Git event bound; requires collect-journey.
+    required: false
+    default: ""
+  journey-until:
+    description: Optional inclusive UTC upper Git event bound; requires collect-journey and cannot exceed as-of.
+    required: false
+    default: ""
   source-captures:
     description: >-
-      Optional repository-relative closed Work/Health transport capture plan.
+      Optional repository-relative closed Work/Health/Releases transport capture plan.
       Freshly evaluates its captures and composes them with selected canonical sources.
       Conflicts with external snapshot/comparison inputs; never accepts review envelopes.
     required: false
@@ -60,7 +76,7 @@ inputs:
   source-runtime:
     description: >-
       Optional trusted prepared ADR alpha.2 runtime for Roadmap or combined
-      source collection, outside the consumer checkout; requires collect-roadmap or a capture source.
+      source collection, outside the consumer checkout; requires collect-roadmap, collect-journey or a capture source.
     required: false
     default: ""
   adr-runtime:
@@ -269,6 +285,10 @@ runs:
         INPUT_ACTIVITY_REF: "${{ inputs.activity-ref }}"
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
         INPUT_COLLECT_ROADMAP: "${{ inputs.collect-roadmap }}"
+        INPUT_COLLECT_JOURNEY: "${{ inputs.collect-journey }}"
+        INPUT_JOURNEY_MAXIMUM_COMMITS: "${{ inputs.journey-maximum-commits }}"
+        INPUT_JOURNEY_SINCE: "${{ inputs.journey-since }}"
+        INPUT_JOURNEY_UNTIL: "${{ inputs.journey-until }}"
         INPUT_SOURCE_CAPTURES: "${{ inputs.source-captures }}"
         INPUT_SOURCE_CAPTURE_ARTIFACT_ID: "${{ inputs.source-capture-artifact-id }}"
         INPUT_SOURCE_CAPTURE_ARTIFACT_DIGEST: "${{ inputs.source-capture-artifact-digest }}"
@@ -316,8 +336,18 @@ runs:
           true | false) ;;
           *) printf 'collect-roadmap must be true or false\n' >&2; exit 2 ;;
         esac
-        if [[ -n "${INPUT_SOURCE_RUNTIME}" && ( ( "${INPUT_COLLECT_ROADMAP}" != "true" && -z "${INPUT_SOURCE_CAPTURES}" && -z "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ) || -n "${INPUT_ADR_RUNTIME}" ) ]]; then
+        if [[ -n "${INPUT_SOURCE_RUNTIME}" && ( ( "${INPUT_COLLECT_ROADMAP}" != "true" && "${INPUT_COLLECT_JOURNEY}" != "true" && -z "${INPUT_SOURCE_CAPTURES}" && -z "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ) || -n "${INPUT_ADR_RUNTIME}" ) ]]; then
           printf 'source-runtime requires a native source plan and excludes adr-runtime\n' >&2
+          exit 2
+        fi
+        case "${INPUT_COLLECT_JOURNEY}" in
+          true | false) ;;
+          *) printf 'collect-journey must be true or false\n' >&2; exit 2 ;;
+        esac
+        if [[ ! "${INPUT_JOURNEY_MAXIMUM_COMMITS}" =~ ^[1-9][0-9]{0,2}$ ]] \
+          || (( INPUT_JOURNEY_MAXIMUM_COMMITS > 256 )) \
+          || [[ "${INPUT_COLLECT_JOURNEY}" != "true" && ( "${INPUT_JOURNEY_MAXIMUM_COMMITS}" != "256" || -n "${INPUT_JOURNEY_SINCE}" || -n "${INPUT_JOURNEY_UNTIL}" ) ]]; then
+          printf 'Journey bounds require collect-journey and an integer limit from 1 through 256\n' >&2
           exit 2
         fi
         case "${INPUT_ADR_POLICY_OWNER}" in
@@ -328,7 +358,7 @@ runs:
           printf 'adr-policy-owner requires collect-adrs\n' >&2
           exit 2
         fi
-        if [[ ( "${INPUT_COLLECT_ADRS}" == "true" || "${INPUT_COLLECT_ROADMAP}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ) && ( -n "${INPUT_OBSERVATORY_SNAPSHOT}" || -n "${INPUT_OBSERVATORY_COMPARISON}" ) ]]; then
+        if [[ ( "${INPUT_COLLECT_ADRS}" == "true" || "${INPUT_COLLECT_ROADMAP}" == "true" || "${INPUT_COLLECT_JOURNEY}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ) && ( -n "${INPUT_OBSERVATORY_SNAPSHOT}" || -n "${INPUT_OBSERVATORY_COMPARISON}" ) ]]; then
           printf 'Native source collection conflicts with external snapshot/comparison inputs\n' >&2
           exit 2
         fi
@@ -477,15 +507,24 @@ runs:
           as_of="$(git -C "${GITHUB_WORKSPACE}" show --no-patch --format=%cI "${source_commit}")"
           timestamp_source="consumer-source-commit"
         fi
-        python3 -I - "${as_of}" <<'PYTHON'
+        python3 -I - "${as_of}" "${INPUT_JOURNEY_SINCE}" "${INPUT_JOURNEY_UNTIL}" <<'PYTHON'
         from datetime import datetime
         import sys
+        import re
 
         value = sys.argv[1]
         normalized = value[:-1] + "+00:00" if value.endswith("Z") else value
         parsed = datetime.fromisoformat(normalized)
         if parsed.tzinfo is None:
             raise SystemExit("as-of must be an RFC 3339 timestamp with a timezone")
+        bounds = []
+        for raw in sys.argv[2:]:
+            if raw and not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", raw):
+                raise SystemExit("Journey bounds require UTC timestamps to whole seconds")
+            bounds.append(datetime.fromisoformat(raw.replace("Z", "+00:00")) if raw else None)
+        lower, upper = bounds
+        if (upper and upper > parsed) or (lower and lower > (upper or parsed)):
+            raise SystemExit("Journey bounds must be ordered and cannot exceed as-of")
         PYTHON
 
         default_branch="${INPUT_DEFAULT_BRANCH:-${EVENT_DEFAULT_BRANCH:-main}}"
@@ -615,6 +654,10 @@ runs:
       env:
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
         INPUT_COLLECT_ROADMAP: "${{ inputs.collect-roadmap }}"
+        INPUT_COLLECT_JOURNEY: "${{ inputs.collect-journey }}"
+        INPUT_JOURNEY_MAXIMUM_COMMITS: "${{ inputs.journey-maximum-commits }}"
+        INPUT_JOURNEY_SINCE: "${{ inputs.journey-since }}"
+        INPUT_JOURNEY_UNTIL: "${{ inputs.journey-until }}"
         INPUT_SOURCE_CAPTURES: "${{ inputs.source-captures }}"
         INPUT_SOURCE_CAPTURE_ARTIFACT_ID: "${{ inputs.source-capture-artifact-id }}"
         INPUT_SOURCE_CAPTURE_ARTIFACT_DIGEST: "${{ inputs.source-capture-artifact-digest }}"
@@ -626,17 +669,28 @@ runs:
         CAPTURE_INTAKE_PLAN: "${{ steps.capture_intake.outputs.plan-path }}"
         CAPTURE_INTAKE_ROOT: "${{ steps.capture_intake.outputs.capture-root }}"
         CAPTURE_INTAKE_RECEIPT: "${{ steps.capture_intake.outputs.receipt-path }}"
+        RESOLVED_GENERATOR_COMMIT: "${{ steps.metadata.outputs.generator-commit }}"
         RESOLVED_AS_OF: "${{ steps.metadata.outputs.as-of }}"
         RESOLVED_REPOSITORY: "${{ steps.metadata.outputs.repository }}"
         RESOLVED_REPOSITORY_VISIBILITY: "${{ steps.metadata.outputs.repository-visibility }}"
         RESOLVED_SOURCE_COMMIT: "${{ steps.metadata.outputs.source-commit }}"
       run: |
         set -euo pipefail
-        if [[ "${INPUT_COLLECT_ADRS}" == "true" || "${INPUT_COLLECT_ROADMAP}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
+        if [[ "${INPUT_COLLECT_ADRS}" == "true" || "${INPUT_COLLECT_ROADMAP}" == "true" || "${INPUT_COLLECT_JOURNEY}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
           runtime_arguments=()
           collector="${GITHUB_ACTION_PATH}/scripts/prepare_repository_adr_build.py"
-          if [[ "${INPUT_COLLECT_ROADMAP}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
+          if [[ "${INPUT_COLLECT_ROADMAP}" == "true" || "${INPUT_COLLECT_JOURNEY}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
             collector="${GITHUB_ACTION_PATH}/scripts/prepare_repository_sources_build.py"
+            runtime_arguments+=(--generator-commit "${RESOLVED_GENERATOR_COMMIT}")
+            if [[ "${INPUT_COLLECT_JOURNEY}" == "true" ]]; then
+              runtime_arguments+=(--collect-journey --journey-maximum-commits "${INPUT_JOURNEY_MAXIMUM_COMMITS}")
+              if [[ -n "${INPUT_JOURNEY_SINCE}" ]]; then
+                runtime_arguments+=(--journey-since "${INPUT_JOURNEY_SINCE}")
+              fi
+              if [[ -n "${INPUT_JOURNEY_UNTIL}" ]]; then
+                runtime_arguments+=(--journey-until "${INPUT_JOURNEY_UNTIL}")
+              fi
+            fi
             if [[ "${INPUT_COLLECT_ROADMAP}" == "true" ]]; then
               runtime_arguments+=(--collect-roadmap)
             fi
@@ -738,6 +792,10 @@ runs:
       env:
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
         INPUT_COLLECT_ROADMAP: "${{ inputs.collect-roadmap }}"
+        INPUT_COLLECT_JOURNEY: "${{ inputs.collect-journey }}"
+        INPUT_JOURNEY_MAXIMUM_COMMITS: "${{ inputs.journey-maximum-commits }}"
+        INPUT_JOURNEY_SINCE: "${{ inputs.journey-since }}"
+        INPUT_JOURNEY_UNTIL: "${{ inputs.journey-until }}"
         INPUT_SOURCE_CAPTURES: "${{ inputs.source-captures }}"
         INPUT_SOURCE_CAPTURE_ARTIFACT_ID: "${{ inputs.source-capture-artifact-id }}"
         INPUT_SOURCE_CAPTURE_ARTIFACT_DIGEST: "${{ inputs.source-capture-artifact-digest }}"
@@ -783,7 +841,7 @@ runs:
           --script-source "${GITHUB_ACTION_PATH}/assets/explorer.js" \
           --dashboard-subdirectory "dashboard"
         snapshot_arguments=()
-        if [[ "${INPUT_COLLECT_ROADMAP}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
+        if [[ "${INPUT_COLLECT_ROADMAP}" == "true" || "${INPUT_COLLECT_JOURNEY}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
           INPUT_OBSERVATORY_SNAPSHOT="${INPUT_WORK_DIRECTORY}/sources/snapshot.json"
           python3 -I "${GITHUB_ACTION_PATH}/scripts/repository_sources_build_contract.py" \
             --provenance "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/provenance.json" \
