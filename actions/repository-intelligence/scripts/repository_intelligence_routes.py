@@ -111,9 +111,14 @@ ROUTES = CORE_ROUTES + RESERVED_ROUTES
 ROUTE_QUESTIONS = dict(_QUESTIONS)
 
 
-def route(identifier: str) -> dict:
+def route(identifier: str, *, supported_views=()) -> dict:
     """Return independent metadata; callers cannot mutate the trusted inventory."""
-    return json.loads(json.dumps(_DEFINITIONS[identifier]))
+    if not set(supported_views) <= {"hygiene"}:
+        raise ValueError("Owner view support is incompatible")
+    value = json.loads(json.dumps(_DEFINITIONS[identifier]))
+    if identifier in supported_views:
+        value["renderer_state"] = "implemented"
+    return value
 
 
 def canonical_routes() -> tuple[str, ...]:
@@ -124,7 +129,7 @@ def source_boundary(identifier: str) -> str:
     return _SOURCE_BOUNDARIES[identifier]
 
 
-def manifest(repository: str, source_commit: str) -> dict:
+def manifest(repository: str, source_commit: str, *, supported_views=()) -> dict:
     """Describe routes and consumer-only aliases without publishing redirects."""
     if (not isinstance(repository, str)
             or not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository)
@@ -143,4 +148,5 @@ def manifest(repository: str, source_commit: str) -> dict:
             "contract_version": _lock["contract_version"]},
         "consumer_boundary": {"canonical_origin": "consumer-owned", "base_path": "consumer-owned",
             "aliases": "consumer-owned redirects only"},
-        "routes": [route(identifier) for identifier in _DEFINITIONS], "external_surfaces": external}
+        "routes": [route(identifier, supported_views=supported_views) for identifier in _DEFINITIONS],
+        "external_surfaces": external}

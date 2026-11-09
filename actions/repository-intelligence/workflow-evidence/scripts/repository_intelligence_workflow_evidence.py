@@ -315,6 +315,7 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
     collect_adrs = getattr(arguments, "collect_adrs", "false")
     collect_roadmap = getattr(arguments, "collect_roadmap", "false")
     collect_journey = getattr(arguments, "collect_journey", "false")
+    collect_dependencies = getattr(arguments, "collect_dependencies", "false")
     search_attribution = getattr(arguments, "search_attribution", "false")
     maximum_commits = getattr(arguments, "journey_maximum_commits", "256")
     journey_since = getattr(arguments, "journey_since", "")
@@ -346,10 +347,12 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
     if collect_adrs not in {"true", "false"} or collect_roadmap not in {"true", "false"}:
         raise ContractError("RIW-INPUT-ADR-MODE")
     if (search_attribution not in {"true", "false"}
-            or search_attribution == "true" and "true" not in {collect_adrs, collect_roadmap, collect_journey} and not capture_id):
+            or search_attribution == "true" and "true" not in {collect_adrs, collect_roadmap, collect_journey, collect_dependencies} and not capture_id):
         raise ContractError("RIW-INPUT-SEARCH-MODE")
     if collect_journey not in {"true", "false"}:
         raise ContractError("RIW-INPUT-JOURNEY-MODE")
+    if collect_dependencies not in {"true", "false"}:
+        raise ContractError("RIW-INPUT-DEPENDENCIES-MODE")
     positive_integer(maximum_commits, "RIW-INPUT-JOURNEY-LIMIT", 256)
     if collect_journey != "true" and (maximum_commits != "256" or journey_since or journey_until):
         raise ContractError("RIW-INPUT-JOURNEY-MODE")
@@ -365,7 +368,7 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
             raise ValueError()
     except ValueError:
         raise ContractError("RIW-INPUT-JOURNEY-BOUNDARY") from None
-    if "true" in {collect_adrs, collect_roadmap, collect_journey} and (arguments.observatory_snapshot or arguments.observatory_comparison):
+    if "true" in {collect_adrs, collect_roadmap, collect_journey, collect_dependencies} and (arguments.observatory_snapshot or arguments.observatory_comparison):
         raise ContractError("RIW-INPUT-ADR-CONFLICT")
     paths = {
         "output": arguments.output_directory,
@@ -399,11 +402,14 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
     for label, value in (
         ("snapshot", arguments.observatory_snapshot),
         ("comparison", arguments.observatory_comparison),
+        ("hygiene", getattr(arguments, "observatory_hygiene", "")),
     ):
         if value:
             validate_relative_path(value, f"RIW-INPUT-{label.upper()}-PATH")
             if paths_overlap(value, paths["output"]):
                 raise ContractError("RIW-INPUT-EVIDENCE-OVERLAP")
+    if getattr(arguments, "observatory_hygiene", "") and not observed_at:
+        raise ContractError("RIW-INPUT-HYGIENE-BOUNDARY")
     if arguments.observatory_comparison and not arguments.observatory_snapshot:
         raise ContractError("RIW-INPUT-COMPARISON-WITHOUT-SNAPSHOT")
     if arguments.observatory_comparison == arguments.observatory_snapshot and arguments.observatory_comparison:
@@ -752,6 +758,7 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--collect-adrs", default="false")
     value.add_argument("--collect-roadmap", default="false")
     value.add_argument("--collect-journey", default="false")
+    value.add_argument("--collect-dependencies", default="false")
     value.add_argument("--search-attribution", default="false")
     value.add_argument("--journey-maximum-commits", default="256")
     value.add_argument("--journey-since", default="")
@@ -765,6 +772,7 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--adr-known-external-decisions", default="[]")
     value.add_argument("--observatory-snapshot", default="")
     value.add_argument("--observatory-comparison", default="")
+    value.add_argument("--observatory-hygiene", default="")
     value.add_argument("--default-branch", default="")
     value.add_argument("--activity-since", default="1 year ago")
     value.add_argument("--max-depth", default="10")

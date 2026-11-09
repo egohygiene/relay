@@ -33,6 +33,11 @@ on:
         required: false
         default: false
         type: boolean
+      collect-dependencies:
+        description: Collect admitted public declared dependencies; runtime and package adoption remain uncollected.
+        required: false
+        default: false
+        type: boolean
       collect-journey:
         description: Collect bounded immutable public Git Journey evidence; semantic history remains partial.
         required: false
@@ -85,6 +90,11 @@ on:
         type: string
       observatory-snapshot:
         description: Optional public-safe Observatory read model for the represented commit.
+        required: false
+        default: ""
+        type: string
+      observatory-hygiene:
+        description: Optional public Observatory conformance model bound to this repository, represented commit and explicit as-of.
         required: false
         default: ""
         type: string
@@ -162,6 +172,11 @@ on:
         required: false
         default: false
         type: boolean
+      collect-dependencies:
+        description: Collect admitted public declared dependencies; runtime and package adoption remain uncollected.
+        required: false
+        default: false
+        type: boolean
       collect-journey:
         description: Collect bounded immutable public Git Journey evidence; semantic history remains partial.
         required: false
@@ -214,6 +229,11 @@ on:
         type: string
       observatory-snapshot:
         description: Optional public-safe Observatory read model for the represented commit.
+        required: false
+        default: ""
+        type: string
+      observatory-hygiene:
+        description: Optional public Observatory conformance model bound to this repository, represented commit and explicit as-of.
         required: false
         default: ""
         type: string
@@ -304,6 +324,7 @@ jobs:
           collect-adrs: "${{ inputs.collect-adrs }}"
           collect-roadmap: "${{ inputs.collect-roadmap }}"
           collect-journey: "${{ inputs.collect-journey }}"
+          collect-dependencies: "${{ inputs.collect-dependencies }}"
           search-attribution: "${{ inputs.search-attribution }}"
           journey-maximum-commits: "${{ inputs.journey-maximum-commits }}"
           journey-since: "${{ inputs.journey-since }}"
@@ -315,6 +336,7 @@ jobs:
           adr-known-external-decisions: "${{ inputs.adr-known-external-decisions }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
           observatory-comparison: "${{ inputs.observatory-comparison }}"
+          observatory-hygiene: "${{ inputs.observatory-hygiene }}"
           default-branch: "${{ inputs.default-branch }}"
           activity-since: "${{ inputs.activity-since }}"
           max-depth: "${{ inputs.max-depth }}"
@@ -351,6 +373,7 @@ jobs:
           collect-adrs: "${{ inputs.collect-adrs }}"
           collect-roadmap: "${{ inputs.collect-roadmap }}"
           collect-journey: "${{ inputs.collect-journey }}"
+          collect-dependencies: "${{ inputs.collect-dependencies }}"
           search-attribution: "${{ inputs.search-attribution }}"
           journey-maximum-commits: "${{ inputs.journey-maximum-commits }}"
           journey-since: "${{ inputs.journey-since }}"
@@ -362,6 +385,7 @@ jobs:
           adr-known-external-decisions: "${{ inputs.adr-known-external-decisions }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
           observatory-comparison: "${{ inputs.observatory-comparison }}"
+          observatory-hygiene: "${{ inputs.observatory-hygiene }}"
           repository: "${{ github.repository }}"
           default-branch: "${{ inputs.default-branch }}"
           source-commit: "${{ github.sha }}"
@@ -480,6 +504,7 @@ jobs:
           collect-adrs: "${{ inputs.collect-adrs }}"
           collect-roadmap: "${{ inputs.collect-roadmap }}"
           collect-journey: "${{ inputs.collect-journey }}"
+          collect-dependencies: "${{ inputs.collect-dependencies }}"
           search-attribution: "${{ inputs.search-attribution }}"
           journey-maximum-commits: "${{ inputs.journey-maximum-commits }}"
           journey-since: "${{ inputs.journey-since }}"
@@ -491,6 +516,7 @@ jobs:
           adr-known-external-decisions: "${{ inputs.adr-known-external-decisions }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
           observatory-comparison: "${{ inputs.observatory-comparison }}"
+          observatory-hygiene: "${{ inputs.observatory-hygiene }}"
           default-branch: "${{ inputs.default-branch }}"
           activity-since: "${{ inputs.activity-since }}"
           max-depth: "${{ inputs.max-depth }}"

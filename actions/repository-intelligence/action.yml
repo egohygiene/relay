@@ -42,6 +42,10 @@ inputs:
       Conflicts with external snapshot/comparison inputs.
     required: false
     default: "false"
+  collect-dependencies:
+    description: Collect bounded declared dependencies admitted through the exact reviewed Hygiene public catalog; runtime/package adoption remains uncollected.
+    required: false
+    default: "false"
   collect-journey:
     description: Collect bounded immutable public Git Journey evidence; cross-domain history stays partial.
     required: false
@@ -117,6 +121,13 @@ inputs:
       Optional repository-relative path to a public-safe Observatory Repository
       Intelligence comparison whose after boundary matches observatory-snapshot
       and the represented commit. Requires observatory-snapshot when supplied.
+    required: false
+    default: ""
+  observatory-hygiene:
+    description: >-
+      Optional repository-relative public Observatory conformance model for this
+      repository, represented commit and explicit as-of boundary. Renders assessed
+      contracts without inferring whole-repository applicability or exemptions.
     required: false
     default: ""
   repository:
@@ -294,6 +305,7 @@ runs:
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
         INPUT_COLLECT_ROADMAP: "${{ inputs.collect-roadmap }}"
         INPUT_COLLECT_JOURNEY: "${{ inputs.collect-journey }}"
+        INPUT_COLLECT_DEPENDENCIES: "${{ inputs.collect-dependencies }}"
         INPUT_SEARCH_ATTRIBUTION: "${{ inputs.search-attribution }}"
         INPUT_JOURNEY_MAXIMUM_COMMITS: "${{ inputs.journey-maximum-commits }}"
         INPUT_JOURNEY_SINCE: "${{ inputs.journey-since }}"
@@ -312,6 +324,7 @@ runs:
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
         INPUT_OBSERVATORY_COMPARISON: "${{ inputs.observatory-comparison }}"
         INPUT_OBSERVATORY_SNAPSHOT: "${{ inputs.observatory-snapshot }}"
+        INPUT_OBSERVATORY_HYGIENE: "${{ inputs.observatory-hygiene }}"
         INPUT_REPORTS_DIRECTORY: "${{ inputs.reports-directory }}"
         INPUT_REPOSITORY: "${{ inputs.repository }}"
         INPUT_REPOSITORY_VISIBILITY: "${{ inputs.repository-visibility }}"
@@ -346,7 +359,7 @@ runs:
           true | false) ;;
           *) printf 'collect-roadmap must be true or false\n' >&2; exit 2 ;;
         esac
-        if [[ -n "${INPUT_SOURCE_RUNTIME}" && ( ( "${INPUT_COLLECT_ROADMAP}" != "true" && "${INPUT_COLLECT_JOURNEY}" != "true" && "${INPUT_SEARCH_ATTRIBUTION}" != "true" && -z "${INPUT_SOURCE_CAPTURES}" && -z "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ) || -n "${INPUT_ADR_RUNTIME}" ) ]]; then
+        if [[ -n "${INPUT_SOURCE_RUNTIME}" && ( ( "${INPUT_COLLECT_ROADMAP}" != "true" && "${INPUT_COLLECT_JOURNEY}" != "true" && "${INPUT_COLLECT_DEPENDENCIES}" != "true" && "${INPUT_SEARCH_ATTRIBUTION}" != "true" && -z "${INPUT_SOURCE_CAPTURES}" && -z "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ) || -n "${INPUT_ADR_RUNTIME}" ) ]]; then
           printf 'source-runtime requires a native source plan and excludes adr-runtime\n' >&2
           exit 2
         fi
@@ -354,7 +367,7 @@ runs:
           true | false) ;;
           *) printf 'search-attribution must be true or false\n' >&2; exit 2 ;;
         esac
-        if [[ "${INPUT_SEARCH_ATTRIBUTION}" == "true" && "${INPUT_COLLECT_ADRS}" != "true" && "${INPUT_COLLECT_ROADMAP}" != "true" && "${INPUT_COLLECT_JOURNEY}" != "true" && -z "${INPUT_SOURCE_CAPTURES}" && -z "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
+        if [[ "${INPUT_SEARCH_ATTRIBUTION}" == "true" && "${INPUT_COLLECT_ADRS}" != "true" && "${INPUT_COLLECT_ROADMAP}" != "true" && "${INPUT_COLLECT_JOURNEY}" != "true" && "${INPUT_COLLECT_DEPENDENCIES}" != "true" && -z "${INPUT_SOURCE_CAPTURES}" && -z "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
           printf 'search-attribution requires a selected native source plan\n' >&2
           exit 2
         fi
@@ -362,6 +375,10 @@ runs:
           printf 'search-runtime requires search-attribution\n' >&2
           exit 2
         fi
+        case "${INPUT_COLLECT_DEPENDENCIES}" in
+          true | false) ;;
+          *) printf 'collect-dependencies must be true or false\n' >&2; exit 2 ;;
+        esac
         case "${INPUT_COLLECT_JOURNEY}" in
           true | false) ;;
           *) printf 'collect-journey must be true or false\n' >&2; exit 2 ;;
@@ -380,7 +397,7 @@ runs:
           printf 'adr-policy-owner requires collect-adrs\n' >&2
           exit 2
         fi
-        if [[ ( "${INPUT_COLLECT_ADRS}" == "true" || "${INPUT_COLLECT_ROADMAP}" == "true" || "${INPUT_COLLECT_JOURNEY}" == "true" || "${INPUT_SEARCH_ATTRIBUTION}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ) && ( -n "${INPUT_OBSERVATORY_SNAPSHOT}" || -n "${INPUT_OBSERVATORY_COMPARISON}" ) ]]; then
+        if [[ ( "${INPUT_COLLECT_ADRS}" == "true" || "${INPUT_COLLECT_ROADMAP}" == "true" || "${INPUT_COLLECT_JOURNEY}" == "true" || "${INPUT_COLLECT_DEPENDENCIES}" == "true" || "${INPUT_SEARCH_ATTRIBUTION}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ) && ( -n "${INPUT_OBSERVATORY_SNAPSHOT}" || -n "${INPUT_OBSERVATORY_COMPARISON}" ) ]]; then
           printf 'Native source collection conflicts with external snapshot/comparison inputs\n' >&2
           exit 2
         fi
@@ -416,6 +433,18 @@ runs:
           if [[ "${INPUT_SOURCE_CAPTURES}/" == "${INPUT_OUTPUT_DIRECTORY}/"* \
             || "${INPUT_OUTPUT_DIRECTORY}/" == "${INPUT_SOURCE_CAPTURES}/"* ]]; then
             printf 'source-captures and output-directory must not overlap\n' >&2
+            exit 2
+          fi
+        fi
+        if [[ -n "${INPUT_OBSERVATORY_HYGIENE}" ]]; then
+          validate_relative_path "observatory-hygiene" "${INPUT_OBSERVATORY_HYGIENE}"
+          if [[ -z "${INPUT_AS_OF}" ]]; then
+            printf 'observatory-hygiene requires an explicit as-of evaluation boundary\n' >&2
+            exit 2
+          fi
+          if [[ "${INPUT_OBSERVATORY_HYGIENE}/" == "${INPUT_OUTPUT_DIRECTORY}/"* \
+            || "${INPUT_OUTPUT_DIRECTORY}/" == "${INPUT_OBSERVATORY_HYGIENE}/"* ]]; then
+            printf 'observatory-hygiene and output-directory must not overlap\n' >&2
             exit 2
           fi
         fi
@@ -677,6 +706,7 @@ runs:
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
         INPUT_COLLECT_ROADMAP: "${{ inputs.collect-roadmap }}"
         INPUT_COLLECT_JOURNEY: "${{ inputs.collect-journey }}"
+        INPUT_COLLECT_DEPENDENCIES: "${{ inputs.collect-dependencies }}"
         INPUT_SEARCH_ATTRIBUTION: "${{ inputs.search-attribution }}"
         INPUT_JOURNEY_MAXIMUM_COMMITS: "${{ inputs.journey-maximum-commits }}"
         INPUT_JOURNEY_SINCE: "${{ inputs.journey-since }}"
@@ -700,10 +730,10 @@ runs:
         RESOLVED_SOURCE_COMMIT: "${{ steps.metadata.outputs.source-commit }}"
       run: |
         set -euo pipefail
-        if [[ "${INPUT_COLLECT_ADRS}" == "true" || "${INPUT_COLLECT_ROADMAP}" == "true" || "${INPUT_COLLECT_JOURNEY}" == "true" || "${INPUT_SEARCH_ATTRIBUTION}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
+        if [[ "${INPUT_COLLECT_ADRS}" == "true" || "${INPUT_COLLECT_ROADMAP}" == "true" || "${INPUT_COLLECT_JOURNEY}" == "true" || "${INPUT_COLLECT_DEPENDENCIES}" == "true" || "${INPUT_SEARCH_ATTRIBUTION}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
           runtime_arguments=()
           collector="${GITHUB_ACTION_PATH}/scripts/prepare_repository_adr_build.py"
-          if [[ "${INPUT_COLLECT_ROADMAP}" == "true" || "${INPUT_COLLECT_JOURNEY}" == "true" || "${INPUT_SEARCH_ATTRIBUTION}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
+          if [[ "${INPUT_COLLECT_ROADMAP}" == "true" || "${INPUT_COLLECT_JOURNEY}" == "true" || "${INPUT_COLLECT_DEPENDENCIES}" == "true" || "${INPUT_SEARCH_ATTRIBUTION}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
             collector="${GITHUB_ACTION_PATH}/scripts/prepare_repository_sources_build.py"
             runtime_arguments+=(--generator-commit "${RESOLVED_GENERATOR_COMMIT}")
             if [[ "${INPUT_SEARCH_ATTRIBUTION}" == "true" ]]; then
@@ -720,6 +750,9 @@ runs:
               if [[ -n "${INPUT_JOURNEY_UNTIL}" ]]; then
                 runtime_arguments+=(--journey-until "${INPUT_JOURNEY_UNTIL}")
               fi
+            fi
+            if [[ "${INPUT_COLLECT_DEPENDENCIES}" == "true" ]]; then
+              runtime_arguments+=(--collect-dependencies)
             fi
             if [[ "${INPUT_COLLECT_ROADMAP}" == "true" ]]; then
               runtime_arguments+=(--collect-roadmap)
@@ -823,6 +856,7 @@ runs:
         INPUT_COLLECT_ADRS: "${{ inputs.collect-adrs }}"
         INPUT_COLLECT_ROADMAP: "${{ inputs.collect-roadmap }}"
         INPUT_COLLECT_JOURNEY: "${{ inputs.collect-journey }}"
+        INPUT_COLLECT_DEPENDENCIES: "${{ inputs.collect-dependencies }}"
         INPUT_SEARCH_ATTRIBUTION: "${{ inputs.search-attribution }}"
         INPUT_JOURNEY_MAXIMUM_COMMITS: "${{ inputs.journey-maximum-commits }}"
         INPUT_JOURNEY_SINCE: "${{ inputs.journey-since }}"
@@ -832,6 +866,7 @@ runs:
         INPUT_SOURCE_CAPTURE_ARTIFACT_DIGEST: "${{ inputs.source-capture-artifact-digest }}"
         INPUT_OBSERVATORY_COMPARISON: "${{ inputs.observatory-comparison }}"
         INPUT_OBSERVATORY_SNAPSHOT: "${{ inputs.observatory-snapshot }}"
+        INPUT_OBSERVATORY_HYGIENE: "${{ inputs.observatory-hygiene }}"
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
         INPUT_REPORTS_DIRECTORY: "${{ inputs.reports-directory }}"
         INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
@@ -872,7 +907,7 @@ runs:
           --script-source "${GITHUB_ACTION_PATH}/assets/explorer.js" \
           --dashboard-subdirectory "dashboard"
         snapshot_arguments=()
-        if [[ "${INPUT_COLLECT_ROADMAP}" == "true" || "${INPUT_COLLECT_JOURNEY}" == "true" || "${INPUT_SEARCH_ATTRIBUTION}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
+        if [[ "${INPUT_COLLECT_ROADMAP}" == "true" || "${INPUT_COLLECT_JOURNEY}" == "true" || "${INPUT_COLLECT_DEPENDENCIES}" == "true" || "${INPUT_SEARCH_ATTRIBUTION}" == "true" || -n "${INPUT_SOURCE_CAPTURES}" || -n "${INPUT_SOURCE_CAPTURE_ARTIFACT_ID}" ]]; then
           INPUT_OBSERVATORY_SNAPSHOT="${INPUT_WORK_DIRECTORY}/sources/snapshot.json"
           python3 -I "${GITHUB_ACTION_PATH}/scripts/repository_sources_build_contract.py" \
             --provenance "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/provenance.json" \
@@ -890,6 +925,10 @@ runs:
             --snapshot "${GITHUB_WORKSPACE}/${INPUT_OBSERVATORY_SNAPSHOT}"
           )
         fi
+        hygiene_arguments=()
+        if [[ -n "${INPUT_OBSERVATORY_HYGIENE}" ]]; then
+          hygiene_arguments+=(--hygiene "${GITHUB_WORKSPACE}/${INPUT_OBSERVATORY_HYGIENE}")
+        fi
         python3 "${GITHUB_ACTION_PATH}/scripts/generate_repository_intelligence_site.py" \
           --repository-root "${GITHUB_WORKSPACE}" \
           --output-root "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}" \
@@ -899,7 +938,8 @@ runs:
           --source-commit "${RESOLVED_SOURCE_COMMIT}" \
           --stylesheet-source "${GITHUB_ACTION_PATH}/assets/site.css" \
           --script-source "${GITHUB_ACTION_PATH}/assets/site.js" \
-          "${snapshot_arguments[@]}"
+          "${snapshot_arguments[@]}" \
+          "${hygiene_arguments[@]}"
         python3 "${GITHUB_ACTION_PATH}/scripts/render_repository_intelligence_dependencies.py" \
           --repository-root "${GITHUB_WORKSPACE}" \
           --output-root "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}" \

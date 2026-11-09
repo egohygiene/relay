@@ -123,6 +123,7 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--summary", required=True)
     parser.add_argument("--provenance", required=True)
     parser.add_argument("--snapshot", default="")
+    parser.add_argument("--hygiene", default="")
     parser.add_argument("--repository", required=True)
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--stylesheet-source", required=True)
@@ -2333,7 +2334,7 @@ def collection_notice(snapshot: dict[str, Any] | None, route: str) -> str:
             'or a passing check.</p><ul>' + rows + '</ul></section>')
 
 
-def navigation(current: str, prefix: str) -> str:
+def navigation(current: str, prefix: str, *, supported_views=()) -> str:
     overview_current = ' aria-current="page"' if current == "intelligence" else ""
     links = [
         f'<a href="{escaped(prefix or "./")}"{overview_current}>Overview</a>'
@@ -2348,8 +2349,9 @@ def navigation(current: str, prefix: str) -> str:
         current_attribute = ' aria-current="page"' if current == route else ""
         extra.append(f'<a href="{escaped(prefix + route + "/")}"{current_attribute}>{escaped(label)}</a>')
     open_attribute = " open" if current in route_contract.RESERVED_IDS else ""
+    support_label = "Owner source availability is shown in each view."
     links.append(f'<details{open_attribute}><summary>Additional evidence views</summary>'
-                 '<p>Source projections unsupported</p>' + "".join(extra) + '</details>')
+                 f'<p>{support_label}</p>' + "".join(extra) + '</details>')
     links.append(
         f'<a href="{escaped(prefix + "dashboard/")}">Dashboard</a>'
     )
@@ -2368,13 +2370,16 @@ def shell_document(
     body: str,
     prefix: str,
     snapshot_available: bool,
+    supported_views=(),
+    source_schema: str = SNAPSHOT_SCHEMA,
 ) -> str:
     state, build_label = build_status(summary)
-    route_metadata = route_contract.route(route)
+    route_metadata = route_contract.route(route, supported_views=supported_views)
     unsupported = route_metadata["renderer_state"] == "source-unsupported"
     repository_url = f"https://github.com/{repository}"
     commit_url = f"{repository_url}/commit/{source_commit}"
     snapshot_label = ("Source projection unsupported" if unsupported else
+                      "Observatory conformance model loaded" if route == "hygiene" and route in supported_views else
                       "Observatory snapshot loaded" if snapshot_available else "Snapshot unavailable")
     canonical_href = (prefix or "./") if route == "intelligence" else prefix + route + "/"
     known_routes = json.dumps(["intelligence", *(name for name, _label in ROUTES), "dashboard"], separators=(",", ":"))
@@ -2417,7 +2422,7 @@ def shell_document(
     <div class="ri-layout">
       <aside class="ri-sidebar" aria-label="Repository Intelligence navigation">
         <div class="ri-repository"><span class="ri-eyebrow">Repository</span><strong>{escaped(repository)}</strong><span>{status_pill(freshness)}</span></div>
-        <nav class="ri-route-nav" data-preserve-context-links>{navigation(route, prefix)}</nav>
+        <nav class="ri-route-nav" data-preserve-context-links>{navigation(route, prefix, supported_views=supported_views)}</nav>
         <div class="ri-local-resume" data-local-resume>
           <span class="ri-eyebrow">This device</span>
           <p>Resume data stays in this browser. It never becomes canonical repository evidence.</p>
@@ -2440,7 +2445,7 @@ def shell_document(
         <div class="ri-visually-hidden" role="status" aria-live="polite" aria-atomic="true" data-context-status></div>
         {command_bar}
         <main id="main-content" tabindex="-1">{body}<div class="ri-no-results" data-no-results hidden>{empty_state("No matching evidence", "Clear a filter or broaden the search to continue.", "empty")}</div></main>
-        <footer><span>Operational state is rendered only from <code>{escaped(SNAPSHOT_SCHEMA)}</code>. Unsupported domain projections remain unprojected.</span><a href="#main-content">Back to top ↑</a></footer>
+        <footer><span>Evidence is rendered from <code>{escaped(source_schema)}</code>. Unsupported domain projections remain unprojected.</span><a href="#main-content">Back to top ↑</a></footer>
       </div>
     </div>
     <script src="{escaped(prefix)}site.js" defer></script>
@@ -2449,7 +2454,7 @@ def shell_document(
 '''
 
 
-def overview_body() -> str:
+def overview_body(*, supported_views=()) -> str:
     """Render the product entry point without duplicating the operational Now view."""
 
     cards = []
@@ -2464,13 +2469,14 @@ def overview_body() -> str:
         )
     additional = "".join(
         f'<li><a data-preserve-context href="./{escaped(route)}/">{escaped(label)}</a>: '
-        f'{escaped(ROUTE_QUESTIONS[route])} <strong>Source projection unsupported.</strong></li>'
+        f'{escaped(ROUTE_QUESTIONS[route])} <strong>'
+        f'{"Assessed contract evidence supplied; applicability inventory unknown." if route in supported_views else "Source projection unsupported."}</strong></li>'
         for route, label in route_contract.RESERVED_ROUTES)
     return f'''<section class="ri-section ri-section--lead" aria-labelledby="intelligence-heading">
       <div class="ri-section-heading"><div><span class="ri-eyebrow">Repository orientation</span><h2 id="intelligence-heading">Choose the evidence question</h2></div><p>Each route answers one bounded question from the same represented commit. Unknown and unavailable evidence stays explicit inside the selected view.</p></div>
       <div class="ri-now-grid ri-overview-grid">{"".join(cards)}</div>
     </section>
-    <section class="ri-section"><details class="ri-panel"><summary>Additional registered evidence views</summary><p>These repository-profile routes preserve stable navigation while their owning source contracts remain unsupported by the current build. Missing evidence never means a repository has passed or is not applicable.</p><ul>{additional}</ul></details></section>
+    <section class="ri-section"><details class="ri-panel"><summary>Additional registered evidence views</summary><p>These repository-profile routes preserve stable navigation. Each view states which owner evidence was supplied; missing evidence never means a repository has passed or is not applicable.</p><ul>{additional}</ul></details></section>
     <section class="ri-section" aria-labelledby="dashboard-heading"><div class="ri-panel ri-panel--wide"><div class="ri-panel-heading"><span class="ri-panel-icon" aria-hidden="true">↗</span><div><span class="ri-eyebrow">Build evidence</span><h2 id="dashboard-heading">Inspect the analytics dashboard</h2></div></div><p>Review source-tree, activity, dependency, and generator evidence without confusing the compatibility dashboard with a canonical repository view.</p><a class="ri-button ri-button--quiet" data-preserve-context href="./dashboard/">Open Dashboard</a></div></section>'''
 
 
@@ -2522,7 +2528,12 @@ def write_site(
     source_commit: str,
     stylesheet_source: Path,
     script_source: Path,
+    hygiene: dict[str, Any] | None = None,
+    hygiene_receipt: dict[str, Any] | None = None,
 ) -> None:
+    if (hygiene is None) != (hygiene_receipt is None):
+        raise SiteInputError("Hygiene model and receipt must be supplied together")
+    supported_views = ("hygiene",) if hygiene is not None else ()
     observed_at = str(
         snapshot.get("observed_at") if snapshot else summary.get("generated_at") or ""
     )
@@ -2534,13 +2545,14 @@ def write_site(
         "freshness": freshness,
         "summary": summary,
         "snapshot_available": snapshot is not None,
+        "supported_views": supported_views,
     }
     atomic_write(
         output_root / "index.html",
         shell_document(
             route="intelligence",
             route_label="Intelligence",
-            body=collection_notice(snapshot, "intelligence") + overview_body(),
+            body=collection_notice(snapshot, "intelligence") + overview_body(supported_views=supported_views),
             prefix="",
             **shared,
         ),
@@ -2556,6 +2568,15 @@ def write_site(
         ),
     )
     for route, label in ROUTES[1:]:
+        if route == "hygiene" and hygiene is not None:
+            helper = load_hygiene_helper()
+            helper.validate_receipt(hygiene_receipt, repository, source_commit, summary["generated_at"])
+            atomic_write(output_root / route / "index.html", shell_document(
+                route=route, route_label=label,
+                body=helper.render_body(hygiene, receipt=hygiene_receipt), prefix="../",
+                **{**shared, "freshness": hygiene_receipt["freshness"], "snapshot_available": True,
+                   "source_schema": hygiene_receipt["owner"]["schema"]}))
+            continue
         body = (
             roadmap_body(snapshot)
             if route == "roadmap"
@@ -2575,13 +2596,24 @@ def write_site(
                 **{**shared, "freshness": projection_freshness(snapshot, route)},
             ),
         )
-    atomic_write(output_root / "routes.json", json.dumps(route_contract.manifest(repository, source_commit),
+    atomic_write(output_root / "routes.json", json.dumps(route_contract.manifest(
+                 repository, source_commit, supported_views=supported_views),
                  ensure_ascii=False, indent=2, sort_keys=True) + "\n")
     atomic_write(output_root / "site.css", stylesheet_source.read_text(encoding="utf-8"))
     atomic_write(output_root / "site.js", script_source.read_text(encoding="utf-8"))
     assets = Path(__file__).resolve().parents[1] / "assets"
     (output_root / "egohygiene.png").write_bytes((assets / "egohygiene.png").read_bytes())
     atomic_write(output_root / "github.svg", (assets / "github.svg").read_text(encoding="utf-8"))
+
+
+def load_hygiene_helper():
+    spec = importlib.util.spec_from_file_location("relay_site_hygiene",
+        Path(__file__).with_name("render_repository_intelligence_hygiene.py"))
+    if spec is None or spec.loader is None:
+        raise SiteInputError("Hygiene renderer is unavailable")
+    helper = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(helper)
+    return helper
 
 
 def main() -> int:
@@ -2591,6 +2623,7 @@ def main() -> int:
     summary_path = Path(args.summary).resolve()
     provenance_path = Path(args.provenance).resolve()
     snapshot_path = Path(args.snapshot).absolute() if args.snapshot else None
+    hygiene_path = Path(args.hygiene).absolute() if args.hygiene else None
     stylesheet_source = Path(args.stylesheet_source).resolve()
     script_source = Path(args.script_source).resolve()
     if not FULL_SHA.fullmatch(args.source_commit):
@@ -2600,11 +2633,23 @@ def main() -> int:
         (summary_path, "dashboard summary"),
         (provenance_path, "bundle provenance"),
         *(((snapshot_path, "Observatory snapshot"),) if snapshot_path is not None else ()),
+        *(((hygiene_path, "Observatory conformance"),) if hygiene_path is not None else ()),
     ):
         validate_repository_path(repository_root, path, label)
     summary = load_object(summary_path, "dashboard summary")
     provenance = load_object(provenance_path, "bundle provenance")
     validate_site_contracts(summary, provenance, args.repository, args.source_commit)
+    hygiene, hygiene_receipt = None, None
+    if hygiene_path is not None:
+        if provenance["consumer"]["visibility"] != "public":
+            raise SiteInputError("Hygiene conformance requires public consumer evidence")
+        if hygiene_path == output_root or output_root in hygiene_path.parents:
+            raise SiteInputError("Hygiene input must remain outside the published bundle")
+        hygiene, hygiene_receipt = load_hygiene_helper().validate_input(
+            hygiene_path, args.repository, args.source_commit, summary["generated_at"])
+        provenance["hygiene_conformance"] = hygiene_receipt
+        atomic_write(provenance_path, json.dumps(provenance, ensure_ascii=False,
+            indent=2, sort_keys=True) + "\n")
     snapshot = None
     if snapshot_path is not None:
         if not snapshot_path.is_file():
@@ -2623,6 +2668,8 @@ def main() -> int:
         source_commit=args.source_commit,
         stylesheet_source=stylesheet_source,
         script_source=script_source,
+        hygiene=hygiene,
+        hygiene_receipt=hygiene_receipt,
     )
     print(
         f"Generated Repository Intelligence shell at {output_root} "
