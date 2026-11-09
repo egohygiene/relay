@@ -1,8 +1,17 @@
 # Repository Intelligence
 
-Generate a complete static repository-intelligence dashboard without deploying
+Generate a static repository-intelligence dashboard without deploying
 it. The action is intentionally a **builder**, so a consumer can compose the
 result with any existing GitHub Pages, documentation, or product-site artifact.
+
+Each repository owns its published `/intelligence/` subtree. The organization
+Intelligence site is a fleet overview that links into these repository views.
+The [repository route handoff](../../docs/repository-intelligence-routes.md)
+uses Hygiene's pinned repository profile, preserves the ten shipped focused
+renderers and exposes unsupported source models explicitly. The overview and
+compatibility dashboard include a portable interactive navigation/evidence
+graph, with keyboard controls and static node/relationship directories.
+Neither the graph nor a generated route proves collection or publication.
 
 The experimental [canonical roadmap collector](../../docs/repository-roadmap-collector.md)
 can prepare local review evidence from an immutable `ROADMAP.md`. Its

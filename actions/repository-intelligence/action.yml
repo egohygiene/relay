@@ -190,6 +190,27 @@ outputs:
   dashboard:
     description: "Repository-relative path to the compatibility analytics dashboard."
     value: "${{ inputs.output-directory }}/dashboard/index.html"
+  route-registry:
+    description: "Repository-relative path to the pinned repository-profile route and alias handoff."
+    value: "${{ inputs.output-directory }}/routes.json"
+  audits:
+    description: "Repository-relative path to the Audits source-availability view."
+    value: "${{ inputs.output-directory }}/audits/index.html"
+  hygiene:
+    description: "Repository-relative path to the Hygiene source-availability view."
+    value: "${{ inputs.output-directory }}/hygiene/index.html"
+  sanity:
+    description: "Repository-relative path to the Sanity source-availability view."
+    value: "${{ inputs.output-directory }}/sanity/index.html"
+  diagnostics:
+    description: "Repository-relative path to the Diagnostics source-availability view."
+    value: "${{ inputs.output-directory }}/diagnostics/index.html"
+  distribution:
+    description: "Repository-relative path to the Distribution source-availability view."
+    value: "${{ inputs.output-directory }}/distribution/index.html"
+  identity:
+    description: "Repository-relative path to the Intelligence Identity source-availability view."
+    value: "${{ inputs.output-directory }}/identity/index.html"
   summary:
     description: "Repository-relative path to the aggregate dashboard projection."
     value: "${{ inputs.output-directory }}/summary.json"
@@ -738,6 +759,15 @@ runs:
           --source-commit "${RESOLVED_SOURCE_COMMIT}" \
           "${snapshot_arguments[@]}" \
           "${comparison_arguments[@]}"
+        python3 "${GITHUB_ACTION_PATH}/scripts/render_repository_intelligence_graph.py" \
+          --repository-root "${GITHUB_WORKSPACE}" \
+          --output-root "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}" \
+          --summary "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/summary.json" \
+          --provenance "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}/provenance.json" \
+          --repository "${RESOLVED_REPOSITORY}" \
+          --source-commit "${RESOLVED_SOURCE_COMMIT}" \
+          --target both \
+          "${snapshot_arguments[@]}"
 
     - name: "🧾 Create deterministic build manifest"
       id: build_manifest

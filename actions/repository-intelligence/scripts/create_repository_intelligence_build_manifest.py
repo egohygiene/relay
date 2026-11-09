@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -37,6 +38,16 @@ ROUTED_ROUTES = (
     "/intelligence/search/",
     "/intelligence/work/",
 )
+# Keep old routed v1 artifacts structurally recognizable for pinned recovery.
+LEGACY_ROUTED_ROUTES = ROUTED_ROUTES
+_route_spec = importlib.util.spec_from_file_location(
+    "relay_manifest_routes", Path(__file__).with_name("repository_intelligence_routes.py"))
+if _route_spec is None or _route_spec.loader is None:
+    raise RuntimeError("Repository Intelligence route profile is unavailable")
+route_contract = importlib.util.module_from_spec(_route_spec)
+_route_spec.loader.exec_module(route_contract)
+ROUTED_ROUTES = route_contract.canonical_routes()
+
 CONTRACTS: dict[str, dict[str, str | int]] = {
     "action_inputs": {
         "schema": "egohygiene.relay.repository-intelligence-inputs/v1",
@@ -144,7 +155,7 @@ def enabled_routes(output_root: Path) -> list[str]:
         route = "/intelligence/" if relative == "index.html" else f"/intelligence/{relative[:-10]}"
         routes.append(route)
     routes.sort()
-    if tuple(routes) not in {("/intelligence/",), ROUTED_ROUTES}:
+    if tuple(routes) not in {("/intelligence/",), LEGACY_ROUTED_ROUTES, ROUTED_ROUTES}:
         raise ManifestError("bundle route inventory is incompatible with manifest v1")
     return routes
 

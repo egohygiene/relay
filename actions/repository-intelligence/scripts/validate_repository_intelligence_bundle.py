@@ -38,6 +38,11 @@ ROUTED_BUNDLE_FILES = {
     "summary.json",
     "work/index.html",
 }
+REGISTERED_BUNDLE_FILES = ROUTED_BUNDLE_FILES | {
+    "routes.json", "audits/index.html", "hygiene/index.html", "sanity/index.html",
+    "diagnostics/index.html", "distribution/index.html", "identity/index.html",
+}
+GRAPH_BUNDLE_FILES = {"graph.js", "graph.css"}
 LEGACY_BUNDLE_FILES = {
     "build-manifest.json",
     "egohygiene.png",
@@ -257,6 +262,28 @@ def canonical_output_root(repository_root: Path, output_root: Path) -> tuple[Pat
     return root, output
 
 
+def expected_bundle_files(output_root: Path) -> set[str]:
+    if not (output_root / "now/index.html").is_file():
+        return set(LEGACY_BUNDLE_FILES)
+    files = set(REGISTERED_BUNDLE_FILES if (output_root / "routes.json").is_file() else ROUTED_BUNDLE_FILES)
+    if any((output_root / name).exists() for name in GRAPH_BUNDLE_FILES):
+        files.update(GRAPH_BUNDLE_FILES)
+    return files
+
+
+def validate_route_manifest(output_root: Path, repository: str, source_commit: str) -> None:
+    path = output_root / "routes.json"
+    if not path.is_file():
+        return
+    try:
+        actual = load_json_object(path, "repository routes")
+        expected = build_manifest_contract.route_contract.manifest(repository, source_commit)
+        if actual != expected:
+            raise ValueError("incompatible")
+    except (ValueError, OSError, KeyError, TypeError) as error:
+        raise BundleValidationError("repository route manifest/source binding is incompatible") from error
+
+
 def collect_bundle_files(output_root: Path) -> set[str]:
     """Return the routed bundle allowlist and reject symbolic links."""
 
@@ -268,9 +295,7 @@ def collect_bundle_files(output_root: Path) -> set[str]:
             )
         if path.is_file():
             discovered.add(path.relative_to(output_root).as_posix())
-    expected = (
-        ROUTED_BUNDLE_FILES if (output_root / "now/index.html").is_file() else LEGACY_BUNDLE_FILES
-    )
+    expected = expected_bundle_files(output_root)
     if discovered != expected:
         missing = sorted(expected - discovered)
         unexpected = sorted(discovered - expected)
@@ -289,10 +314,19 @@ def load_json_object(path: Path, label: str) -> dict[str, Any]:
     def reject_nonstandard_number(value: str) -> None:
         raise ValueError(f"non-standard JSON number: {value}")
 
+    def unique_members(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        document: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in document:
+                raise ValueError("duplicate JSON member")
+            document[key] = value
+        return document
+
     try:
         document = json.loads(
             path.read_text(encoding="utf-8"),
             parse_constant=reject_nonstandard_number,
+            object_pairs_hook=unique_members,
         )
     except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as error:
         raise BundleValidationError(f"{label} must contain valid UTF-8 JSON") from error
@@ -1344,9 +1378,7 @@ def validate_html_references(
     """Validate every HTML href/src and the required framework-free assets."""
 
     destinations: set[str] = set()
-    expected_files = (
-        ROUTED_BUNDLE_FILES if (output_root / "now/index.html").is_file() else LEGACY_BUNDLE_FILES
-    )
+    expected_files = expected_bundle_files(output_root)
     collectors: dict[Path, ReferenceCollector] = {}
     for relative_name in sorted(name for name in expected_files if name.endswith(".html")):
         html_path = output_root / relative_name
@@ -1384,9 +1416,13 @@ def validate_html_references(
             "styles.css",
             "summary.json",
         }
-        if expected_files is ROUTED_BUNDLE_FILES
+        if (output_root / "now/index.html").is_file()
         else {"explorer.js", "provenance.json", "styles.css", "summary.json"}
     )
+    if "routes.json" in expected_files:
+        required.add("routes.json")
+    if GRAPH_BUNDLE_FILES.issubset(expected_files):
+        required.update(GRAPH_BUNDLE_FILES)
     if not required.issubset(destinations):
         missing = ", ".join(sorted(required - destinations))
         raise BundleValidationError(f"index.html does not reference required bundle files: {missing}")
@@ -1412,6 +1448,8 @@ def validate_canonical_assets(output_root: Path) -> None:
             "styles.css": assets_root / "dashboard.css",
         }
     )
+    if any((output_root / name).exists() for name in GRAPH_BUNDLE_FILES):
+        expected.update({name: assets_root / name for name in GRAPH_BUNDLE_FILES})
     for output_name, source in expected.items():
         try:
             source_bytes = source.read_bytes()
@@ -1464,9 +1502,7 @@ def validate_privacy(
             if any(pattern.search(value) for pattern in SECRET_PATTERNS):
                 raise BundleValidationError(f"public JSON contains a secret-like value: {path}")
     repository_path = str(repository_root)
-    bundle_files = (
-        ROUTED_BUNDLE_FILES if (output_root / "now/index.html").is_file() else LEGACY_BUNDLE_FILES
-    )
+    bundle_files = expected_bundle_files(output_root)
     for name in sorted(bundle_files):
         if name == "egohygiene.png":
             # This binary is byte-checked against the canonical asset before privacy validation.
@@ -1518,7 +1554,9 @@ def validate_routed_shell(
 
     if not (output_root / "now/index.html").is_file():
         return
-    for route in SHELL_ROUTES:
+    shell_routes = ([name for name, _label in build_manifest_contract.route_contract.ROUTES]
+                    if (output_root / "routes.json").is_file() else SHELL_ROUTES)
+    for route in shell_routes:
         rendered = (output_root / route / "index.html").read_text(encoding="utf-8")
         markers = {
             f'data-ri-route="{route}"',
@@ -1526,9 +1564,17 @@ def validate_routed_shell(
             f'data-ri-commit="{source_commit}"',
             'class="ri-route-nav"',
             'data-local-resume',
-            'data-filter-query',
             'aria-current="page"',
         }
+        if route in build_manifest_contract.route_contract.RESERVED_IDS:
+            markers.update({
+                'data-ri-renderer-state="source-unsupported"',
+                'Source projection unsupported',
+                'Repository evidence boundary',
+                build_manifest_contract.route_contract.source_boundary(route),
+            })
+        else:
+            markers.add('data-filter-query')
         missing = sorted(marker for marker in markers if marker not in rendered)
         if missing:
             raise BundleValidationError(
@@ -1621,6 +1667,7 @@ def validate_bundle(
     if source_epoch < 0:
         raise BundleValidationError("consumer source epoch must be non-negative")
     collect_bundle_files(output)
+    validate_route_manifest(output, repository, source_commit)
     documents = validate_json_contracts(
         output,
         repository=repository,
