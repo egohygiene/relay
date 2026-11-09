@@ -1,0 +1,520 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/source-release-build.v1.schema.json",
+  "title": "Fresh bounded release and deployment source build receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "admission",
+    "repository",
+    "source_commit",
+    "generator_commit",
+    "observed_at",
+    "status",
+    "inputs",
+    "runtime",
+    "validation",
+    "coverage",
+    "diagnostics",
+    "candidate_digests"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.relay.source-release-build/v1"
+    },
+    "kind": {
+      "const": "releases"
+    },
+    "admission": {
+      "const": "fresh-captured-input"
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+    },
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "generator_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "observed_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+      "format": "date-time"
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "partial",
+        "stale",
+        "unavailable",
+        "uncollected",
+        "not_applicable"
+      ]
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capture_sha256",
+        "receipt_sha256",
+        "public_environments",
+        "maximum_age_seconds",
+        "inventory",
+        "record_counts",
+        "commit_revisions",
+        "contracts"
+      ],
+      "properties": {
+        "capture_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "receipt_sha256": {
+          "type": "array",
+          "maxItems": 256,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "public_environments": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9._ -]+$"
+          }
+        },
+        "maximum_age_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2678400
+        },
+        "inventory": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "releases",
+                "deployments"
+              ],
+              "properties": {
+                "releases": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "status",
+                    "observed_at",
+                    "pages_captured",
+                    "pagination_complete"
+                  ],
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "complete",
+                        "truncated",
+                        "filtered",
+                        "incomplete",
+                        "denied",
+                        "unavailable",
+                        "failed",
+                        "uncollected",
+                        "not_applicable"
+                      ]
+                    },
+                    "observed_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "pages_captured": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 10000
+                    },
+                    "pagination_complete": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "deployments": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "status",
+                    "observed_at",
+                    "pages_captured",
+                    "pagination_complete"
+                  ],
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "complete",
+                        "truncated",
+                        "filtered",
+                        "incomplete",
+                        "denied",
+                        "unavailable",
+                        "failed",
+                        "uncollected",
+                        "not_applicable"
+                      ]
+                    },
+                    "observed_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "pages_captured": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 10000
+                    },
+                    "pagination_complete": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "record_counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "releases",
+            "deployments",
+            "git",
+            "history"
+          ],
+          "properties": {
+            "releases": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 256
+            },
+            "deployments": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 256
+            },
+            "git": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 512
+            },
+            "history": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 512
+            }
+          }
+        },
+        "commit_revisions": {
+          "type": "array",
+          "maxItems": 512,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          }
+        },
+        "contracts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "provider_capture",
+            "review",
+            "deployment_receipt"
+          ],
+          "properties": {
+            "provider_capture": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "review": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "deployment_receipt": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lock_sha256",
+        "egolint_sha256",
+        "pins",
+        "relay_files_sha256"
+      ],
+      "properties": {
+        "lock_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "egolint_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "pins": {
+          "type": "object"
+        },
+        "relay_files_sha256": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "actions/repository-intelligence/scripts/collect_repository_releases.py",
+            "actions/repository-intelligence/scripts/collect_repository_roadmap.py",
+            "actions/repository-intelligence/scripts/collect_repository_adrs.py",
+            "actions/repository-intelligence/scripts/repository_adr_inputs.py",
+            "actions/repository-intelligence/contracts/release-collector.v1.lock.json",
+            "actions/repository-intelligence/contracts/roadmap-collector-requirements.txt",
+            "actions/repository-intelligence/schemas/release-provider-capture.v1.schema.json",
+            "actions/repository-intelligence/schemas/release-collection-review.v1.schema.json",
+            "actions/repository-intelligence-deployment-provenance/schemas/deployment-receipt.schema.json"
+          ],
+          "properties": {
+            "actions/repository-intelligence/scripts/collect_repository_releases.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "actions/repository-intelligence/scripts/collect_repository_roadmap.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "actions/repository-intelligence/scripts/collect_repository_adrs.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "actions/repository-intelligence/scripts/repository_adr_inputs.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "actions/repository-intelligence/contracts/release-collector.v1.lock.json": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "actions/repository-intelligence/contracts/roadmap-collector-requirements.txt": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "actions/repository-intelligence/schemas/release-provider-capture.v1.schema.json": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "actions/repository-intelligence/schemas/release-collection-review.v1.schema.json": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "actions/repository-intelligence-deployment-provenance/schemas/deployment-receipt.schema.json": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hygiene",
+        "coverage",
+        "observatory"
+      ],
+      "properties": {
+        "hygiene": {
+          "const": "valid"
+        },
+        "coverage": {
+          "const": "valid"
+        },
+        "observatory": {
+          "const": "normalized"
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roadmap",
+        "decisions",
+        "git",
+        "issues",
+        "pull_requests",
+        "checks",
+        "releases",
+        "deployments",
+        "history"
+      ],
+      "properties": {
+        "roadmap": {
+          "$ref": "#/$defs/claim"
+        },
+        "decisions": {
+          "$ref": "#/$defs/claim"
+        },
+        "git": {
+          "$ref": "#/$defs/claim"
+        },
+        "issues": {
+          "$ref": "#/$defs/claim"
+        },
+        "pull_requests": {
+          "$ref": "#/$defs/claim"
+        },
+        "checks": {
+          "$ref": "#/$defs/claim"
+        },
+        "releases": {
+          "$ref": "#/$defs/claim"
+        },
+        "deployments": {
+          "$ref": "#/$defs/claim"
+        },
+        "history": {
+          "$ref": "#/$defs/claim"
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "owner"
+        ],
+        "properties": {
+          "code": {
+            "const": "TARGET"
+          },
+          "owner": {
+            "const": "relay"
+          }
+        }
+      }
+    },
+    "candidate_digests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "projection_sha256",
+        "snapshot_sha256"
+      ],
+      "properties": {
+        "projection_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "snapshot_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "collection",
+        "freshness",
+        "reason",
+        "observed_at"
+      ],
+      "properties": {
+        "collection": {
+          "enum": [
+            "uncollected",
+            "unavailable",
+            "partial",
+            "observed_empty",
+            "observed",
+            "failed",
+            "not_applicable"
+          ]
+        },
+        "freshness": {
+          "enum": [
+            "current",
+            "stale",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "not_requested",
+            "access_denied",
+            "provider_unavailable",
+            "collection_failed",
+            "complete",
+            "filtered",
+            "truncated",
+            "incomplete",
+            "explicit_not_applicable"
+          ]
+        },
+        "observed_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -19,9 +19,41 @@ SHA256 = re.compile(r"[0-9a-f]{64}")
 FILES = ("collect_repository_roadmap_source.py", "prepare_repository_sources_build.py",
          "collect_repository_roadmap.py", "collect_repository_adrs.py", "repository_adr_inputs.py",
          "collect_repository_work.py", "collect_repository_health.py", "repository_capture_build_contract.py",
-         "repository_source_capture_inputs.py", "repository_capture_artifact.py")
+         "repository_source_capture_inputs.py", "repository_capture_artifact.py", "collect_repository_journey.py",
+         "repository_journey_build_contract.py", "collect_repository_releases.py", "repository_release_build_contract.py")
 SOURCE_DOMAINS = {"decisions": ("decisions",), "roadmap": ("roadmap",),
-                  "work": ("issues", "pull_requests"), "health": ("checks",)}
+                  "work": ("issues", "pull_requests"), "health": ("checks",),
+                  "journey": ("git", "history"), "releases": ("releases", "deployments")}
+UNCOLLECTED = {"collection": "uncollected", "freshness": "unknown", "reason": "not_requested", "observed_at": None}
+
+
+def combined_coverage(receipts):
+    """Preserve independent inventories; only two reviewed ancillary scopes overlap."""
+    domains = ("roadmap", "decisions", "git", "issues", "pull_requests", "checks", "releases", "deployments", "history")
+    result = {name: dict(UNCOLLECTED) for name in domains}
+    for kind, receipt in receipts.items():
+        for domain in SOURCE_DOMAINS[kind]:
+            result[domain] = dict(receipt["coverage"][domain])
+    release = receipts.get("releases")
+    if release is not None:
+        journey = receipts.get("journey")
+        for domain in ("git", "history"):
+            ancillary = release["coverage"][domain]
+            if ancillary["collection"] == "uncollected":
+                continue
+            if journey is None:
+                result[domain] = dict(ancillary)
+                continue
+            # A release can name a commit outside the declared Journey boundary.
+            # Only a proven subset leaves Journey's Git inventory claim intact.
+            if domain == "git" and set(release["inputs"]["commit_revisions"]) <= set(journey["commit_revisions"]):
+                continue
+            primary = journey["coverage"][domain]
+            result[domain] = {"collection": "partial",
+                "freshness": "stale" if "stale" in {primary["freshness"], ancillary["freshness"]} else "current",
+                "reason": "truncated" if primary["reason"] == "truncated" else "incomplete",
+                "observed_at": min(primary["observed_at"], ancillary["observed_at"])}
+    return result
 
 
 def module(name, filename):
@@ -59,6 +91,8 @@ def validate(value, repository, source_commit):
     coverage.validate_domains(value["coverage"], value["observed_at"])
     uncollected = {"collection": "uncollected", "freshness": "unknown", "reason": "not_requested", "observed_at": None}
     selected_domains = {domain for kind in value["domains"] for domain in SOURCE_DOMAINS[kind]}
+    if "releases" in value["domains"]:
+        selected_domains.update({"git", "history"})
     for domain, claim in value["coverage"].items():
         if domain not in selected_domains:
             require(claim == uncollected)
@@ -85,12 +119,20 @@ def validate(value, repository, source_commit):
             require(receipt["coverage"]["roadmap"] == {"collection": "observed", "freshness": "current",
                 "reason": "complete", "observed_at": value["observed_at"]})
             require(all(claim == uncollected for name, claim in receipt["coverage"].items() if name != "roadmap"))
+        elif domain == "journey":
+            module("relay_sources_journey_receipt", "repository_journey_build_contract.py").validate(
+                receipt, repository, source_commit, value["observed_at"])
+            coverage.validate_domains(receipt["coverage"], value["observed_at"])
+        elif domain == "releases":
+            module("relay_sources_release_receipt", "repository_release_build_contract.py").validate(
+                receipt, repository, source_commit, value["observed_at"])
+            coverage.validate_domains(receipt["coverage"], value["observed_at"])
         else:
             module("relay_sources_capture_receipt", "repository_capture_build_contract.py").validate(
                 receipt, domain, repository, source_commit, value["observed_at"])
             coverage.validate_domains(receipt["coverage"], value["observed_at"])
         runtime = receipt["runtime"]
-        lock_name = domain if domain in {"work", "health"} else "adr"
+        lock_name = "release" if domain == "releases" else domain if domain in {"work", "health"} else "adr"
         lock_bytes = (ROOT / "contracts" / (lock_name + "-collector.v1.lock.json")).read_bytes()
         require(runtime["pins"] == json.loads(lock_bytes) and runtime["lock_sha256"] == digest(lock_bytes)
             and isinstance(runtime["egolint_sha256"], str) and SHA256.fullmatch(runtime["egolint_sha256"]))
@@ -99,9 +141,8 @@ def validate(value, repository, source_commit):
         # selections must still be byte-for-byte identical before composition.
         runtimes.append({name: runtime["pins"]["sources"][name]
                          for name in ("egolint", "hygiene", "observatory")})
-        for captured_domain in SOURCE_DOMAINS[domain]:
-            require(value["coverage"][captured_domain] == receipt["coverage"][captured_domain])
     require(all(runtime == runtimes[0] for runtime in runtimes))
+    require(value["coverage"] == combined_coverage(value["domains"]))
     digests = value["candidate_digests"]
     require(isinstance(digests, dict) and set(digests) == {"snapshot_sha256", "projection_sha256"}
         and all(isinstance(item, str) and SHA256.fullmatch(item) for item in digests.values()))
@@ -131,6 +172,8 @@ def attach(provenance_path, receipt_path, snapshot_path):
     validate(receipt, provenance["consumer"]["repository"], provenance["consumer"]["source_commit"])
     require(provenance["consumer"]["visibility"] == "public" and "adr_collection" not in provenance)
     require(provenance["generated_at"] == receipt["observed_at"])
+    if "releases" in receipt["domains"]:
+        require(receipt["domains"]["releases"]["generator_commit"] == provenance["generator"]["source_commit"])
     require(digest(snapshot_bytes) == receipt["candidate_digests"]["snapshot_sha256"]
         and snapshot["repository"]["key"] == receipt["repository"]
         and snapshot["repository"]["repository"] == receipt["repository"]
