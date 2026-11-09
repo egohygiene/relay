@@ -7,6 +7,23 @@ investigation, browser verification, consumer canaries, publication and stable
 release acceptance remain deferred. Existing automated repository workflows may
 run on these branches; no result from them is claimed here.
 
+## Continued endpoints and interactive dashboard
+
+The next implementation batch is aggregated in
+[site #125](https://github.com/egohygiene/egohygiene.io/pull/125), with
+[its slice review index](https://github.com/egohygiene/egohygiene.io/blob/codex/intelligence-endpoint-dashboard/docs/development/intelligence-endpoint-review.md).
+Eighteen dedicated canonical endpoints now connect through the overview and
+interactive view/repository/evidence graph. Separate slices #119–#124 retain
+intent, operations, supporting views, governance source boundaries and the graph.
+Missing owner models and comparison baselines stay explicit.
+
+[Relay #166](https://github.com/egohygiene/relay/pull/166), branch
+`codex/intelligence-source-domains`, extends the combined Relay source with fresh
+Work/Health CLI/composite composition. Reusable same-run artifact intake and an
+explicit evaluation boundary remain a named follow-up. The prior nine drafts
+below are retained, not assumed merged or accepted. Tests, builds, browser/host
+proof, CI investigation and publication remain deferred.
+
 ## Review queue
 
 | Review | Draft | Scope and practical limit |
