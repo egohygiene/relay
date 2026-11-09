@@ -1100,6 +1100,10 @@ def validate_json_contracts(
         spec.loader.exec_module(adapter)
         try:
             adapter.validate(provenance["source_collection"], repository, source_commit)
+            source = provenance["source_collection"]
+            if (source["observed_at"] != provenance["generated_at"] or "releases" in source["domains"]
+                    and source["domains"]["releases"]["generator_commit"] != generator_source_commit):
+                raise ValueError("Source provenance evaluation or generator boundary is inconsistent")
             if repository_visibility != "public":
                 raise ValueError("Source provenance requires public consumer source")
         except (ValueError, KeyError, TypeError) as error:

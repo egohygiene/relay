@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://egohygiene.github.io/relay/contracts/source-capture-plan.v1.schema.json",
-  "title": "Non-executable Work and Health transport capture source plan",
+  "title": "Non-executable Work, Health and Releases transport capture source plan",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -16,6 +16,11 @@
     {
       "required": [
         "health"
+      ]
+    },
+    {
+      "required": [
+        "releases"
       ]
     }
   ],
@@ -142,6 +147,56 @@
               }
             }
           ]
+        },
+        "maximum_age_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2678400
+        }
+      }
+    },
+    "releases": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capture",
+        "public_environments",
+        "deployment_receipts",
+        "maximum_age_seconds"
+      ],
+      "properties": {
+        "capture": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240,
+              "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*(?:^|/)\\.git(?:/|$))[A-Za-z0-9._/-]+$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "public_environments": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._ -]{1,64}$"
+          }
+        },
+        "deployment_receipts": {
+          "type": "array",
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*(?:^|/)\\.git(?:/|$))[A-Za-z0-9._/-]+$"
+          }
         },
         "maximum_age_seconds": {
           "type": "integer",

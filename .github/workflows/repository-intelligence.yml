@@ -33,6 +33,31 @@ on:
         required: false
         default: false
         type: boolean
+      collect-journey:
+        description: Collect bounded immutable public Git Journey evidence; semantic history remains partial.
+        required: false
+        default: false
+        type: boolean
+      journey-maximum-commits:
+        description: Maximum privately inspected Git commits from 1 through 256.
+        required: false
+        default: "256"
+        type: string
+      journey-since:
+        description: Optional inclusive UTC lower Git event bound; requires collect-journey.
+        required: false
+        default: ""
+        type: string
+      journey-until:
+        description: Optional inclusive UTC upper Git event bound; requires collect-journey.
+        required: false
+        default: ""
+        type: string
+      as-of:
+        description: Optional explicit UTC source evaluation boundary; defaults to the represented commit timestamp.
+        required: false
+        default: ""
+        type: string
       adr-policy-owner:
         description: Explicit canonical Hygiene ADR policy-owner selection; requires collect-adrs.
         required: false
@@ -122,6 +147,31 @@ on:
         required: false
         default: false
         type: boolean
+      collect-journey:
+        description: Collect bounded immutable public Git Journey evidence; semantic history remains partial.
+        required: false
+        default: false
+        type: boolean
+      journey-maximum-commits:
+        description: Maximum privately inspected Git commits from 1 through 256.
+        required: false
+        default: "256"
+        type: string
+      journey-since:
+        description: Optional inclusive UTC lower Git event bound; requires collect-journey.
+        required: false
+        default: ""
+        type: string
+      journey-until:
+        description: Optional inclusive UTC upper Git event bound; requires collect-journey.
+        required: false
+        default: ""
+        type: string
+      as-of:
+        description: Optional explicit UTC source evaluation boundary; defaults to the represented commit timestamp.
+        required: false
+        default: ""
+        type: string
       adr-policy-owner:
         description: Explicit canonical Hygiene ADR policy-owner selection; requires collect-adrs.
         required: false
@@ -221,6 +271,11 @@ jobs:
           reports-directory: "${{ inputs.reports-directory }}"
           collect-adrs: "${{ inputs.collect-adrs }}"
           collect-roadmap: "${{ inputs.collect-roadmap }}"
+          collect-journey: "${{ inputs.collect-journey }}"
+          journey-maximum-commits: "${{ inputs.journey-maximum-commits }}"
+          journey-since: "${{ inputs.journey-since }}"
+          journey-until: "${{ inputs.journey-until }}"
+          as-of: "${{ inputs.as-of }}"
           adr-policy-owner: "${{ inputs.adr-policy-owner }}"
           adr-known-external-decisions: "${{ inputs.adr-known-external-decisions }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
@@ -260,6 +315,11 @@ jobs:
           reports-directory: "${{ inputs.reports-directory }}"
           collect-adrs: "${{ inputs.collect-adrs }}"
           collect-roadmap: "${{ inputs.collect-roadmap }}"
+          collect-journey: "${{ inputs.collect-journey }}"
+          journey-maximum-commits: "${{ inputs.journey-maximum-commits }}"
+          journey-since: "${{ inputs.journey-since }}"
+          journey-until: "${{ inputs.journey-until }}"
+          as-of: "${{ inputs.as-of }}"
           adr-policy-owner: "${{ inputs.adr-policy-owner }}"
           adr-known-external-decisions: "${{ inputs.adr-known-external-decisions }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
@@ -345,6 +405,11 @@ jobs:
           reports-directory: "${{ inputs.reports-directory }}"
           collect-adrs: "${{ inputs.collect-adrs }}"
           collect-roadmap: "${{ inputs.collect-roadmap }}"
+          collect-journey: "${{ inputs.collect-journey }}"
+          journey-maximum-commits: "${{ inputs.journey-maximum-commits }}"
+          journey-since: "${{ inputs.journey-since }}"
+          journey-until: "${{ inputs.journey-until }}"
+          as-of: "${{ inputs.as-of }}"
           adr-policy-owner: "${{ inputs.adr-policy-owner }}"
           adr-known-external-decisions: "${{ inputs.adr-known-external-decisions }}"
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"

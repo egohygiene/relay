@@ -785,8 +785,13 @@
       "purpose": "Build, provenance-check, and upload the complete routed Repository Intelligence site under a read-only event/trust contract, then preserve a sanitized run report for success or actionable failure.",
       "audience": "reusable",
       "status": "beta",
-      "triggers": ["workflow_call", "workflow_dispatch"],
-      "permissions": {"contents": "read"},
+      "triggers": [
+        "workflow_call",
+        "workflow_dispatch"
+      ],
+      "permissions": {
+        "contents": "read"
+      },
       "timeout_minutes": 15,
       "concurrency": {
         "group": "relay-intelligence-v1-${{ github.repository }}-${{ github.workflow_ref }}-${{ github.ref }}",
@@ -889,6 +894,41 @@
           "required": false,
           "default": 30,
           "description": "Validated 1-90 day retention for the generated public dashboard artifact; sanitized run evidence always uses a fixed 30 days."
+        },
+        {
+          "name": "collect-journey",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Collect bounded immutable public Git Journey evidence; semantic history remains partial."
+        },
+        {
+          "name": "journey-maximum-commits",
+          "type": "string",
+          "required": false,
+          "default": "256",
+          "description": "Maximum privately inspected Git commits from 1 through 256."
+        },
+        {
+          "name": "journey-since",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional inclusive UTC lower Git event bound; requires collect-journey."
+        },
+        {
+          "name": "journey-until",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional inclusive UTC upper Git event bound; requires collect-journey."
+        },
+        {
+          "name": "as-of",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional explicit UTC source evaluation boundary; defaults to the represented commit timestamp."
         }
       ],
       "outputs": [
@@ -1422,6 +1462,34 @@
           "required": false,
           "default": "",
           "description": "Explicit UTC source evaluation boundary; required with capture intake."
+        },
+        {
+          "name": "collect-journey",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Collect bounded immutable public Git Journey evidence; semantic history remains partial."
+        },
+        {
+          "name": "journey-maximum-commits",
+          "type": "string",
+          "required": false,
+          "default": "256",
+          "description": "Maximum privately inspected Git commits from 1 through 256."
+        },
+        {
+          "name": "journey-since",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional inclusive UTC lower Git event bound; requires collect-journey."
+        },
+        {
+          "name": "journey-until",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional inclusive UTC upper Git event bound; requires collect-journey."
         }
       ],
       "outputs": [

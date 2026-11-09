@@ -33,6 +33,26 @@ on:
         required: false
         default: false
         type: boolean
+      collect-journey:
+        description: Collect bounded immutable public Git Journey evidence; semantic history remains partial.
+        required: false
+        default: false
+        type: boolean
+      journey-maximum-commits:
+        description: Maximum privately inspected Git commits from 1 through 256.
+        required: false
+        default: "256"
+        type: string
+      journey-since:
+        description: Optional inclusive UTC lower Git event bound; requires collect-journey.
+        required: false
+        default: ""
+        type: string
+      journey-until:
+        description: Optional inclusive UTC upper Git event bound; requires collect-journey.
+        required: false
+        default: ""
+        type: string
       source-capture-artifact-id:
         description: Exact ordinary public capture artifact ID from this run and attempt.
         required: false
@@ -137,6 +157,26 @@ on:
         required: false
         default: false
         type: boolean
+      collect-journey:
+        description: Collect bounded immutable public Git Journey evidence; semantic history remains partial.
+        required: false
+        default: false
+        type: boolean
+      journey-maximum-commits:
+        description: Maximum privately inspected Git commits from 1 through 256.
+        required: false
+        default: "256"
+        type: string
+      journey-since:
+        description: Optional inclusive UTC lower Git event bound; requires collect-journey.
+        required: false
+        default: ""
+        type: string
+      journey-until:
+        description: Optional inclusive UTC upper Git event bound; requires collect-journey.
+        required: false
+        default: ""
+        type: string
       source-capture-artifact-id:
         description: Exact ordinary public capture artifact ID from this run and attempt.
         required: false
@@ -253,6 +293,10 @@ jobs:
           reports-directory: "${{ inputs.reports-directory }}"
           collect-adrs: "${{ inputs.collect-adrs }}"
           collect-roadmap: "${{ inputs.collect-roadmap }}"
+          collect-journey: "${{ inputs.collect-journey }}"
+          journey-maximum-commits: "${{ inputs.journey-maximum-commits }}"
+          journey-since: "${{ inputs.journey-since }}"
+          journey-until: "${{ inputs.journey-until }}"
           source-capture-artifact-id: "${{ inputs.source-capture-artifact-id }}"
           source-capture-artifact-digest: "${{ inputs.source-capture-artifact-digest }}"
           as-of: "${{ inputs.as-of }}"
@@ -295,6 +339,10 @@ jobs:
           reports-directory: "${{ inputs.reports-directory }}"
           collect-adrs: "${{ inputs.collect-adrs }}"
           collect-roadmap: "${{ inputs.collect-roadmap }}"
+          collect-journey: "${{ inputs.collect-journey }}"
+          journey-maximum-commits: "${{ inputs.journey-maximum-commits }}"
+          journey-since: "${{ inputs.journey-since }}"
+          journey-until: "${{ inputs.journey-until }}"
           source-capture-artifact-id: "${{ inputs.source-capture-artifact-id }}"
           source-capture-artifact-digest: "${{ inputs.source-capture-artifact-digest }}"
           as-of: "${{ inputs.as-of }}"
@@ -419,6 +467,10 @@ jobs:
           reports-directory: "${{ inputs.reports-directory }}"
           collect-adrs: "${{ inputs.collect-adrs }}"
           collect-roadmap: "${{ inputs.collect-roadmap }}"
+          collect-journey: "${{ inputs.collect-journey }}"
+          journey-maximum-commits: "${{ inputs.journey-maximum-commits }}"
+          journey-since: "${{ inputs.journey-since }}"
+          journey-until: "${{ inputs.journey-until }}"
           source-capture-artifact-id: "${{ inputs.source-capture-artifact-id }}"
           source-capture-artifact-digest: "${{ inputs.source-capture-artifact-digest }}"
           as-of: "${{ inputs.as-of }}"

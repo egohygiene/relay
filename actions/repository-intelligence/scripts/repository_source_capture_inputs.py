@@ -2,7 +2,7 @@
 # Copyright 2026 Ego Hygiene
 # SPDX-License-Identifier: MIT
 
-"""Read a closed non-executable Work/Health capture plan before acquisition."""
+"""Read a closed non-executable Work/Health/Releases plan before acquisition."""
 
 from __future__ import annotations
 
@@ -47,8 +47,8 @@ def apply(args):
         and path.is_file() and path.stat().st_size <= 65536)
     content = path.read_bytes()
     plan = json.loads(content, object_pairs_hook=pairs, parse_constant=lambda _value: require(False))
-    require(isinstance(plan, dict) and set(plan) <= {"schema", "work", "health"}
-        and plan.get("schema") == SCHEMA and bool(set(plan) & {"work", "health"}))
+    require(isinstance(plan, dict) and set(plan) <= {"schema", "work", "health", "releases"}
+        and plan.get("schema") == SCHEMA and bool(set(plan) & {"work", "health", "releases"}))
     root = getattr(args, "capture_root", None) or args.repository_root
     root = root.absolute()
     require(root.is_dir() and not any(part.is_symlink() for part in (root, *root.parents)))
@@ -86,4 +86,24 @@ def apply(args):
         args.health_report = [name + "=" + str(root / relative(filename)) for name, filename in sorted(reports.items())]
         args.health_check_runs_state = checks["state"]
         args.health_maximum_age_seconds = age(health["maximum_age_seconds"])
+    if "releases" in plan:
+        releases = plan["releases"]
+        require(isinstance(releases, dict) and set(releases) == {
+            "capture", "public_environments", "deployment_receipts", "maximum_age_seconds"}
+            and not args.collect_releases and args.release_capture is None and not args.release_public_environment
+            and not args.release_deployment_receipt and args.release_maximum_age_seconds == 86400)
+        environments, receipts = releases["public_environments"], releases["deployment_receipts"]
+        # Establish the explicit public environment selection before selecting
+        # any provider capture/receipt paths. It is never inferred from records.
+        require(isinstance(environments, list) and len(environments) <= 64
+            and all(isinstance(item, str) and re.fullmatch(r"[A-Za-z0-9._ -]{1,64}", item) for item in environments)
+            and len(set(environments)) == len(environments))
+        require(isinstance(receipts, list) and len(receipts) <= 8
+            and all(isinstance(item, str) for item in receipts) and len(set(receipts)) == len(receipts))
+        require(releases["capture"] is not None or not receipts)
+        args.collect_releases = True
+        args.release_capture = root / relative(releases["capture"]) if releases["capture"] is not None else None
+        args.release_public_environment = sorted(environments)
+        args.release_deployment_receipt = [root / relative(item) for item in receipts]
+        args.release_maximum_age_seconds = age(releases["maximum_age_seconds"])
     return hashlib.sha256(content).hexdigest()

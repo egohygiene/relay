@@ -78,10 +78,14 @@ def source_exists(root: Path, revision: str) -> None:
         base.fail("SOURCE")
 
 
-def generator_binding(revision: str) -> dict:
+def generator_binding(revision: str, source_root: Path | None = None) -> dict:
     """Bind all executed Relay helpers and owner selections to one real commit."""
     generator_root = ROOT.parents[1]
-    source_exists(generator_root, revision)
+    # Installed Actions are archives without .git. A trusted orchestration layer
+    # may supply an independently acquired bare proof of the same immutable
+    # Relay revision. Captured provider JSON cannot select this source root.
+    proof_root = base.safe_path(source_root) if source_root is not None else generator_root
+    source_exists(proof_root, revision)
     paths = [Path(__file__).resolve(), Path(base.__file__).resolve(),
              Path(normalization.__file__).resolve(),
              Path(normalization.inputs.__file__).resolve(), LOCK_PATH,
@@ -93,7 +97,7 @@ def generator_binding(revision: str) -> dict:
     for path in paths:
         relative = path.relative_to(generator_root).as_posix()
         raw = base.read_file(path, base.MAX_OUTPUT)
-        if base.git_blob(generator_root, revision, relative, base.MAX_OUTPUT) != raw:
+        if base.git_blob(proof_root, revision, relative, base.MAX_OUTPUT) != raw:
             base.fail("SOURCE")
         digests[relative] = base.digest(raw)
     return digests
@@ -329,7 +333,7 @@ def collect(args: argparse.Namespace) -> dict:
         if len(environment) > 64 or not re.fullmatch(r"[A-Za-z0-9._ -]+", text(environment)):
             base.fail("VISIBILITY")
     lock, runtime_receipt = base.runtime_files(args.runtime, lock_path=LOCK_PATH)
-    helpers = generator_binding(args.generator_commit)
+    helpers = generator_binding(args.generator_commit, getattr(args, "generator_repository_root", None))
     source_exists(args.repository_root, args.source_commit)
     captured, capture_digest = None, None
     if args.capture is not None:
@@ -408,6 +412,8 @@ def parser() -> argparse.ArgumentParser:
     for name in ("repository", "visibility", "source-commit", "generator-commit", "observed-at"):
         command.add_argument("--" + name, required=True)
     command.add_argument("--capture", type=Path)
+    command.add_argument("--generator-repository-root", type=Path,
+        help="Optional trusted bare Relay Git proof outside the captured data; executed helpers must match generator-commit.")
     command.add_argument("--public-environment", action="append", default=[])
     command.add_argument("--deployment-receipt", action="append", type=Path, default=[])
     command.add_argument("--maximum-age-seconds", type=int, default=86400)

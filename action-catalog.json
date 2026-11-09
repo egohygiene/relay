@@ -57,7 +57,7 @@
       "id": "repository-intelligence",
       "path": "actions/repository-intelligence",
       "name": "Repository Intelligence",
-      "summary": "Build a deterministic routed intelligence site with operational, roadmap, decision, journey, dependencies, health, releases, work, search, comparison, and analytics views.",
+      "summary": "Build a deterministic routed intelligence site, optionally composing fresh canonical ADR/Roadmap, bounded Git Journey and public Work/Health/Releases captures through pinned normalization.",
       "status": "beta",
       "runtime": ["bash", "git", "python3", "cargo", "rustup"],
       "permissions": {"contents": "read", "actions": "read"},

@@ -31,8 +31,9 @@ MANIFEST = "capture-bundle.json"
 SCHEMA = "egohygiene.relay.source-capture-bundle/v1"
 RECEIPT = "egohygiene.relay.source-capture-intake/v1"
 MAX_FILE = 1024 * 1024
-MAX_TOTAL = 6 * MAX_FILE
-MAX_ARCHIVE = 8 * MAX_FILE
+MAX_TOTAL = 16 * MAX_FILE
+MAX_ARCHIVE = 20 * MAX_FILE
+MAX_FILES = 15
 SHA = re.compile(r"[0-9a-f]{40}")
 REPOSITORY = re.compile(r"egohygiene/(?:\.github|[a-z0-9][a-z0-9.-]*)")
 
@@ -130,7 +131,9 @@ def plan_selection(root, plan_bytes):
         collect_work=False, work_capture=None, work_maximum_age_seconds=86400,
         collect_health=False, health_expect_report=[], health_report=[], health_check_runs=None,
         health_check_runs_observed_at=None, health_check_runs_state="not-requested",
-        health_inventory="partial", health_maximum_age_seconds=86400)
+        health_inventory="partial", health_maximum_age_seconds=86400,
+        collect_releases=False, release_capture=None, release_public_environment=[], release_deployment_receipt=[],
+        release_maximum_age_seconds=86400)
     require(read(root / PLAN, 65536) == plan_bytes)
     helper.apply(args)
     selections = {PLAN: "plan"}
@@ -146,11 +149,20 @@ def plan_selection(root, plan_bytes):
             key = relative(args.health_check_runs.relative_to(root).as_posix())
             require(key not in selections)
             selections[key] = "github-check-runs"
-    require(1 <= len(selections) <= 6 and len({name.casefold() for name in selections}) == len(selections))
+    if args.collect_releases:
+        if args.release_capture is not None:
+            key = relative(args.release_capture.relative_to(root).as_posix())
+            require(key not in selections)
+            selections[key] = "release-capture"
+        for path in args.release_deployment_receipt:
+            key = relative(path.relative_to(root).as_posix())
+            require(key not in selections)
+            selections[key] = "deployment-receipt"
+    require(1 <= len(selections) <= MAX_FILES and len({name.casefold() for name in selections}) == len(selections))
     return selections
 
 
-def source_identity(content, kind, expected, observed):
+def source_identity(content, kind, expected, observed, environments=()):
     document = load(content, 65536 if kind == "plan" else MAX_FILE)
     if kind == "work":
         require(document.get("schema") == "egohygiene.relay.work-provider-capture/v1"
@@ -173,6 +185,28 @@ def source_identity(content, kind, expected, observed):
             and isinstance(runs, list) and len(runs) <= 256 and document["total_count"] >= len(runs))
         for run in runs:
             require(isinstance(run, dict) and run.get("head_sha") == expected["source_commit"])
+    elif kind == "release-capture":
+        require(document.get("schema") == "egohygiene.relay.release-provider-capture/v1"
+            and document.get("visibility") == "public" and document.get("scope") == "public-only"
+            and document.get("repository") == expected["repository"]
+            and document.get("represented_commit") == expected["source_commit"])
+        for name in ("releases", "deployments"):
+            inventory = document.get(name)
+            require(isinstance(inventory, dict))
+            if inventory.get("observed_at") is not None:
+                require(instant(inventory["observed_at"]) <= observed)
+        deployments = document["deployments"].get("records")
+        require(isinstance(deployments, list) and len(deployments) <= 256
+            and all(isinstance(item, dict) and item.get("environment") in environments for item in deployments))
+    elif kind == "deployment-receipt":
+        require(document.get("schema") == "egohygiene.relay.repository-intelligence-deployment-receipt/v1"
+            and isinstance(document.get("consumer"), dict)
+            and document["consumer"].get("repository") == expected["repository"]
+            and isinstance(document["consumer"].get("revision"), str)
+            and SHA.fullmatch(document["consumer"]["revision"])
+            and isinstance(document.get("deployment"), dict)
+            and document["deployment"].get("environment") in environments
+            and instant(document["deployment"].get("recorded_at"), provider=True) <= observed)
     else:
         require(kind == "plan")
         checks = document.get("health", {}).get("check_runs", {})
@@ -202,10 +236,11 @@ def pack(args):
     require(root.is_dir())
     plan_bytes = read(root / PLAN, 65536)
     selections = plan_selection(root, plan_bytes)
+    environments = load(plan_bytes, 65536).get("releases", {}).get("public_environments", [])
     files, total, content = [], 0, {}
     for path, kind in sorted(selections.items()):
         data = read(root / path, 65536 if kind == "plan" else MAX_FILE)
-        source_identity(data, kind, expected, observed)
+        source_identity(data, kind, expected, observed, environments)
         total += len(data)
         require(total <= MAX_TOTAL)
         content[path] = data
@@ -269,7 +304,7 @@ def request(url, token, limit, deadline, *, allow_redirect=False):
 def unpack(archive, destination, expected, observed):
     with zipfile.ZipFile(io.BytesIO(archive)) as package:
         members = package.infolist()
-        require(1 <= len(members) <= 24)
+        require(1 <= len(members) <= 48)
         files, directories = {}, set()
         for item in members:
             require(not item.flag_bits & 1 and item.compress_type in {zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED})
@@ -298,7 +333,7 @@ def unpack(archive, destination, expected, observed):
             and all(manifest[key] == value for key, value in expected.items()))
         require(all(type(manifest[key]) is int for key in ("repository_id", "run_id", "run_attempt")))
         rows = manifest["files"]
-        require(isinstance(rows, list) and 1 <= len(rows) <= 6)
+        require(isinstance(rows, list) and 1 <= len(rows) <= MAX_FILES)
         content, total = {}, 0
         for row in rows:
             require(isinstance(row, dict) and set(row) == {"path", "size_bytes", "sha256"})
@@ -320,9 +355,10 @@ def unpack(archive, destination, expected, observed):
             target.write_bytes(data)
             target.chmod(0o600)
         selections = plan_selection(destination, content[PLAN])
+        environments = load(content[PLAN], 65536).get("releases", {}).get("public_environments", [])
         require(set(selections) == set(content))
         for path, kind in selections.items():
-            source_identity(content[path], kind, expected, observed)
+            source_identity(content[path], kind, expected, observed, environments)
         (destination / MANIFEST).write_bytes(manifest_bytes)
         (destination / MANIFEST).chmod(0o600)
         return manifest_bytes, content[PLAN]
@@ -353,6 +389,7 @@ def verify_receipt(path, root, repository, source_commit, observed_at, plan_sha2
     plan_bytes = read(root / PLAN, 65536)
     require(digest(plan_bytes) == receipt["plan_sha256"])
     selections = plan_selection(root, plan_bytes)
+    environments = load(plan_bytes, 65536).get("releases", {}).get("public_environments", [])
     rows = manifest["files"]
     require(isinstance(rows, list) and len(rows) == len(selections))
     seen, total = [], 0
@@ -364,7 +401,7 @@ def verify_receipt(path, root, repository, source_commit, observed_at, plan_sha2
         total += len(content)
         require(type(row["size_bytes"]) is int and len(content) == row["size_bytes"]
             and digest(content) == row["sha256"] and total <= MAX_TOTAL)
-        source_identity(content, selections[key], expected, observed)
+        source_identity(content, selections[key], expected, observed, environments)
         seen.append(key)
     require(seen == sorted(selections))
     return receipt

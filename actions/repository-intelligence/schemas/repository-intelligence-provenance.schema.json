@@ -379,6 +379,12 @@
                   }
                 }
               ]
+            },
+            "journey": {
+              "$ref": "source-journey-build.v1.schema.json"
+            },
+            "releases": {
+              "$ref": "source-release-build.v1.schema.json"
             }
           }
         },
@@ -464,7 +470,11 @@
             "collect_repository_health.py",
             "repository_capture_build_contract.py",
             "repository_source_capture_inputs.py",
-            "repository_capture_artifact.py"
+            "repository_capture_artifact.py",
+            "collect_repository_journey.py",
+            "repository_journey_build_contract.py",
+            "collect_repository_releases.py",
+            "repository_release_build_contract.py"
           ],
           "properties": {
             "collect_repository_roadmap_source.py": {
@@ -504,6 +514,22 @@
               "pattern": "^[0-9a-f]{64}$"
             },
             "repository_capture_artifact.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "collect_repository_journey.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "repository_journey_build_contract.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "collect_repository_releases.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "repository_release_build_contract.py": {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$"
             }
