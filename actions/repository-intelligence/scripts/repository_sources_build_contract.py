@@ -17,7 +17,11 @@ ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = "egohygiene.relay.source-build/v1"
 SHA256 = re.compile(r"[0-9a-f]{64}")
 FILES = ("collect_repository_roadmap_source.py", "prepare_repository_sources_build.py",
-         "collect_repository_roadmap.py", "collect_repository_adrs.py", "repository_adr_inputs.py")
+         "collect_repository_roadmap.py", "collect_repository_adrs.py", "repository_adr_inputs.py",
+         "collect_repository_work.py", "collect_repository_health.py", "repository_capture_build_contract.py",
+         "repository_source_capture_inputs.py")
+SOURCE_DOMAINS = {"decisions": ("decisions",), "roadmap": ("roadmap",),
+                  "work": ("issues", "pull_requests"), "health": ("checks",)}
 
 
 def module(name, filename):
@@ -42,18 +46,21 @@ def require(condition):
 
 def validate(value, repository, source_commit):
     require(isinstance(value, dict) and set(value) == {"schema", "repository", "source_commit", "observed_at",
-        "domains", "coverage", "candidate_digests", "implementation"})
+        "domains", "coverage", "candidate_digests", "implementation", "input_plan_sha256"})
     require(value["schema"] == SCHEMA and value["repository"] == repository and value["source_commit"] == source_commit)
     require(isinstance(value["observed_at"], str)
         and re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", value["observed_at"]))
     require(value["implementation"] == implementation())
+    require(value["input_plan_sha256"] is None or isinstance(value["input_plan_sha256"], str)
+        and SHA256.fullmatch(value["input_plan_sha256"]))
     require(isinstance(value["domains"], dict) and bool(value["domains"])
-        and set(value["domains"]) <= {"decisions", "roadmap"})
+        and set(value["domains"]) <= set(SOURCE_DOMAINS))
     coverage = module("relay_sources_coverage", "repository_intelligence_coverage.py")
     coverage.validate_domains(value["coverage"], value["observed_at"])
     uncollected = {"collection": "uncollected", "freshness": "unknown", "reason": "not_requested", "observed_at": None}
+    selected_domains = {domain for kind in value["domains"] for domain in SOURCE_DOMAINS[kind]}
     for domain, claim in value["coverage"].items():
-        if domain not in value["domains"]:
+        if domain not in selected_domains:
             require(claim == uncollected)
     runtimes = []
     for domain, receipt in value["domains"].items():
@@ -61,7 +68,7 @@ def validate(value, repository, source_commit):
             and receipt["observed_at"] == value["observed_at"])
         if domain == "decisions":
             module("relay_sources_adr_receipt", "repository_adr_build_contract.py").validate(receipt, repository, source_commit)
-        else:
+        elif domain == "roadmap":
             require(set(receipt) == {"repository", "source_commit", "observed_at", "roadmap_sha256",
                 "maximum_intent_age_days", "intent_freshness", "reference_count", "runtime", "validation", "coverage",
                 "projection_sha256", "snapshot_sha256"})
@@ -78,12 +85,22 @@ def validate(value, repository, source_commit):
             require(receipt["coverage"]["roadmap"] == {"collection": "observed", "freshness": "current",
                 "reason": "complete", "observed_at": value["observed_at"]})
             require(all(claim == uncollected for name, claim in receipt["coverage"].items() if name != "roadmap"))
+        else:
+            module("relay_sources_capture_receipt", "repository_capture_build_contract.py").validate(
+                receipt, domain, repository, source_commit, value["observed_at"])
+            coverage.validate_domains(receipt["coverage"], value["observed_at"])
         runtime = receipt["runtime"]
-        lock_bytes = (ROOT / "contracts/adr-collector.v1.lock.json").read_bytes()
+        lock_name = domain if domain in {"work", "health"} else "adr"
+        lock_bytes = (ROOT / "contracts" / (lock_name + "-collector.v1.lock.json")).read_bytes()
         require(runtime["pins"] == json.loads(lock_bytes) and runtime["lock_sha256"] == digest(lock_bytes)
             and isinstance(runtime["egolint_sha256"], str) and SHA256.fullmatch(runtime["egolint_sha256"]))
-        runtimes.append({key: runtime[key] for key in ("lock_sha256", "egolint_sha256", "pins")})
-        require(value["coverage"][domain] == receipt["coverage"][domain])
+        # Different receipt profiles may preserve different capture contracts or
+        # additional ADR artifacts. Their common executable/normalizer source
+        # selections must still be byte-for-byte identical before composition.
+        runtimes.append({name: runtime["pins"]["sources"][name]
+                         for name in ("egolint", "hygiene", "observatory")})
+        for captured_domain in SOURCE_DOMAINS[domain]:
+            require(value["coverage"][captured_domain] == receipt["coverage"][captured_domain])
     require(all(runtime == runtimes[0] for runtime in runtimes))
     digests = value["candidate_digests"]
     require(isinstance(digests, dict) and set(digests) == {"snapshot_sha256", "projection_sha256"}
@@ -113,6 +130,7 @@ def attach(provenance_path, receipt_path, snapshot_path):
     snapshot_bytes, snapshot = read(snapshot_path)
     validate(receipt, provenance["consumer"]["repository"], provenance["consumer"]["source_commit"])
     require(provenance["consumer"]["visibility"] == "public" and "adr_collection" not in provenance)
+    require(provenance["generated_at"] == receipt["observed_at"])
     require(digest(snapshot_bytes) == receipt["candidate_digests"]["snapshot_sha256"]
         and snapshot["repository"]["key"] == receipt["repository"]
         and snapshot["repository"]["repository"] == receipt["repository"]

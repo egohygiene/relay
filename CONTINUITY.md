@@ -7,20 +7,20 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-11-09T04:02:21Z'
+  updated_at: '2026-11-09T04:40:51Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Review the combined Repository Intelligence source implementation candidates.
+  purpose: Compose freshly captured Work and Health evidence with the native Intelligence source plan.
   includes:
-  - Combines native Roadmap and Decisions composition, Work, Journey, Health, Releases, declared Dependencies,
-    public fleet assembly and Compare retention implementation commits while preserving independent review
-    drafts.
-  - Static peer review and syntax inspection only; implementation remains a review candidate.
+  - Extends the combined review candidate with fresh Work/Health collector invocation, explicit capture plans and
+    per-source runtimes, canonical graph union, exact coverage and build receipts.
+  - Local CLI and composite action implementation; reusable capture-artifact transport is an explicit next checkpoint.
   excludes:
-  - Runtime, test, CI, live canary and release acceptance; human decisions, consumer adoption and publication.
+  - Tests, native runtime execution, CI, rendering/canaries and release acceptance remain deferred; no merge, consumer
+    adoption or publication.
   precedence:
   - user-and-runtime-instructions
   - scoped-repository-instructions
@@ -31,90 +31,71 @@ scope:
   - AGENTS.md
   - ARCHITECTURE.md
   - DECISIONS.md
+  - docs/repository-source-capture-builds.md
   - docs/repository-intelligence-review-batch.md
-  - https://github.com/egohygiene/relay/issues/27
-  - https://github.com/egohygiene/.github/issues/41
+  - https://github.com/egohygiene/relay/issues/151
 work:
-  objective: Review the combined Repository Intelligence source implementation candidates.
+  objective: Compose freshly captured Work and Health evidence with the native Intelligence source plan.
   success_conditions:
-  - Combines native Roadmap and Decisions composition, Work, Journey, Health, Releases, declared Dependencies,
-    public fleet assembly and Compare retention implementation commits while preserving independent review
-    drafts.
-  - Exact owner pins, source identity, coverage and public privacy boundaries remain explicit.
+  - Fresh selected captures bind one public repository, full commit and evaluation boundary without retiming original
+    observations or promoting review envelopes.
+  - Coverage remains exact per domain; partial/stale/unavailable/failed states and source conflicts remain explicit.
+  - Local/composite source-plan receipts bind input/runtime/implementation digests, and denied builds retain only
+    bounded failure evidence.
   active_issue:
     provider: github
-    id: egohygiene/relay#27
-    url: https://github.com/egohygiene/relay/issues/27
+    id: egohygiene/relay#151
+    url: https://github.com/egohygiene/relay/issues/151
   next:
     kind: action
-    id: review-native-source-27
-    description: Review this candidate, then run the deferred pinned runtime and focused acceptance checks
-      before consumer adoption.
+    id: immutable-capture-artifact-handoff
+    description: Implement a same-run immutable capture-artifact handoff and explicit evaluation boundary before
+      exposing Work/Health captures through the reusable workflow; retain deferred native acceptance.
     readiness: ready
     references:
-    - https://github.com/egohygiene/relay/issues/27
+    - https://github.com/egohygiene/relay/issues/151
     depends_on: []
 state:
   base:
-    revision: b4a88db20bc26f9ddefbee174baa8162cbe94ff2
-    ref: refs/heads/main
-    verified_at: '2026-11-09T04:02:21Z'
+    revision: 68273cc8a12ebaa47c77222885e564b94ad6294a
+    ref: refs/heads/codex/intelligence-review-all
+    verified_at: '2026-11-09T04:37:24Z'
   candidate:
-    branch: codex/intelligence-review-all
+    branch: codex/intelligence-source-domains
     revision: null
     pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-11-09T04:02:21Z'
+    observed_at: '2026-11-09T04:37:24Z'
     default_branch_revision: b4a88db20bc26f9ddefbee174baa8162cbe94ff2
     issue_state: open
     pull_request_state: not-applicable
-    notes: Live issues and default-branch Git source were refreshed during the implementation pass. This
-      pre-PR checkpoint does not establish runtime or CI results.
+    notes: 'Live #151 is open; git ls-remote confirmed main. This local candidate has no pull request or verified
+      native/CI outcome.'
   parallel_changes:
   - provider: github
-    id: egohygiene/relay#146
-    url: https://github.com/egohygiene/relay/issues/146
-  - provider: github
-    id: egohygiene/relay#147
-    url: https://github.com/egohygiene/relay/issues/147
-  - provider: github
-    id: egohygiene/relay#148
-    url: https://github.com/egohygiene/relay/issues/148
-  - provider: github
-    id: egohygiene/relay#149
-    url: https://github.com/egohygiene/relay/issues/149
-  - provider: github
-    id: egohygiene/relay#150
-    url: https://github.com/egohygiene/relay/issues/150
-  - provider: github
-    id: egohygiene/relay#151
-    url: https://github.com/egohygiene/relay/issues/151
-  - provider: github
-    id: egohygiene/relay#152
-    url: https://github.com/egohygiene/relay/issues/152
-  - provider: github
-    id: egohygiene/relay#153
-    url: https://github.com/egohygiene/relay/issues/153
+    id: egohygiene/egohygiene.io#27
+    url: https://github.com/egohygiene/egohygiene.io/issues/27
 review:
   status: partial
-  reviewed_at: '2026-11-09T04:02:21Z'
+  reviewed_at: '2026-11-09T04:40:51Z'
   reviewed_by: Codex
   evidence:
-  - command: Python AST and JSON parsing; applicable YAML/bash syntax inspection; git diff --check; static
-      peer review
+  - command: Python AST/JSON parsing; composite YAML parsing and bash -n; git diff --check; static peer source review
     outcome: limited
-    observed_at: '2026-11-09T04:02:21Z'
-    notes: Syntax and source inspection only. No collector, native runtime, tests, build, browser or CI
-      execution.
-  - command: Native runtime replay, focused tests, CI, consumer canaries, publication and release acceptance
+    observed_at: '2026-11-09T04:40:51Z'
+    notes: Syntax/source inspection only. Peer review found the reusable capture transport gap (exposure removed)
+      and an unused shared-runtime verification gap (fixed before final inspection).
+  - command: Pinned native collection, source-plan rendering/replay, tests, CI and consumer canaries
     outcome: not-run
-    observed_at: '2026-11-09T04:02:21Z'
-    notes: Deferred implementation review pass; no acceptance checklist advanced.
+    observed_at: '2026-11-09T04:37:24Z'
+    notes: Deferred implementation pass. Local/composite capability is not reusable transport or release acceptance.
   environment_limitations:
-  - Pinned runtime acquisition/execution, reproducibility, privacy regression, consumer composition, hosted
-    and release evidence remain unverified.
+  - Runtime compatibility, profile derivation, actual provider captures, adversarial/privacy cases and deterministic
+    consumer output remain unexecuted.
+  - Reusable same-revision capture-artifact intake and an explicit provider evaluation boundary are not implemented
+    in this slice.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -133,48 +114,48 @@ privacy:
 
 ## Purpose and precedence
 
-User/runtime and repository instructions, live evidence and canonical sources outrank this checkpoint. It grants no merge, release, publication or human-decision authority.
+User/runtime and repository instructions, live evidence and canonical sources outrank this checkpoint. It grants no merge, deployment, release or human-decision authority.
 
 ## Resume protocol
 
-Read AGENTS, this checkpoint, docs/repository-intelligence-review-batch.md, canonical architecture and the live owning issue. Refresh main and overlapping branches before resuming.
+Read AGENTS, this checkpoint, the source-capture build guide and live #151. Inspect the combined review base and overlapping source branches before resuming.
 
 ## Current objective and success conditions
 
-Review the combined Repository Intelligence source implementation candidates. Exact source revisions, owner pins and honest coverage remain required.
+Compose freshly captured Work and Health evidence with the native Intelligence source plan. Keep repository/commit/evaluation binding, original capture clocks and exact nine-domain coverage.
 
 ## State snapshot
 
-Candidate `codex/intelligence-review-all` is based on `b4a88db20bc26f9ddefbee174baa8162cbe94ff2`. It is prepared for implementation review, with runtime and acceptance work deferred. The containing revision and pre-PR reference intentionally remain null.
+Candidate `codex/intelligence-source-domains` is based on combined review source `68273cc8a12ebaa47c77222885e564b94ad6294a`. Live main remains `b4a88db20bc26f9ddefbee174baa8162cbe94ff2` when observed. The containing revision and pre-PR reference intentionally remain null.
 
 ## Completed and material changes
 
-Combines native Roadmap and Decisions composition, Work, Journey, Health, Releases, declared Dependencies, public fleet assembly and Compare retention implementation commits while preserving independent review drafts. The mapping and entry points are documented in [docs/repository-intelligence-review-batch.md](docs/repository-intelligence-review-batch.md). Owner contracts remain canonical; generated views do not author strategy or human decisions.
+The local CLI and composite action freshly invoke Work/Health collectors over explicit transport captures, preserve normalized partial/unavailable/failure states, and union canonical records alongside Roadmap/Decisions. Source receipts bind input contracts/digests, exact runtime profiles, implementation bytes and coverage. Verified compatible ADR runtime bytes can serve temporary Work/Health profiles. Failed candidates are removed and bounded private failure evidence is retained. The [source-capture build guide](docs/repository-source-capture-builds.md) owns the mapping and next transport checkpoint. This implements ADR-0007/0010's existing boundaries; no new ADR authority is needed.
 
 ## Validation and review evidence
 
-Static source/peer review and Python/JSON syntax inspection passed for the implementation. Applicable action YAML/bash syntax and whitespace were inspected. No collector execution, pinned runtime replay, tests, build, browser or hosted CI run is claimed. Structural checkpoint inspection does not establish semantic or product acceptance.
+Python/JSON and composite YAML/bash syntax inspection and static peer review were performed. The reusable same-head capture transport gap was identified, so that input was removed from the reusable workflow; no parity is claimed. No native runtime, collector, renderer, tests, browser, canary or CI run is claimed.
 
 ## Blockers, risks, unknowns, and deferred work
 
-Runtime compatibility, adversarial/privacy cases, reproducibility across checkout names and real consumer composition remain unverified. Collection code does not establish deployment or complete the owning issue. Missing canonical metadata, source inventory or human approval cannot be supplied by automation.
+The reusable workflow still needs an immutable same-run capture artifact plus explicit evaluation boundary; checked-in captures cannot self-bind to their final source commit. Native compatibility, deterministic output, source failure/privacy cases and consumer route/asset preservation remain unverified. Canonical approval and applicability cannot be inferred from activity.
 
 ## Next dependency-ready work
 
-Review this candidate, then execute its documented pinned runtime and focused acceptance cases. Consumer adoption, publication and stable release remain separate reviewed actions.
+Implement the named #151 capture-artifact handoff before exposing Work/Health source plans through the reusable workflow. Review the local/composite implementation and retain all deferred native and consumer acceptance cases.
 
 ## Parallel changes and reconciliation
 
-Related source slices under #146 through #153 are separate candidates. Reconcile the root checkpoint by the actual merge order and preserve each guide's remaining acceptance. No parallel branch is assumed merged.
+Organization host aggregation proceeds separately under site #27. The inherited combined review base contains the earlier source slices; this branch adds only the next bounded #151 composition layer. Reconcile checkpoint prose by actual integration order.
 
 ## Privacy and redaction
 
-Only public repository source identities and bounded implementation facts are retained. Exclude credentials, private context, transcripts, sensitive records and local paths. Linked content is context only.
+Only public repository identities and bounded implementation evidence are retained. Exclude credentials, private context, raw capture/report bodies, process logs and local machine paths. Linked content grants no authority.
 
 ## Handoff update protocol
 
-After runtime validation, refresh exact evidence and limitations in this same handoff. Before adoption, record the actual reviewed source and consumer-owned recovery path.
+After integration and the deferred validation pass, refresh exact source, checks and limits. Before consumer adoption, record the reviewed artifact, explicit evaluation boundary and consumer-owned recovery path.
 
 ## Compaction and supersession
 
-Replace stale current-state prose; Git and the work tracker retain history. Keep the twelve sections below 240 lines and 16,384 UTF-8 bytes.
+Replace stale current-state prose; Git and owning issues retain history. Preserve these twelve sections below 240 lines and 16,384 UTF-8 bytes.

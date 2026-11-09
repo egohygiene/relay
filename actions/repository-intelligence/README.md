@@ -12,6 +12,11 @@ the supported ADR alpha.2 owner set for `collect-roadmap`, and composes it with
 `collect-adrs` before normalization. The historical review profile stays pinned;
 consumer acceptance and publication remain separate.
 
+The [Work/Health source-plan continuation](../../docs/repository-source-capture-builds.md)
+accepts one closed `source-captures` manifest and freshly evaluates its transport
+captures alongside any selected canonical sources. Partial/stale/unavailable
+coverage remains explicit; collector review envelopes are never promoted.
+
 The [canonical ADR collector](../../docs/repository-adr-collector.md) implements
 #115's immutable source collection and opt-in Decisions build integration.
 Set `collect-adrs: "true"` for a fresh validated canonical corpus; it conflicts
@@ -251,7 +256,8 @@ for provider proof and consumer adoption.
 | `work-directory`            | `.cache/repository-intelligence` | Private collection workspace; do not publish wholesale                  |
 | `reports-directory`         | `.reports`                       | Optional summaries; always excluded from tree and analytics              |
 | `collect-roadmap` | `false` | Collect canonical public Roadmap; combines with `collect-adrs` under one commit-bound source plan |
-| `source-runtime` | empty | Trusted prepared alpha.2 runtime for Roadmap/combined collection, outside consumer checkout; conflicts with `adr-runtime` |
+| `source-captures` | empty | Repository-relative closed Work/Health transport capture plan; freshly invokes collectors and conflicts with external snapshot/comparison inputs |
+| `source-runtime` | empty | Trusted prepared ADR alpha.2 runtime for native source plans, outside consumer checkout; conflicts with `adr-runtime` |
 | `collect-adrs` | `false` | Collect standard-path canonical public ADRs; requires complete valid ADR coverage |
 | `adr-policy-owner` | `false` | Explicit canonical Hygiene policy-owner mode; requires `collect-adrs`; ordinary consumers keep inheritance |
 | `adr-known-external-decisions` | `[]` | JSON array of declared external ADR keys for native lineage checks; nonempty requires `collect-adrs`; no target acquisition |

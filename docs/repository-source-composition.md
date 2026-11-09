@@ -4,6 +4,10 @@ Refs Relay #112, #113 and #151; parent acceptance remains #101 and organization
 `.github#41`. This candidate implements native build integration, not a completed
 consumer adoption, release or deployment.
 
+The next [Work/Health capture composition slice](repository-source-capture-builds.md)
+extends this boundary through fresh collector calls and the optional
+`source-captures` manifest input. It preserves this canonical-source path.
+
 The source plan is explicit: one public repository, one full represented Git
 commit, one UTC observation boundary, and `--collect-roadmap` and/or
 `--collect-adrs`. Both collectors use the exact supported alpha.2 owner set in
@@ -105,8 +109,9 @@ it never concatenates generated views. Repository identity records may merge onl
 identical metadata and their provenance IDs. Conflicting record IDs, overlapping
 collected domains, mixed repositories, commits, boundaries, versions or runtimes
 are denied. Uncollected domains remain uncollected; a union cannot promote partial
-inventory to complete. The first supported native plan covers Roadmap and
-Decisions. Other collector review artifacts are not automatically admitted by it.
+inventory to complete. The first source slice covers Roadmap and Decisions;
+the linked continuation adds fresh Work/Health transport captures. Collector
+review artifacts are not build inputs.
 
 ## Provenance and failure behavior
 
@@ -124,9 +129,10 @@ source-plan receipt. The workflow preflight validates the new flag and protects
 the private `sources` path in the same way as the existing `adr` path.
 
 Parser, native and acquisition exceptions cross a fixed-text CLI boundary. The
-existing workflow report retains the overall generation failure stage; richer
-per-domain failure artifact retention remains follow-up work. One failed selected
-native source denies this build rather than silently erasing the other source.
+existing workflow report retains the overall generation failure stage. The
+capture-composition continuation also retains a bounded private `failure.json`
+when its output namespace is usable. A malformed selected native source denies
+this build rather than silently erasing the other source.
 Failure isolation between public modules still belongs to final product
 acceptance and does not authorize publishing incomplete source plans.
 

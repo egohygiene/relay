@@ -157,7 +157,8 @@
         "domains",
         "coverage",
         "candidate_digests",
-        "implementation"
+        "implementation",
+        "input_plan_sha256"
       ],
       "properties": {
         "schema": {
@@ -350,6 +351,34 @@
                 "projection_sha256",
                 "snapshot_sha256"
               ]
+            },
+            "work": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/capturedSourceBuild"
+                },
+                {
+                  "properties": {
+                    "kind": {
+                      "const": "work"
+                    }
+                  }
+                }
+              ]
+            },
+            "health": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/capturedSourceBuild"
+                },
+                {
+                  "properties": {
+                    "kind": {
+                      "const": "health"
+                    }
+                  }
+                }
+              ]
             }
           }
         },
@@ -430,7 +459,11 @@
             "prepare_repository_sources_build.py",
             "collect_repository_roadmap.py",
             "collect_repository_adrs.py",
-            "repository_adr_inputs.py"
+            "repository_adr_inputs.py",
+            "collect_repository_work.py",
+            "collect_repository_health.py",
+            "repository_capture_build_contract.py",
+            "repository_source_capture_inputs.py"
           ],
           "properties": {
             "collect_repository_roadmap_source.py": {
@@ -452,8 +485,35 @@
             "repository_adr_inputs.py": {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$"
+            },
+            "collect_repository_work.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "collect_repository_health.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "repository_capture_build_contract.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "repository_source_capture_inputs.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
             }
           }
+        },
+        "input_plan_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       }
     },
@@ -805,6 +865,337 @@
         "schema_version": {
           "type": "integer",
           "minimum": 1
+        }
+      }
+    },
+    "capturedSourceBuild": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "kind",
+        "admission",
+        "repository",
+        "source_commit",
+        "observed_at",
+        "status",
+        "inputs",
+        "runtime",
+        "validation",
+        "coverage",
+        "diagnostics",
+        "candidate_digests"
+      ],
+      "properties": {
+        "schema": {
+          "const": "egohygiene.relay.source-capture-build/v1"
+        },
+        "kind": {
+          "enum": [
+            "work",
+            "health"
+          ]
+        },
+        "admission": {
+          "const": "fresh-captured-input"
+        },
+        "repository": {
+          "type": "string",
+          "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "observed_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+          "format": "date-time"
+        },
+        "status": {
+          "enum": [
+            "ready",
+            "partial",
+            "stale",
+            "unavailable",
+            "uncollected",
+            "failed",
+            "not_applicable"
+          ]
+        },
+        "inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scope",
+            "maximum_age_seconds",
+            "captures",
+            "contracts"
+          ],
+          "properties": {
+            "scope": {
+              "enum": [
+                "provider-inventories",
+                "partial",
+                "complete",
+                "not-applicable"
+              ]
+            },
+            "maximum_age_seconds": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2678400
+            },
+            "captures": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "producer",
+                  "status",
+                  "sha256",
+                  "observed_at",
+                  "expires_at"
+                ],
+                "properties": {
+                  "producer": {
+                    "enum": [
+                      "work-capture",
+                      "osv",
+                      "megalinter",
+                      "scorecard",
+                      "github-check-runs"
+                    ]
+                  },
+                  "status": {
+                    "enum": [
+                      "admitted",
+                      "partial",
+                      "missing",
+                      "rejected",
+                      "not-requested",
+                      "unavailable",
+                      "failed"
+                    ]
+                  },
+                  "sha256": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "observed_at": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "expires_at": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "contracts": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "review"
+              ],
+              "properties": {
+                "review": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "provider_capture": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "report_summary": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              }
+            }
+          }
+        },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "lock_sha256",
+            "egolint_sha256",
+            "collector_sha256",
+            "shared_runtime_sha256",
+            "normalizer_sha256",
+            "pins"
+          ],
+          "properties": {
+            "lock_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "egolint_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "collector_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "shared_runtime_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "normalizer_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "pins": {
+              "type": "object"
+            }
+          }
+        },
+        "validation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "hygiene",
+            "coverage",
+            "observatory"
+          ],
+          "properties": {
+            "hygiene": {
+              "const": "valid"
+            },
+            "coverage": {
+              "const": "valid"
+            },
+            "observatory": {
+              "const": "normalized"
+            }
+          }
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "roadmap",
+            "decisions",
+            "git",
+            "issues",
+            "pull_requests",
+            "checks",
+            "releases",
+            "deployments",
+            "history"
+          ],
+          "properties": {
+            "roadmap": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "decisions": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "git": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "issues": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "pull_requests": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "checks": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "releases": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "deployments": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            },
+            "history": {
+              "$ref": "#/$defs/adrCollectionClaim"
+            }
+          }
+        },
+        "diagnostics": {
+          "type": "array",
+          "maxItems": 1024,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "code",
+              "owner",
+              "producer"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "^[A-Z_]{1,64}$"
+              },
+              "owner": {
+                "enum": [
+                  "relay",
+                  "hygiene",
+                  "egolint",
+                  "observatory"
+                ]
+              },
+              "producer": {
+                "enum": [
+                  "osv",
+                  "megalinter",
+                  "scorecard",
+                  "github-check-runs",
+                  null
+                ]
+              }
+            }
+          }
+        },
+        "candidate_digests": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "projection_sha256",
+            "snapshot_sha256"
+          ],
+          "properties": {
+            "projection_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "snapshot_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
         }
       }
     }
