@@ -1,0 +1,16 @@
+{
+  "schema": "egohygiene.observatory.public-conformance-admission-lock/v1",
+  "owner": "egohygiene/hygiene",
+  "revision": "49639c1845cdfd08fbd5a768261a8b3cf515f80f",
+  "catalog": {
+    "source": "catalog/public-repositories.json",
+    "local": "src/observatory/data/hygiene.public-repositories.v1.json",
+    "sha256": "af9c7186ded0bb57b18741eaa5905314b96d6adb03736946c868e0fc4aa50b26"
+  },
+  "owner_files": {
+    "schemas/repository-public-catalog.v1.schema.json": "eeb88b6a99de987500b946bd71c987e1fb7d0bd7350f466885c11ac7603c96d8",
+    "tools/public_inventory.py": "fd3bb2099f2b9040502f19a8e582e4c4100653bd6cf2ea640cc36338dcfc4273"
+  },
+  "scope": "exact-reviewed-public-artifact-only",
+  "lifecycle": "proposed"
+}
