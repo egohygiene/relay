@@ -130,6 +130,20 @@ inputs:
       contracts without inferring whole-repository applicability or exemptions.
     required: false
     default: ""
+  observatory-audits:
+    description: >-
+      Optional repository-relative public Observatory Audits model for this
+      repository, represented commit and explicit as-of boundary. Audit completion,
+      findings and issue suggestions retain their separate source meanings.
+    required: false
+    default: ""
+  observatory-sanity:
+    description: >-
+      Optional repository-relative public Observatory architecture-coherence model
+      for this repository, represented commit and explicit as-of boundary. Reviewer
+      assessments and claimed or verified human decisions remain separate.
+    required: false
+    default: ""
   repository:
     description: >-
       Repository in owner/name form; required without GITHUB_REPOSITORY.
@@ -325,6 +339,8 @@ runs:
         INPUT_OBSERVATORY_COMPARISON: "${{ inputs.observatory-comparison }}"
         INPUT_OBSERVATORY_SNAPSHOT: "${{ inputs.observatory-snapshot }}"
         INPUT_OBSERVATORY_HYGIENE: "${{ inputs.observatory-hygiene }}"
+        INPUT_OBSERVATORY_AUDITS: "${{ inputs.observatory-audits }}"
+        INPUT_OBSERVATORY_SANITY: "${{ inputs.observatory-sanity }}"
         INPUT_REPORTS_DIRECTORY: "${{ inputs.reports-directory }}"
         INPUT_REPOSITORY: "${{ inputs.repository }}"
         INPUT_REPOSITORY_VISIBILITY: "${{ inputs.repository-visibility }}"
@@ -445,6 +461,30 @@ runs:
           if [[ "${INPUT_OBSERVATORY_HYGIENE}/" == "${INPUT_OUTPUT_DIRECTORY}/"* \
             || "${INPUT_OUTPUT_DIRECTORY}/" == "${INPUT_OBSERVATORY_HYGIENE}/"* ]]; then
             printf 'observatory-hygiene and output-directory must not overlap\n' >&2
+            exit 2
+          fi
+        fi
+        if [[ -n "${INPUT_OBSERVATORY_AUDITS}" ]]; then
+          validate_relative_path "observatory-audits" "${INPUT_OBSERVATORY_AUDITS}"
+          if [[ -z "${INPUT_AS_OF}" ]]; then
+            printf 'observatory-audits requires an explicit as-of evaluation boundary\n' >&2
+            exit 2
+          fi
+          if [[ "${INPUT_OBSERVATORY_AUDITS}/" == "${INPUT_OUTPUT_DIRECTORY}/"* \
+            || "${INPUT_OUTPUT_DIRECTORY}/" == "${INPUT_OBSERVATORY_AUDITS}/"* ]]; then
+            printf 'observatory-audits and output-directory must not overlap\n' >&2
+            exit 2
+          fi
+        fi
+        if [[ -n "${INPUT_OBSERVATORY_SANITY}" ]]; then
+          validate_relative_path "observatory-sanity" "${INPUT_OBSERVATORY_SANITY}"
+          if [[ -z "${INPUT_AS_OF}" ]]; then
+            printf 'observatory-sanity requires an explicit as-of evaluation boundary\n' >&2
+            exit 2
+          fi
+          if [[ "${INPUT_OBSERVATORY_SANITY}/" == "${INPUT_OUTPUT_DIRECTORY}/"* \
+            || "${INPUT_OUTPUT_DIRECTORY}/" == "${INPUT_OBSERVATORY_SANITY}/"* ]]; then
+            printf 'observatory-sanity and output-directory must not overlap\n' >&2
             exit 2
           fi
         fi
@@ -867,6 +907,8 @@ runs:
         INPUT_OBSERVATORY_COMPARISON: "${{ inputs.observatory-comparison }}"
         INPUT_OBSERVATORY_SNAPSHOT: "${{ inputs.observatory-snapshot }}"
         INPUT_OBSERVATORY_HYGIENE: "${{ inputs.observatory-hygiene }}"
+        INPUT_OBSERVATORY_AUDITS: "${{ inputs.observatory-audits }}"
+        INPUT_OBSERVATORY_SANITY: "${{ inputs.observatory-sanity }}"
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
         INPUT_REPORTS_DIRECTORY: "${{ inputs.reports-directory }}"
         INPUT_WORK_DIRECTORY: "${{ inputs.work-directory }}"
@@ -929,6 +971,13 @@ runs:
         if [[ -n "${INPUT_OBSERVATORY_HYGIENE}" ]]; then
           hygiene_arguments+=(--hygiene "${GITHUB_WORKSPACE}/${INPUT_OBSERVATORY_HYGIENE}")
         fi
+        review_arguments=()
+        if [[ -n "${INPUT_OBSERVATORY_AUDITS}" ]]; then
+          review_arguments+=(--audits "${GITHUB_WORKSPACE}/${INPUT_OBSERVATORY_AUDITS}")
+        fi
+        if [[ -n "${INPUT_OBSERVATORY_SANITY}" ]]; then
+          review_arguments+=(--sanity "${GITHUB_WORKSPACE}/${INPUT_OBSERVATORY_SANITY}")
+        fi
         python3 "${GITHUB_ACTION_PATH}/scripts/generate_repository_intelligence_site.py" \
           --repository-root "${GITHUB_WORKSPACE}" \
           --output-root "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}" \
@@ -939,7 +988,8 @@ runs:
           --stylesheet-source "${GITHUB_ACTION_PATH}/assets/site.css" \
           --script-source "${GITHUB_ACTION_PATH}/assets/site.js" \
           "${snapshot_arguments[@]}" \
-          "${hygiene_arguments[@]}"
+          "${hygiene_arguments[@]}" \
+          "${review_arguments[@]}"
         python3 "${GITHUB_ACTION_PATH}/scripts/render_repository_intelligence_dependencies.py" \
           --repository-root "${GITHUB_WORKSPACE}" \
           --output-root "${GITHUB_WORKSPACE}/${INPUT_OUTPUT_DIRECTORY}" \

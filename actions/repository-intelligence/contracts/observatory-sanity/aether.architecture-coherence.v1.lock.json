@@ -1,0 +1,27 @@
+{
+  "files": [
+    {
+      "local": "sanity-owner/architecture_coherence.py",
+      "sha256": "d3e751bff903a11c0d01e2b5476836d9c1f9c28df77d7d03f50f8200595521ee",
+      "source": "library/organization/skills/architecture/review-architecture-coherence/scripts/architecture_coherence.py"
+    },
+    {
+      "local": "sanity-owner/architecture_coherence_governance.py",
+      "sha256": "cc0608819cf7755fdbcafd279c5b575916fe8d30547c8a17b58c35dcc520c6fe",
+      "source": "library/organization/skills/architecture/review-architecture-coherence/scripts/architecture_coherence_governance.py"
+    },
+    {
+      "local": "sanity-owner/governance.lock.json",
+      "sha256": "17005c8a71f75fd8b3dcacf6ba1b0f1a68e91ff5b191ca64041deb2ecb77b3aa",
+      "source": "library/organization/skills/architecture/review-architecture-coherence/scripts/governance.lock.json"
+    },
+    {
+      "local": "sanity-owner/aether.architecture-coherence-review.v1.schema.json",
+      "sha256": "5875e2563bac3a0d987781aef69742598cd5d840b838759e8abca1efeb61f810",
+      "source": "catalog/schemas/aether.architecture-coherence-review.v1.schema.json"
+    }
+  ],
+  "owner": "egohygiene/aether",
+  "revision": "74490907bf3979ac45594d97fb1bb5fa7071346d",
+  "schema": "egohygiene.observatory.public-review-owner-lock/v1"
+}

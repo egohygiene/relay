@@ -64,6 +64,29 @@ assessment passes. Owner-admitted links outside the host's narrower URL policy
 remain complete escaped text instead of broadening global link authority.
 Absent owner input preserves the explicit source-unsupported page.
 
+## Optional Audits and Sanity inputs
+
+`observatory-audits` and `observatory-sanity` select separate normalized
+Observatory models for the existing `/audits/` and `/sanity/` routes. Each path
+must be repository-relative, outside the output subtree, and bound to the public
+repository, represented commit and explicit `as-of` clock. They may accompany
+the native source plan, an external core snapshot, or the Hygiene model.
+
+The builder validates exact pinned owner code and retains independent
+`provenance.audit_evidence` and `provenance.architecture_coherence` receipts.
+The receipts bind owner revision, schema, model bytes, renderer implementation,
+evaluation clock and page content. The shared navigation graph marks these
+routes implemented only with valid receipts; it does not infer new semantic
+relationships or extend core-domain coverage. The bundle remains 30 files.
+
+Audits preserves profile/version, completion, finding classification, positive
+observations, explicit history and uncertainty. Sanity separates assessment
+recommendations, applicability, human claims, verified evidence and freshness.
+Raw JSON or an AI recommendation cannot create trusted human ratification.
+Missing inputs retain explicit unsupported routes. See the focused
+[Audits guide](repository-intelligence-audits.md) and
+[Sanity guide](repository-intelligence-sanity.md) for owner query formats.
+
 ## Compare and integration review
 
 The [Compare action](repository-intelligence-compare-artifact.md) can compose an

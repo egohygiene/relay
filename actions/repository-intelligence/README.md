@@ -293,6 +293,9 @@ See [production Journey/Releases composition](../../docs/repository-journey-rele
 | `adr-known-external-decisions` | `[]` | JSON array of declared external ADR keys for native lineage checks; nonempty requires `collect-adrs`; no target acquisition |
 | `adr-runtime` | empty | Composite-only trusted prepared runtime outside the consumer; otherwise acquire pinned dependencies |
 | `observatory-snapshot`      | empty                            | Optional commit-matched public-safe Repository Intelligence read model    |
+| `observatory-hygiene` | empty | Optional exact owner conformance model; requires explicit `as-of` |
+| `observatory-audits` | empty | Optional exact owner audit model for `/audits/`; requires explicit `as-of` |
+| `observatory-sanity` | empty | Optional exact owner architecture review model for `/sanity/`; requires explicit `as-of` |
 | `observatory-comparison`    | empty                            | Optional comparison whose after boundary matches the snapshot and commit |
 | `repository`                | workflow repository              | Required without `GITHUB_REPOSITORY`; cannot override GitHub identity    |
 | `repository-visibility`     | event visibility, else `unknown` | Local-only fallback; cannot override GitHub visibility                  |
@@ -540,4 +543,6 @@ a build or Pages artifact instead.
 - Deployment receipts must stay outside `output-directory` and the final
   composed site. See the consumer integration and rollback action linked above.
 
-Production source admission, optional owner-backed Hygiene and the queued organization sanity sweep are documented in [production data paths](../../docs/repository-intelligence-production-paths.md).
+Production source admission, optional owner-backed Hygiene, Audits and Sanity, and the organization sanity sweep are documented in [production data paths](../../docs/repository-intelligence-production-paths.md). Repository Pages remain the publication owner; the central site aggregates the separate fleet projections.
+
+Review the sliced owner and consumer changes in the [Audits and Sanity implementation index](../../docs/repository-intelligence-audits-sanity-review.md).

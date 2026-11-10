@@ -868,6 +868,20 @@
           "description": "Optional public Observatory conformance model bound to the represented source and explicit as-of."
         },
         {
+          "name": "observatory-audits",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional public Observatory Audits model bound to the represented source and explicit as-of; completion is independent of findings or conformance."
+        },
+        {
+          "name": "observatory-sanity",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional public Observatory architecture-coherence model bound to the represented source and explicit as-of; reviewer assessment and human decisions remain distinct."
+        },
+        {
           "name": "observatory-comparison",
           "type": "string",
           "required": false,
@@ -1434,6 +1448,20 @@
           "required": false,
           "default": "",
           "description": "Optional public Observatory conformance model bound to the represented source and explicit as-of."
+        },
+        {
+          "name": "observatory-audits",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional public Observatory Audits model bound to the represented source and explicit as-of; completion is independent of findings or conformance."
+        },
+        {
+          "name": "observatory-sanity",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "Optional public Observatory architecture-coherence model bound to the represented source and explicit as-of; reviewer assessment and human decisions remain distinct."
         },
         {
           "name": "observatory-comparison",

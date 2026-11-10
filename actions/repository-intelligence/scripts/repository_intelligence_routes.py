@@ -113,7 +113,7 @@ ROUTE_QUESTIONS = dict(_QUESTIONS)
 
 def route(identifier: str, *, supported_views=()) -> dict:
     """Return independent metadata; callers cannot mutate the trusted inventory."""
-    if not set(supported_views) <= {"hygiene"}:
+    if not set(supported_views) <= {"hygiene", "audits", "sanity"}:
         raise ValueError("Owner view support is incompatible")
     value = json.loads(json.dumps(_DEFINITIONS[identifier]))
     if identifier in supported_views:

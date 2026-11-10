@@ -1,0 +1,55 @@
+{
+  "schema": "egohygiene.relay.observatory-sanity-lock/v1",
+  "owner": "egohygiene/observatory",
+  "revision": "692fbe7a5a31827d442818bf33f5b225abc2d4b8",
+  "contract": {
+    "schema": "egohygiene.observatory.repository-sanity/v1",
+    "version": "1.0.0-alpha.1"
+  },
+  "files": {
+    "src/observatory/sanity_contract.py": {
+      "vendored": "contracts/observatory-sanity/sanity_contract.py",
+      "sha256": "13bc66a6bac2cdf064e07f7f39e5ea7bfad4034831e219eb46b5546a1e268bd9"
+    },
+    "src/observatory/public_reviews.py": {
+      "vendored": "contracts/observatory-sanity/public_reviews.py",
+      "sha256": "3a91f3e6d75de3765782570e78fa90b63942354c6076176074f5fd6f2cf432b6"
+    },
+    "src/observatory/conformance_contract.py": {
+      "vendored": "contracts/observatory-sanity/conformance_contract.py",
+      "sha256": "cff878b9d112ee2f9aa948a9f38b382f44a081acf1a5da18616bf21977085f13"
+    },
+    "src/observatory/data/hygiene.public-repositories.v1.json": {
+      "vendored": "contracts/observatory-sanity/hygiene.public-repositories.v1.json",
+      "sha256": "af9c7186ded0bb57b18741eaa5905314b96d6adb03736946c868e0fc4aa50b26"
+    },
+    "contracts/hygiene.public-conformance.v1.lock.json": {
+      "vendored": "contracts/observatory-sanity/hygiene.public-conformance.v1.lock.json",
+      "sha256": "d3b55cd731a9c4e8e657f3dbbf331fd3f4c7899d54b854255ce13f71857fad4e"
+    },
+    "schemas/repository-sanity.v1.schema.json": {
+      "vendored": "contracts/observatory-sanity/repository-sanity.v1.schema.json",
+      "sha256": "44d361f94978dab9207c286a851ecd9ca19210f8af8879ef281b22a17b31d7a3"
+    },
+    "src/observatory/data/aether.architecture-coherence.v1.lock.json": {
+      "vendored": "contracts/observatory-sanity/aether.architecture-coherence.v1.lock.json",
+      "sha256": "a5ea406128a8ef50b9a7cd2bdaeb02dde52e6137474b5f6f2aac272acbe8d73e"
+    },
+    "src/observatory/data/sanity-owner/architecture_coherence.py": {
+      "vendored": "contracts/observatory-sanity/sanity-owner/architecture_coherence.py",
+      "sha256": "d3e751bff903a11c0d01e2b5476836d9c1f9c28df77d7d03f50f8200595521ee"
+    },
+    "src/observatory/data/sanity-owner/architecture_coherence_governance.py": {
+      "vendored": "contracts/observatory-sanity/sanity-owner/architecture_coherence_governance.py",
+      "sha256": "cc0608819cf7755fdbcafd279c5b575916fe8d30547c8a17b58c35dcc520c6fe"
+    },
+    "src/observatory/data/sanity-owner/governance.lock.json": {
+      "vendored": "contracts/observatory-sanity/sanity-owner/governance.lock.json",
+      "sha256": "17005c8a71f75fd8b3dcacf6ba1b0f1a68e91ff5b191ca64041deb2ecb77b3aa"
+    },
+    "src/observatory/data/sanity-owner/aether.architecture-coherence-review.v1.schema.json": {
+      "vendored": "contracts/observatory-sanity/sanity-owner/aether.architecture-coherence-review.v1.schema.json",
+      "sha256": "5875e2563bac3a0d987781aef69742598cd5d840b838759e8abca1efeb61f810"
+    }
+  }
+}

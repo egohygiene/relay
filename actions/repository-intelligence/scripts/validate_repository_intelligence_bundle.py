@@ -15,6 +15,11 @@ import re
 from typing import Any
 from urllib.parse import quote, unquote, urlsplit
 
+_owner_spec = importlib.util.spec_from_file_location("relay_bundle_owner_views",
+    Path(__file__).with_name("repository_intelligence_owner_views.py"))
+owner_views = importlib.util.module_from_spec(_owner_spec)
+_owner_spec.loader.exec_module(owner_views)
+
 ROUTED_BUNDLE_FILES = {
     "build-manifest.json",
     "compare/index.html",
@@ -277,34 +282,27 @@ def validate_route_manifest(output_root: Path, repository: str, source_commit: s
         return
     try:
         actual = load_json_object(path, "repository routes")
-        receipt = validated_hygiene_receipt(output_root, repository, source_commit)
+        receipts = validated_owner_receipts(output_root, repository, source_commit)
         expected = build_manifest_contract.route_contract.manifest(repository, source_commit,
-            supported_views=("hygiene",) if receipt is not None else ())
+            supported_views=tuple(receipts))
         if actual != expected:
             raise ValueError("incompatible")
     except (ValueError, OSError, KeyError, TypeError) as error:
         raise BundleValidationError("repository route manifest/source binding is incompatible") from error
 
 
-def validated_hygiene_receipt(output_root: Path, repository: str, source_commit: str):
-    """Admit the separate owner view without upgrading the core read model."""
+def validated_owner_receipts(output_root: Path, repository: str, source_commit: str):
+    """Admit separate owner views without upgrading the core read model."""
     provenance = load_json_object(output_root / "provenance.json", "provenance.json")
-    receipt = provenance.get("hygiene_conformance")
-    if receipt is None:
-        return None
     try:
-        if provenance["consumer"]["visibility"] != "public":
-            raise ValueError("public owner view required")
-        spec = importlib.util.spec_from_file_location("relay_bundle_hygiene",
-            Path(__file__).with_name("render_repository_intelligence_hygiene.py"))
-        if spec is None or spec.loader is None:
-            raise ValueError("owner view unavailable")
-        helper = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(helper)
-        helper.validate_receipt(receipt, repository, source_commit, provenance["generated_at"])
-        return receipt
+        return owner_views.validate_receipts(provenance, repository, source_commit)
     except (ValueError, OSError, KeyError, TypeError, ImportError) as error:
-        raise BundleValidationError("Hygiene conformance provenance is incompatible") from error
+        raise BundleValidationError("Owner-view provenance is incompatible") from error
+
+
+def validated_hygiene_receipt(output_root: Path, repository: str, source_commit: str):
+    """Compatibility accessor for the first optional owner view."""
+    return validated_owner_receipts(output_root, repository, source_commit).get("hygiene")
 
 
 def collect_bundle_files(output_root: Path) -> set[str]:
@@ -1101,12 +1099,13 @@ def validate_json_contracts(
     if summary_repository.get("source_commit") != source_commit:
         raise BundleValidationError("summary source commit does not match the consumer")
 
-    optional = {name for name in ("adr_collection", "source_collection", "hygiene_conformance") if name in provenance}
+    owner_keys = {definition["provenance"] for definition in owner_views.VIEWS.values()}
+    optional = {name for name in {"adr_collection", "source_collection"} | owner_keys if name in provenance}
     if {"adr_collection", "source_collection"} <= optional:
         raise BundleValidationError("Native source receipts must use one source plan")
     require_exact_keys(provenance, PROVENANCE_KEYS | optional, "provenance.json")
-    if "hygiene_conformance" in optional:
-        validated_hygiene_receipt(output_root, repository, source_commit)
+    if owner_keys & optional:
+        validated_owner_receipts(output_root, repository, source_commit)
     if "adr_collection" in optional:
         spec = importlib.util.spec_from_file_location(
             "relay_adr_build_contract", Path(__file__).with_name("repository_adr_build_contract.py"))
@@ -1585,7 +1584,7 @@ def validate_routed_shell(
         return
     shell_routes = ([name for name, _label in build_manifest_contract.route_contract.ROUTES]
                     if (output_root / "routes.json").is_file() else SHELL_ROUTES)
-    hygiene_receipt = validated_hygiene_receipt(output_root, repository, source_commit)
+    receipts = validated_owner_receipts(output_root, repository, source_commit)
     for route in shell_routes:
         rendered = (output_root / route / "index.html").read_text(encoding="utf-8")
         markers = {
@@ -1596,16 +1595,12 @@ def validate_routed_shell(
             'data-local-resume',
             'aria-current="page"',
         }
-        if route == "hygiene" and hygiene_receipt is not None:
-            markers.update({'data-ri-renderer-state="implemented"', 'id="hygiene-heading"', 'data-filter-query'})
-            spec = importlib.util.spec_from_file_location("relay_bundle_hygiene_page",
-                Path(__file__).with_name("render_repository_intelligence_hygiene.py"))
-            helper = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(helper)
+        if route in receipts:
+            markers.update({'data-ri-renderer-state="implemented"', f'id="{route}-heading"', 'data-filter-query'})
             try:
-                helper.validate_page(rendered, hygiene_receipt)
+                owner_views.helper(route).validate_page(rendered, receipts[route])
             except (ValueError, KeyError, TypeError) as error:
-                raise BundleValidationError("Hygiene page/model binding is incompatible") from error
+                raise BundleValidationError("Owner page/model binding is incompatible") from error
         elif route in build_manifest_contract.route_contract.RESERVED_IDS:
             markers.update({
                 'data-ri-renderer-state="source-unsupported"',

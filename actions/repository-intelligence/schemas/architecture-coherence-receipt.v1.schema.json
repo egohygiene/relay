@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.github.io/relay/contracts/architecture-coherence-receipt.v1.schema.json",
+  "title": "Bounded supplied Sanity assessment and human-evidence view receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "repository",
+    "source_commit",
+    "as_of",
+    "owner",
+    "input_sha256",
+    "model_sha256",
+    "implementation",
+    "freshness",
+    "counts",
+    "current_freshness",
+    "current_reviews",
+    "other_revision_reviews",
+    "human_state",
+    "human_evidence",
+    "current_governance_records",
+    "other_revision_governance_records"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.relay.architecture-coherence-receipt/v1"
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+    },
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "revision",
+        "schema",
+        "contract_version"
+      ],
+      "properties": {
+        "repository": {
+          "const": "egohygiene/observatory"
+        },
+        "revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "schema": {
+          "const": "egohygiene.observatory.repository-sanity/v1"
+        },
+        "contract_version": {
+          "const": "1.0.0-alpha.1"
+        }
+      }
+    },
+    "input_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "model_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "renderer_sha256",
+        "support_sha256",
+        "lock_sha256"
+      ],
+      "properties": {
+        "renderer_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "support_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "lock_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "freshness": {
+      "enum": [
+        "current",
+        "stale",
+        "unknown"
+      ]
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "review",
+        "governance",
+        "change"
+      ],
+      "properties": {
+        "review": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 256
+        },
+        "change": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 524288
+        },
+        "governance": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 256
+        }
+      }
+    },
+    "current_freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "current",
+        "stale",
+        "unknown"
+      ],
+      "properties": {
+        "current": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 512
+        },
+        "stale": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 512
+        },
+        "unknown": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 512
+        }
+      }
+    },
+    "current_reviews": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 256
+    },
+    "other_revision_reviews": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 256
+    },
+    "human_state": {
+      "enum": [
+        "mixed",
+        "not-reviewed",
+        "review-due",
+        "review-in-progress",
+        "stale",
+        "unavailable"
+      ]
+    },
+    "human_evidence": {
+      "enum": [
+        "absent",
+        "unverified"
+      ]
+    },
+    "current_governance_records": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 256
+    },
+    "other_revision_governance_records": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 256
+    }
+  }
+}

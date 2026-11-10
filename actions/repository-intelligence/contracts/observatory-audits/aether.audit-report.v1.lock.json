@@ -1,0 +1,27 @@
+{
+  "files": [
+    {
+      "local": "audit-owner/audit_contract.py",
+      "sha256": "a700d9469cae02e9f929bc076cfb37940f3c64349380c0142efe94a7a83e0b85",
+      "source": "library/organization/skills/quality/audit-repository/scripts/audit_contract.py"
+    },
+    {
+      "local": "audit-owner/audit-profiles.v1.json",
+      "sha256": "dde4d72db9e0a952e1e10b01b8fdfa7cfecd4c001095af8b23d9f821ea789737",
+      "source": "library/organization/skills/quality/audit-repository/references/audit-profiles.v1.json"
+    },
+    {
+      "local": "audit-owner/aether.audit-profile-registry.v1.schema.json",
+      "sha256": "ad1335fe7662d91308d3d501197df70fac00892de40da8820538631b0f80312d",
+      "source": "catalog/schemas/aether.audit-profile-registry.v1.schema.json"
+    },
+    {
+      "local": "audit-owner/aether.repository-audit-report.v1.schema.json",
+      "sha256": "060446225135d573da15d4c31a6a59a89e04665e0c3cce43f8373b1e465bc96b",
+      "source": "catalog/schemas/aether.repository-audit-report.v1.schema.json"
+    }
+  ],
+  "owner": "egohygiene/aether",
+  "revision": "74490907bf3979ac45594d97fb1bb5fa7071346d",
+  "schema": "egohygiene.observatory.public-review-owner-lock/v1"
+}

@@ -403,13 +403,16 @@ def validate_configuration(arguments: argparse.Namespace) -> int:
         ("snapshot", arguments.observatory_snapshot),
         ("comparison", arguments.observatory_comparison),
         ("hygiene", getattr(arguments, "observatory_hygiene", "")),
+        ("audits", getattr(arguments, "observatory_audits", "")),
+        ("sanity", getattr(arguments, "observatory_sanity", "")),
     ):
         if value:
             validate_relative_path(value, f"RIW-INPUT-{label.upper()}-PATH")
             if paths_overlap(value, paths["output"]):
                 raise ContractError("RIW-INPUT-EVIDENCE-OVERLAP")
-    if getattr(arguments, "observatory_hygiene", "") and not observed_at:
-        raise ContractError("RIW-INPUT-HYGIENE-BOUNDARY")
+    for label in ("hygiene", "audits", "sanity"):
+        if getattr(arguments, "observatory_" + label, "") and not observed_at:
+            raise ContractError("RIW-INPUT-" + label.upper() + "-BOUNDARY")
     if arguments.observatory_comparison and not arguments.observatory_snapshot:
         raise ContractError("RIW-INPUT-COMPARISON-WITHOUT-SNAPSHOT")
     if arguments.observatory_comparison == arguments.observatory_snapshot and arguments.observatory_comparison:
@@ -773,6 +776,8 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--observatory-snapshot", default="")
     value.add_argument("--observatory-comparison", default="")
     value.add_argument("--observatory-hygiene", default="")
+    value.add_argument("--observatory-audits", default="")
+    value.add_argument("--observatory-sanity", default="")
     value.add_argument("--default-branch", default="")
     value.add_argument("--activity-since", default="1 year ago")
     value.add_argument("--max-depth", default="10")

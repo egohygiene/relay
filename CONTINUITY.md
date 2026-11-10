@@ -7,24 +7,20 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-11-09T18:12:59Z'
+  updated_at: '2026-11-10T02:13:05Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Retain one source-qualified review index for the merged Repository Intelligence production implementation
-    batch.
+  purpose: Present separate owner-backed Audits and Sanity pages in each repository Intelligence subtree.
   includes:
-  - docs/repository-intelligence-production-review.md records twelve verified implementation PRs across eight
-    repositories, each reviewed head and actual merge commit, the shared immutable consumer pin, resulting
-    data paths, preserved gates/recovery and remaining acceptance inputs.
-  - The merged integration PR links the five consumer and central-host adoptions. Seventeen original review
-    drafts are closed as superseded; their already integrated implementation and original branches remain available.
-    The Hygiene guide clarifies that absent supplied evidence stays unavailable/unknown.
-  - The review index explicitly queues structured Audits and Sanity owner contracts before a separate organization
-    sanity sweep. This documentation change adds no runtime, policy, scheduling, deployment or human approval
-    authority.
+  - Optional exact Observatory models and closed provenance receipts enable the existing Audits and Sanity
+    routes, shared shell, filters and interactive navigation graph.
+  - Reusable workflow and CI-evidence inputs preserve explicit evaluation clocks and source path boundaries;
+    native coverage, historical selectors and publisher ownership remain separate.
+  - The 30-file bundle retains explicit unsupported states when owner inputs are absent; claimed human decisions
+    cannot become verified ratification.
   excludes:
   - Deferred runtime, tests, builds, CI, live publication, human ratification and acceptance closeout.
   precedence:
@@ -35,79 +31,71 @@ scope:
   - continuity-checkpoint
   canonical_sources:
   - AGENTS.md
-  - ARCHITECTURE.md
-  - SYSTEM.md
-  - DECISIONS.md
-  - docs/repository-intelligence-production-review.md
+  - actions/repository-intelligence/action.yml
+  - .github/workflows/repository-intelligence.yml
+  - .github/workflows/repository-intelligence-captures.yml
+  - actions/repository-intelligence/scripts/repository_intelligence_owner_views.py
+  - actions/repository-intelligence/scripts/generate_repository_intelligence_site.py
+  - actions/repository-intelligence/scripts/validate_repository_intelligence_bundle.py
   - docs/repository-intelligence-production-paths.md
-  - docs/repository-intelligence-hygiene.md
-  - https://github.com/egohygiene/relay/issues/151
+  - https://github.com/egohygiene/relay/issues/74
 work:
-  objective: Retain one source-qualified review index for the merged Repository Intelligence production implementation
-    batch.
+  objective: Present separate owner-backed Audits and Sanity pages in each repository Intelligence subtree.
   success_conditions:
-  - A reviewer can reach every independently merged source/transport/model/consumer slice and inspect its exact
-    source.
-  - Implementation merges remain distinct from native execution, artifact upload, publication, human ratification
-    and issue acceptance.
-  - The next owner-contract and organization sweep sequence is explicit without claiming it was executed.
+  - Immutable owner inputs and public source admission precede public identities, counts and digests.
+  - Missing, partial and unverified evidence remains explicit and cannot establish human approval.
+  - Existing publication, source ownership and historical recovery are preserved.
   active_issue:
     provider: github
-    id: egohygiene/relay#151
-    url: https://github.com/egohygiene/relay/issues/151
+    id: egohygiene/relay#74
+    url: https://github.com/egohygiene/relay/issues/74
   next:
     kind: action
-    id: prepare-audits-and-sanity-owner-contracts
-    description: Implement the structured Audits chain Aether 86 to Observatory 20 to Relay 74 and Sanity foundations
-      Hygiene 59/Aether 87 to Observatory 21 to Relay 76, then run the separately queued organization sanity
-      sweep after those contracts/pages and required evidence exist.
+    id: qualify-owner-backed-repository-pages
+    description: Supply actual public owner models and qualify repository/fleet publication after source integration;
+      keep authentic human ratification and organization audit execution separate.
     readiness: ready
     references:
-    - https://github.com/egohygiene/relay/issues/151
+    - https://github.com/egohygiene/relay/issues/74
     depends_on: []
 state:
   base:
-    revision: 50027a108169fa92de3e58f26c1f41c9aea2945a
+    revision: d97a81d6c9b6425f6ae4ad4c78a68682f2169aff
     ref: refs/heads/main
-    verified_at: '2026-11-09T18:12:59Z'
+    verified_at: '2026-11-10T02:13:05Z'
   candidate:
-    branch: codex/intelligence-production-review
+    branch: codex/intelligence-audits-sanity-integration
     revision: null
     pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-11-09T18:12:59Z'
-    default_branch_revision: 50027a108169fa92de3e58f26c1f41c9aea2945a
+    observed_at: '2026-11-10T02:13:05Z'
+    default_branch_revision: d97a81d6c9b6425f6ae4ad4c78a68682f2169aff
     issue_state: open
     pull_request_state: not-applicable
-    notes: Relay main 50027a1 was verified after implementation PR 176. All twelve listed implementation PRs,
-      including five consumer adoptions and central site 127, were verified merged at their exact reviewed
-      heads and recorded merge SHAs. Feature/acceptance issues remain open; unrelated organization PRs are
-      outside this review.
+    notes: Observed Relay main d97a81d6c9b6425f6ae4ad4c78a68682f2169aff remains the base. Owner sources are
+      pinned independently, and existing consumer publication and recovery paths remain intact.
   parallel_changes: []
 review:
   status: partial
-  reviewed_at: '2026-11-09T18:12:59Z'
+  reviewed_at: '2026-11-10T02:13:05Z'
   reviewed_by: Codex
   evidence:
-  - command: GitHub merged PR/head/merge identity reads, Markdown source/link review, preserved implementation
-      pin inspection, continuity schema/formats/size and scoped whitespace
+  - command: Independent static source review; Python syntax, closed schema definitions/local references, exact
+      owner resource hashes, source metadata and continuity schema/size/links; whitespace
     outcome: limited
-    observed_at: '2026-11-09T18:12:59Z'
+    observed_at: '2026-11-10T02:13:05Z'
     notes: Static source and metadata inspection only; no application execution.
   - command: Native/runtime execution, tests, builds, CI investigation, browser/provider/consumer/publication
       qualification
     outcome: not-run
-    observed_at: '2026-11-09T18:12:59Z'
+    observed_at: '2026-11-10T02:13:05Z'
     notes: Deferred at maintainer request; source merges do not establish acceptance.
   environment_limitations:
-  - All application/native execution, tests, builds, actual API/artifact transport, CI, browsers, canaries,
-    live publication and recovery qualification remain deferred.
-  - Real compatible snapshot pairs and fleet artifact selections, actual owner conformance inputs and provider/runtime
-    budgets remain acceptance work.
-  - Hygiene 47 retains authentic ADR metadata/human approval prerequisites and Akashic roadmap source prerequisites
-    remain separate. No sanity sweep or human ratification is claimed.
+  - Tests, native/application execution, builds, CI, browser/provider/publication qualification and actual
+    audit execution remain deferred.
+  - Source implementation does not establish human ratification, successful publication or parent issue completion.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -134,35 +122,35 @@ Read scoped instructions, canonical sources above and this checkpoint. Verify mu
 
 ## Current objective and success conditions
 
-Retain one source-qualified review index for the merged Repository Intelligence production implementation batch. A reviewer can reach every independently merged source/transport/model/consumer slice and inspect its exact source. Implementation merges remain distinct from native execution, artifact upload, publication, human ratification and issue acceptance. The next owner-contract and organization sweep sequence is explicit without claiming it was executed.
+Present separate owner-backed Audits and Sanity pages in each repository Intelligence subtree. Immutable owner inputs and public source admission precede public identities, counts and digests. Missing, partial and unverified evidence remains explicit and cannot establish human approval. Existing publication, source ownership and historical recovery are preserved.
 
 ## State snapshot
 
-Candidate `codex/intelligence-production-review` is based on observed main `50027a108169fa92de3e58f26c1f41c9aea2945a`. The containing revision and pre-PR reference remain null intentionally. Relay main 50027a1 was verified after implementation PR 176. All twelve listed implementation PRs, including five consumer adoptions and central site 127, were verified merged at their exact reviewed heads and recorded merge SHAs. Feature/acceptance issues remain open; unrelated organization PRs are outside this review.
+Candidate `codex/intelligence-audits-sanity-integration` is based on observed main `d97a81d6c9b6425f6ae4ad4c78a68682f2169aff`. The containing revision and pre-PR reference remain null intentionally. Observed Relay main d97a81d6c9b6425f6ae4ad4c78a68682f2169aff remains the base. Owner sources are pinned independently, and existing consumer publication and recovery paths remain intact.
 
 ## Completed and material changes
 
-docs/repository-intelligence-production-review.md records twelve verified implementation PRs across eight repositories, each reviewed head and actual merge commit, the shared immutable consumer pin, resulting data paths, preserved gates/recovery and remaining acceptance inputs.
+Optional exact Observatory models and closed provenance receipts enable the existing Audits and Sanity routes, shared shell, filters and interactive navigation graph.
 
-The merged integration PR links the five consumer and central-host adoptions. Seventeen original review drafts are closed as superseded; their already integrated implementation and original branches remain available. The Hygiene guide clarifies that absent supplied evidence stays unavailable/unknown.
+Reusable workflow and CI-evidence inputs preserve explicit evaluation clocks and source path boundaries; native coverage, historical selectors and publisher ownership remain separate.
 
-The review index explicitly queues structured Audits and Sanity owner contracts before a separate organization sanity sweep. This documentation change adds no runtime, policy, scheduling, deployment or human approval authority.
+The 30-file bundle retains explicit unsupported states when owner inputs are absent; claimed human decisions cannot become verified ratification.
 
 ## Validation and review evidence
 
-GitHub merged PR/head/merge identity reads, Markdown source/link review, preserved implementation pin inspection, continuity schema/formats/size and scoped whitespace. Static inspection only. Native/runtime execution, tests, builds, CI investigation, browsers, provider reads and publication qualification were not run.
+Independent static source review; Python syntax, closed schema definitions/local references, exact owner resource hashes, source metadata and continuity schema/size/links; whitespace. Static source inspection only. Native/application execution, tests, builds, CI investigation, browser/model/source-capture provider execution and publication qualification were not run. Read-only source and Git metadata observations are separate.
 
 ## Blockers, risks, unknowns, and deferred work
 
-All application/native execution, tests, builds, actual API/artifact transport, CI, browsers, canaries, live publication and recovery qualification remain deferred. Real compatible snapshot pairs and fleet artifact selections, actual owner conformance inputs and provider/runtime budgets remain acceptance work. Hygiene 47 retains authentic ADR metadata/human approval prerequisites and Akashic roadmap source prerequisites remain separate. No sanity sweep or human ratification is claimed.
+Tests, native/application execution, builds, CI, browser/provider/publication qualification and actual audit execution remain deferred. Source implementation does not establish human ratification, successful publication or parent issue completion.
 
 ## Next dependency-ready work
 
-Implement the structured Audits chain Aether 86 to Observatory 20 to Relay 74 and Sanity foundations Hygiene 59/Aether 87 to Observatory 21 to Relay 76, then run the separately queued organization sanity sweep after those contracts/pages and required evidence exist.
+Supply actual public owner models and qualify repository/fleet publication after source integration; keep authentic human ratification and organization audit execution separate.
 
 ## Parallel changes and reconciliation
 
-The implementation was delivered in independent merged slices before this documentation handoff. Current consumers retain exact Relay 981ddf4367c67fcd625e54321d95bab027f6c0f2; this review index does not require a new runtime adoption. ADR not required: source-qualified navigation and factual wording correction introduce no architectural decision.
+Other Intelligence slices remain separately reviewed. Reconcile the current main and this handoff before integration; preserve all immutable historical recovery bytes and consumer-owned publication gates.
 
 ## Privacy and redaction
 

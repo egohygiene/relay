@@ -1,0 +1,30 @@
+{
+  "schema": "egohygiene.aether.architecture-coherence-governance-lock/v1",
+  "owner": "egohygiene/hygiene",
+  "revision": "d11580e9a9c5d78b9a5d21474deaa612712a0fb9",
+  "contract_version": "1.0.0-alpha.1",
+  "policy_status": "proposed",
+  "profile": "public-egohygiene",
+  "files": {
+    "helper": {
+      "source_path": "tools/architecture_coherence.py",
+      "path": "architecture_coherence_governance.py",
+      "sha256": "cc0608819cf7755fdbcafd279c5b575916fe8d30547c8a17b58c35dcc520c6fe"
+    },
+    "governance_schema": {
+      "source_path": "schemas/architecture-coherence-governance.v1.schema.json",
+      "path": "architecture-coherence-governance.v1.schema.json",
+      "sha256": "8666cc3502c04409c586b2a6afdc0a676e8473689096b9305a4cb9671e77ce7e"
+    },
+    "material_change_schema": {
+      "source_path": "schemas/architecture-coherence-material-change.v1.schema.json",
+      "path": "architecture-coherence-material-change.v1.schema.json",
+      "sha256": "42ede98ebef62e4f5d9dbbaa9e77582099619970245454ac44774b49be2680e1"
+    }
+  },
+  "helper_sha256": "cc0608819cf7755fdbcafd279c5b575916fe8d30547c8a17b58c35dcc520c6fe",
+  "policy": {
+    "source_path": "catalog/architecture-coherence-policy.json",
+    "sha256": "929f54655aa018a9f227ccd592d7ea74e2579b56d07bd1bd8e8ebe6a5a82f940"
+  }
+}
