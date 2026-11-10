@@ -1,7 +1,7 @@
 {
   "schema": "egohygiene.relay.observatory-audits-lock/v1",
   "owner": "egohygiene/observatory",
-  "revision": "82ac5f14d74a8e144a1499307c45b6d4b0aa92ee",
+  "revision": "7b857de2424f90de519fbc2e24332a7c0a89991b",
   "contract": {
     "schema": "egohygiene.observatory.repository-audits/v1",
     "version": "1.0.0-alpha.1"
@@ -13,7 +13,7 @@
     },
     "src/observatory/public_reviews.py": {
       "vendored": "contracts/observatory-audits/public_reviews.py",
-      "sha256": "3a91f3e6d75de3765782570e78fa90b63942354c6076176074f5fd6f2cf432b6"
+      "sha256": "66243f8ef1fbdabc4d0dfad4cf71f525ecfc0c6f1ad3ed750f8b70407f1115ff"
     },
     "src/observatory/conformance_contract.py": {
       "vendored": "contracts/observatory-audits/conformance_contract.py",

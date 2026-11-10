@@ -203,7 +203,7 @@ def ownership_preflight(value, allowed):
     and never reports the excluded token, URI, path or number of exclusions.
     """
     nodes = 0
-    repository_token = re.compile(r"egohygiene/(?:\.github|[A-Za-z0-9][A-Za-z0-9.-]*)", re.IGNORECASE)
+    repository_token = re.compile(r"egohygiene/[A-Za-z0-9_.-]+", re.IGNORECASE)
     public_names = {name.lower() for name in allowed}
     url_token = re.compile(r"https?://[^\s<>\"'`\)\]]+", re.IGNORECASE)
 
