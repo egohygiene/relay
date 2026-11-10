@@ -107,6 +107,9 @@ relationships never establish completeness or automatic resolution.
 
 All projected fields remain in static HTML disclosures, except source human
 notes and authority identity, which use the bounded metadata described above.
+Material-change authority uses the same restriction in both context disclosures
+and change cards: claim kind, evidence URL and original decision time remain;
+the actor reference is omitted.
 Text is escaped; Markdown is not executed. Already owner-admitted URLs must also
 pass the existing Relay host URL boundary. Permitted GitHub links declare
 `data-source-repository`; unsupported origins and incompatible self-revision
