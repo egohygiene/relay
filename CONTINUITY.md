@@ -7,20 +7,24 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-11-10T02:13:05Z'
+  updated_at: '2026-11-10T02:33:30Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Present separate owner-backed Audits and Sanity pages in each repository Intelligence subtree.
+  purpose: Complete public source admission and authority disclosure for owner-backed Audits/Sanity and record
+    the merged review batch.
   includes:
-  - Optional exact Observatory models and closed provenance receipts enable the existing Audits and Sanity
-    routes, shared shell, filters and interactive navigation graph.
-  - Reusable workflow and CI-evidence inputs preserve explicit evaluation clocks and source path boundaries;
-    native coverage, historical selectors and publisher ownership remain separate.
-  - The 30-file bundle retains explicit unsupported states when owner inputs are absent; claimed human decisions
-    cannot become verified ratification.
+  - Both immutable Audit/Sanity capsules now select Observatory 7b857de2424f90de519fbc2e24332a7c0a89991b. Complete
+    case-insensitive namespace tokens prevent protected names from matching public prefixes; all 22 resources
+    are bound to exact owner bytes.
+  - Sanity removes authority actor references from nested review/governance disclosures and material-change
+    cards, retaining claim kind, evidence URI and decision time. Model/source digests, evaluations, counts
+    and receipt formats remain intact.
+  - The consolidated review index records merged Aether, Hygiene, Observatory, Relay, central host and Reflector
+    slices, exact source/merge observations, deferred qualification and the actual organization-sweep boundary.
+    Existing consumer builder pins remain unchanged pending explicit adoption.
   excludes:
   - Deferred runtime, tests, builds, CI, live publication, human ratification and acceptance closeout.
   precedence:
@@ -38,9 +42,14 @@ scope:
   - actions/repository-intelligence/scripts/generate_repository_intelligence_site.py
   - actions/repository-intelligence/scripts/validate_repository_intelligence_bundle.py
   - docs/repository-intelligence-production-paths.md
+  - actions/repository-intelligence/scripts/render_repository_intelligence_sanity.py
+  - actions/repository-intelligence/contracts/repository-audits.v1.lock.json
+  - actions/repository-intelligence/contracts/repository-sanity.v1.lock.json
+  - docs/repository-intelligence-audits-sanity-review.md
   - https://github.com/egohygiene/relay/issues/74
 work:
-  objective: Present separate owner-backed Audits and Sanity pages in each repository Intelligence subtree.
+  objective: Complete public source admission and authority disclosure for owner-backed Audits/Sanity and record
+    the merged review batch.
   success_conditions:
   - Immutable owner inputs and public source admission precede public identities, counts and digests.
   - Missing, partial and unverified evidence remains explicit and cannot establish human approval.
@@ -52,45 +61,49 @@ work:
   next:
     kind: action
     id: qualify-owner-backed-repository-pages
-    description: Supply actual public owner models and qualify repository/fleet publication after source integration;
-      keep authentic human ratification and organization audit execution separate.
+    description: Refresh the prepared public source inventory, configure an explicitly trusted offline adapter
+      and run the organization sweep, then qualify native/provider/publication behavior and adopt reviewed
+      builder/model pins. Actual human ratification remains separate.
     readiness: ready
     references:
     - https://github.com/egohygiene/relay/issues/74
     depends_on: []
 state:
   base:
-    revision: d97a81d6c9b6425f6ae4ad4c78a68682f2169aff
+    revision: 7f6b3e5d5c70ff8d3ae5aab70a08ae094b09a715
     ref: refs/heads/main
-    verified_at: '2026-11-10T02:13:05Z'
+    verified_at: '2026-11-10T02:33:30Z'
   candidate:
-    branch: codex/intelligence-audits-sanity-integration
+    branch: codex/intelligence-audits-sanity-review
     revision: null
     pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-11-10T02:13:05Z'
-    default_branch_revision: d97a81d6c9b6425f6ae4ad4c78a68682f2169aff
+    observed_at: '2026-11-10T02:33:30Z'
+    default_branch_revision: 7f6b3e5d5c70ff8d3ae5aab70a08ae094b09a715
     issue_state: open
     pull_request_state: not-applicable
-    notes: Observed Relay main d97a81d6c9b6425f6ae4ad4c78a68682f2169aff remains the base. Owner sources are
-      pinned independently, and existing consumer publication and recovery paths remain intact.
+    notes: Observed Relay main 7f6b3e5d5c70ff8d3ae5aab70a08ae094b09a715 contains the merged owner views. Functional
+      follow-up b749b946ca6ba18cee98e0947dc227fada191fc4 preserves authority privacy and exact new source admission.
+      Nine implementation slices across six repositories are merged, including Observatory 33, central site
+      128 and Reflector 265; actual audits and publication qualification remain separate.
   parallel_changes: []
 review:
   status: partial
-  reviewed_at: '2026-11-10T02:13:05Z'
+  reviewed_at: '2026-11-10T02:33:30Z'
   reviewed_by: Codex
   evidence:
-  - command: Independent static source review; Python syntax, closed schema definitions/local references, exact
-      owner resource hashes, source metadata and continuity schema/size/links; whitespace
+  - command: Independent final namespace/privacy source review; Python AST, unchanged receipt/schema/collector
+      boundaries, exact 22 owner resource byte/hash comparisons, continuity schema/size/links, actual expected-head
+      merge API observations and whitespace
     outcome: limited
-    observed_at: '2026-11-10T02:13:05Z'
+    observed_at: '2026-11-10T02:33:30Z'
     notes: Static source and metadata inspection only; no application execution.
   - command: Native/runtime execution, tests, builds, CI investigation, browser/provider/consumer/publication
       qualification
     outcome: not-run
-    observed_at: '2026-11-10T02:13:05Z'
+    observed_at: '2026-11-10T02:33:30Z'
     notes: Deferred at maintainer request; source merges do not establish acceptance.
   environment_limitations:
   - Tests, native/application execution, builds, CI, browser/provider/publication qualification and actual
@@ -122,23 +135,23 @@ Read scoped instructions, canonical sources above and this checkpoint. Verify mu
 
 ## Current objective and success conditions
 
-Present separate owner-backed Audits and Sanity pages in each repository Intelligence subtree. Immutable owner inputs and public source admission precede public identities, counts and digests. Missing, partial and unverified evidence remains explicit and cannot establish human approval. Existing publication, source ownership and historical recovery are preserved.
+Complete public source admission and authority disclosure for owner-backed Audits/Sanity and record the merged review batch. Immutable owner inputs and public source admission precede public identities, counts and digests. Missing, partial and unverified evidence remains explicit and cannot establish human approval. Existing publication, source ownership and historical recovery are preserved.
 
 ## State snapshot
 
-Candidate `codex/intelligence-audits-sanity-integration` is based on observed main `d97a81d6c9b6425f6ae4ad4c78a68682f2169aff`. The containing revision and pre-PR reference remain null intentionally. Observed Relay main d97a81d6c9b6425f6ae4ad4c78a68682f2169aff remains the base. Owner sources are pinned independently, and existing consumer publication and recovery paths remain intact.
+Candidate `codex/intelligence-audits-sanity-review` is based on observed main `7f6b3e5d5c70ff8d3ae5aab70a08ae094b09a715`. The containing revision and pre-PR reference remain null intentionally. Observed Relay main 7f6b3e5d5c70ff8d3ae5aab70a08ae094b09a715 contains the merged owner views. Functional follow-up b749b946ca6ba18cee98e0947dc227fada191fc4 preserves authority privacy and exact new source admission. Nine implementation slices across six repositories are merged, including Observatory 33, central site 128 and Reflector 265; actual audits and publication qualification remain separate.
 
 ## Completed and material changes
 
-Optional exact Observatory models and closed provenance receipts enable the existing Audits and Sanity routes, shared shell, filters and interactive navigation graph.
+Both immutable Audit/Sanity capsules now select Observatory 7b857de2424f90de519fbc2e24332a7c0a89991b. Complete case-insensitive namespace tokens prevent protected names from matching public prefixes; all 22 resources are bound to exact owner bytes.
 
-Reusable workflow and CI-evidence inputs preserve explicit evaluation clocks and source path boundaries; native coverage, historical selectors and publisher ownership remain separate.
+Sanity removes authority actor references from nested review/governance disclosures and material-change cards, retaining claim kind, evidence URI and decision time. Model/source digests, evaluations, counts and receipt formats remain intact.
 
-The 30-file bundle retains explicit unsupported states when owner inputs are absent; claimed human decisions cannot become verified ratification.
+The consolidated review index records merged Aether, Hygiene, Observatory, Relay, central host and Reflector slices, exact source/merge observations, deferred qualification and the actual organization-sweep boundary. Existing consumer builder pins remain unchanged pending explicit adoption.
 
 ## Validation and review evidence
 
-Independent static source review; Python syntax, closed schema definitions/local references, exact owner resource hashes, source metadata and continuity schema/size/links; whitespace. Static source inspection only. Native/application execution, tests, builds, CI investigation, browser/model/source-capture provider execution and publication qualification were not run. Read-only source and Git metadata observations are separate.
+Independent final namespace/privacy source review; Python AST, unchanged receipt/schema/collector boundaries, exact 22 owner resource byte/hash comparisons, continuity schema/size/links, actual expected-head merge API observations and whitespace. Static source inspection only. Native/application execution, tests, builds, CI investigation, browser/model/source-capture provider execution and publication qualification were not run. Read-only source and Git metadata observations are separate.
 
 ## Blockers, risks, unknowns, and deferred work
 
@@ -146,7 +159,7 @@ Tests, native/application execution, builds, CI, browser/provider/publication qu
 
 ## Next dependency-ready work
 
-Supply actual public owner models and qualify repository/fleet publication after source integration; keep authentic human ratification and organization audit execution separate.
+Refresh the prepared public source inventory, configure an explicitly trusted offline adapter and run the organization sweep, then qualify native/provider/publication behavior and adopt reviewed builder/model pins. Actual human ratification remains separate.
 
 ## Parallel changes and reconciliation
 

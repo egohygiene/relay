@@ -132,6 +132,15 @@ def _governance_claim(value):
     return result
 
 
+def _material_change(value):
+    """Keep materiality facts and bounded authority claims without actor identity."""
+    result = {key: item for key, item in value.items() if key != "authority"}
+    authority = value["authority"]
+    result["authority_claim"] = None if authority is None else {
+        "kind": authority["kind"], "evidence_url": authority["evidence_url"], "decided_at": authority["decided_at"]}
+    return result
+
+
 def render_body(value, receipt=None):
     contract, lock = VIEW.owner()
     contract.validate(value, admission_root=VIEW.vendor)
@@ -166,6 +175,7 @@ def render_body(value, receipt=None):
     cards = []
     for review in reviews:
         fields = {key: item for key, item in review.items() if key != "governance_source"}
+        fields["material_changes"] = [_material_change(item) for item in review["material_changes"]]
         fields["governance_source_metadata"] = _governance_claim(review["governance_source"])
         cards.append(display.record(group="review", identifier=review["id"], title=review["id"] + " — reviewer assessment",
             state=review["execution"]["status"], fields=fields,
@@ -177,13 +187,14 @@ def render_body(value, receipt=None):
                 "Effective governance from owner policy": review["governance"], "Revision context": review["revision_status"]}))
     governance_cards = [display.record(group="governance", identifier=record["id"], title=record["id"] + " — independent governance record",
         state=record["governance"]["state"], fields={**{key: item for key, item in record.items() if key != "governance_source"},
+            "material_changes": [_material_change(item) for item in record["material_changes"]],
             "governance_source_metadata": _governance_claim(record["governance_source"])},
         facets=(("sanity-revision", record["revision_status"]), ("sanity-governance", record["governance"]["state"])),
         intro={"Effective governance from owner policy": record["governance"], "Revision context": record["revision_status"],
             "Source context": "Supplied before or independently of an architecture assessment; no human approval is authenticated."})
         for record in governance_records]
     changes = [display.record(group="change", identifier=record["id"] + ":" + item["id"], title=item["id"] + " — supplied change occurrence",
-        state="unknown", fields={"context_id": record["id"], "revision_status": record["revision_status"], **item},
+        state="unknown", fields={"context_id": record["id"], "revision_status": record["revision_status"], **_material_change(item)},
         facets=(("sanity-revision", record["revision_status"]),))
         for record in all_records for item in record["material_changes"]]
     judgments = []
