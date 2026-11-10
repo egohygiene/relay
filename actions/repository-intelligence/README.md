@@ -544,3 +544,5 @@ a build or Pages artifact instead.
   composed site. See the consumer integration and rollback action linked above.
 
 Production source admission, optional owner-backed Hygiene, Audits and Sanity, and the organization sanity sweep are documented in [production data paths](../../docs/repository-intelligence-production-paths.md). Repository Pages remain the publication owner; the central site aggregates the separate fleet projections.
+
+Review the sliced owner and consumer changes in the [Audits and Sanity implementation index](../../docs/repository-intelligence-audits-sanity-review.md).

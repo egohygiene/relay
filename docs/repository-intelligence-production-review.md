@@ -1,5 +1,8 @@
 # Repository Intelligence production batch review
 
+The next implementation batch is indexed in the
+[Audits and Sanity review](repository-intelligence-audits-sanity-review.md).
+
 Observed 2026-11-09: twelve implementation PRs are merged across eight repositories.
 Each reviewed head and actual merge commit was verified against GitHub. These are
 implementation observations; runtime, publication and acceptance remain separate.
