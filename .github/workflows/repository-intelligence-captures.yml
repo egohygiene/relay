@@ -98,6 +98,16 @@ on:
         required: false
         default: ""
         type: string
+      observatory-audits:
+        description: Optional public Observatory Audits model bound to this repository, represented commit and explicit as-of.
+        required: false
+        default: ""
+        type: string
+      observatory-sanity:
+        description: Optional public Observatory architecture-coherence model bound to this repository, represented commit and explicit as-of; reviewer assessment does not establish human ratification.
+        required: false
+        default: ""
+        type: string
       observatory-comparison:
         description: Optional public-safe Observatory comparison whose after boundary matches the snapshot and represented commit.
         required: false
@@ -237,6 +247,16 @@ on:
         required: false
         default: ""
         type: string
+      observatory-audits:
+        description: Optional public Observatory Audits model bound to this repository, represented commit and explicit as-of.
+        required: false
+        default: ""
+        type: string
+      observatory-sanity:
+        description: Optional public Observatory architecture-coherence model bound to this repository, represented commit and explicit as-of; reviewer assessment does not establish human ratification.
+        required: false
+        default: ""
+        type: string
       observatory-comparison:
         description: Optional public-safe Observatory comparison whose after boundary matches the snapshot and represented commit.
         required: false
@@ -337,6 +357,8 @@ jobs:
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
           observatory-comparison: "${{ inputs.observatory-comparison }}"
           observatory-hygiene: "${{ inputs.observatory-hygiene }}"
+          observatory-audits: "${{ inputs.observatory-audits }}"
+          observatory-sanity: "${{ inputs.observatory-sanity }}"
           default-branch: "${{ inputs.default-branch }}"
           activity-since: "${{ inputs.activity-since }}"
           max-depth: "${{ inputs.max-depth }}"
@@ -386,6 +408,8 @@ jobs:
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
           observatory-comparison: "${{ inputs.observatory-comparison }}"
           observatory-hygiene: "${{ inputs.observatory-hygiene }}"
+          observatory-audits: "${{ inputs.observatory-audits }}"
+          observatory-sanity: "${{ inputs.observatory-sanity }}"
           repository: "${{ github.repository }}"
           default-branch: "${{ inputs.default-branch }}"
           source-commit: "${{ github.sha }}"
@@ -517,6 +541,8 @@ jobs:
           observatory-snapshot: "${{ inputs.observatory-snapshot }}"
           observatory-comparison: "${{ inputs.observatory-comparison }}"
           observatory-hygiene: "${{ inputs.observatory-hygiene }}"
+          observatory-audits: "${{ inputs.observatory-audits }}"
+          observatory-sanity: "${{ inputs.observatory-sanity }}"
           default-branch: "${{ inputs.default-branch }}"
           activity-since: "${{ inputs.activity-since }}"
           max-depth: "${{ inputs.max-depth }}"

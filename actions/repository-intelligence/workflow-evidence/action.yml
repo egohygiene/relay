@@ -134,6 +134,14 @@ inputs:
     description: Optional public Observatory conformance model; requires explicit as-of.
     required: false
     default: ""
+  observatory-audits:
+    description: Optional public Observatory Audits model; requires explicit as-of.
+    required: false
+    default: ""
+  observatory-sanity:
+    description: Optional public Observatory architecture-coherence model; requires explicit as-of and preserves unverified human claims.
+    required: false
+    default: ""
   observatory-comparison:
     description: "Optional Observatory comparison path."
     required: false
@@ -266,6 +274,8 @@ runs:
         INPUT_OBSERVATORY_COMPARISON: "${{ inputs.observatory-comparison }}"
         INPUT_OBSERVATORY_SNAPSHOT: "${{ inputs.observatory-snapshot }}"
         INPUT_OBSERVATORY_HYGIENE: "${{ inputs.observatory-hygiene }}"
+        INPUT_OBSERVATORY_AUDITS: "${{ inputs.observatory-audits }}"
+        INPUT_OBSERVATORY_SANITY: "${{ inputs.observatory-sanity }}"
         INPUT_OPERATION: "${{ inputs.operation }}"
         INPUT_OUTPUT_DIRECTORY: "${{ inputs.output-directory }}"
         INPUT_PREFLIGHT_OUTCOME: "${{ inputs.preflight-outcome }}"
@@ -322,6 +332,8 @@ runs:
           --observatory-snapshot="${INPUT_OBSERVATORY_SNAPSHOT}" \
           --observatory-comparison="${INPUT_OBSERVATORY_COMPARISON}" \
           --observatory-hygiene="${INPUT_OBSERVATORY_HYGIENE}" \
+          --observatory-audits="${INPUT_OBSERVATORY_AUDITS}" \
+          --observatory-sanity="${INPUT_OBSERVATORY_SANITY}" \
           --default-branch="${INPUT_DEFAULT_BRANCH}" \
           --activity-since="${INPUT_ACTIVITY_SINCE}" \
           --max-depth="${INPUT_MAX_DEPTH}" \
