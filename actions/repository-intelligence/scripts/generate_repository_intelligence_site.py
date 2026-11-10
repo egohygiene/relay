@@ -26,6 +26,10 @@ _routes_spec = importlib.util.spec_from_file_location(
     "relay_intelligence_routes", Path(__file__).with_name("repository_intelligence_routes.py"))
 route_contract = importlib.util.module_from_spec(_routes_spec)
 _routes_spec.loader.exec_module(route_contract)
+_owners_spec = importlib.util.spec_from_file_location(
+    "relay_intelligence_owner_views", Path(__file__).with_name("repository_intelligence_owner_views.py"))
+owner_views = importlib.util.module_from_spec(_owners_spec)
+_owners_spec.loader.exec_module(owner_views)
 
 SNAPSHOT_SCHEMA = "egohygiene.observatory.repository-intelligence-read-model/v1"
 ROUTES = route_contract.ROUTES
@@ -124,6 +128,8 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--provenance", required=True)
     parser.add_argument("--snapshot", default="")
     parser.add_argument("--hygiene", default="")
+    parser.add_argument("--audits", default="")
+    parser.add_argument("--sanity", default="")
     parser.add_argument("--repository", required=True)
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--stylesheet-source", required=True)
@@ -2379,7 +2385,7 @@ def shell_document(
     repository_url = f"https://github.com/{repository}"
     commit_url = f"{repository_url}/commit/{source_commit}"
     snapshot_label = ("Source projection unsupported" if unsupported else
-                      "Observatory conformance model loaded" if route == "hygiene" and route in supported_views else
+                      owner_views.VIEWS[route]["loaded_label"] if route in owner_views.VIEWS and route in supported_views else
                       "Observatory snapshot loaded" if snapshot_available else "Snapshot unavailable")
     canonical_href = (prefix or "./") if route == "intelligence" else prefix + route + "/"
     known_routes = json.dumps(["intelligence", *(name for name, _label in ROUTES), "dashboard"], separators=(",", ":"))
@@ -2470,7 +2476,7 @@ def overview_body(*, supported_views=()) -> str:
     additional = "".join(
         f'<li><a data-preserve-context href="./{escaped(route)}/">{escaped(label)}</a>: '
         f'{escaped(ROUTE_QUESTIONS[route])} <strong>'
-        f'{"Assessed contract evidence supplied; applicability inventory unknown." if route in supported_views else "Source projection unsupported."}</strong></li>'
+        f'{owner_views.VIEWS[route]["availability"] if route in supported_views else "Source projection unsupported."}</strong></li>'
         for route, label in route_contract.RESERVED_ROUTES)
     return f'''<section class="ri-section ri-section--lead" aria-labelledby="intelligence-heading">
       <div class="ri-section-heading"><div><span class="ri-eyebrow">Repository orientation</span><h2 id="intelligence-heading">Choose the evidence question</h2></div><p>Each route answers one bounded question from the same represented commit. Unknown and unavailable evidence stays explicit inside the selected view.</p></div>
@@ -2530,10 +2536,19 @@ def write_site(
     script_source: Path,
     hygiene: dict[str, Any] | None = None,
     hygiene_receipt: dict[str, Any] | None = None,
+    owner_models: dict[str, Any] | None = None,
+    owner_receipts: dict[str, Any] | None = None,
 ) -> None:
     if (hygiene is None) != (hygiene_receipt is None):
         raise SiteInputError("Hygiene model and receipt must be supplied together")
-    supported_views = ("hygiene",) if hygiene is not None else ()
+    models, receipts = dict(owner_models or {}), dict(owner_receipts or {})
+    if hygiene is not None:
+        if "hygiene" in models or "hygiene" in receipts:
+            raise SiteInputError("Hygiene input must use one selection")
+        models["hygiene"], receipts["hygiene"] = hygiene, hygiene_receipt
+    if set(models) != set(receipts) or not set(models) <= set(owner_views.VIEWS):
+        raise SiteInputError("Owner models and receipts must use the same supported views")
+    supported_views = tuple(identifier for identifier in owner_views.VIEWS if identifier in models)
     observed_at = str(
         snapshot.get("observed_at") if snapshot else summary.get("generated_at") or ""
     )
@@ -2568,14 +2583,14 @@ def write_site(
         ),
     )
     for route, label in ROUTES[1:]:
-        if route == "hygiene" and hygiene is not None:
-            helper = load_hygiene_helper()
-            helper.validate_receipt(hygiene_receipt, repository, source_commit, summary["generated_at"])
+        if route in models:
+            helper, receipt = owner_views.helper(route), receipts[route]
+            helper.validate_receipt(receipt, repository, source_commit, summary["generated_at"])
             atomic_write(output_root / route / "index.html", shell_document(
                 route=route, route_label=label,
-                body=helper.render_body(hygiene, receipt=hygiene_receipt), prefix="../",
-                **{**shared, "freshness": hygiene_receipt["freshness"], "snapshot_available": True,
-                   "source_schema": hygiene_receipt["owner"]["schema"]}))
+                body=helper.render_body(models[route], receipt=receipt), prefix="../",
+                **{**shared, "freshness": receipt["freshness"], "snapshot_available": True,
+                   "source_schema": receipt["owner"]["schema"]}))
             continue
         body = (
             roadmap_body(snapshot)
@@ -2607,13 +2622,8 @@ def write_site(
 
 
 def load_hygiene_helper():
-    spec = importlib.util.spec_from_file_location("relay_site_hygiene",
-        Path(__file__).with_name("render_repository_intelligence_hygiene.py"))
-    if spec is None or spec.loader is None:
-        raise SiteInputError("Hygiene renderer is unavailable")
-    helper = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(helper)
-    return helper
+    # Preserve the existing helper API for callers of the first optional view.
+    return owner_views.helper("hygiene")
 
 
 def main() -> int:
@@ -2623,7 +2633,8 @@ def main() -> int:
     summary_path = Path(args.summary).resolve()
     provenance_path = Path(args.provenance).resolve()
     snapshot_path = Path(args.snapshot).absolute() if args.snapshot else None
-    hygiene_path = Path(args.hygiene).absolute() if args.hygiene else None
+    owner_paths = {identifier: Path(getattr(args, identifier)).absolute()
+                   for identifier in owner_views.VIEWS if getattr(args, identifier)}
     stylesheet_source = Path(args.stylesheet_source).resolve()
     script_source = Path(args.script_source).resolve()
     if not FULL_SHA.fullmatch(args.source_commit):
@@ -2633,23 +2644,23 @@ def main() -> int:
         (summary_path, "dashboard summary"),
         (provenance_path, "bundle provenance"),
         *(((snapshot_path, "Observatory snapshot"),) if snapshot_path is not None else ()),
-        *(((hygiene_path, "Observatory conformance"),) if hygiene_path is not None else ()),
+        *((path, owner_views.VIEWS[identifier]["input_label"]) for identifier, path in owner_paths.items()),
     ):
         validate_repository_path(repository_root, path, label)
     summary = load_object(summary_path, "dashboard summary")
     provenance = load_object(provenance_path, "bundle provenance")
     validate_site_contracts(summary, provenance, args.repository, args.source_commit)
-    hygiene, hygiene_receipt = None, None
-    if hygiene_path is not None:
+    models, receipts = {}, {}
+    if owner_paths:
         if provenance["consumer"]["visibility"] != "public":
-            raise SiteInputError("Hygiene conformance requires public consumer evidence")
-        if hygiene_path == output_root or output_root in hygiene_path.parents:
-            raise SiteInputError("Hygiene input must remain outside the published bundle")
-        hygiene, hygiene_receipt = load_hygiene_helper().validate_input(
-            hygiene_path, args.repository, args.source_commit, summary["generated_at"])
-        provenance["hygiene_conformance"] = hygiene_receipt
-        atomic_write(provenance_path, json.dumps(provenance, ensure_ascii=False,
-            indent=2, sort_keys=True) + "\n")
+            raise SiteInputError("Owner views require public consumer evidence")
+        if len(set(owner_paths.values())) != len(owner_paths):
+            raise SiteInputError("Owner inputs must use distinct files")
+        for identifier, path in owner_paths.items():
+            if path == output_root or output_root in path.parents:
+                raise SiteInputError("Owner inputs must remain outside the published bundle")
+            models[identifier], receipts[identifier] = owner_views.helper(identifier).validate_input(
+                path, args.repository, args.source_commit, summary["generated_at"])
     snapshot = None
     if snapshot_path is not None:
         if not snapshot_path.is_file():
@@ -2659,6 +2670,11 @@ def main() -> int:
             args.repository,
             args.source_commit,
         )
+    if receipts:
+        for identifier, receipt in receipts.items():
+            provenance[owner_views.VIEWS[identifier]["provenance"]] = receipt
+        atomic_write(provenance_path, json.dumps(provenance, ensure_ascii=False,
+            indent=2, sort_keys=True) + "\n")
     write_site(
         output_root=output_root,
         summary=summary,
@@ -2668,8 +2684,8 @@ def main() -> int:
         source_commit=args.source_commit,
         stylesheet_source=stylesheet_source,
         script_source=script_source,
-        hygiene=hygiene,
-        hygiene_receipt=hygiene_receipt,
+        owner_models=models,
+        owner_receipts=receipts,
     )
     print(
         f"Generated Repository Intelligence shell at {output_root} "

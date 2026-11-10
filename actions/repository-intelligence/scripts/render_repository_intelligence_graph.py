@@ -129,7 +129,7 @@ def graph_model(snapshot: dict | None, repository: str, prefix: str = "", *, own
     if prefix not in {"", "../"} or not REPOSITORY.fullmatch(repository):
         raise ValueError("GRAPH_INPUT")
     owner_views = owner_views or {}
-    if not isinstance(owner_views, dict) or not set(owner_views) <= {"hygiene"}:
+    if not isinstance(owner_views, dict) or not set(owner_views) <= set(site.owner_views.VIEWS):
         raise ValueError("GRAPH_INPUT")
     current = snapshot if isinstance(snapshot, dict) and snapshot.get("visibility") == "public" else None
     if current and site.require_object(current.get("repository")).get("key") != repository:
@@ -365,14 +365,7 @@ def main() -> int:
         summary = site.load_object(paths[0], "dashboard summary")
         provenance = site.load_object(paths[1], "bundle provenance")
         site.validate_site_contracts(summary, provenance, args.repository, args.source_commit)
-        owner_views = {}
-        if "hygiene_conformance" in provenance:
-            if provenance["consumer"]["visibility"] != "public":
-                raise ValueError("GRAPH_INPUT")
-            helper = site.load_hygiene_helper()
-            helper.validate_receipt(provenance["hygiene_conformance"], args.repository,
-                args.source_commit, provenance["generated_at"])
-            owner_views["hygiene"] = provenance["hygiene_conformance"]
+        owner_views = site.owner_views.validate_receipts(provenance, args.repository, args.source_commit)
         snapshot = site.validate_snapshot(site.load_object(snapshot_path, "Observatory snapshot"), args.repository, args.source_commit) if snapshot_path else None
         targets = []
         if args.target in {"overview", "both", "all"}:
