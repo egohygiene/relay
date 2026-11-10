@@ -2406,6 +2406,17 @@ def shell_document(
           <button class="ri-button ri-button--quiet" type="button" data-filter-reset>Reset</button>
           <output data-filter-results aria-live="polite">Showing the full view</output>
         </div>'''
+        if route in {"audits", "sanity"} and route in supported_views:
+            choices = owner_views.filter_choices(body)
+
+            def selection(match):
+                dimension = match.group(1)
+                label = "All states" if dimension == "state" else "All evidence"
+                options = ''.join(f'<option value="{escaped(value)}">{escaped(state_label(value))}</option>'
+                                  for value in choices[dimension])
+                return f'<select data-filter-{dimension}><option value="all">{label}</option>{options}</select>'
+
+            command_bar = re.sub(r'<select data-filter-(state|kind)>.*?</select>', selection, command_bar)
     return f'''<!doctype html>
 <html lang="en">
   <head>

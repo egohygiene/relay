@@ -10,6 +10,7 @@ install providers, change policy, or grant human ratification authority.
 from __future__ import annotations
 
 import importlib.util
+from html.parser import HTMLParser
 from pathlib import Path
 
 
@@ -24,6 +25,30 @@ VIEWS = {
                "input_label": "Observatory architecture review", "loaded_label": "Observatory coherence model loaded",
                "availability": "Supplied architecture review evidence; human ratification remains separate."},
 }
+
+
+def filter_choices(body):
+    """Derive presentation choices from our rendered public record attributes."""
+    class Choices(HTMLParser):
+        def __init__(self):
+            super().__init__(convert_charrefs=True)
+            self.values = {"state": set(), "kind": set()}
+
+        def handle_starttag(self, tag, attributes):
+            attributes = dict(attributes)
+            if "data-filter-item" not in attributes:
+                return
+            for dimension in self.values:
+                value = attributes.get("data-" + dimension)
+                if value:
+                    if len(value) > 128 or value not in self.values[dimension] and len(self.values[dimension]) >= 128:
+                        raise ValueError("Owner filter choices are incompatible")
+                    self.values[dimension].add(value)
+
+    parser = Choices()
+    parser.feed(body)
+    parser.close()
+    return {dimension: sorted(values) for dimension, values in parser.values.items()}
 
 
 def helper(identifier):
