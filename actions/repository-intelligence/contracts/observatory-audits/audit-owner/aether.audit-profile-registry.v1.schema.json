@@ -1,0 +1,153 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "contract_version",
+    "status",
+    "profiles"
+  ],
+  "properties": {
+    "schema": {
+      "const": "aether.audit-profile-registry/v1"
+    },
+    "contract_version": {
+      "const": "1.0.0"
+    },
+    "status": {
+      "const": "draft"
+    },
+    "profiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "version",
+          "kind",
+          "stability",
+          "title",
+          "focus",
+          "applicability",
+          "required_evidence",
+          "exclusions",
+          "includes",
+          "finding_natures"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,63}$"
+          },
+          "version": {
+            "type": "string",
+            "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+          },
+          "kind": {
+            "enum": [
+              "leaf",
+              "composite"
+            ]
+          },
+          "stability": {
+            "enum": [
+              "stable",
+              "experimental"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "focus": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "minItems": 0,
+            "maxItems": 64,
+            "uniqueItems": true
+          },
+          "applicability": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "required_evidence": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "minItems": 1,
+            "maxItems": 32,
+            "uniqueItems": true
+          },
+          "exclusions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "minItems": 0,
+            "maxItems": 32,
+            "uniqueItems": true
+          },
+          "includes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "version"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9-]{0,63}$"
+                },
+                "version": {
+                  "type": "string",
+                  "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+                }
+              }
+            },
+            "minItems": 0,
+            "maxItems": 128,
+            "uniqueItems": true
+          },
+          "finding_natures": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "defect",
+                "opportunity",
+                "experimental-opportunity",
+                "policy-conformance",
+                "risk",
+                "clarification",
+                "positive-observation"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 7,
+            "uniqueItems": true
+          }
+        }
+      },
+      "minItems": 1,
+      "maxItems": 128
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/egohygiene/aether/catalog/schemas/aether.audit-profile-registry.v1.schema.json",
+  "title": "Draft composable repository audit profile registry v1",
+  "description": "Stable/experimental names profile intent, not human approval. The owner stdlib helper enforces composition, exact version and cycle semantics."
+}

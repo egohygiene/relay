@@ -1,0 +1,178 @@
+{
+  "schema": "aether.audit-profile-registry/v1",
+  "contract_version": "1.0.0",
+  "status": "draft",
+  "profiles": [
+    {
+      "id": "contract-drift",
+      "version": "1.0.0",
+      "kind": "leaf",
+      "stability": "stable",
+      "title": "Contract drift",
+      "focus": [
+        "required-artifacts",
+        "generated-drift",
+        "specification-alignment",
+        "ownership",
+        "obsolete-assumptions",
+        "declared-integrations",
+        "lost-capabilities"
+      ],
+      "applicability": "Use only within explicitly selected repository scope and supplied applicability evidence; missing context remains unknown.",
+      "required_evidence": [
+        "scope",
+        "represented-source",
+        "observation-provenance",
+        "limitations",
+        "explicit-expectation"
+      ],
+      "exclusions": [
+        "No mutation, issue publication or human ratification.",
+        "Absence alone does not establish a requirement or failure."
+      ],
+      "includes": [],
+      "finding_natures": [
+        "defect",
+        "opportunity",
+        "policy-conformance",
+        "risk",
+        "clarification",
+        "positive-observation"
+      ]
+    },
+    {
+      "id": "experimental-opportunity",
+      "version": "1.0.0",
+      "kind": "leaf",
+      "stability": "experimental",
+      "title": "Experimental opportunities",
+      "focus": [
+        "speculation",
+        "research",
+        "prototype"
+      ],
+      "applicability": "Use only within explicitly selected repository scope and supplied applicability evidence; missing context remains unknown.",
+      "required_evidence": [
+        "scope",
+        "represented-source",
+        "observation-provenance",
+        "limitations",
+        "observed-current-capability"
+      ],
+      "exclusions": [
+        "No mutation, issue publication or human ratification.",
+        "Absence alone does not establish a requirement or failure."
+      ],
+      "includes": [],
+      "finding_natures": [
+        "experimental-opportunity"
+      ]
+    },
+    {
+      "id": "feature-opportunity",
+      "version": "1.0.0",
+      "kind": "leaf",
+      "stability": "stable",
+      "title": "Feature opportunities",
+      "focus": [
+        "capability",
+        "integration",
+        "workflow",
+        "ergonomics",
+        "product-improvement"
+      ],
+      "applicability": "Use only within explicitly selected repository scope and supplied applicability evidence; missing context remains unknown.",
+      "required_evidence": [
+        "scope",
+        "represented-source",
+        "observation-provenance",
+        "limitations",
+        "observed-current-capability"
+      ],
+      "exclusions": [
+        "No mutation, issue publication or human ratification.",
+        "Absence alone does not establish a requirement or failure."
+      ],
+      "includes": [],
+      "finding_natures": [
+        "opportunity",
+        "clarification",
+        "positive-observation"
+      ]
+    },
+    {
+      "id": "holistic",
+      "version": "1.0.0",
+      "kind": "composite",
+      "stability": "stable",
+      "title": "Holistic repository assessment",
+      "focus": [],
+      "applicability": "Resolve each stable leaf profile separately; report blocked, unsupported, unknown and not-applicable scopes explicitly.",
+      "required_evidence": [
+        "scope",
+        "represented-source",
+        "observation-provenance",
+        "limitations"
+      ],
+      "exclusions": [
+        "Experimental opportunities require explicit additional selection.",
+        "Composition never creates an issue, conformance verdict or human acceptance."
+      ],
+      "includes": [
+        {
+          "id": "contract-drift",
+          "version": "1.0.0"
+        },
+        {
+          "id": "feature-opportunity",
+          "version": "1.0.0"
+        },
+        {
+          "id": "implementation-quality",
+          "version": "1.0.0"
+        }
+      ],
+      "finding_natures": []
+    },
+    {
+      "id": "implementation-quality",
+      "version": "1.0.0",
+      "kind": "leaf",
+      "stability": "stable",
+      "title": "Implementation quality",
+      "focus": [
+        "code-quality",
+        "bugs",
+        "reliability",
+        "testing",
+        "ci-cd",
+        "security-privacy",
+        "performance",
+        "maintainability",
+        "documentation",
+        "developer-experience"
+      ],
+      "applicability": "Use only within explicitly selected repository scope and supplied applicability evidence; missing context remains unknown.",
+      "required_evidence": [
+        "scope",
+        "represented-source",
+        "observation-provenance",
+        "limitations",
+        "observed-current-capability"
+      ],
+      "exclusions": [
+        "No mutation, issue publication or human ratification.",
+        "Absence alone does not establish a requirement or failure."
+      ],
+      "includes": [],
+      "finding_natures": [
+        "defect",
+        "opportunity",
+        "policy-conformance",
+        "risk",
+        "clarification",
+        "positive-observation"
+      ]
+    }
+  ]
+}

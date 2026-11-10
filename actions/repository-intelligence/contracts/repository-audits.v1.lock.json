@@ -1,0 +1,55 @@
+{
+  "schema": "egohygiene.relay.observatory-audits-lock/v1",
+  "owner": "egohygiene/observatory",
+  "revision": "82ac5f14d74a8e144a1499307c45b6d4b0aa92ee",
+  "contract": {
+    "schema": "egohygiene.observatory.repository-audits/v1",
+    "version": "1.0.0-alpha.1"
+  },
+  "files": {
+    "src/observatory/audits_contract.py": {
+      "vendored": "contracts/observatory-audits/audits_contract.py",
+      "sha256": "611fba505ee2ce7ca032399b9ca78c1a794e540bb3357687648271f460754895"
+    },
+    "src/observatory/public_reviews.py": {
+      "vendored": "contracts/observatory-audits/public_reviews.py",
+      "sha256": "3a91f3e6d75de3765782570e78fa90b63942354c6076176074f5fd6f2cf432b6"
+    },
+    "src/observatory/conformance_contract.py": {
+      "vendored": "contracts/observatory-audits/conformance_contract.py",
+      "sha256": "cff878b9d112ee2f9aa948a9f38b382f44a081acf1a5da18616bf21977085f13"
+    },
+    "src/observatory/data/hygiene.public-repositories.v1.json": {
+      "vendored": "contracts/observatory-audits/hygiene.public-repositories.v1.json",
+      "sha256": "af9c7186ded0bb57b18741eaa5905314b96d6adb03736946c868e0fc4aa50b26"
+    },
+    "contracts/hygiene.public-conformance.v1.lock.json": {
+      "vendored": "contracts/observatory-audits/hygiene.public-conformance.v1.lock.json",
+      "sha256": "d3b55cd731a9c4e8e657f3dbbf331fd3f4c7899d54b854255ce13f71857fad4e"
+    },
+    "schemas/repository-audits.v1.schema.json": {
+      "vendored": "contracts/observatory-audits/repository-audits.v1.schema.json",
+      "sha256": "756870a3dc7d65bb116d2e8ac298a50e2b213f27f8724d13913bf07b89170847"
+    },
+    "src/observatory/data/aether.audit-report.v1.lock.json": {
+      "vendored": "contracts/observatory-audits/aether.audit-report.v1.lock.json",
+      "sha256": "951fc63ac3fc30918b4de3ac6def6da286046901a51b5cb8ffed3e3692614194"
+    },
+    "src/observatory/data/audit-owner/audit_contract.py": {
+      "vendored": "contracts/observatory-audits/audit-owner/audit_contract.py",
+      "sha256": "a700d9469cae02e9f929bc076cfb37940f3c64349380c0142efe94a7a83e0b85"
+    },
+    "src/observatory/data/audit-owner/audit-profiles.v1.json": {
+      "vendored": "contracts/observatory-audits/audit-owner/audit-profiles.v1.json",
+      "sha256": "dde4d72db9e0a952e1e10b01b8fdfa7cfecd4c001095af8b23d9f821ea789737"
+    },
+    "src/observatory/data/audit-owner/aether.audit-profile-registry.v1.schema.json": {
+      "vendored": "contracts/observatory-audits/audit-owner/aether.audit-profile-registry.v1.schema.json",
+      "sha256": "ad1335fe7662d91308d3d501197df70fac00892de40da8820538631b0f80312d"
+    },
+    "src/observatory/data/audit-owner/aether.repository-audit-report.v1.schema.json": {
+      "vendored": "contracts/observatory-audits/audit-owner/aether.repository-audit-report.v1.schema.json",
+      "sha256": "060446225135d573da15d4c31a6a59a89e04665e0c3cce43f8373b1e465bc96b"
+    }
+  }
+}
