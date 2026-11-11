@@ -1,0 +1,2526 @@
+{
+  "$defs": {
+    "aether_alternative": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "enum": [
+            "high",
+            "medium",
+            "low",
+            "unknown"
+          ]
+        },
+        "evidence": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+          "type": "string"
+        },
+        "summary": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "tradeoffs": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "why_not_chosen": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "summary",
+        "tradeoffs",
+        "why_not_chosen",
+        "evidence",
+        "confidence"
+      ],
+      "type": "object"
+    },
+    "aether_assumption": {
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "enum": [
+            "observed",
+            "reported",
+            "inferred",
+            "unverified"
+          ]
+        },
+        "consequence": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+          "type": "string"
+        },
+        "statement": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "statement",
+        "basis",
+        "consequence",
+        "evidence"
+      ],
+      "type": "object"
+    },
+    "aether_component": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "owner": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "responsibility": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "responsibility",
+        "owner",
+        "evidence"
+      ],
+      "type": "object"
+    },
+    "aether_concern": {
+      "additionalProperties": false,
+      "properties": {
+        "alternative_ids": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "category": {
+          "enum": [
+            "wrong",
+            "risky",
+            "unverified",
+            "intentional-tradeoff",
+            "complex-but-justified"
+          ]
+        },
+        "confidence": {
+          "enum": [
+            "high",
+            "medium",
+            "low",
+            "unknown"
+          ]
+        },
+        "detail": {
+          "maxLength": 6000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+          "type": "string"
+        },
+        "importance": {
+          "enum": [
+            "consequential",
+            "advisory"
+          ]
+        },
+        "summary": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "category",
+        "importance",
+        "summary",
+        "detail",
+        "evidence",
+        "confidence",
+        "alternative_ids"
+      ],
+      "type": "object"
+    },
+    "aether_dimension": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "enum": [
+            "high",
+            "medium",
+            "low",
+            "unknown"
+          ]
+        },
+        "evidence": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "id": {
+          "enum": [
+            "purpose",
+            "responsibility-boundaries",
+            "source-of-truth",
+            "dependency-direction",
+            "cohesion",
+            "duplicate-ownership",
+            "speculative-abstractions",
+            "missing-ownership",
+            "coupling",
+            "documentation-divergence",
+            "decision-consistency",
+            "replaceability",
+            "operational-plausibility",
+            "security-privacy-trust",
+            "maintainability",
+            "justified-complexity",
+            "simplest-credible-alternative"
+          ]
+        },
+        "status": {
+          "enum": [
+            "coherent",
+            "concern",
+            "unknown",
+            "not-assessed"
+          ]
+        },
+        "summary": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "summary",
+        "evidence",
+        "confidence"
+      ],
+      "type": "object"
+    },
+    "aether_governance": {
+      "$comment": "Source claim only. No JSON field proves authentic human authority. Evaluate with separately trusted typed evidence; default evaluation never ratifies. Reference helper additionally validates exact scope/revision/review/time bindings and public admission before payload.",
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "else": {
+            "properties": {
+              "human_decision": {
+                "type": "null"
+              },
+              "review_ref": {
+                "type": "null"
+              },
+              "valid_until": {
+                "type": "null"
+              }
+            }
+          },
+          "if": {
+            "properties": {
+              "progress": {
+                "const": "complete"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "review_ref": {
+                "$ref": "#/$defs/aether_hygiene_review"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "applicability": {
+          "$ref": "#/$defs/aether_hygiene_applicability"
+        },
+        "contract_version": {
+          "const": "1.0.0-alpha.1"
+        },
+        "human_decision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/aether_hygiene_decision"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "progress": {
+          "enum": [
+            "not-started",
+            "due",
+            "in-progress",
+            "complete"
+          ]
+        },
+        "represented_revisions": {
+          "$ref": "#/$defs/aether_hygiene_revisions"
+        },
+        "review_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/aether_hygiene_review"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "schema": {
+          "const": "egohygiene.architecture-coherence-governance/v1"
+        },
+        "scope": {
+          "$ref": "#/$defs/aether_hygiene_scope"
+        },
+        "valid_until": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/aether_hygiene_instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "visibility": {
+          "enum": [
+            "public",
+            "internal",
+            "restricted"
+          ]
+        }
+      },
+      "required": [
+        "schema",
+        "contract_version",
+        "visibility",
+        "scope",
+        "represented_revisions",
+        "applicability",
+        "progress",
+        "review_ref",
+        "human_decision",
+        "valid_until"
+      ],
+      "title": "Proposed architecture-coherence governance source alpha.1",
+      "type": "object"
+    },
+    "aether_hygiene_applicability": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "else": {
+            "properties": {
+              "declared_at": {
+                "$ref": "#/$defs/aether_hygiene_instant"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/aether_hygiene_url"
+                },
+                "maxItems": 32,
+                "minItems": 1,
+                "type": "array",
+                "uniqueItems": true
+              },
+              "reason": {
+                "$ref": "#/$defs/aether_hygiene_text"
+              }
+            }
+          },
+          "if": {
+            "properties": {
+              "status": {
+                "const": "unknown"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "authority": {
+                "const": null
+              },
+              "declared_at": {
+                "const": null
+              },
+              "deferred_until": {
+                "const": null
+              },
+              "evidence": {
+                "const": []
+              },
+              "reason": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "else": {
+            "properties": {
+              "authority": {
+                "type": "null"
+              }
+            }
+          },
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "not-applicable",
+                  "deferred"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "authority": {
+                "$ref": "#/$defs/aether_hygiene_authority"
+              }
+            }
+          }
+        },
+        {
+          "else": {
+            "properties": {
+              "deferred_until": {
+                "type": "null"
+              }
+            }
+          },
+          "if": {
+            "properties": {
+              "status": {
+                "const": "deferred"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "deferred_until": {
+                "$ref": "#/$defs/aether_hygiene_instant"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "authority": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/aether_hygiene_authority"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "declared_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/aether_hygiene_instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "deferred_until": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/aether_hygiene_instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/aether_hygiene_url"
+          },
+          "maxItems": 32,
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/aether_hygiene_text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "unknown",
+            "required",
+            "recommended",
+            "optional",
+            "not-applicable",
+            "deferred"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "declared_at",
+        "evidence",
+        "reason",
+        "deferred_until",
+        "authority"
+      ],
+      "type": "object"
+    },
+    "aether_hygiene_authority": {
+      "additionalProperties": false,
+      "properties": {
+        "decided_at": {
+          "$ref": "#/$defs/aether_hygiene_instant"
+        },
+        "evidence_url": {
+          "$ref": "#/$defs/aether_hygiene_url"
+        },
+        "kind": {
+          "const": "human"
+        },
+        "reference": {
+          "pattern": "^https://github\\.com/[A-Za-z0-9][A-Za-z0-9-]{0,38}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "reference",
+        "evidence_url",
+        "decided_at"
+      ],
+      "type": "object"
+    },
+    "aether_hygiene_decision": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "disposition": {
+                "const": "ratified-with-notes"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "notes": {
+                "items": {
+                  "$ref": "#/$defs/aether_hygiene_text"
+                },
+                "maxItems": 32,
+                "minItems": 1,
+                "type": "array"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "assessment_sha256": {
+          "$ref": "#/$defs/aether_hygiene_hash"
+        },
+        "authority": {
+          "$ref": "#/$defs/aether_hygiene_authority"
+        },
+        "disposition": {
+          "enum": [
+            "ratified",
+            "ratified-with-notes",
+            "revision-required",
+            "rejected",
+            "deferred",
+            "not-applicable"
+          ]
+        },
+        "follow_up": {
+          "items": {
+            "$ref": "#/$defs/aether_hygiene_url"
+          },
+          "maxItems": 32,
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "notes": {
+          "items": {
+            "$ref": "#/$defs/aether_hygiene_text"
+          },
+          "maxItems": 32,
+          "minItems": 0,
+          "type": "array"
+        },
+        "represented_revisions": {
+          "$ref": "#/$defs/aether_hygiene_revisions"
+        },
+        "review_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        "scope_key": {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "disposition",
+        "authority",
+        "review_id",
+        "assessment_sha256",
+        "scope_key",
+        "represented_revisions",
+        "notes",
+        "follow_up"
+      ],
+      "type": "object"
+    },
+    "aether_hygiene_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "aether_hygiene_instant": {
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+      "type": "string"
+    },
+    "aether_hygiene_repository": {
+      "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$",
+      "type": "string"
+    },
+    "aether_hygiene_review": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment_sha256": {
+          "$ref": "#/$defs/aether_hygiene_hash"
+        },
+        "completed_at": {
+          "$ref": "#/$defs/aether_hygiene_instant"
+        },
+        "id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        "url": {
+          "$ref": "#/$defs/aether_hygiene_url"
+        }
+      },
+      "required": [
+        "id",
+        "url",
+        "assessment_sha256",
+        "completed_at"
+      ],
+      "type": "object"
+    },
+    "aether_hygiene_revision": {
+      "additionalProperties": false,
+      "properties": {
+        "repository": {
+          "$ref": "#/$defs/aether_hygiene_repository"
+        },
+        "revision": {
+          "$ref": "#/$defs/aether_hygiene_sha"
+        }
+      },
+      "required": [
+        "repository",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "aether_hygiene_revisions": {
+      "items": {
+        "$ref": "#/$defs/aether_hygiene_revision"
+      },
+      "maxItems": 256,
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "aether_hygiene_scope": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "repository",
+            "subsystem",
+            "organization"
+          ]
+        },
+        "repositories": {
+          "items": {
+            "$ref": "#/$defs/aether_hygiene_repository"
+          },
+          "maxItems": 256,
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "kind",
+        "key",
+        "repositories"
+      ],
+      "type": "object"
+    },
+    "aether_hygiene_sha": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+    },
+    "aether_hygiene_text": {
+      "maxLength": 2048,
+      "minLength": 1,
+      "type": "string"
+    },
+    "aether_hygiene_url": {
+      "format": "uri",
+      "maxLength": 2048,
+      "pattern": "^https://github\\.com/egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)/[^%?\\\\]+$",
+      "type": "string"
+    },
+    "aether_question": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+          "type": "string"
+        },
+        "owner": {
+          "anyOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "question": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "question",
+        "owner",
+        "evidence"
+      ],
+      "type": "object"
+    },
+    "aether_relationship": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "from": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "data",
+            "dependency",
+            "control",
+            "trust",
+            "deployment"
+          ]
+        },
+        "summary": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "to": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "from",
+        "to",
+        "kind",
+        "summary",
+        "evidence"
+      ],
+      "type": "object"
+    },
+    "aether_revision": {
+      "additionalProperties": false,
+      "properties": {
+        "repository": {
+          "maxLength": 200,
+          "pattern": "^[a-z0-9][a-z0-9-]*/(?:\\.github|[a-z0-9][a-z0-9_.-]*)$",
+          "type": "string"
+        },
+        "revision": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "aether_scope": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "repository",
+            "subsystem",
+            "organization"
+          ]
+        },
+        "repositories": {
+          "items": {
+            "maxLength": 200,
+            "pattern": "^[a-z0-9][a-z0-9-]*/(?:\\.github|[a-z0-9][a-z0-9_.-]*)$",
+            "type": "string"
+          },
+          "maxItems": 128,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "key",
+        "repositories"
+      ],
+      "type": "object"
+    },
+    "aether_source": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "architecture",
+            "adr",
+            "specification",
+            "code",
+            "catalog",
+            "policy",
+            "dependency",
+            "runtime",
+            "deployment",
+            "other"
+          ]
+        },
+        "origin": {
+          "enum": [
+            "canonical",
+            "implementation",
+            "human-record",
+            "prior-ai-review",
+            "external"
+          ]
+        },
+        "path": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "type": "string"
+        },
+        "repository": {
+          "maxLength": 200,
+          "pattern": "^[a-z0-9][a-z0-9-]*/(?:\\.github|[a-z0-9][a-z0-9_.-]*)$",
+          "type": "string"
+        },
+        "revision": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "maxLength": 4096,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "visibility": {
+          "enum": [
+            "public",
+            "internal",
+            "restricted"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "repository",
+        "revision",
+        "path",
+        "kind",
+        "origin",
+        "visibility",
+        "url"
+      ],
+      "type": "object"
+    },
+    "aether_strength": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "enum": [
+            "high",
+            "medium",
+            "low",
+            "unknown"
+          ]
+        },
+        "evidence": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+          "type": "string"
+        },
+        "summary": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "summary",
+        "evidence",
+        "confidence"
+      ],
+      "type": "object"
+    },
+    "assessment": {
+      "additionalProperties": false,
+      "properties": {
+        "alternatives": {
+          "items": {
+            "$ref": "#/$defs/aether_alternative"
+          },
+          "maxItems": 256,
+          "minItems": 0,
+          "type": "array"
+        },
+        "assumptions": {
+          "items": {
+            "$ref": "#/$defs/aether_assumption"
+          },
+          "maxItems": 256,
+          "minItems": 0,
+          "type": "array"
+        },
+        "components": {
+          "items": {
+            "$ref": "#/$defs/aether_component"
+          },
+          "maxItems": 128,
+          "minItems": 0,
+          "type": "array"
+        },
+        "concerns": {
+          "items": {
+            "$ref": "#/$defs/projected_concern"
+          },
+          "maxItems": 256,
+          "minItems": 0,
+          "type": "array"
+        },
+        "dimensions": {
+          "items": {
+            "$ref": "#/$defs/aether_dimension"
+          },
+          "maxItems": 17,
+          "minItems": 0,
+          "type": "array"
+        },
+        "explanation_summary": {
+          "maxLength": 12000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "questions": {
+          "items": {
+            "$ref": "#/$defs/aether_question"
+          },
+          "maxItems": 256,
+          "minItems": 0,
+          "type": "array"
+        },
+        "recommendation": {
+          "additionalProperties": false,
+          "properties": {
+            "disposition": {
+              "enum": [
+                "ratify",
+                "ratify-with-notes",
+                "revise",
+                "reject",
+                "defer"
+              ]
+            },
+            "reason": {
+              "maxLength": 6000,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "disposition",
+            "reason"
+          ],
+          "type": "object"
+        },
+        "relationships": {
+          "items": {
+            "$ref": "#/$defs/aether_relationship"
+          },
+          "maxItems": 256,
+          "minItems": 0,
+          "type": "array"
+        },
+        "strengths": {
+          "items": {
+            "$ref": "#/$defs/aether_strength"
+          },
+          "maxItems": 256,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "components",
+        "relationships",
+        "dimensions",
+        "assumptions",
+        "strengths",
+        "concerns",
+        "questions",
+        "alternatives",
+        "recommendation",
+        "explanation_summary"
+      ],
+      "type": "object"
+    },
+    "change_authority": {
+      "additionalProperties": false,
+      "properties": {
+        "decided_at": {
+          "$ref": "#/$defs/change_instant"
+        },
+        "evidence_url": {
+          "$ref": "#/$defs/change_url"
+        },
+        "kind": {
+          "const": "human"
+        },
+        "reference": {
+          "pattern": "^https://github\\.com/[A-Za-z0-9][A-Za-z0-9-]{0,38}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "reference",
+        "evidence_url",
+        "decided_at"
+      ],
+      "type": "object"
+    },
+    "change_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "change_instant": {
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+      "type": "string"
+    },
+    "change_repository": {
+      "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$",
+      "type": "string"
+    },
+    "change_scope": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "repository",
+            "subsystem",
+            "organization"
+          ]
+        },
+        "repositories": {
+          "items": {
+            "$ref": "#/$defs/change_repository"
+          },
+          "maxItems": 256,
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "kind",
+        "key",
+        "repositories"
+      ],
+      "type": "object"
+    },
+    "change_sha": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+    },
+    "change_text": {
+      "maxLength": 2048,
+      "minLength": 1,
+      "type": "string"
+    },
+    "change_url": {
+      "format": "uri",
+      "maxLength": 2048,
+      "pattern": "^https://github\\.com/egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)/[^%?\\\\]+$",
+      "type": "string"
+    },
+    "governance_evaluation": {
+      "additionalProperties": false,
+      "properties": {
+        "applicability": {
+          "enum": [
+            "unknown",
+            "required",
+            "recommended",
+            "optional"
+          ]
+        },
+        "applicability_evidence": {
+          "enum": [
+            "absent",
+            "not-required",
+            "unverified"
+          ]
+        },
+        "change_inventory": {
+          "enum": [
+            "unknown",
+            "partial",
+            "complete",
+            "unavailable"
+          ]
+        },
+        "claimed_applicability": {
+          "enum": [
+            "unknown",
+            "required",
+            "recommended",
+            "optional",
+            "not-applicable",
+            "deferred"
+          ]
+        },
+        "claimed_human_disposition": {
+          "anyOf": [
+            {
+              "enum": [
+                "ratified",
+                "ratified-with-notes",
+                "revision-required",
+                "rejected",
+                "deferred",
+                "not-applicable"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "due_trigger_ids": {
+          "items": {
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 1024,
+          "minItems": 0,
+          "type": "array"
+        },
+        "freshness": {
+          "enum": [
+            "current",
+            "stale",
+            "unknown"
+          ]
+        },
+        "human_disposition": {
+          "const": null
+        },
+        "human_evidence": {
+          "enum": [
+            "absent",
+            "unverified"
+          ]
+        },
+        "material_change_ids": {
+          "items": {
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 1024,
+          "minItems": 0,
+          "type": "array"
+        },
+        "progress": {
+          "enum": [
+            "not-started",
+            "due",
+            "in-progress",
+            "complete"
+          ]
+        },
+        "revision_match": {
+          "enum": [
+            "matched",
+            "different",
+            "unknown"
+          ]
+        },
+        "state": {
+          "enum": [
+            "not-reviewed",
+            "review-due",
+            "review-in-progress",
+            "unavailable"
+          ]
+        },
+        "unverified_change_ids": {
+          "items": {
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 1024,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "state",
+        "applicability",
+        "claimed_applicability",
+        "progress",
+        "human_disposition",
+        "claimed_human_disposition",
+        "human_evidence",
+        "applicability_evidence",
+        "freshness",
+        "revision_match",
+        "material_change_ids",
+        "unverified_change_ids",
+        "due_trigger_ids",
+        "change_inventory"
+      ],
+      "type": "object"
+    },
+    "hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "identifier": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "independent": {
+      "additionalProperties": false,
+      "properties": {
+        "change_inventory": {
+          "enum": [
+            "unknown",
+            "partial",
+            "complete",
+            "unavailable"
+          ]
+        },
+        "governance": {
+          "$ref": "#/$defs/governance_evaluation"
+        },
+        "governance_source": {
+          "$ref": "#/$defs/aether_governance"
+        },
+        "id": {
+          "pattern": "^governance-[a-f0-9]{24}$",
+          "type": "string"
+        },
+        "material_changes": {
+          "items": {
+            "$ref": "#/$defs/material_change"
+          },
+          "maxItems": 1024,
+          "minItems": 0,
+          "type": "array"
+        },
+        "revision_status": {
+          "enum": [
+            "matched",
+            "different"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/input"
+        }
+      },
+      "required": [
+        "id",
+        "revision_status",
+        "governance_source",
+        "governance",
+        "material_changes",
+        "change_inventory",
+        "source"
+      ],
+      "type": "object"
+    },
+    "input": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact": {
+          "oneOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "path": {
+                  "type": "string"
+                },
+                "repository": {
+                  "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$",
+                  "type": "string"
+                },
+                "revision": {
+                  "pattern": "^[0-9a-f]{40}$",
+                  "type": "string"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "repository",
+                "revision",
+                "path",
+                "url",
+                "sha256"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "artifact_integrity": {
+          "enum": [
+            "verified-input-bytes",
+            "unverified-claim",
+            "unavailable"
+          ]
+        },
+        "canonical_input_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "input_kind": {
+          "enum": [
+            "raw-json",
+            "structured"
+          ]
+        },
+        "raw_input_sha256": {
+          "oneOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "input_kind",
+        "raw_input_sha256",
+        "canonical_input_sha256",
+        "artifact",
+        "artifact_integrity"
+      ],
+      "type": "object"
+    },
+    "instant": {
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+      "type": "string"
+    },
+    "material_change": {
+      "$comment": "Classification is explicit sourced input, never inferred from commit count, file changes, CI, or audit severity. Explicit-human-invalidation additionally requires separately trusted human evidence.",
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "else": {
+            "properties": {
+              "authority": {
+                "type": "null"
+              }
+            }
+          },
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "explicit-human-invalidation"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "authority": {
+                "$ref": "#/$defs/change_authority"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "authority": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/change_authority"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "contract_version": {
+          "const": "1.0.0-alpha.1"
+        },
+        "evidence_url": {
+          "$ref": "#/$defs/change_url"
+        },
+        "id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "architecture-milestone",
+            "ownership-change",
+            "accepted-adr-topology-change",
+            "cross-repository-dependency",
+            "persistence-boundary",
+            "trust-boundary",
+            "runtime-replacement",
+            "repository-split-merge-extraction",
+            "organization-architecture-change",
+            "audit-architecture-drift",
+            "material-architecture-document-change",
+            "explicit-human-invalidation",
+            "repeated-ownership-confusion",
+            "maintainer-request",
+            "routine-implementation"
+          ]
+        },
+        "observed_at": {
+          "$ref": "#/$defs/change_instant"
+        },
+        "review_id": {
+          "anyOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "schema": {
+          "const": "egohygiene.architecture-coherence-material-change/v1"
+        },
+        "scope": {
+          "$ref": "#/$defs/change_scope"
+        },
+        "visibility": {
+          "enum": [
+            "public",
+            "internal",
+            "restricted"
+          ]
+        }
+      },
+      "required": [
+        "schema",
+        "contract_version",
+        "visibility",
+        "scope",
+        "review_id",
+        "id",
+        "kind",
+        "observed_at",
+        "evidence_url",
+        "authority"
+      ],
+      "title": "Proposed explicit scoped architecture-coherence change evidence alpha.1",
+      "type": "object"
+    },
+    "projected_concern": {
+      "additionalProperties": false,
+      "properties": {
+        "alternative_ids": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "category": {
+          "enum": [
+            "wrong",
+            "risky",
+            "unverified",
+            "intentional-tradeoff",
+            "complex-but-justified"
+          ]
+        },
+        "confidence": {
+          "enum": [
+            "high",
+            "medium",
+            "low",
+            "unknown"
+          ]
+        },
+        "evidence": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+          "type": "string"
+        },
+        "importance": {
+          "enum": [
+            "consequential",
+            "advisory"
+          ]
+        },
+        "summary": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "category",
+        "importance",
+        "summary",
+        "evidence",
+        "confidence",
+        "alternative_ids"
+      ],
+      "type": "object"
+    },
+    "repository_model": {
+      "additionalProperties": false,
+      "properties": {
+        "admission": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_path": {
+              "type": "string"
+            },
+            "artifact_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "helper_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "observed_at": {
+              "format": "date-time",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "type": "string"
+            },
+            "owner": {
+              "const": "egohygiene/hygiene"
+            },
+            "revision": {
+              "pattern": "^[0-9a-f]{40}$",
+              "type": "string"
+            },
+            "schema": {
+              "const": "egohygiene.relay.public-catalog-admission/v1"
+            },
+            "schema_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "selected_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "schema",
+            "owner",
+            "revision",
+            "artifact_path",
+            "artifact_sha256",
+            "schema_sha256",
+            "helper_sha256",
+            "observed_at",
+            "selected_sha256"
+          ],
+          "type": "object"
+        },
+        "as_of": {
+          "$ref": "#/$defs/instant"
+        },
+        "contract_version": {
+          "const": "1.0.0-alpha.1"
+        },
+        "digest": {
+          "$ref": "#/$defs/hash"
+        },
+        "evidence": {
+          "additionalProperties": false,
+          "properties": {
+            "canonical_inputs_sha256": {
+              "$ref": "#/$defs/hash"
+            },
+            "human_verification": {
+              "const": "unavailable-no-authenticated-human-source-context"
+            },
+            "record_count": {
+              "maximum": 512,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "state": {
+              "enum": [
+                "supplied",
+                "unavailable"
+              ]
+            }
+          },
+          "required": [
+            "state",
+            "record_count",
+            "canonical_inputs_sha256",
+            "human_verification"
+          ],
+          "type": "object"
+        },
+        "governance_records": {
+          "items": {
+            "$ref": "#/$defs/independent"
+          },
+          "maxItems": 256,
+          "minItems": 0,
+          "type": "array"
+        },
+        "human_evidence": {
+          "enum": [
+            "absent",
+            "unverified"
+          ]
+        },
+        "human_state": {
+          "enum": [
+            "not-reviewed",
+            "review-due",
+            "review-in-progress",
+            "unavailable",
+            "mixed"
+          ]
+        },
+        "queries": {
+          "additionalProperties": false,
+          "properties": {
+            "latest_review_ids": {
+              "items": {
+                "$ref": "#/$defs/identifier"
+              },
+              "maxItems": 256,
+              "minItems": 0,
+              "type": "array"
+            },
+            "material_changes": {
+              "const": "explicit-hygiene-classifications-only-no-commit-volume-proxy"
+            },
+            "review_due_ids": {
+              "items": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 512,
+              "minItems": 0,
+              "type": "array"
+            },
+            "stale_ids": {
+              "items": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 512,
+              "minItems": 0,
+              "type": "array"
+            },
+            "unverified_human_claim_ids": {
+              "items": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 512,
+              "minItems": 0,
+              "type": "array"
+            }
+          },
+          "required": [
+            "latest_review_ids",
+            "review_due_ids",
+            "stale_ids",
+            "unverified_human_claim_ids",
+            "material_changes"
+          ],
+          "type": "object"
+        },
+        "repository": {
+          "additionalProperties": false,
+          "properties": {
+            "full_name": {
+              "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$",
+              "type": "string"
+            },
+            "repository_id": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "source_url": {
+              "type": "string"
+            },
+            "visibility": {
+              "const": "public"
+            }
+          },
+          "required": [
+            "full_name",
+            "repository_id",
+            "visibility",
+            "source_url"
+          ],
+          "type": "object"
+        },
+        "represented_commit": {
+          "$ref": "#/$defs/revision"
+        },
+        "reviews": {
+          "items": {
+            "$ref": "#/$defs/review"
+          },
+          "maxItems": 256,
+          "minItems": 0,
+          "type": "array"
+        },
+        "schema": {
+          "const": "egohygiene.observatory.repository-sanity/v1"
+        },
+        "source_owner": {
+          "additionalProperties": false,
+          "properties": {
+            "contract_version": {
+              "const": "1.0.0-alpha.1"
+            },
+            "governance": {
+              "additionalProperties": false,
+              "properties": {
+                "contract_version": {
+                  "const": "1.0.0-alpha.1"
+                },
+                "owner": {
+                  "const": "egohygiene/hygiene"
+                },
+                "policy": {
+                  "const": "egohygiene.architecture-coherence-policy/v1"
+                },
+                "revision": {
+                  "const": "d11580e9a9c5d78b9a5d21474deaa612712a0fb9"
+                },
+                "schema": {
+                  "const": "egohygiene.architecture-coherence-governance/v1"
+                }
+              },
+              "required": [
+                "owner",
+                "revision",
+                "schema",
+                "contract_version",
+                "policy"
+              ],
+              "type": "object"
+            },
+            "lock_sha256": {
+              "const": "a5ea406128a8ef50b9a7cd2bdaeb02dde52e6137474b5f6f2aac272acbe8d73e"
+            },
+            "owner": {
+              "const": "egohygiene/aether"
+            },
+            "revision": {
+              "const": "74490907bf3979ac45594d97fb1bb5fa7071346d"
+            },
+            "schema": {
+              "const": "egohygiene.architecture-coherence-review/v1"
+            }
+          },
+          "required": [
+            "owner",
+            "revision",
+            "lock_sha256",
+            "schema",
+            "contract_version",
+            "governance"
+          ],
+          "type": "object"
+        },
+        "summary": {
+          "additionalProperties": false,
+          "properties": {
+            "assessment": {
+              "const": "reviewer-assessment-is-not-human-ratification-or-conformance"
+            },
+            "concern_count": {
+              "maximum": 1048576,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "counting_unit": {
+              "const": "repository-review-projection"
+            },
+            "current_review_count": {
+              "maximum": 1048576,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "execution": {
+              "additionalProperties": {
+                "maximum": 1048576,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "propertyNames": {
+                "enum": [
+                  "complete",
+                  "partial",
+                  "blocked",
+                  "failed"
+                ]
+              },
+              "type": "object"
+            },
+            "governance_record_count": {
+              "maximum": 1048576,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "human_state_counts": {
+              "additionalProperties": {
+                "maximum": 1048576,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "propertyNames": {
+                "enum": [
+                  "not-reviewed",
+                  "review-due",
+                  "review-in-progress",
+                  "unavailable"
+                ]
+              },
+              "type": "object"
+            },
+            "other_revision_review_count": {
+              "maximum": 1048576,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "question_count": {
+              "maximum": 1048576,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "review_count": {
+              "maximum": 1048576,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "strength_count": {
+              "maximum": 1048576,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "counting_unit",
+            "review_count",
+            "governance_record_count",
+            "execution",
+            "current_review_count",
+            "other_revision_review_count",
+            "strength_count",
+            "concern_count",
+            "question_count",
+            "human_state_counts",
+            "assessment"
+          ],
+          "type": "object"
+        },
+        "visibility": {
+          "const": "public"
+        }
+      },
+      "required": [
+        "schema",
+        "contract_version",
+        "visibility",
+        "repository",
+        "represented_commit",
+        "as_of",
+        "admission",
+        "source_owner",
+        "reviews",
+        "governance_records",
+        "summary",
+        "queries",
+        "evidence",
+        "human_state",
+        "human_evidence",
+        "digest"
+      ],
+      "title": "Public source-bound Sanity metadata without JSON human verification",
+      "type": "object"
+    },
+    "review": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment": {
+          "$ref": "#/$defs/assessment"
+        },
+        "change_inventory": {
+          "enum": [
+            "unknown",
+            "partial",
+            "complete",
+            "unavailable"
+          ]
+        },
+        "completed_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "execution": {
+          "additionalProperties": false,
+          "properties": {
+            "completed_at": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "limitations": {
+              "items": {
+                "maxLength": 12000,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 64,
+              "minItems": 0,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "status": {
+              "enum": [
+                "complete",
+                "partial",
+                "blocked",
+                "failed"
+              ]
+            }
+          },
+          "required": [
+            "status",
+            "completed_at",
+            "limitations"
+          ],
+          "type": "object"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+          "type": "string"
+        },
+        "governance": {
+          "$ref": "#/$defs/governance_evaluation"
+        },
+        "governance_source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/aether_governance"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+          "type": "string"
+        },
+        "material_changes": {
+          "items": {
+            "$ref": "#/$defs/material_change"
+          },
+          "maxItems": 1024,
+          "minItems": 0,
+          "type": "array"
+        },
+        "represented_revisions": {
+          "items": {
+            "$ref": "#/$defs/aether_revision"
+          },
+          "maxItems": 128,
+          "minItems": 1,
+          "type": "array"
+        },
+        "reviewer": {
+          "additionalProperties": false,
+          "properties": {
+            "independent_challenge": {
+              "enum": [
+                "performed",
+                "not-performed",
+                "unknown"
+              ]
+            },
+            "kind": {
+              "enum": [
+                "ai",
+                "human",
+                "mixed",
+                "tool"
+              ]
+            },
+            "method": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "model": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "provider": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "provider",
+            "model",
+            "method",
+            "independent_challenge"
+          ],
+          "type": "object"
+        },
+        "revision_status": {
+          "enum": [
+            "matched",
+            "different"
+          ]
+        },
+        "scope": {
+          "$ref": "#/$defs/aether_scope"
+        },
+        "source": {
+          "additionalProperties": false,
+          "properties": {
+            "assessment_sha256": {
+              "$ref": "#/$defs/hash"
+            },
+            "contract_version": {
+              "const": "1.0.0-alpha.1"
+            },
+            "input": {
+              "$ref": "#/$defs/input"
+            },
+            "review_schema": {
+              "const": "egohygiene.architecture-coherence-review/v1"
+            }
+          },
+          "required": [
+            "review_schema",
+            "contract_version",
+            "assessment_sha256",
+            "input"
+          ],
+          "type": "object"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/aether_source"
+          },
+          "maxItems": 256,
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "scope",
+        "represented_revisions",
+        "generated_at",
+        "execution",
+        "reviewer",
+        "sources",
+        "completed_at",
+        "revision_status",
+        "assessment",
+        "governance_source",
+        "governance",
+        "material_changes",
+        "change_inventory",
+        "source"
+      ],
+      "type": "object"
+    },
+    "revision": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+    }
+  },
+  "$id": "https://egohygiene.io/schemas/observatory/fleet-sanity.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "admission": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_path": {
+          "type": "string"
+        },
+        "artifact_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "helper_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+          "type": "string"
+        },
+        "owner": {
+          "const": "egohygiene/hygiene"
+        },
+        "revision": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        "schema": {
+          "const": "egohygiene.relay.public-catalog-admission/v1"
+        },
+        "schema_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "selected_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema",
+        "owner",
+        "revision",
+        "artifact_path",
+        "artifact_sha256",
+        "schema_sha256",
+        "helper_sha256",
+        "observed_at",
+        "selected_sha256"
+      ],
+      "type": "object"
+    },
+    "as_of": {
+      "$ref": "#/$defs/instant"
+    },
+    "contract_version": {
+      "const": "1.0.0-alpha.1"
+    },
+    "digest": {
+      "$ref": "#/$defs/hash"
+    },
+    "evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_inputs_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "repository_count": {
+          "maximum": 1024,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "state": {
+          "enum": [
+            "supplied",
+            "unavailable"
+          ]
+        },
+        "with_evidence_count": {
+          "maximum": 1024,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "state",
+        "repository_count",
+        "with_evidence_count",
+        "canonical_inputs_sha256"
+      ],
+      "type": "object"
+    },
+    "repositories": {
+      "items": {
+        "$ref": "#/$defs/repository_model"
+      },
+      "maxItems": 1024,
+      "minItems": 0,
+      "type": "array"
+    },
+    "schema": {
+      "const": "egohygiene.observatory.fleet-sanity/v1"
+    },
+    "summary": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment": {
+          "const": "reviewer-assessment-is-not-human-ratification-or-conformance"
+        },
+        "concern_count": {
+          "maximum": 1048576,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "counting_unit": {
+          "const": "repository-review-projection"
+        },
+        "current_review_count": {
+          "maximum": 1048576,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "execution": {
+          "additionalProperties": {
+            "maximum": 1048576,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "propertyNames": {
+            "enum": [
+              "complete",
+              "partial",
+              "blocked",
+              "failed"
+            ]
+          },
+          "type": "object"
+        },
+        "governance_record_count": {
+          "maximum": 1048576,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "human_state_counts": {
+          "additionalProperties": {
+            "maximum": 1048576,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "propertyNames": {
+            "enum": [
+              "not-reviewed",
+              "review-due",
+              "review-in-progress",
+              "unavailable"
+            ]
+          },
+          "type": "object"
+        },
+        "other_revision_review_count": {
+          "maximum": 1048576,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "question_count": {
+          "maximum": 1048576,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "review_count": {
+          "maximum": 1048576,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "strength_count": {
+          "maximum": 1048576,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "counting_unit",
+        "review_count",
+        "governance_record_count",
+        "execution",
+        "current_review_count",
+        "other_revision_review_count",
+        "strength_count",
+        "concern_count",
+        "question_count",
+        "human_state_counts",
+        "assessment"
+      ],
+      "type": "object"
+    },
+    "visibility": {
+      "const": "public"
+    }
+  },
+  "required": [
+    "schema",
+    "contract_version",
+    "visibility",
+    "as_of",
+    "admission",
+    "repositories",
+    "summary",
+    "evidence",
+    "digest"
+  ],
+  "title": "Explicit public roster Sanity query metadata",
+  "type": "object"
+}
