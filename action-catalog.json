@@ -256,6 +256,17 @@
       "consumer_ref": "egohygiene/relay/actions/repository-intelligence-compare-artifact@v1"
     },
     {
+      "id": "repository-intelligence-static-intake",
+      "path": "actions/repository-intelligence-static-intake",
+      "name": "Repository Intelligence Static Intake",
+      "summary": "Verify and stage exact producer-owned organization Intelligence export bytes for local review without executing or publishing them.",
+      "status": "experimental",
+      "runtime": ["bash", "python3"],
+      "permissions": {},
+      "side_effects": ["workspace-write"],
+      "consumer_ref": "egohygiene/relay/actions/repository-intelligence-static-intake@v1"
+    },
+    {
       "id": "repository-intelligence-fleet-artifact",
       "path": "actions/repository-intelligence-fleet-artifact",
       "name": "Repository Intelligence Fleet Artifact",

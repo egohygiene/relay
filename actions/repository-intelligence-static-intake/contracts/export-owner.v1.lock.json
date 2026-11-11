@@ -1,0 +1,9 @@
+{
+  "files": {
+    "contracts/organization-intelligence/export/export-manifest.v1.schema.json": "1e1214aa0d16c50397eb9dbb3ddf5c507a4ade1ec7a1787dfd7b7979f684fc36",
+    "contracts/organization-intelligence/export/organization-routes.v1.json": "ee34306a5124dad52a0dfb01ac4a6f3edef6989856afe239e8680c23ab4c4391"
+  },
+  "owner": "egohygiene/egohygiene.io",
+  "revision": "54e0b6e66b9b028bad382bbbc4bc6ba588cee665",
+  "schema": "egohygiene.relay.organization-intelligence-export-owner/v1"
+}

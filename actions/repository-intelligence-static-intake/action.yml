@@ -1,0 +1,65 @@
+name: Repository Intelligence Static Intake
+description: Verify and stage a producer-owned organization Intelligence export for review without publishing or executing it.
+inputs:
+  archive:
+    description: Local raw producer ZIP, downloaded separately by a trusted read-only caller.
+    required: true
+  archive-sha256:
+    description: Expected raw ZIP SHA-256, without a prefix.
+    required: true
+  manifest-sha256:
+    description: Expected export-manifest.json SHA-256, without a prefix.
+    required: true
+  producer-commit:
+    description: Exact full egohygiene/egohygiene.io producer commit selected by the caller.
+    required: true
+  origin:
+    description: Explicit intended HTTPS origin, without a path or trailing slash.
+    required: true
+  base-path:
+    description: Explicit intended mount directory, with leading and trailing slashes.
+    required: true
+  output-directory:
+    description: New review directory under an existing trusted parent; never a publication destination.
+    required: true
+outputs:
+  review-directory:
+    description: Local verified review directory, including manifest and intake receipt.
+    value: ${{ steps.intake.outputs.review-directory }}
+  site-directory:
+    description: Verified static site subtree; deployment remains unauthorized.
+    value: ${{ steps.intake.outputs.site-directory }}
+  receipt-path:
+    description: Separate review-only intake receipt.
+    value: ${{ steps.intake.outputs.receipt-path }}
+  receipt-sha256:
+    description: SHA-256 of the retained receipt bytes.
+    value: ${{ steps.intake.outputs.receipt-sha256 }}
+  publication:
+    description: Always review-only.
+    value: ${{ steps.intake.outputs.publication }}
+runs:
+  using: composite
+  steps:
+    - name: Verify producer-owned Intelligence bytes
+      id: intake
+      shell: bash
+      env:
+        INTAKE_ARCHIVE: ${{ inputs.archive }}
+        INTAKE_ARCHIVE_SHA256: ${{ inputs.archive-sha256 }}
+        INTAKE_MANIFEST_SHA256: ${{ inputs.manifest-sha256 }}
+        INTAKE_PRODUCER_COMMIT: ${{ inputs.producer-commit }}
+        INTAKE_ORIGIN: ${{ inputs.origin }}
+        INTAKE_BASE_PATH: ${{ inputs.base-path }}
+        INTAKE_OUTPUT_DIRECTORY: ${{ inputs.output-directory }}
+      run: |
+        set -euo pipefail
+        python3 -I "${GITHUB_ACTION_PATH}/scripts/static_intake.py" \
+          --archive "$INTAKE_ARCHIVE" \
+          --archive-sha256 "$INTAKE_ARCHIVE_SHA256" \
+          --manifest-sha256 "$INTAKE_MANIFEST_SHA256" \
+          --producer-commit "$INTAKE_PRODUCER_COMMIT" \
+          --origin "$INTAKE_ORIGIN" \
+          --base-path "$INTAKE_BASE_PATH" \
+          --output-directory "$INTAKE_OUTPUT_DIRECTORY" \
+          --github-output "$GITHUB_OUTPUT"
