@@ -1,0 +1,620 @@
+{
+  "$id": "https://egohygiene.io/schemas/organization-intelligence-export.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "as_of": {
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+      "type": "string"
+    },
+    "contract_version": {
+      "const": "1.0.0-alpha.1"
+    },
+    "files": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^(?:\\.nojekyll|[a-zA-Z0-9][a-zA-Z0-9._/-]*)$",
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "size_bytes": {
+            "maximum": 16777216,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "size_bytes"
+        ],
+        "type": "object"
+      },
+      "maxItems": 256,
+      "minItems": 41,
+      "type": "array"
+    },
+    "models": {
+      "additionalProperties": false,
+      "properties": {
+        "audits": {
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "else": {
+                "properties": {
+                  "presentation_sha256": {
+                    "type": "null"
+                  }
+                }
+              },
+              "if": {
+                "properties": {
+                  "state": {
+                    "const": "available"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "presentation_sha256": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "contract_version": {
+              "const": "1.0.0-alpha.1"
+            },
+            "presentation_sha256": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "schema": {
+              "const": "egohygiene.observatory.fleet-audits/v1"
+            },
+            "state": {
+              "enum": [
+                "available",
+                "unavailable"
+              ]
+            }
+          },
+          "required": [
+            "state",
+            "schema",
+            "contract_version",
+            "presentation_sha256"
+          ],
+          "type": "object"
+        },
+        "core": {
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "else": {
+                "properties": {
+                  "presentation_sha256": {
+                    "type": "null"
+                  }
+                }
+              },
+              "if": {
+                "properties": {
+                  "state": {
+                    "const": "available"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "presentation_sha256": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "contract_version": {
+              "const": "1.0.0-alpha.2"
+            },
+            "presentation_sha256": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "schema": {
+              "const": "egohygiene.observatory.repository-intelligence-fleet/v1"
+            },
+            "state": {
+              "enum": [
+                "available",
+                "unavailable"
+              ]
+            }
+          },
+          "required": [
+            "state",
+            "schema",
+            "contract_version",
+            "presentation_sha256"
+          ],
+          "type": "object"
+        },
+        "sanity": {
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "else": {
+                "properties": {
+                  "presentation_sha256": {
+                    "type": "null"
+                  }
+                }
+              },
+              "if": {
+                "properties": {
+                  "state": {
+                    "const": "available"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "presentation_sha256": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "contract_version": {
+              "const": "1.0.0-alpha.1"
+            },
+            "presentation_sha256": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "schema": {
+              "const": "egohygiene.observatory.fleet-sanity/v1"
+            },
+            "state": {
+              "enum": [
+                "available",
+                "unavailable"
+              ]
+            }
+          },
+          "required": [
+            "state",
+            "schema",
+            "contract_version",
+            "presentation_sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "core",
+        "audits",
+        "sanity"
+      ],
+      "type": "object"
+    },
+    "producer": {
+      "additionalProperties": false,
+      "properties": {
+        "repository": {
+          "const": "egohygiene/egohygiene.io"
+        },
+        "revision": {
+          "pattern": "^[a-f0-9]{40}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "publication": {
+      "const": "review-only"
+    },
+    "routes": {
+      "items": {
+        "enum": [
+          {
+            "canonical_path": "/intelligence/",
+            "file": "index.html",
+            "id": "home",
+            "path": "/"
+          },
+          {
+            "canonical_path": "/intelligence/journey/",
+            "file": "activity/index.html",
+            "id": "journey",
+            "path": "/activity/"
+          },
+          {
+            "canonical_path": "/decisions/",
+            "file": "adr/index.html",
+            "id": "decisions",
+            "path": "/adr/"
+          },
+          {
+            "canonical_path": "/audits/",
+            "file": "audits/index.html",
+            "id": "audits",
+            "path": "/audits/"
+          },
+          {
+            "canonical_path": "/intelligence/compare/",
+            "file": "compare/index.html",
+            "id": "compare",
+            "path": "/compare/"
+          },
+          {
+            "canonical_path": "/intelligence/dashboard/",
+            "file": "dashboard/index.html",
+            "id": "dashboard",
+            "path": "/dashboard/"
+          },
+          {
+            "canonical_path": "/decisions/",
+            "file": "decisions/index.html",
+            "id": "decisions",
+            "path": "/decisions/"
+          },
+          {
+            "canonical_path": "/dependencies/",
+            "file": "dependencies/index.html",
+            "id": "dependencies",
+            "path": "/dependencies/"
+          },
+          {
+            "canonical_path": "/intelligence/diagnostics/",
+            "file": "diagnostics/index.html",
+            "id": "diagnostics",
+            "path": "/diagnostics/"
+          },
+          {
+            "canonical_path": "/distribution/",
+            "file": "distribution/index.html",
+            "id": "distribution",
+            "path": "/distribution/"
+          },
+          {
+            "canonical_path": "/health/",
+            "file": "health/index.html",
+            "id": "health",
+            "path": "/health/"
+          },
+          {
+            "canonical_path": "/hygiene/",
+            "file": "hygiene/index.html",
+            "id": "hygiene",
+            "path": "/hygiene/"
+          },
+          {
+            "canonical_path": "/intelligence/",
+            "file": "intelligence/index.html",
+            "id": "intelligence",
+            "path": "/intelligence/"
+          },
+          {
+            "canonical_path": "/intelligence/journey/",
+            "file": "intelligence/activity/index.html",
+            "id": "journey",
+            "path": "/intelligence/activity/"
+          },
+          {
+            "canonical_path": "/audits/",
+            "file": "intelligence/audits/index.html",
+            "id": "audits",
+            "path": "/intelligence/audits/"
+          },
+          {
+            "canonical_path": "/intelligence/compare/",
+            "file": "intelligence/compare/index.html",
+            "id": "compare",
+            "path": "/intelligence/compare/"
+          },
+          {
+            "canonical_path": "/intelligence/dashboard/",
+            "file": "intelligence/dashboard/index.html",
+            "id": "dashboard",
+            "path": "/intelligence/dashboard/"
+          },
+          {
+            "canonical_path": "/decisions/",
+            "file": "intelligence/decisions/index.html",
+            "id": "decisions",
+            "path": "/intelligence/decisions/"
+          },
+          {
+            "canonical_path": "/dependencies/",
+            "file": "intelligence/dependencies/index.html",
+            "id": "dependencies",
+            "path": "/intelligence/dependencies/"
+          },
+          {
+            "canonical_path": "/intelligence/diagnostics/",
+            "file": "intelligence/diagnostics/index.html",
+            "id": "diagnostics",
+            "path": "/intelligence/diagnostics/"
+          },
+          {
+            "canonical_path": "/distribution/",
+            "file": "intelligence/distribution/index.html",
+            "id": "distribution",
+            "path": "/intelligence/distribution/"
+          },
+          {
+            "canonical_path": "/health/",
+            "file": "intelligence/health/index.html",
+            "id": "health",
+            "path": "/intelligence/health/"
+          },
+          {
+            "canonical_path": "/hygiene/",
+            "file": "intelligence/hygiene/index.html",
+            "id": "hygiene",
+            "path": "/intelligence/hygiene/"
+          },
+          {
+            "canonical_path": "/intelligence/identity/",
+            "file": "intelligence/identity/index.html",
+            "id": "identity_intelligence",
+            "path": "/intelligence/identity/"
+          },
+          {
+            "canonical_path": "/intelligence/journey/",
+            "file": "intelligence/journey/index.html",
+            "id": "journey",
+            "path": "/intelligence/journey/"
+          },
+          {
+            "canonical_path": "/intelligence/now/",
+            "file": "intelligence/now/index.html",
+            "id": "now",
+            "path": "/intelligence/now/"
+          },
+          {
+            "canonical_path": "/releases/",
+            "file": "intelligence/releases/index.html",
+            "id": "releases",
+            "path": "/intelligence/releases/"
+          },
+          {
+            "canonical_path": "/roadmap/",
+            "file": "intelligence/roadmap/index.html",
+            "id": "roadmap",
+            "path": "/intelligence/roadmap/"
+          },
+          {
+            "canonical_path": "/sanity/",
+            "file": "intelligence/sanity/index.html",
+            "id": "sanity",
+            "path": "/intelligence/sanity/"
+          },
+          {
+            "canonical_path": "/search/",
+            "file": "intelligence/search/index.html",
+            "id": "search",
+            "path": "/intelligence/search/"
+          },
+          {
+            "canonical_path": "/intelligence/work/",
+            "file": "intelligence/work/index.html",
+            "id": "work",
+            "path": "/intelligence/work/"
+          },
+          {
+            "canonical_path": "/intelligence/journey/",
+            "file": "journey/index.html",
+            "id": "journey",
+            "path": "/journey/"
+          },
+          {
+            "canonical_path": "/intelligence/now/",
+            "file": "now/index.html",
+            "id": "now",
+            "path": "/now/"
+          },
+          {
+            "canonical_path": "/releases/",
+            "file": "releases/index.html",
+            "id": "releases",
+            "path": "/releases/"
+          },
+          {
+            "canonical_path": "/roadmap/",
+            "file": "roadmap/index.html",
+            "id": "roadmap",
+            "path": "/roadmap/"
+          },
+          {
+            "canonical_path": "/sanity/",
+            "file": "sanity/index.html",
+            "id": "sanity",
+            "path": "/sanity/"
+          },
+          {
+            "canonical_path": "/search/",
+            "file": "search/index.html",
+            "id": "search",
+            "path": "/search/"
+          },
+          {
+            "canonical_path": "/status/",
+            "file": "status/index.html",
+            "id": "status",
+            "path": "/status/"
+          },
+          {
+            "canonical_path": "/intelligence/work/",
+            "file": "work/index.html",
+            "id": "work",
+            "path": "/work/"
+          }
+        ]
+      },
+      "maxItems": 39,
+      "minItems": 39,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "schema": {
+      "const": "egohygiene.website.organization-intelligence-export/v1"
+    },
+    "scope": {
+      "additionalProperties": false,
+      "properties": {
+        "admission": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_path": {
+              "const": "catalog/public-repositories.json"
+            },
+            "artifact_sha256": {
+              "const": "af9c7186ded0bb57b18741eaa5905314b96d6adb03736946c868e0fc4aa50b26"
+            },
+            "helper_sha256": {
+              "const": "fd3bb2099f2b9040502f19a8e582e4c4100653bd6cf2ea640cc36338dcfc4273"
+            },
+            "observed_at": {
+              "const": "2026-11-09T14:06:57Z"
+            },
+            "owner": {
+              "const": "egohygiene/hygiene"
+            },
+            "revision": {
+              "const": "49639c1845cdfd08fbd5a768261a8b3cf515f80f"
+            },
+            "schema": {
+              "const": "egohygiene.relay.public-catalog-admission/v1"
+            },
+            "schema_sha256": {
+              "const": "eeb88b6a99de987500b946bd71c987e1fb7d0bd7350f466885c11ac7603c96d8"
+            },
+            "selected_sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_path",
+            "artifact_sha256",
+            "helper_sha256",
+            "observed_at",
+            "owner",
+            "revision",
+            "schema",
+            "schema_sha256",
+            "selected_sha256"
+          ],
+          "type": "object"
+        },
+        "kind": {
+          "const": "organization"
+        },
+        "repositories": {
+          "items": {
+            "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$",
+            "type": "string"
+          },
+          "maxItems": 1024,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "kind",
+        "repositories",
+        "admission"
+      ],
+      "type": "object"
+    },
+    "target": {
+      "additionalProperties": false,
+      "properties": {
+        "base_path": {
+          "anyOf": [
+            {
+              "pattern": "^/(?:[a-z0-9][a-z0-9._-]*/)*$"
+            },
+            {
+              "const": "/.github/"
+            }
+          ],
+          "type": "string"
+        },
+        "origin": {
+          "maxLength": 256,
+          "minLength": 9,
+          "pattern": "^https://[a-z0-9.-]+$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "origin",
+        "base_path"
+      ],
+      "type": "object"
+    },
+    "visibility": {
+      "const": "public"
+    }
+  },
+  "required": [
+    "schema",
+    "contract_version",
+    "visibility",
+    "producer",
+    "target",
+    "as_of",
+    "scope",
+    "models",
+    "routes",
+    "files",
+    "publication"
+  ],
+  "title": "Producer-owned portable organization Intelligence review artifact",
+  "type": "object"
+}

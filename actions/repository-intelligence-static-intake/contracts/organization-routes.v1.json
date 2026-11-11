@@ -1,0 +1,240 @@
+{
+  "contract_version": "1.0.0-alpha.1",
+  "routes": [
+    {
+      "canonical_path": "/intelligence/",
+      "file": "index.html",
+      "id": "home",
+      "path": "/"
+    },
+    {
+      "canonical_path": "/intelligence/journey/",
+      "file": "activity/index.html",
+      "id": "journey",
+      "path": "/activity/"
+    },
+    {
+      "canonical_path": "/decisions/",
+      "file": "adr/index.html",
+      "id": "decisions",
+      "path": "/adr/"
+    },
+    {
+      "canonical_path": "/audits/",
+      "file": "audits/index.html",
+      "id": "audits",
+      "path": "/audits/"
+    },
+    {
+      "canonical_path": "/intelligence/compare/",
+      "file": "compare/index.html",
+      "id": "compare",
+      "path": "/compare/"
+    },
+    {
+      "canonical_path": "/intelligence/dashboard/",
+      "file": "dashboard/index.html",
+      "id": "dashboard",
+      "path": "/dashboard/"
+    },
+    {
+      "canonical_path": "/decisions/",
+      "file": "decisions/index.html",
+      "id": "decisions",
+      "path": "/decisions/"
+    },
+    {
+      "canonical_path": "/dependencies/",
+      "file": "dependencies/index.html",
+      "id": "dependencies",
+      "path": "/dependencies/"
+    },
+    {
+      "canonical_path": "/intelligence/diagnostics/",
+      "file": "diagnostics/index.html",
+      "id": "diagnostics",
+      "path": "/diagnostics/"
+    },
+    {
+      "canonical_path": "/distribution/",
+      "file": "distribution/index.html",
+      "id": "distribution",
+      "path": "/distribution/"
+    },
+    {
+      "canonical_path": "/health/",
+      "file": "health/index.html",
+      "id": "health",
+      "path": "/health/"
+    },
+    {
+      "canonical_path": "/hygiene/",
+      "file": "hygiene/index.html",
+      "id": "hygiene",
+      "path": "/hygiene/"
+    },
+    {
+      "canonical_path": "/intelligence/",
+      "file": "intelligence/index.html",
+      "id": "intelligence",
+      "path": "/intelligence/"
+    },
+    {
+      "canonical_path": "/intelligence/journey/",
+      "file": "intelligence/activity/index.html",
+      "id": "journey",
+      "path": "/intelligence/activity/"
+    },
+    {
+      "canonical_path": "/audits/",
+      "file": "intelligence/audits/index.html",
+      "id": "audits",
+      "path": "/intelligence/audits/"
+    },
+    {
+      "canonical_path": "/intelligence/compare/",
+      "file": "intelligence/compare/index.html",
+      "id": "compare",
+      "path": "/intelligence/compare/"
+    },
+    {
+      "canonical_path": "/intelligence/dashboard/",
+      "file": "intelligence/dashboard/index.html",
+      "id": "dashboard",
+      "path": "/intelligence/dashboard/"
+    },
+    {
+      "canonical_path": "/decisions/",
+      "file": "intelligence/decisions/index.html",
+      "id": "decisions",
+      "path": "/intelligence/decisions/"
+    },
+    {
+      "canonical_path": "/dependencies/",
+      "file": "intelligence/dependencies/index.html",
+      "id": "dependencies",
+      "path": "/intelligence/dependencies/"
+    },
+    {
+      "canonical_path": "/intelligence/diagnostics/",
+      "file": "intelligence/diagnostics/index.html",
+      "id": "diagnostics",
+      "path": "/intelligence/diagnostics/"
+    },
+    {
+      "canonical_path": "/distribution/",
+      "file": "intelligence/distribution/index.html",
+      "id": "distribution",
+      "path": "/intelligence/distribution/"
+    },
+    {
+      "canonical_path": "/health/",
+      "file": "intelligence/health/index.html",
+      "id": "health",
+      "path": "/intelligence/health/"
+    },
+    {
+      "canonical_path": "/hygiene/",
+      "file": "intelligence/hygiene/index.html",
+      "id": "hygiene",
+      "path": "/intelligence/hygiene/"
+    },
+    {
+      "canonical_path": "/intelligence/identity/",
+      "file": "intelligence/identity/index.html",
+      "id": "identity_intelligence",
+      "path": "/intelligence/identity/"
+    },
+    {
+      "canonical_path": "/intelligence/journey/",
+      "file": "intelligence/journey/index.html",
+      "id": "journey",
+      "path": "/intelligence/journey/"
+    },
+    {
+      "canonical_path": "/intelligence/now/",
+      "file": "intelligence/now/index.html",
+      "id": "now",
+      "path": "/intelligence/now/"
+    },
+    {
+      "canonical_path": "/releases/",
+      "file": "intelligence/releases/index.html",
+      "id": "releases",
+      "path": "/intelligence/releases/"
+    },
+    {
+      "canonical_path": "/roadmap/",
+      "file": "intelligence/roadmap/index.html",
+      "id": "roadmap",
+      "path": "/intelligence/roadmap/"
+    },
+    {
+      "canonical_path": "/sanity/",
+      "file": "intelligence/sanity/index.html",
+      "id": "sanity",
+      "path": "/intelligence/sanity/"
+    },
+    {
+      "canonical_path": "/search/",
+      "file": "intelligence/search/index.html",
+      "id": "search",
+      "path": "/intelligence/search/"
+    },
+    {
+      "canonical_path": "/intelligence/work/",
+      "file": "intelligence/work/index.html",
+      "id": "work",
+      "path": "/intelligence/work/"
+    },
+    {
+      "canonical_path": "/intelligence/journey/",
+      "file": "journey/index.html",
+      "id": "journey",
+      "path": "/journey/"
+    },
+    {
+      "canonical_path": "/intelligence/now/",
+      "file": "now/index.html",
+      "id": "now",
+      "path": "/now/"
+    },
+    {
+      "canonical_path": "/releases/",
+      "file": "releases/index.html",
+      "id": "releases",
+      "path": "/releases/"
+    },
+    {
+      "canonical_path": "/roadmap/",
+      "file": "roadmap/index.html",
+      "id": "roadmap",
+      "path": "/roadmap/"
+    },
+    {
+      "canonical_path": "/sanity/",
+      "file": "sanity/index.html",
+      "id": "sanity",
+      "path": "/sanity/"
+    },
+    {
+      "canonical_path": "/search/",
+      "file": "search/index.html",
+      "id": "search",
+      "path": "/search/"
+    },
+    {
+      "canonical_path": "/status/",
+      "file": "status/index.html",
+      "id": "status",
+      "path": "/status/"
+    },
+    {
+      "canonical_path": "/intelligence/work/",
+      "file": "work/index.html",
+      "id": "work",
+      "path": "/work/"
+    }
+  ],
+  "schema": "egohygiene.website.organization-intelligence-export-routes/v1"
+}
