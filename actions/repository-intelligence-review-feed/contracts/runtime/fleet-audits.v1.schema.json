@@ -1,0 +1,3161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://egohygiene.io/schemas/observatory/fleet-audits.v1.schema.json",
+  "title": "Independent public fleet audit metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "contract_version",
+    "visibility",
+    "as_of",
+    "admission",
+    "repositories",
+    "summary",
+    "evidence",
+    "digest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "egohygiene.observatory.fleet-audits/v1"
+    },
+    "contract_version": {
+      "const": "1.0.0-alpha.1"
+    },
+    "visibility": {
+      "const": "public"
+    },
+    "as_of": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+      "format": "date-time"
+    },
+    "admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "owner",
+        "revision",
+        "artifact_path",
+        "artifact_sha256",
+        "schema_sha256",
+        "helper_sha256",
+        "observed_at",
+        "selected_sha256"
+      ],
+      "properties": {
+        "schema": {
+          "const": "egohygiene.relay.public-catalog-admission/v1"
+        },
+        "owner": {
+          "const": "egohygiene/hygiene"
+        },
+        "revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "artifact_path": {
+          "type": "string"
+        },
+        "artifact_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "schema_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "helper_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "observed_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+          "format": "date-time"
+        },
+        "selected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "repositories": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/repositoryModel"
+      },
+      "maxItems": 1024
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completion",
+        "counting_unit",
+        "freshness",
+        "revision",
+        "findings",
+        "candidate_issues",
+        "assessment"
+      ],
+      "properties": {
+        "completion": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "complete",
+            "partial",
+            "blocked",
+            "failed",
+            "unsupported",
+            "not_applicable",
+            "unknown"
+          ],
+          "properties": {
+            "complete": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "partial": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "blocked": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "failed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unsupported": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_applicable": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unknown": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "counting_unit": {
+          "const": "repository-report-projection"
+        },
+        "freshness": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "current",
+            "stale",
+            "unknown"
+          ],
+          "properties": {
+            "current": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "stale": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unknown": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "revision": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "matched",
+            "different"
+          ],
+          "properties": {
+            "matched": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "different": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "findings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "classification",
+            "nature",
+            "severity",
+            "confidence",
+            "status",
+            "evidence_classification",
+            "history_delta"
+          ],
+          "properties": {
+            "classification": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "confirmed-defect",
+                "probable-issue",
+                "architectural-concern",
+                "maintainability-risk",
+                "optimization-opportunity",
+                "documentation-gap",
+                "future-enhancement",
+                "intentional-trade-off",
+                "needs-human-clarification",
+                "positive-observation"
+              ],
+              "properties": {
+                "confirmed-defect": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "probable-issue": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "architectural-concern": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "maintainability-risk": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "optimization-opportunity": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "documentation-gap": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "future-enhancement": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "intentional-trade-off": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "needs-human-clarification": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "positive-observation": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "nature": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "defect",
+                "opportunity",
+                "experimental-opportunity",
+                "policy-conformance",
+                "risk",
+                "clarification",
+                "positive-observation"
+              ],
+              "properties": {
+                "defect": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "opportunity": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "experimental-opportunity": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "policy-conformance": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "risk": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "clarification": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "positive-observation": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "severity": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "critical",
+                "high",
+                "medium",
+                "low",
+                "informational"
+              ],
+              "properties": {
+                "critical": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "high": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "medium": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "low": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "informational": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "confidence": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "high",
+                "medium",
+                "low"
+              ],
+              "properties": {
+                "high": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "medium": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "low": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "status": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "confirmed",
+                "probable",
+                "needs-validation",
+                "intentional-trade-off",
+                "needs-clarification",
+                "not-applicable"
+              ],
+              "properties": {
+                "confirmed": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "probable": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "needs-validation": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "intentional-trade-off": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "needs-clarification": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "not-applicable": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "evidence_classification": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "observed",
+                "inferred",
+                "recommended",
+                "unverified"
+              ],
+              "properties": {
+                "observed": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "inferred": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "recommended": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "unverified": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "history_delta": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "new",
+                "unchanged",
+                "improved",
+                "regressed",
+                "resolved",
+                "unverified",
+                "not-compared"
+              ],
+              "properties": {
+                "new": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "unchanged": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "improved": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "regressed": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "resolved": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "unverified": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "not-compared": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "candidate_issues": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "suggested",
+            "materialization"
+          ],
+          "properties": {
+            "suggested": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "materialization": {
+              "const": "unavailable"
+            }
+          }
+        },
+        "assessment": {
+          "const": "authored-audit-evidence-only-no-conformance-or-sanity-score"
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "repository_count",
+        "with_evidence_count",
+        "canonical_inputs_sha256"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "supplied",
+            "unavailable"
+          ]
+        },
+        "repository_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "with_evidence_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "canonical_inputs_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "visibility",
+        "repository",
+        "title",
+        "classification",
+        "nature",
+        "severity",
+        "confidence",
+        "status",
+        "area",
+        "effort",
+        "impact",
+        "observation",
+        "why_it_matters",
+        "recommendation",
+        "suggested_validation",
+        "dependencies",
+        "evidence_classification",
+        "evidence_refs",
+        "source_profile",
+        "missing_evidence",
+        "history"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^AUDIT-[0-9]{3}$"
+        },
+        "visibility": {
+          "enum": [
+            "public",
+            "private",
+            "internal"
+          ]
+        },
+        "repository": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "classification": {
+          "enum": [
+            "confirmed-defect",
+            "probable-issue",
+            "architectural-concern",
+            "maintainability-risk",
+            "optimization-opportunity",
+            "documentation-gap",
+            "future-enhancement",
+            "intentional-trade-off",
+            "needs-human-clarification",
+            "positive-observation"
+          ]
+        },
+        "nature": {
+          "enum": [
+            "defect",
+            "opportunity",
+            "experimental-opportunity",
+            "policy-conformance",
+            "risk",
+            "clarification",
+            "positive-observation"
+          ]
+        },
+        "severity": {
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "informational"
+          ]
+        },
+        "confidence": {
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "status": {
+          "enum": [
+            "confirmed",
+            "probable",
+            "needs-validation",
+            "intentional-trade-off",
+            "needs-clarification",
+            "not-applicable"
+          ]
+        },
+        "area": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "effort": {
+          "enum": [
+            "small",
+            "medium",
+            "large",
+            "unknown"
+          ]
+        },
+        "impact": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "observation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "why_it_matters": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "recommendation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "suggested_validation": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "minItems": 0,
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "minItems": 0,
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "evidence_classification": {
+          "enum": [
+            "observed",
+            "inferred",
+            "recommended",
+            "unverified"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^EVIDENCE-[0-9]{1,5}$"
+          },
+          "minItems": 0,
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "source_profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,63}$"
+            },
+            "version": {
+              "type": "string",
+              "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+            }
+          }
+        },
+        "missing_evidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "minItems": 0,
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "history": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "delta",
+            "prior_audit_id",
+            "prior_finding_id",
+            "evidence_classification",
+            "evidence_refs"
+          ],
+          "properties": {
+            "delta": {
+              "enum": [
+                "new",
+                "unchanged",
+                "improved",
+                "regressed",
+                "resolved",
+                "unverified",
+                "not-compared"
+              ]
+            },
+            "prior_audit_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-z0-9][a-z0-9._:-]{0,127}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "prior_finding_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^AUDIT-[0-9]{3}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_classification": {
+              "enum": [
+                "observed",
+                "inferred",
+                "recommended",
+                "unverified"
+              ]
+            },
+            "evidence_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^EVIDENCE-[0-9]{1,5}$"
+              },
+              "minItems": 0,
+              "maxItems": 64,
+              "uniqueItems": true
+            }
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "classification",
+        "kind",
+        "repository",
+        "revision",
+        "uri",
+        "path",
+        "sha256",
+        "observed_at",
+        "summary"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^EVIDENCE-[0-9]{1,5}$"
+        },
+        "classification": {
+          "enum": [
+            "observed",
+            "inferred",
+            "recommended",
+            "unverified"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "source",
+            "command",
+            "artifact",
+            "provider",
+            "policy",
+            "prior-audit",
+            "manual"
+          ]
+        },
+        "repository": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "revision": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "uri": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "format": "uri",
+              "pattern": "^https://"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "path": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "observed_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      }
+    },
+    "repositoryModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "contract_version",
+        "visibility",
+        "repository",
+        "represented_commit",
+        "as_of",
+        "admission",
+        "source_owner",
+        "freshness_policy",
+        "runs",
+        "summary",
+        "queries",
+        "campaigns",
+        "evidence",
+        "digest"
+      ],
+      "properties": {
+        "schema": {
+          "const": "egohygiene.observatory.repository-audits/v1"
+        },
+        "contract_version": {
+          "const": "1.0.0-alpha.1"
+        },
+        "visibility": {
+          "const": "public"
+        },
+        "repository": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "full_name",
+            "repository_id",
+            "visibility",
+            "source_url"
+          ],
+          "properties": {
+            "full_name": {
+              "type": "string",
+              "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+            },
+            "repository_id": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "visibility": {
+              "const": "public"
+            },
+            "source_url": {
+              "type": "string"
+            }
+          }
+        },
+        "represented_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "as_of": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+          "format": "date-time"
+        },
+        "admission": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema",
+            "owner",
+            "revision",
+            "artifact_path",
+            "artifact_sha256",
+            "schema_sha256",
+            "helper_sha256",
+            "observed_at",
+            "selected_sha256"
+          ],
+          "properties": {
+            "schema": {
+              "const": "egohygiene.relay.public-catalog-admission/v1"
+            },
+            "owner": {
+              "const": "egohygiene/hygiene"
+            },
+            "revision": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "artifact_path": {
+              "type": "string"
+            },
+            "artifact_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "schema_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "helper_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "observed_at": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "format": "date-time"
+            },
+            "selected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "source_owner": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "owner",
+            "revision",
+            "lock_sha256",
+            "schema",
+            "contract_version",
+            "registry_sha256"
+          ],
+          "properties": {
+            "owner": {
+              "const": "egohygiene/aether"
+            },
+            "revision": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "lock_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "schema": {
+              "const": "aether.repository-audit-report/v1"
+            },
+            "contract_version": {
+              "const": "1.0.0"
+            },
+            "registry_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "freshness_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "maximum_age_seconds",
+            "anchor"
+          ],
+          "properties": {
+            "maximum_age_seconds": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 31536000
+            },
+            "anchor": {
+              "const": "original-completed-at"
+            }
+          }
+        },
+        "runs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "scope",
+              "profiles",
+              "started_at",
+              "completed_at",
+              "completion",
+              "revision_status",
+              "freshness",
+              "source",
+              "findings",
+              "candidate_issues",
+              "prior_audits",
+              "producer",
+              "limitations",
+              "command_states"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9._:-]{0,127}$"
+              },
+              "scope": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "repositories",
+                  "include",
+                  "exclude",
+                  "inspected",
+                  "uninspected"
+                ],
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "repository",
+                      "organization"
+                    ]
+                  },
+                  "repositories": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "full_name",
+                        "revision",
+                        "visibility"
+                      ],
+                      "properties": {
+                        "full_name": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+                        },
+                        "revision": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{40}$"
+                        },
+                        "visibility": {
+                          "enum": [
+                            "public",
+                            "private",
+                            "internal"
+                          ]
+                        }
+                      }
+                    },
+                    "minItems": 1,
+                    "maxItems": 128,
+                    "uniqueItems": true
+                  },
+                  "include": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "minItems": 1,
+                    "maxItems": 256,
+                    "uniqueItems": true
+                  },
+                  "exclude": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "minItems": 0,
+                    "maxItems": 256,
+                    "uniqueItems": true
+                  },
+                  "inspected": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "minItems": 0,
+                    "maxItems": 256,
+                    "uniqueItems": true
+                  },
+                  "uninspected": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "minItems": 0,
+                    "maxItems": 256,
+                    "uniqueItems": true
+                  }
+                }
+              },
+              "profiles": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "registry_version",
+                  "registry_sha256",
+                  "requested",
+                  "resolved"
+                ],
+                "properties": {
+                  "registry_version": {
+                    "type": "string",
+                    "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+                  },
+                  "registry_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "requested": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^[a-z][a-z0-9-]{0,63}$"
+                        },
+                        "version": {
+                          "type": "string",
+                          "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+                        }
+                      }
+                    },
+                    "minItems": 1,
+                    "maxItems": 128,
+                    "uniqueItems": true
+                  },
+                  "resolved": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^[a-z][a-z0-9-]{0,63}$"
+                        },
+                        "version": {
+                          "type": "string",
+                          "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+                        }
+                      }
+                    },
+                    "minItems": 1,
+                    "maxItems": 128,
+                    "uniqueItems": true
+                  }
+                }
+              },
+              "started_at": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+                "format": "date-time"
+              },
+              "completed_at": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "completion": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "reason",
+                  "continuation",
+                  "profiles"
+                ],
+                "properties": {
+                  "state": {
+                    "enum": [
+                      "complete",
+                      "partial",
+                      "blocked",
+                      "failed",
+                      "unsupported",
+                      "not_applicable",
+                      "unknown"
+                    ]
+                  },
+                  "reason": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 1,
+                    "maxLength": 4096
+                  },
+                  "continuation": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "minItems": 0,
+                    "maxItems": 64,
+                    "uniqueItems": true
+                  },
+                  "profiles": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "profile",
+                        "state",
+                        "reason"
+                      ],
+                      "properties": {
+                        "profile": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "id",
+                            "version"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,63}$"
+                            },
+                            "version": {
+                              "type": "string",
+                              "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+                            }
+                          }
+                        },
+                        "state": {
+                          "enum": [
+                            "complete",
+                            "partial",
+                            "blocked",
+                            "failed",
+                            "unsupported",
+                            "not_applicable",
+                            "unknown"
+                          ]
+                        },
+                        "reason": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "minLength": 1,
+                          "maxLength": 2048
+                        }
+                      }
+                    },
+                    "minItems": 1,
+                    "maxItems": 128
+                  }
+                }
+              },
+              "revision_status": {
+                "enum": [
+                  "matched",
+                  "different"
+                ]
+              },
+              "freshness": {
+                "enum": [
+                  "current",
+                  "stale",
+                  "unknown"
+                ]
+              },
+              "source": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "report_schema",
+                  "contract_version",
+                  "owner_report_sha256",
+                  "canonical_report",
+                  "input"
+                ],
+                "properties": {
+                  "report_schema": {
+                    "const": "aether.repository-audit-report/v1"
+                  },
+                  "contract_version": {
+                    "const": "1.0.0"
+                  },
+                  "owner_report_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "canonical_report": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "path",
+                      "uri",
+                      "sha256"
+                    ],
+                    "properties": {
+                      "path": {
+                        "type": "string",
+                        "maxLength": 512,
+                        "pattern": "^audits/[A-Za-z0-9][A-Za-z0-9._-]*-[0-9]{8}T[0-9]{6}Z\\.md$"
+                      },
+                      "uri": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 2048,
+                            "format": "uri",
+                            "pattern": "^https://"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    }
+                  },
+                  "input": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "input_kind",
+                      "raw_input_sha256",
+                      "canonical_input_sha256",
+                      "artifact",
+                      "artifact_integrity"
+                    ],
+                    "properties": {
+                      "input_kind": {
+                        "enum": [
+                          "raw-json",
+                          "structured"
+                        ]
+                      },
+                      "raw_input_sha256": {
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "canonical_input_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "artifact": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "repository",
+                              "revision",
+                              "path",
+                              "url",
+                              "sha256"
+                            ],
+                            "properties": {
+                              "repository": {
+                                "type": "string",
+                                "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$"
+                              },
+                              "revision": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{40}$"
+                              },
+                              "path": {
+                                "type": "string"
+                              },
+                              "url": {
+                                "type": "string"
+                              },
+                              "sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              }
+                            }
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "artifact_integrity": {
+                        "enum": [
+                          "verified-input-bytes",
+                          "unverified-claim",
+                          "unavailable"
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              "findings": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "repository",
+                    "title",
+                    "classification",
+                    "nature",
+                    "severity",
+                    "confidence",
+                    "status",
+                    "area",
+                    "effort",
+                    "impact",
+                    "source_profile",
+                    "evidence_classification",
+                    "history",
+                    "key",
+                    "evidence",
+                    "history_evidence",
+                    "missing_evidence"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^AUDIT-[0-9]{3}$"
+                    },
+                    "repository": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+                    },
+                    "title": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "classification": {
+                      "enum": [
+                        "confirmed-defect",
+                        "probable-issue",
+                        "architectural-concern",
+                        "maintainability-risk",
+                        "optimization-opportunity",
+                        "documentation-gap",
+                        "future-enhancement",
+                        "intentional-trade-off",
+                        "needs-human-clarification",
+                        "positive-observation"
+                      ]
+                    },
+                    "nature": {
+                      "enum": [
+                        "defect",
+                        "opportunity",
+                        "experimental-opportunity",
+                        "policy-conformance",
+                        "risk",
+                        "clarification",
+                        "positive-observation"
+                      ]
+                    },
+                    "severity": {
+                      "enum": [
+                        "critical",
+                        "high",
+                        "medium",
+                        "low",
+                        "informational"
+                      ]
+                    },
+                    "confidence": {
+                      "enum": [
+                        "high",
+                        "medium",
+                        "low"
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "confirmed",
+                        "probable",
+                        "needs-validation",
+                        "intentional-trade-off",
+                        "needs-clarification",
+                        "not-applicable"
+                      ]
+                    },
+                    "area": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "effort": {
+                      "enum": [
+                        "small",
+                        "medium",
+                        "large",
+                        "unknown"
+                      ]
+                    },
+                    "impact": {
+                      "enum": [
+                        "low",
+                        "medium",
+                        "high",
+                        "critical"
+                      ]
+                    },
+                    "source_profile": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^[a-z][a-z0-9-]{0,63}$"
+                        },
+                        "version": {
+                          "type": "string",
+                          "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+                        }
+                      }
+                    },
+                    "evidence_classification": {
+                      "enum": [
+                        "observed",
+                        "inferred",
+                        "recommended",
+                        "unverified"
+                      ]
+                    },
+                    "history": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "delta",
+                        "prior_audit_id",
+                        "prior_finding_id",
+                        "evidence_classification",
+                        "evidence_refs"
+                      ],
+                      "properties": {
+                        "delta": {
+                          "enum": [
+                            "new",
+                            "unchanged",
+                            "improved",
+                            "regressed",
+                            "resolved",
+                            "unverified",
+                            "not-compared"
+                          ]
+                        },
+                        "prior_audit_id": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^[a-z0-9][a-z0-9._:-]{0,127}$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "prior_finding_id": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^AUDIT-[0-9]{3}$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "evidence_classification": {
+                          "enum": [
+                            "observed",
+                            "inferred",
+                            "recommended",
+                            "unverified"
+                          ]
+                        },
+                        "evidence_refs": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "pattern": "^EVIDENCE-[0-9]{1,5}$"
+                          },
+                          "minItems": 0,
+                          "maxItems": 64,
+                          "uniqueItems": true
+                        }
+                      }
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "evidence": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "id",
+                          "classification",
+                          "kind",
+                          "repository",
+                          "revision",
+                          "uri",
+                          "path",
+                          "sha256",
+                          "observed_at"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^EVIDENCE-[0-9]{1,5}$"
+                          },
+                          "classification": {
+                            "enum": [
+                              "observed",
+                              "inferred",
+                              "recommended",
+                              "unverified"
+                            ]
+                          },
+                          "kind": {
+                            "enum": [
+                              "source",
+                              "command",
+                              "artifact",
+                              "provider",
+                              "policy",
+                              "prior-audit",
+                              "manual"
+                            ]
+                          },
+                          "repository": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "revision": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{40}$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "uri": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 2048,
+                                "format": "uri",
+                                "pattern": "^https://"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "path": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "minLength": 1,
+                            "maxLength": 512
+                          },
+                          "sha256": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "observed_at": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+                                "format": "date-time"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "classification": {
+                                  "const": "observed"
+                                }
+                              },
+                              "required": [
+                                "classification"
+                              ]
+                            },
+                            "then": {
+                              "properties": {
+                                "observed_at": {
+                                  "type": "string"
+                                }
+                              },
+                              "anyOf": [
+                                {
+                                  "properties": {
+                                    "uri": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                {
+                                  "properties": {
+                                    "path": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "kind": {
+                                  "const": "source"
+                                }
+                              },
+                              "required": [
+                                "kind"
+                              ]
+                            },
+                            "then": {
+                              "properties": {
+                                "repository": {
+                                  "type": "string"
+                                },
+                                "revision": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "revision": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "revision"
+                              ]
+                            },
+                            "then": {
+                              "properties": {
+                                "repository": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "maxItems": 64
+                    },
+                    "history_evidence": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "id",
+                          "classification",
+                          "kind",
+                          "repository",
+                          "revision",
+                          "uri",
+                          "path",
+                          "sha256",
+                          "observed_at"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^EVIDENCE-[0-9]{1,5}$"
+                          },
+                          "classification": {
+                            "enum": [
+                              "observed",
+                              "inferred",
+                              "recommended",
+                              "unverified"
+                            ]
+                          },
+                          "kind": {
+                            "enum": [
+                              "source",
+                              "command",
+                              "artifact",
+                              "provider",
+                              "policy",
+                              "prior-audit",
+                              "manual"
+                            ]
+                          },
+                          "repository": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "revision": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{40}$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "uri": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 2048,
+                                "format": "uri",
+                                "pattern": "^https://"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "path": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "minLength": 1,
+                            "maxLength": 512
+                          },
+                          "sha256": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "observed_at": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+                                "format": "date-time"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "classification": {
+                                  "const": "observed"
+                                }
+                              },
+                              "required": [
+                                "classification"
+                              ]
+                            },
+                            "then": {
+                              "properties": {
+                                "observed_at": {
+                                  "type": "string"
+                                }
+                              },
+                              "anyOf": [
+                                {
+                                  "properties": {
+                                    "uri": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                {
+                                  "properties": {
+                                    "path": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "kind": {
+                                  "const": "source"
+                                }
+                              },
+                              "required": [
+                                "kind"
+                              ]
+                            },
+                            "then": {
+                              "properties": {
+                                "repository": {
+                                  "type": "string"
+                                },
+                                "revision": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "revision": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "revision"
+                              ]
+                            },
+                            "then": {
+                              "properties": {
+                                "repository": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "maxItems": 64
+                    },
+                    "missing_evidence": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2048
+                      },
+                      "maxItems": 64,
+                      "uniqueItems": true
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "classification": {
+                            "enum": [
+                              "optimization-opportunity",
+                              "future-enhancement"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "classification"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "nature": {
+                            "enum": [
+                              "opportunity",
+                              "experimental-opportunity"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "nature": {
+                            "enum": [
+                              "opportunity",
+                              "experimental-opportunity"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "nature"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "classification": {
+                            "enum": [
+                              "optimization-opportunity",
+                              "future-enhancement",
+                              "needs-human-clarification"
+                            ]
+                          },
+                          "status": {
+                            "enum": [
+                              "probable",
+                              "needs-validation",
+                              "needs-clarification"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "classification": {
+                            "const": "probable-issue"
+                          }
+                        },
+                        "required": [
+                          "classification"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "nature": {
+                            "enum": [
+                              "defect",
+                              "risk",
+                              "policy-conformance"
+                            ]
+                          },
+                          "status": {
+                            "enum": [
+                              "probable",
+                              "needs-validation"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "classification": {
+                            "const": "intentional-trade-off"
+                          }
+                        },
+                        "required": [
+                          "classification"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "nature": {
+                            "const": "risk"
+                          },
+                          "status": {
+                            "const": "intentional-trade-off"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "classification": {
+                            "const": "positive-observation"
+                          }
+                        },
+                        "required": [
+                          "classification"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "nature": {
+                            "const": "positive-observation"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "nature": {
+                            "const": "positive-observation"
+                          }
+                        },
+                        "required": [
+                          "nature"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "classification": {
+                            "const": "positive-observation"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "classification": {
+                            "const": "confirmed-defect"
+                          }
+                        },
+                        "required": [
+                          "classification"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "nature": {
+                            "enum": [
+                              "defect",
+                              "policy-conformance"
+                            ]
+                          },
+                          "status": {
+                            "const": "confirmed"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "anyOf": [
+                          {
+                            "properties": {
+                              "status": {
+                                "const": "confirmed"
+                              }
+                            }
+                          },
+                          {
+                            "properties": {
+                              "classification": {
+                                "const": "confirmed-defect"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "evidence_classification": {
+                            "const": "observed"
+                          },
+                          "evidence": {
+                            "contains": {
+                              "type": "object",
+                              "properties": {
+                                "classification": {
+                                  "const": "observed"
+                                }
+                              },
+                              "required": [
+                                "classification"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "anyOf": [
+                          {
+                            "properties": {
+                              "confidence": {
+                                "const": "low"
+                              }
+                            }
+                          },
+                          {
+                            "properties": {
+                              "evidence_classification": {
+                                "enum": [
+                                  "recommended",
+                                  "unverified"
+                                ]
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "missing_evidence": {
+                            "minItems": 1
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "nature": {
+                            "const": "experimental-opportunity"
+                          }
+                        },
+                        "required": [
+                          "nature"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "severity": {
+                            "const": "informational"
+                          },
+                          "evidence_classification": {
+                            "enum": [
+                              "recommended",
+                              "unverified"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "nature": {
+                            "const": "policy-conformance"
+                          }
+                        },
+                        "required": [
+                          "nature"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "evidence": {
+                            "contains": {
+                              "type": "object",
+                              "properties": {
+                                "classification": {
+                                  "const": "observed"
+                                },
+                                "kind": {
+                                  "const": "policy"
+                                }
+                              },
+                              "required": [
+                                "classification",
+                                "kind"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "maxItems": 4096
+              },
+              "candidate_issues": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "status",
+                    "priority",
+                    "finding_ids",
+                    "projection",
+                    "materialization"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^CANDIDATE-[0-9]{3}$"
+                    },
+                    "status": {
+                      "const": "suggested"
+                    },
+                    "priority": {
+                      "enum": [
+                        "low",
+                        "medium",
+                        "high",
+                        "critical"
+                      ]
+                    },
+                    "finding_ids": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 64,
+                      "items": {
+                        "type": "string",
+                        "pattern": "^AUDIT-[0-9]{3}$"
+                      },
+                      "uniqueItems": true
+                    },
+                    "projection": {
+                      "enum": [
+                        "complete",
+                        "repository-subset"
+                      ]
+                    },
+                    "materialization": {
+                      "const": "unavailable"
+                    }
+                  }
+                },
+                "maxItems": 256
+              },
+              "prior_audits": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "audit_id",
+                    "uri",
+                    "sha256",
+                    "relationship",
+                    "evidence_classification"
+                  ],
+                  "properties": {
+                    "audit_id": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9][a-z0-9._:-]{0,127}$"
+                    },
+                    "uri": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 2048,
+                          "format": "uri",
+                          "pattern": "^https://"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "relationship": {
+                      "enum": [
+                        "predecessor",
+                        "related"
+                      ]
+                    },
+                    "evidence_classification": {
+                      "enum": [
+                        "observed",
+                        "inferred",
+                        "recommended",
+                        "unverified"
+                      ]
+                    }
+                  }
+                },
+                "minItems": 0,
+                "maxItems": 128
+              },
+              "producer": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "version",
+                  "uri"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  },
+                  "version": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "uri": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "format": "uri",
+                        "pattern": "^https://"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                },
+                "minItems": 0,
+                "maxItems": 128,
+                "uniqueItems": true
+              },
+              "command_states": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "success",
+                  "failure",
+                  "not_run",
+                  "unavailable",
+                  "unsupported"
+                ],
+                "properties": {
+                  "success": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "failure": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "not_run": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "unavailable": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "unsupported": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          },
+          "maxItems": 256
+        },
+        "summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "completion",
+            "counting_unit",
+            "freshness",
+            "revision",
+            "findings",
+            "candidate_issues",
+            "assessment"
+          ],
+          "properties": {
+            "completion": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "complete",
+                "partial",
+                "blocked",
+                "failed",
+                "unsupported",
+                "not_applicable",
+                "unknown"
+              ],
+              "properties": {
+                "complete": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "partial": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "blocked": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "failed": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "unsupported": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "not_applicable": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "unknown": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "counting_unit": {
+              "const": "repository-report-projection"
+            },
+            "freshness": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "current",
+                "stale",
+                "unknown"
+              ],
+              "properties": {
+                "current": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "stale": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "unknown": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "revision": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "matched",
+                "different"
+              ],
+              "properties": {
+                "matched": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "different": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "findings": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "classification",
+                "nature",
+                "severity",
+                "confidence",
+                "status",
+                "evidence_classification",
+                "history_delta"
+              ],
+              "properties": {
+                "classification": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "confirmed-defect",
+                    "probable-issue",
+                    "architectural-concern",
+                    "maintainability-risk",
+                    "optimization-opportunity",
+                    "documentation-gap",
+                    "future-enhancement",
+                    "intentional-trade-off",
+                    "needs-human-clarification",
+                    "positive-observation"
+                  ],
+                  "properties": {
+                    "confirmed-defect": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "probable-issue": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "architectural-concern": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "maintainability-risk": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "optimization-opportunity": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "documentation-gap": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "future-enhancement": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "intentional-trade-off": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "needs-human-clarification": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "positive-observation": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                },
+                "nature": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "defect",
+                    "opportunity",
+                    "experimental-opportunity",
+                    "policy-conformance",
+                    "risk",
+                    "clarification",
+                    "positive-observation"
+                  ],
+                  "properties": {
+                    "defect": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "opportunity": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "experimental-opportunity": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "policy-conformance": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "risk": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "clarification": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "positive-observation": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                },
+                "severity": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "critical",
+                    "high",
+                    "medium",
+                    "low",
+                    "informational"
+                  ],
+                  "properties": {
+                    "critical": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "high": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "medium": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "low": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "informational": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                },
+                "confidence": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "high",
+                    "medium",
+                    "low"
+                  ],
+                  "properties": {
+                    "high": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "medium": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "low": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                },
+                "status": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "confirmed",
+                    "probable",
+                    "needs-validation",
+                    "intentional-trade-off",
+                    "needs-clarification",
+                    "not-applicable"
+                  ],
+                  "properties": {
+                    "confirmed": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "probable": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "needs-validation": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "intentional-trade-off": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "needs-clarification": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "not-applicable": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                },
+                "evidence_classification": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "observed",
+                    "inferred",
+                    "recommended",
+                    "unverified"
+                  ],
+                  "properties": {
+                    "observed": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "inferred": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "recommended": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "unverified": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                },
+                "history_delta": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "new",
+                    "unchanged",
+                    "improved",
+                    "regressed",
+                    "resolved",
+                    "unverified",
+                    "not-compared"
+                  ],
+                  "properties": {
+                    "new": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "unchanged": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "improved": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "regressed": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "resolved": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "unverified": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "not-compared": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            },
+            "candidate_issues": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "suggested",
+                "materialization"
+              ],
+              "properties": {
+                "suggested": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "materialization": {
+                  "const": "unavailable"
+                }
+              }
+            },
+            "assessment": {
+              "const": "authored-audit-evidence-only-no-conformance-or-sanity-score"
+            }
+          }
+        },
+        "queries": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "latest_by_profile",
+            "recurrence_claims",
+            "resolution_claims",
+            "comparison"
+          ],
+          "properties": {
+            "latest_by_profile": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "profile",
+                  "boundary",
+                  "audit_ids"
+                ],
+                "properties": {
+                  "profile": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "version"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[a-z][a-z0-9-]{0,63}$"
+                      },
+                      "version": {
+                        "type": "string",
+                        "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+                      }
+                    }
+                  },
+                  "boundary": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+                    "format": "date-time"
+                  },
+                  "audit_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 256
+                  }
+                }
+              },
+              "maxItems": 128
+            },
+            "recurrence_claims": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 4096
+            },
+            "resolution_claims": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 4096
+            },
+            "comparison": {
+              "const": "explicit-source-history-only-no-disappearance-inference"
+            }
+          }
+        },
+        "campaigns": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "references",
+            "reason"
+          ],
+          "properties": {
+            "state": {
+              "const": "unavailable"
+            },
+            "references": {
+              "type": "array",
+              "maxItems": 0
+            },
+            "reason": {
+              "const": "No compatible orchestration manifests supplied."
+            }
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "record_count",
+            "canonical_inputs_sha256",
+            "current_revision_run_count",
+            "other_revision_run_count"
+          ],
+          "properties": {
+            "state": {
+              "enum": [
+                "supplied",
+                "unavailable"
+              ]
+            },
+            "record_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "canonical_inputs_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "current_revision_run_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "other_revision_run_count": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}
