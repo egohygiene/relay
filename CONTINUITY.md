@@ -7,25 +7,28 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-11-11T00:05:17Z'
+  updated_at: '2026-11-12T23:46:26Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Prepare offline review-only intake for a producer-owned organization Intelligence static export.
+  purpose: Integrate the reviewed typed review feed and hand off the one accepted public report-to-review-artifact canary
+    while preserving functional source and historical pins.
   includes:
-  - A new dedicated composite action and stdlib verifier admit exact ZIP/manifest/source/origin/base bindings,
-    a complete sealed file inventory, organization routes/public membership, safe resources and CSP. It never
-    executes scripts/models, downloads providers or publishes pages.
-  - The export schema and 39-route inventory remain website-owned and are mirrored at exact source54e0b6e66b9b028bad382bbbc4bc6ba588cee665
-    with hash lock. Relay owns transport verification and a separate receipt whose publication is always review-only
-    and deployment authorization false.
-  - Archive and local-directory admission preserve exact site bytes while staging an ordinary review directory.
-    Receipt qualification explicitly distinguishes byte proof from producer-declared model derivation, unexecuted
-    JavaScript/browser checks and pending hosting/site-declaration admission.
+  - The new shared feed reads explicit plans and selected typed sidecars from exact Git objects, authenticates public scope
+    before report identities/counts/public hashes and invokes the pinned Observatory builders. Original report revisions and
+    observation clocks remain unchanged; empty/missing selections become owner unavailable models and malformed provided selections
+    deny output.
+  - An isolated owner runtime reuses exact Aether7449090, Observatory7b857de and Hygiene49639/af9c resources. Four repository/singleton-fleet
+    models and a bounded receipt form an ordinary consumer-owned artifact; the standalone receipt validator binds public target,
+    exact frame, files and implementation digests.
+  - The reusable action exposes exact source/as-of/model paths for same-frame native builders. It adds no auditor/model/provider/Markdown
+    execution, new semantic authority, source mutation or publisher. Existing frozen collector locks and recovery profiles
+    remain intact.
   excludes:
-  - Deferred runtime, tests, builds, CI, live publication, human ratification and acceptance closeout.
+  - Broad CI, browser/live-site checks, publication/deployment, release, human ratification and full consumer/fleet acceptance.
+  - Additional framework work, broad audit campaigns, provider settings, issue closure and unrelated source changes.
   precedence:
   - user-and-runtime-instructions
   - scoped-repository-instructions
@@ -35,78 +38,101 @@ scope:
   canonical_sources:
   - AGENTS.md
   - DECISIONS.md
-  - actions/repository-intelligence-static-intake/action.yml
-  - actions/repository-intelligence-static-intake/scripts/static_intake.py
-  - actions/repository-intelligence-static-intake/contracts/export-owner.v1.lock.json
-  - actions/repository-intelligence-static-intake/contracts/static-intake-receipt.v1.schema.json
-  - docs/organization-intelligence-static-intake.md
+  - actions/repository-intelligence-review-feed/action.yml
+  - actions/repository-intelligence-review-feed/scripts/review_feed.py
+  - actions/repository-intelligence-review-feed/scripts/review_feed_contract.py
+  - actions/repository-intelligence-review-feed/contracts/review-feed-owner.v1.lock.json
+  - actions/repository-intelligence-review-feed/contracts/review-plan.v1.schema.json
+  - actions/repository-intelligence-review-feed/contracts/review-feed-receipt.v1.schema.json
+  - docs/repository-intelligence-typed-review-feed.md
   - action-catalog.json
-  - https://github.com/egohygiene/.github/issues/27
+  - https://github.com/egohygiene/relay/issues/74
 work:
-  objective: Prepare offline review-only intake for a producer-owned organization Intelligence static export.
+  objective: Land reviewed PR181 without functional changes, then support the one authorized supported report-to-model/dashboard-to-retained-export-to-.github
+    review artifact canary.
   success_conditions:
-  - Out-of-band exact producer source, raw archive/manifest hashes and target are required; rejected bytes
-    never become a successful review.
-  - Transport/source qualification cannot imply script/model execution, human approval, site-policy admission
-    or deployment.
-  - Existing builders, native source contracts, workflows, recovery and publisher authority remain unchanged.
+  - Compatible explicitly selected sidecars reach existing owner inputs at the same public repository/represented SHA/actual
+    evaluation clock.
+  - Missing and historical evidence is honest; failures retain bounded denial metadata without raw private bodies or invented
+    findings/human verification.
+  - The source Git environment disables lazy fetch, hooks, signature programs and consumer-module imports; owner code is locked
+    outside consumer source.
   active_issue:
     provider: github
-    id: egohygiene/.github#27
-    url: https://github.com/egohygiene/.github/issues/27
+    id: egohygiene/relay#74
+    url: https://github.com/egohygiene/relay/issues/74
   next:
     kind: action
-    id: review-static-export-consumer
-    description: Review the producer export and pinned .github manual artifact consumer together. Qualify actual
-      export/ZIP/browser behavior later under the user deferral, and reconcile canonical hosting/declaration
-      gates before any publisher activation.
+    id: one-real-review-feed-canary
+    description: Confirm the actual PR181 merge, integrate the reviewed consumers and run only the focused tests/builds/runtime
+      directly needed for one real supported public report through repository models/dashboard, retained export and .github
+      review artifact. Broad CI/browser/live publication remains deferred.
     readiness: ready
     references:
-    - https://github.com/egohygiene/.github/issues/27
+    - https://github.com/egohygiene/relay/pull/181
+    - https://github.com/egohygiene/identity/pull/144
+    - https://github.com/egohygiene/civics/pull/9
+    - https://github.com/egohygiene/egohygiene.io/pull/140
+    - https://github.com/egohygiene/pace/pull/37
     depends_on: []
 state:
   base:
-    revision: 73f750ef9dd1782b20d280b4c555aacd92ee5f4e
+    revision: a3d87ab48d92d10f74d8d0df8a6106b66cce0dac
     ref: refs/heads/main
-    verified_at: '2026-11-11T00:05:17Z'
+    verified_at: '2026-11-12T23:46:26Z'
   candidate:
-    branch: codex/intelligence-static-export-intake
+    branch: codex/intelligence-typed-review-feed
     revision: null
-    pull_request: null
+    pull_request:
+      provider: github
+      id: egohygiene/relay#181
+      url: https://github.com/egohygiene/relay/pull/181
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-11-11T00:05:17Z'
-    default_branch_revision: 73f750ef9dd1782b20d280b4c555aacd92ee5f4e
+    observed_at: '2026-11-12T23:46:26Z'
+    default_branch_revision: a3d87ab48d92d10f74d8d0df8a6106b66cce0dac
     issue_state: open
-    pull_request_state: not-applicable
-    notes: Relay main73f750ef9dd1782b20d280b4c555aacd92ee5f4e was refreshed. Functional intake d15cacd987ef1f98a6b94b051a42925eb91f8cc7
-      is prepared. Producer schema/route source54e0b6e66b9b028bad382bbbc4bc6ba588cee665 is publicly reachable
-      through website draft PR139; no producer run or received ZIP exists in this source review.
-  parallel_changes: []
+    pull_request_state: draft
+    notes: Observed PR181 open/draft and mergeable at d7c60473626f8dcc901210a208ad01a6474e8c1d; main remains its original
+      basea3d87ab. Reviews/threads were empty; issues74/76 remain open. The user authorized landing this reviewed convergence
+      batch plus the one focused canary. No merge or run is inferred before its actual receipt.
+  parallel_changes:
+  - provider: github
+    id: egohygiene/identity#144
+    url: https://github.com/egohygiene/identity/pull/144
+  - provider: github
+    id: egohygiene/civics#9
+    url: https://github.com/egohygiene/civics/pull/9
+  - provider: github
+    id: egohygiene/egohygiene.io#140
+    url: https://github.com/egohygiene/egohygiene.io/pull/140
+  - provider: github
+    id: egohygiene/pace#37
+    url: https://github.com/egohygiene/pace/pull/37
 review:
   status: partial
-  reviewed_at: '2026-11-11T00:05:17Z'
+  reviewed_at: '2026-11-12T23:46:26Z'
   reviewed_by: Codex
   evidence:
-  - command: Independent offline static source peer of archive/path/UTF8/duplicate-key/resource/CSP/public-scope/provenance
-      boundaries; AST, schema definitions/local refs, action/catalog metadata, exact immutable producer mirror
-      hashes, continuity schema/size/links and whitespace
+  - command: Independent source peers of Git isolation/public admission/order/clocks/historical context/receipt privacy and
+      action/runtime closure; Python AST, schema definitions and field/API parity, exact22 owner resource hashes/Git source
+      comparisons, action catalog metadata, continuity schema/size/links and whitespace
     outcome: limited
-    observed_at: '2026-11-11T00:05:17Z'
-    notes: Static source and metadata inspection only; no application execution.
-  - command: Native/runtime execution, tests, builds, CI investigation, browser/provider/consumer/publication
-      qualification
+    observed_at: '2026-11-12T23:46:26Z'
+    notes: Static source and metadata inspection. The convergence refresh changes only this handoff beyond originald7; functional5d27/d7
+      pins, all owner locks and existing main source remain intact. No current runtime acceptance is claimed.
+  - command: Focused canary execution and broad qualification
     outcome: not-run
-    observed_at: '2026-11-11T00:05:17Z'
-    notes: Deferred at maintainer request; source merges do not establish acceptance.
+    observed_at: '2026-11-12T23:46:26Z'
+    notes: The single accepted canary now authorizes focused tests/builds/runtime as its next step; none ran for this source
+      integration. Broad CI/browser/live publication and full acceptance remain deferred.
   environment_limitations:
-  - No verifier/JavaScript/model/browser/application execution, build, tests, native scenario, CI, artifact
-    download or publication occurred.
-  - Review-only transport proof is not site-declaration admission, canonical hosting approval, deployment authorization
-    or real model replay.
-  - Hygiene exact project-prefix compatibility and owner/publication declarations remain separately proposed;
-    frozen source locks are unchanged.
+  - The feed retains source-only evidence until actual focused canary results are produced; a merge is not consumer acceptance.
+  - The canary requires a real supported public sidecar and exact source/frame bindings; original clocks, unavailable evidence
+    and human authority remain honest.
+  - Broad CI, browser/live-site, publication/deployment, release and fleet qualification remain outside this accepted narrow
+    plan; source holds and recovery remain unchanged.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -133,35 +159,35 @@ Read scoped instructions, canonical sources above and this checkpoint. Verify mu
 
 ## Current objective and success conditions
 
-Prepare offline review-only intake for a producer-owned organization Intelligence static export. Out-of-band exact producer source, raw archive/manifest hashes and target are required; rejected bytes never become a successful review. Transport/source qualification cannot imply script/model execution, human approval, site-policy admission or deployment. Existing builders, native source contracts, workflows, recovery and publisher authority remain unchanged.
+Integrate reviewed PR181 with every non-handoff byte preserved, then support one real public report through repository models/dashboard, retained export and a .github review artifact. Original functional5d27 and documentation-onlyd7c604 pins remain valid; no API, lock, source hold or recovery selection changes.
 
 ## State snapshot
 
-Candidate `codex/intelligence-static-export-intake` is based on observed main `73f750ef9dd1782b20d280b4c555aacd92ee5f4e`. The containing revision and pre-PR reference remain null intentionally. Relay main73f750ef9dd1782b20d280b4c555aacd92ee5f4e was refreshed. Functional intake d15cacd987ef1f98a6b94b051a42925eb91f8cc7 is prepared. Producer schema/route source54e0b6e66b9b028bad382bbbc4bc6ba588cee665 is publicly reachable through website draft PR139; no producer run or received ZIP exists in this source review.
+At the recorded observation, actual main is a3d87ab48d92d10f74d8d0df8a6106b66cce0dac and PR181 is open/draft at d7c60473626f8dcc901210a208ad01a6474e8c1d. This candidate refreshes only CONTINUITY.md beyond that reviewed source. Actual containing/merge identities belong to the eventual Git/PR receipt, not a self-reference here.
 
 ## Completed and material changes
 
-A new dedicated composite action and stdlib verifier admit exact ZIP/manifest/source/origin/base bindings, a complete sealed file inventory, organization routes/public membership, safe resources and CSP. It never executes scripts/models, downloads providers or publishes pages.
+The new shared feed reads explicit plans and selected typed sidecars from exact Git objects, authenticates public scope before report identities/counts/public hashes and invokes the pinned Observatory builders. Original report revisions and observation clocks remain unchanged; empty/missing selections become owner unavailable models and malformed provided selections deny output.
 
-The export schema and 39-route inventory remain website-owned and are mirrored at exact source54e0b6e66b9b028bad382bbbc4bc6ba588cee665 with hash lock. Relay owns transport verification and a separate receipt whose publication is always review-only and deployment authorization false.
+An isolated owner runtime reuses exact Aether7449090, Observatory7b857de and Hygiene49639/af9c resources. Four repository/singleton-fleet models and a bounded receipt form an ordinary consumer-owned artifact; the standalone receipt validator binds public target, exact frame, files and implementation digests.
 
-Archive and local-directory admission preserve exact site bytes while staging an ordinary review directory. Receipt qualification explicitly distinguishes byte proof from producer-declared model derivation, unexecuted JavaScript/browser checks and pending hosting/site-declaration admission.
+The reusable action exposes exact source/as-of/model paths for same-frame native builders. It adds no auditor/model/provider/Markdown execution, new semantic authority, source mutation or publisher. Existing frozen collector locks and recovery profiles remain intact.
 
 ## Validation and review evidence
 
-Independent offline static source peer of archive/path/UTF8/duplicate-key/resource/CSP/public-scope/provenance boundaries; AST, schema definitions/local refs, action/catalog metadata, exact immutable producer mirror hashes, continuity schema/size/links and whitespace. Static source inspection only. Native/application execution, tests, builds, CI investigation, browser/model/source-capture provider execution and publication qualification were not run. Read-only source and Git metadata observations are separate.
+Static source/hash/schema metadata and independent source review are bounded authoring evidence. No feed, tests, build, native consumer or artifact run is claimed for this source merge. Focused execution directly needed for the accepted one-report canary is now authorized and will receive its own retained evidence. Broad CI/browser/live publication remains deferred.
 
 ## Blockers, risks, unknowns, and deferred work
 
-No verifier/JavaScript/model/browser/application execution, build, tests, native scenario, CI, artifact download or publication occurred. Review-only transport proof is not site-declaration admission, canonical hosting approval, deployment authorization or real model replay. Hygiene exact project-prefix compatibility and owner/publication declarations remain separately proposed; frozen source locks are unchanged.
+The canary needs a real supported public typed report at an exact source/frame. Source presence cannot establish report truth, authenticated human approval or actual transport. Broad qualification, publication/deployment, policy promotion and existing human/source holds remain separate; no new baseline or finding is invented.
 
 ## Next dependency-ready work
 
-Review the producer export and pinned .github manual artifact consumer together. Qualify actual export/ZIP/browser behavior later under the user deferral, and reconcile canonical hosting/declaration gates before any publisher activation.
+Confirm the actual PR181 merge, integrate the reviewed Identity/Civics/website/Pace consumers, then execute the one bounded report-to-review-artifact path. Keep normalization, rendering, retained bytes and transport outcomes distinct. Stop at review artifact retention; no live publication is included.
 
 ## Parallel changes and reconciliation
 
-ADR reference: existing Relay ADR0007 bounded sibling composition and ADR0010 deterministic bytes versus deployment receipts. The new intake implements those boundaries without taking over producer schemas or policy. The hosting proposal is separately recorded in .github ADR0006 and website ADR0017.
+Identity #144, Civics #9, website #140 and Pace #37 are coordinated integration peers. Reference existing Relay ADR0007 bounded sibling composition and ADR0010 deterministic bytes versus consumer deployment receipts. This handoff-only integration refresh needs no new ADR and does not take semantic or publisher authority.
 
 ## Privacy and redaction
 

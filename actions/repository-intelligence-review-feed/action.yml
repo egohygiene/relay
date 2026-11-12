@@ -1,0 +1,66 @@
+name: Repository Intelligence Typed Review Feed
+description: Normalize explicitly selected public typed audit and architecture review sidecars through pinned owner queries without executing auditors, models or providers.
+inputs:
+  source-root:
+    description: Existing exact consumer Git worktree. Candidate code is never executed.
+    required: true
+  plan:
+    description: Literal repository-relative typed review plan read from represented-commit Git objects.
+    required: true
+  repository:
+    description: Explicit canonical public repository admitted through the pinned Hygiene catalog.
+    required: true
+  represented-commit:
+    description: Exact full consumer source commit from which plan and report blobs are read.
+    required: true
+  as-of:
+    description: Actual UTC source-frame evaluation clock shared with the existing builder; original report clocks remain unchanged.
+    required: true
+  output-directory:
+    description: New repository-relative .cache/ directory, separate from builder work/output and canonical source paths.
+    required: true
+outputs:
+  repository-audits:
+    description: Repository-relative pinned Observatory repository Audits model, including honest unavailable evidence.
+    value: ${{ steps.feed.outputs.repository-audits }}
+  repository-sanity:
+    description: Repository-relative pinned Observatory repository Sanity model, without authenticated human verification.
+    value: ${{ steps.feed.outputs.repository-sanity }}
+  fleet-audits:
+    description: Repository-relative singleton fleet Audits model at the same source/as-of boundary.
+    value: ${{ steps.feed.outputs.fleet-audits }}
+  fleet-sanity:
+    description: Repository-relative singleton fleet Sanity model at the same source/as-of boundary.
+    value: ${{ steps.feed.outputs.fleet-sanity }}
+  artifact-directory:
+    description: Ordinary artifact directory containing only four models and a receipt, or a bounded denial receipt.
+    value: ${{ steps.feed.outputs.artifact-directory }}
+  receipt-path:
+    description: Repository-relative successful review-feed-receipt.json or separately named denial receipt.
+    value: ${{ steps.feed.outputs.receipt-path }}
+  receipt-sha256:
+    description: SHA-256 of the retained receipt bytes, separate from caller-owned artifact transport proof.
+    value: ${{ steps.feed.outputs.receipt-sha256 }}
+runs:
+  using: composite
+  steps:
+    - name: Normalize selected typed review evidence
+      id: feed
+      shell: bash
+      env:
+        REVIEW_SOURCE_ROOT: ${{ inputs.source-root }}
+        REVIEW_PLAN: ${{ inputs.plan }}
+        REVIEW_REPOSITORY: ${{ inputs.repository }}
+        REVIEW_COMMIT: ${{ inputs.represented-commit }}
+        REVIEW_AS_OF: ${{ inputs.as-of }}
+        REVIEW_OUTPUT: ${{ inputs.output-directory }}
+      run: |
+        set -euo pipefail
+        python3 -I "${GITHUB_ACTION_PATH}/scripts/review_feed.py" \
+          --source-root "$REVIEW_SOURCE_ROOT" \
+          --plan "$REVIEW_PLAN" \
+          --repository "$REVIEW_REPOSITORY" \
+          --represented-commit "$REVIEW_COMMIT" \
+          --as-of "$REVIEW_AS_OF" \
+          --output-directory "$REVIEW_OUTPUT" \
+          --github-output "$GITHUB_OUTPUT"

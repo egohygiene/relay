@@ -256,6 +256,17 @@
       "consumer_ref": "egohygiene/relay/actions/repository-intelligence-compare-artifact@v1"
     },
     {
+      "id": "repository-intelligence-review-feed",
+      "path": "actions/repository-intelligence-review-feed",
+      "name": "Repository Intelligence Typed Review Feed",
+      "summary": "Normalize explicitly selected public typed audit and architecture review sidecars through exact owner queries and retain ordinary byte/source evidence without executing auditors or publishing.",
+      "status": "experimental",
+      "runtime": ["bash", "git", "python3"],
+      "permissions": {},
+      "side_effects": ["workspace-write"],
+      "consumer_ref": "egohygiene/relay/actions/repository-intelligence-review-feed@v1"
+    },
+    {
       "id": "repository-intelligence-static-intake",
       "path": "actions/repository-intelligence-static-intake",
       "name": "Repository Intelligence Static Intake",

@@ -1,0 +1,154 @@
+{
+  "$id": "https://egohygiene.github.io/relay/schemas/typed-review-feed-denial.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "admission": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_path": {
+          "const": "catalog/public-repositories.json"
+        },
+        "artifact_sha256": {
+          "const": "af9c7186ded0bb57b18741eaa5905314b96d6adb03736946c868e0fc4aa50b26"
+        },
+        "helper_sha256": {
+          "const": "fd3bb2099f2b9040502f19a8e582e4c4100653bd6cf2ea640cc36338dcfc4273"
+        },
+        "observed_at": {
+          "const": "2026-11-09T14:06:57Z"
+        },
+        "owner": {
+          "const": "egohygiene/hygiene"
+        },
+        "revision": {
+          "const": "49639c1845cdfd08fbd5a768261a8b3cf515f80f"
+        },
+        "schema": {
+          "const": "egohygiene.relay.public-catalog-admission/v1"
+        },
+        "schema_sha256": {
+          "const": "eeb88b6a99de987500b946bd71c987e1fb7d0bd7350f466885c11ac7603c96d8"
+        },
+        "selected_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifact_path",
+        "artifact_sha256",
+        "helper_sha256",
+        "observed_at",
+        "owner",
+        "revision",
+        "schema",
+        "schema_sha256",
+        "selected_sha256"
+      ],
+      "type": "object"
+    },
+    "contract_version": {
+      "const": "1.0.0-alpha.1"
+    },
+    "diagnostic": {
+      "enum": [
+        "INPUT",
+        "PATH",
+        "SOURCE",
+        "CLOCK",
+        "REPORT",
+        "PIN",
+        "OUTPUT",
+        "VISIBILITY"
+      ]
+    },
+    "publication": {
+      "const": "review-only"
+    },
+    "qualification": {
+      "additionalProperties": false,
+      "properties": {
+        "auditor_execution": {
+          "const": "not-performed"
+        },
+        "human_verification": {
+          "const": "unavailable-no-trusted-context"
+        },
+        "model_execution": {
+          "const": "not-performed"
+        },
+        "normalization": {
+          "const": "pinned-observatory-owner-only"
+        },
+        "publication": {
+          "const": "not-authorized"
+        },
+        "source_profile": {
+          "const": "immutable-git-sidecars"
+        }
+      },
+      "required": [
+        "normalization",
+        "auditor_execution",
+        "model_execution",
+        "human_verification",
+        "source_profile",
+        "publication"
+      ],
+      "type": "object"
+    },
+    "schema": {
+      "const": "egohygiene.relay.typed-review-feed-denial/v1"
+    },
+    "source": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+          "type": "string"
+        },
+        "commit_at": {
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+          "type": "string"
+        },
+        "repository": {
+          "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$",
+          "type": "string"
+        },
+        "represented_commit": {
+          "pattern": "^[a-f0-9]{40}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "represented_commit",
+        "commit_at",
+        "as_of"
+      ],
+      "type": "object"
+    },
+    "status": {
+      "const": "denied"
+    },
+    "visibility": {
+      "const": "public"
+    }
+  },
+  "required": [
+    "schema",
+    "contract_version",
+    "visibility",
+    "status",
+    "publication",
+    "source",
+    "admission",
+    "diagnostic",
+    "qualification"
+  ],
+  "title": "Sanitized denied typed review feed evidence",
+  "type": "object"
+}

@@ -1,0 +1,653 @@
+{
+  "$id": "https://egohygiene.github.io/relay/schemas/typed-review-feed-receipt.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "admission": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_path": {
+          "const": "catalog/public-repositories.json"
+        },
+        "artifact_sha256": {
+          "const": "af9c7186ded0bb57b18741eaa5905314b96d6adb03736946c868e0fc4aa50b26"
+        },
+        "helper_sha256": {
+          "const": "fd3bb2099f2b9040502f19a8e582e4c4100653bd6cf2ea640cc36338dcfc4273"
+        },
+        "observed_at": {
+          "const": "2026-11-09T14:06:57Z"
+        },
+        "owner": {
+          "const": "egohygiene/hygiene"
+        },
+        "revision": {
+          "const": "49639c1845cdfd08fbd5a768261a8b3cf515f80f"
+        },
+        "schema": {
+          "const": "egohygiene.relay.public-catalog-admission/v1"
+        },
+        "schema_sha256": {
+          "const": "eeb88b6a99de987500b946bd71c987e1fb7d0bd7350f466885c11ac7603c96d8"
+        },
+        "selected_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifact_path",
+        "artifact_sha256",
+        "helper_sha256",
+        "observed_at",
+        "owner",
+        "revision",
+        "schema",
+        "schema_sha256",
+        "selected_sha256"
+      ],
+      "type": "object"
+    },
+    "contract_version": {
+      "const": "1.0.0-alpha.1"
+    },
+    "implementation": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "lock_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "plan_schema_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "producer_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "receipt_schema_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "producer_sha256",
+        "contract_sha256",
+        "lock_sha256",
+        "receipt_schema_sha256",
+        "plan_schema_sha256"
+      ],
+      "type": "object"
+    },
+    "models": {
+      "additionalProperties": false,
+      "properties": {
+        "fleet-audits": {
+          "additionalProperties": false,
+          "properties": {
+            "as_of": {
+              "format": "date-time",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+              "type": "string"
+            },
+            "canonical_digest": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "contract_version": {
+              "const": "1.0.0-alpha.1"
+            },
+            "evidence_state": {
+              "enum": [
+                "supplied",
+                "unavailable"
+              ]
+            },
+            "path": {
+              "const": "fleet-audits.json"
+            },
+            "repository": {
+              "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$",
+              "type": "string"
+            },
+            "represented_commit": {
+              "pattern": "^[a-f0-9]{40}$",
+              "type": "string"
+            },
+            "schema": {
+              "const": "egohygiene.observatory.fleet-audits/v1"
+            },
+            "sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "size_bytes": {
+              "maximum": 4194304,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "size_bytes",
+            "schema",
+            "contract_version",
+            "repository",
+            "represented_commit",
+            "as_of",
+            "evidence_state",
+            "canonical_digest"
+          ],
+          "type": "object"
+        },
+        "fleet-sanity": {
+          "additionalProperties": false,
+          "properties": {
+            "as_of": {
+              "format": "date-time",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+              "type": "string"
+            },
+            "canonical_digest": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "contract_version": {
+              "const": "1.0.0-alpha.1"
+            },
+            "evidence_state": {
+              "enum": [
+                "supplied",
+                "unavailable"
+              ]
+            },
+            "path": {
+              "const": "fleet-sanity.json"
+            },
+            "repository": {
+              "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$",
+              "type": "string"
+            },
+            "represented_commit": {
+              "pattern": "^[a-f0-9]{40}$",
+              "type": "string"
+            },
+            "schema": {
+              "const": "egohygiene.observatory.fleet-sanity/v1"
+            },
+            "sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "size_bytes": {
+              "maximum": 4194304,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "size_bytes",
+            "schema",
+            "contract_version",
+            "repository",
+            "represented_commit",
+            "as_of",
+            "evidence_state",
+            "canonical_digest"
+          ],
+          "type": "object"
+        },
+        "repository-audits": {
+          "additionalProperties": false,
+          "properties": {
+            "as_of": {
+              "format": "date-time",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+              "type": "string"
+            },
+            "canonical_digest": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "contract_version": {
+              "const": "1.0.0-alpha.1"
+            },
+            "evidence_state": {
+              "enum": [
+                "supplied",
+                "unavailable"
+              ]
+            },
+            "path": {
+              "const": "repository-audits.json"
+            },
+            "repository": {
+              "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$",
+              "type": "string"
+            },
+            "represented_commit": {
+              "pattern": "^[a-f0-9]{40}$",
+              "type": "string"
+            },
+            "schema": {
+              "const": "egohygiene.observatory.repository-audits/v1"
+            },
+            "sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "size_bytes": {
+              "maximum": 4194304,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "size_bytes",
+            "schema",
+            "contract_version",
+            "repository",
+            "represented_commit",
+            "as_of",
+            "evidence_state",
+            "canonical_digest"
+          ],
+          "type": "object"
+        },
+        "repository-sanity": {
+          "additionalProperties": false,
+          "properties": {
+            "as_of": {
+              "format": "date-time",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+              "type": "string"
+            },
+            "canonical_digest": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "contract_version": {
+              "const": "1.0.0-alpha.1"
+            },
+            "evidence_state": {
+              "enum": [
+                "supplied",
+                "unavailable"
+              ]
+            },
+            "path": {
+              "const": "repository-sanity.json"
+            },
+            "repository": {
+              "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$",
+              "type": "string"
+            },
+            "represented_commit": {
+              "pattern": "^[a-f0-9]{40}$",
+              "type": "string"
+            },
+            "schema": {
+              "const": "egohygiene.observatory.repository-sanity/v1"
+            },
+            "sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "size_bytes": {
+              "maximum": 4194304,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "size_bytes",
+            "schema",
+            "contract_version",
+            "repository",
+            "represented_commit",
+            "as_of",
+            "evidence_state",
+            "canonical_digest"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "repository-audits",
+        "repository-sanity",
+        "fleet-audits",
+        "fleet-sanity"
+      ],
+      "type": "object"
+    },
+    "owners": {
+      "additionalProperties": false,
+      "properties": {
+        "aether": {
+          "additionalProperties": false,
+          "properties": {
+            "repository": {
+              "const": "egohygiene/aether"
+            },
+            "revision": {
+              "const": "74490907bf3979ac45594d97fb1bb5fa7071346d"
+            }
+          },
+          "required": [
+            "repository",
+            "revision"
+          ],
+          "type": "object"
+        },
+        "catalog": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_sha256": {
+              "const": "af9c7186ded0bb57b18741eaa5905314b96d6adb03736946c868e0fc4aa50b26"
+            },
+            "repository": {
+              "const": "egohygiene/hygiene"
+            },
+            "revision": {
+              "const": "49639c1845cdfd08fbd5a768261a8b3cf515f80f"
+            }
+          },
+          "required": [
+            "repository",
+            "revision",
+            "artifact_sha256"
+          ],
+          "type": "object"
+        },
+        "governance": {
+          "additionalProperties": false,
+          "properties": {
+            "policy_status": {
+              "const": "proposed"
+            },
+            "repository": {
+              "const": "egohygiene/hygiene"
+            },
+            "revision": {
+              "const": "d11580e9a9c5d78b9a5d21474deaa612712a0fb9"
+            }
+          },
+          "required": [
+            "repository",
+            "revision",
+            "policy_status"
+          ],
+          "type": "object"
+        },
+        "observatory": {
+          "additionalProperties": false,
+          "properties": {
+            "lock_sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "repository": {
+              "const": "egohygiene/observatory"
+            },
+            "revision": {
+              "const": "7b857de2424f90de519fbc2e24332a7c0a89991b"
+            }
+          },
+          "required": [
+            "repository",
+            "revision",
+            "lock_sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "observatory",
+        "aether",
+        "catalog",
+        "governance"
+      ],
+      "type": "object"
+    },
+    "plan": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "else": {
+            "properties": {
+              "sha256": {
+                "type": "null"
+              }
+            }
+          },
+          "if": {
+            "properties": {
+              "state": {
+                "const": "present"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "sha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "path": {
+          "maxLength": 240,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$",
+          "type": "string"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "enum": [
+            "present",
+            "missing"
+          ]
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "state"
+      ],
+      "type": "object"
+    },
+    "publication": {
+      "const": "review-only"
+    },
+    "qualification": {
+      "additionalProperties": false,
+      "properties": {
+        "auditor_execution": {
+          "const": "not-performed"
+        },
+        "human_verification": {
+          "const": "unavailable-no-trusted-context"
+        },
+        "model_execution": {
+          "const": "not-performed"
+        },
+        "normalization": {
+          "const": "pinned-observatory-owner-only"
+        },
+        "publication": {
+          "const": "not-authorized"
+        },
+        "source_profile": {
+          "const": "immutable-git-sidecars"
+        }
+      },
+      "required": [
+        "normalization",
+        "auditor_execution",
+        "model_execution",
+        "human_verification",
+        "source_profile",
+        "publication"
+      ],
+      "type": "object"
+    },
+    "reports": {
+      "items": {
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "else": {
+              "properties": {
+                "sha256": {
+                  "type": "null"
+                }
+              }
+            },
+            "if": {
+              "properties": {
+                "state": {
+                  "const": "provided"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "sha256": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "domain": {
+            "enum": [
+              "audits",
+              "sanity"
+            ]
+          },
+          "expected_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "path": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$",
+            "type": "string"
+          },
+          "sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "enum": [
+              "provided",
+              "missing"
+            ]
+          }
+        },
+        "required": [
+          "domain",
+          "path",
+          "expected_sha256",
+          "state",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "maxItems": 128,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "schema": {
+      "const": "egohygiene.relay.typed-review-feed-receipt/v1"
+    },
+    "source": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+          "type": "string"
+        },
+        "commit_at": {
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+          "type": "string"
+        },
+        "repository": {
+          "pattern": "^egohygiene/(?:\\.github|[a-z0-9][a-z0-9.-]*)$",
+          "type": "string"
+        },
+        "represented_commit": {
+          "pattern": "^[a-f0-9]{40}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "represented_commit",
+        "commit_at",
+        "as_of"
+      ],
+      "type": "object"
+    },
+    "status": {
+      "const": "normalized"
+    },
+    "visibility": {
+      "const": "public"
+    }
+  },
+  "required": [
+    "schema",
+    "contract_version",
+    "visibility",
+    "status",
+    "publication",
+    "source",
+    "admission",
+    "plan",
+    "reports",
+    "models",
+    "owners",
+    "implementation",
+    "qualification"
+  ],
+  "title": "Typed review normalization byte and source receipt",
+  "type": "object"
+}
