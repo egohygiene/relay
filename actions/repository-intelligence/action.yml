@@ -343,8 +343,8 @@ runs:
           local label="$1"
           local value="$2"
           if [[ ! "${value}" =~ ^[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$ ]] \
-            || "/${value}/" == */./* \
-            || "/${value}/" == */../*; then
+            || [[ "/${value}/" == */./* ]] \
+            || [[ "/${value}/" == */../* ]]; then
             printf '%s must use canonical, literal repository-relative path segments: %q\n' \
               "${label}" "${value}" >&2
             return 2

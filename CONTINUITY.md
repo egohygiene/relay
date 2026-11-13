@@ -134,6 +134,16 @@ privacy:
 
 # relay continuity
 
+> **Scoped backport continuation — November 13, 2026:** Flow #137 checkpoint 8
+> corrects the literal Bash path guard on frozen consumer pin
+> `981ddf4367c67fcd625e54321d95bab027f6c0f2`. The original pinned metadata and
+> historical checkpoint below are preserved; they are not a current adoption
+> or qualification claim for this candidate. See
+> [the scoped handoff and actual validation](docs/work/137/08-relay-path-guard.md).
+> The guard-only candidate remains unmerged; consumer repinning and hosted
+> acceptance are separate. No source collection or publication is authorized
+> by this historical record.
+
 ## Purpose and precedence
 
 User/runtime and repository instructions, live evidence and canonical sources outrank this checkpoint. It grants no release, deployment or human-decision authority.
