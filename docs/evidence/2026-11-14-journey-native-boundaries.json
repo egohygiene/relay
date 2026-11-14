@@ -1,0 +1,219 @@
+{
+  "schema": "relay.journey-native-boundary-qualification/v1alpha1",
+  "issue": "egohygiene/relay#147",
+  "consumer_acceptance": [
+    "egohygiene/empathy#105",
+    "egohygiene/empathy#98"
+  ],
+  "base_revision": "12d3a0823c8c8f885dea4acf482160fd726325e2",
+  "functional_revision": "96d0d59787325ad970a838008f24c76b48d7a4da",
+  "evaluated_at": "2026-11-14T00:35:46Z",
+  "actual_consumer_source": {
+    "revision": "e50f35ff32e0534a57315b555a5d67576c435844",
+    "observed_at": "2026-11-14T00:03:18Z",
+    "maximum_commits": 256,
+    "current_composed_run": 43531533608,
+    "current_standalone_run": 43531534118,
+    "artifacts": [
+      {
+        "artifact_id": "14087412910",
+        "archive_sha256": "f7a480523c9f82a3c1649a190ad5293f8c9b49c2c3d235758b4262cb2d8ed76c",
+        "closed_failure": {
+          "code": "SOURCE_BUILD_DENIED",
+          "publication": "denied",
+          "schema": "egohygiene.relay.source-build-failure/v1",
+          "source": "journey",
+          "stage": "collection-validation-normalization",
+          "status": "denied"
+        }
+      },
+      {
+        "artifact_id": "14087816991",
+        "archive_sha256": "01f349dacdfe52b32de447b8a66f2e92a15458a3218edc843b9c9d084bf441d5",
+        "closed_failure": {
+          "code": "SOURCE_BUILD_DENIED",
+          "publication": "denied",
+          "schema": "egohygiene.relay.source-build-failure/v1",
+          "source": "journey",
+          "stage": "collection-validation-normalization",
+          "status": "denied"
+        }
+      }
+    ]
+  },
+  "before": {
+    "inventory": {
+      "record_count": 256,
+      "scope": {
+        "shallow": false,
+        "truncated": true,
+        "time_filtered": false,
+        "withheld_timestamps": false
+      },
+      "object_count": 256
+    },
+    "fixed_code": "RUNTIME",
+    "native_observation": {
+      "function": "source_validate",
+      "line": 182,
+      "fixed_code": "RUNTIME",
+      "captured_objects": 256,
+      "shallow_boundary_count": 2,
+      "native_status": "incomplete",
+      "native_summary": {
+        "diagnostics": 0,
+        "blocking_diagnostics": 0,
+        "commits_inspected": 255,
+        "adrs_inspected": 0,
+        "roadmap_steps_inspected": 0
+      },
+      "repository_equal": true,
+      "source_revision_equal": true,
+      "catalog_equal": true,
+      "contracts_equal": true,
+      "native_diagnostic_codes": []
+    },
+    "cause": "The private shallow marker on a truncated merge suppresses every parent, including a selected branch. The unchanged native inspected-count guard correctly denies 255 inspected objects against 256 selected original objects."
+  },
+  "repair": {
+    "selection_unchanged": true,
+    "raw_original_objects_unchanged": true,
+    "supplemental_roots": "Original selected branch heads authenticated through exact original parent headers and Git object hashes; no synthetic source root.",
+    "per_pass": "Exact private Git reachable set, report schema, repository, real per-pass represented commit, catalog, contracts and inspected count all match.",
+    "aggregate": "Disjoint exact SHA sets cover all original objects once; summed native counts equal the unique original selection.",
+    "budget": {
+      "logical_commits_maximum": 256,
+      "original_object_bytes_maximum": 2097152,
+      "native_passes_shared_deadline_seconds": 60,
+      "native_invocations_maximum": "At most one per selected original object; actual e50 uses two.",
+      "new_native_protocol_or_pin": false
+    },
+    "native_states": "Any invalid report stays invalid. Incomplete uncollected canonical ADR/roadmap domains remain incomplete; no incomplete selected-commit verification is admitted.",
+    "public_envelope": "Unchanged single represented source, original clock, original selected object hashes, events, coverage and closed receipt contract; private inspection details are not exported."
+  },
+  "checks": {
+    "focused_regressions": {
+      "command": "python -m unittest discover -s tests -p test_repository_journey_validation.py -v",
+      "outcome": "passed",
+      "groups": 12,
+      "controls": [
+        "Actual Git shallow merge hides a selected branch before repair; disjoint native inspection covers it after repair.",
+        "Ordinary linear and single-boundary histories.",
+        "Missing or tampered private corpus objects; unrelated or missing roots; selection above caller cap.",
+        "Wrong per-pass represented source, repository, catalog, contracts, report schema and native counts.",
+        "Native invalid remains invalid; public output retains all records and honest truncation without private inspection fields.",
+        "One shared deadline, remaining budget on the supplemental pass and exhausted-budget denial."
+      ]
+    },
+    "syntax_and_whitespace": {
+      "outcome": "passed",
+      "commands": [
+        "python -m py_compile actions/repository-intelligence/scripts/collect_repository_journey.py tests/test_repository_journey_validation.py",
+        "git diff --check"
+      ]
+    },
+    "action_catalog": {
+      "command": "python3 scripts/validate_actions.py",
+      "outcome": "failed-pre-existing",
+      "findings": 10,
+      "exact_base": "12d3a0823c8c8f885dea4acf482160fd726325e2",
+      "baseline_and_candidate_normalized_diagnostics_byte_identical": true,
+      "scope": "Unchanged action SPDX and advertised/missing README entries. No catalog cleanup is included."
+    }
+  },
+  "actual_native_after": {
+    "mode": "actual immutable-source pinned native replay, not provider or publication proof",
+    "functional_revision": "96d0d59787325ad970a838008f24c76b48d7a4da",
+    "source_clean": true,
+    "source_revision": "e50f35ff32e0534a57315b555a5d67576c435844",
+    "original_observed_at": "2026-11-14T00:03:18Z",
+    "started_at": "2026-11-14T00:30:42.670738+00:00",
+    "maximum_commits": 256,
+    "elapsed_seconds": 108.648,
+    "outcome": "passed",
+    "selected_original_objects": 256,
+    "unique_native_verified_objects": 256,
+    "total_native_inspected_objects": 256,
+    "all_original_raw_hashes_preserved": true,
+    "result_status": "partial",
+    "scope": {
+      "shallow": false,
+      "truncated": true,
+      "time_filtered": false,
+      "withheld_timestamps": false,
+      "provider_events": "uncollected",
+      "parent_topology": "unavailable",
+      "declared_reference_resolution": "unavailable"
+    },
+    "validation": {
+      "hygiene": "valid",
+      "coverage": "valid",
+      "observatory": "normalized",
+      "egolint": "incomplete",
+      "diagnostics_truncated": false
+    },
+    "projection_commit_events": 256,
+    "review_envelope_schema": "passed",
+    "existing_production_receipt_contract": "passed",
+    "runtime_receipt": {
+      "lock_sha256": "44e9b34d5c2531c5c8c4cae83111146f4e812a0188bb665288e69af4bfdfdb6c",
+      "egolint_sha256": "0a5a6ddc760f7f7a741a2f3d2087d1d6c245b38bebabd578ac029ca8f2f372e3",
+      "collector_sha256": "a4be375f929abdca0362df3dc9b4abb67f7e80825195ae10d8cdaf6f574c222f"
+    },
+    "review_envelope_sha256": "bec3701ffd07a2d0b1adbcef7ff5564282a8e0c9cec524884844cf6ad26ce460",
+    "production_receipt_sha256": "ccc2b3f0610e4da31de202ca4b936648254b02d2e74b03714ce3e35eba2156f4",
+    "finished_at": "2026-11-14T00:32:31.385268+00:00"
+  },
+  "native_inspections": [
+    {
+      "root": "e50f35ff32e0534a57315b555a5d67576c435844",
+      "status": "incomplete",
+      "commits_inspected": 255
+    },
+    {
+      "root": "c154c7d8bf1b46c278725925d2f10926f0a1898b",
+      "status": "incomplete",
+      "commits_inspected": 1
+    }
+  ],
+  "checkout_reproducibility": {
+    "functional_revision": "96d0d59787325ad970a838008f24c76b48d7a4da",
+    "source_revision": "e50f35ff32e0534a57315b555a5d67576c435844",
+    "observed_at": "2026-11-14T00:03:18Z",
+    "source_clean": true,
+    "mode": "differently named exact-source native Journey replay",
+    "started_at": "2026-11-14T00:33:56.098842+00:00",
+    "native_validation_seconds": 0.701,
+    "native_inspections": [
+      {
+        "root": "e50f35ff32e0534a57315b555a5d67576c435844",
+        "status": "incomplete",
+        "commits_inspected": 255
+      },
+      {
+        "root": "c154c7d8bf1b46c278725925d2f10926f0a1898b",
+        "status": "incomplete",
+        "commits_inspected": 1
+      }
+    ],
+    "complete_collection_seconds": 2.834,
+    "outcome": "passed",
+    "complete_review_envelope_byte_identical": true,
+    "production_receipt_byte_identical": true,
+    "review_envelope_sha256": "bec3701ffd07a2d0b1adbcef7ff5564282a8e0c9cec524884844cf6ad26ce460",
+    "production_receipt_sha256": "ccc2b3f0610e4da31de202ca4b936648254b02d2e74b03714ce3e35eba2156f4",
+    "finished_at": "2026-11-14T00:33:58.978175+00:00"
+  },
+  "source_files": {
+    "actions/repository-intelligence/scripts/collect_repository_journey.py": "a4be375f929abdca0362df3dc9b4abb67f7e80825195ae10d8cdaf6f574c222f",
+    "tests/test_repository_journey_validation.py": "590dc2768796daafb90d69641d286ca569bf28c528de835cbcbeec01e0bcdfcf",
+    "docs/repository-journey-collector.md": "647fa507f36a94edce749b35d4164ceff7a01aaee6432e111a0adf08889ede72"
+  },
+  "limits": [
+    "Fresh isolated copy of the owner-prepared runtime is reauthenticated against every locked owner file, requirement version and executable digest; no native rebuild or pin change.",
+    "Actual local immutable-source native replay; no new provider publication, release, deployment or fleet acceptance.",
+    "The first successful proof used broad Python tracing and includes its normalization overhead in total elapsed time; the narrow-trace equal-output replay measures native validation separately. Original clocks are retained.",
+    "Action catalog has ten identical pre-existing baseline findings. Broad CI and whole-suite execution remain separate.",
+    "The independent Hygiene dependency relationship/profile repair and compatible Empathy adoption/full build remain required; Journey and Dependencies stay enabled."
+  ]
+}

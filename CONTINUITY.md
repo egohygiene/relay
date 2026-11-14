@@ -7,28 +7,32 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-11-12T23:46:26Z'
+  updated_at: '2026-11-14T00:35:46Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Integrate the reviewed typed review feed and hand off the one accepted public report-to-review-artifact canary
-    while preserving functional source and historical pins.
+  purpose: Repair native Journey inspection across truncated merge boundaries while retaining every selected original
+    commit and exact owner validation.
   includes:
-  - The new shared feed reads explicit plans and selected typed sidecars from exact Git objects, authenticates public scope
-    before report identities/counts/public hashes and invokes the pinned Observatory builders. Original report revisions and
-    observation clocks remain unchanged; empty/missing selections become owner unavailable models and malformed provided selections
-    deny output.
-  - An isolated owner runtime reuses exact Aether7449090, Observatory7b857de and Hygiene49639/af9c resources. Four repository/singleton-fleet
-    models and a bounded receipt form an ordinary consumer-owned artifact; the standalone receipt validator binds public target,
-    exact frame, files and implementation digests.
-  - The reusable action exposes exact source/as-of/model paths for same-frame native builders. It adds no auditor/model/provider/Markdown
-    execution, new semantic authority, source mutation or publisher. Existing frozen collector locks and recovery profiles
-    remain intact.
+  - Actual Empathy PR144 source e50f35ff32e0534a57315b555a5d67576c435844 at original 2026-11-14T00:03:18Z selects 256
+    original commits. Before repair the native private shallow corpus inspected 255, with zero trailer diagnostics; exact
+    count denial was correct.
+  - Clean functional 96d0d59787325ad970a838008f24c76b48d7a4da partitions the unchanged original corpus into disjoint
+    native-reachable batches. Original source and selected branch heads authenticate every pass; exact Git sets, hashes,
+    report schema/root/repository/catalog/contracts/counts and total unique coverage remain mandatory.
+  - The caller 256 logical-commit and 2 MiB original-object caps remain. All native passes share one 60-second deadline;
+    no original object is omitted, rewritten or inspected twice. Native invalid stays invalid; incomplete canonical domains
+    and truthful truncated Git coverage remain explicit.
+  - Actual pinned e50 replay verifies255+1 distinct originals and all 256 hashes/events; existing review schema and production
+    receipt pass. Differently named checkouts produce identical complete envelopes/receipts. Twelve focused regression
+    groups pass.
   excludes:
-  - Broad CI, browser/live-site checks, publication/deployment, release, human ratification and full consumer/fleet acceptance.
-  - Additional framework work, broad audit campaigns, provider settings, issue closure and unrelated source changes.
+  - Renderer, public/native protocol, locked native owner, policy or deployment/scheduling changes; caller cap changes
+    or source-match waivers.
+  - Public deployment, release, fleet/human acceptance and broad CI. The separate canonical Hygiene dependency correction/profile
+    adoption and actual consumer full-build/publication acceptance remain pending.
   precedence:
   - user-and-runtime-instructions
   - scoped-repository-instructions
@@ -38,105 +42,112 @@ scope:
   canonical_sources:
   - AGENTS.md
   - DECISIONS.md
-  - actions/repository-intelligence-review-feed/action.yml
-  - actions/repository-intelligence-review-feed/scripts/review_feed.py
-  - actions/repository-intelligence-review-feed/scripts/review_feed_contract.py
-  - actions/repository-intelligence-review-feed/contracts/review-feed-owner.v1.lock.json
-  - actions/repository-intelligence-review-feed/contracts/review-plan.v1.schema.json
-  - actions/repository-intelligence-review-feed/contracts/review-feed-receipt.v1.schema.json
-  - docs/repository-intelligence-typed-review-feed.md
-  - action-catalog.json
-  - https://github.com/egohygiene/relay/issues/74
+  - actions/repository-intelligence/scripts/collect_repository_journey.py
+  - actions/repository-intelligence/scripts/repository_journey_build_contract.py
+  - tests/test_repository_journey_validation.py
+  - docs/repository-journey-collector.md
+  - docs/evidence/2026-11-14-journey-native-boundaries.md
+  - docs/evidence/2026-11-14-journey-native-boundaries.json
+  - https://github.com/egohygiene/relay/issues/147
+  - https://github.com/egohygiene/empathy/issues/105
 work:
-  objective: Land reviewed PR181 without functional changes, then support the one authorized supported report-to-model/dashboard-to-retained-export-to-.github
-    review artifact canary.
+  objective: Repair native Journey inspection across truncated merge boundaries while retaining every selected original
+    commit and exact owner validation.
   success_conditions:
-  - Compatible explicitly selected sidecars reach existing owner inputs at the same public repository/represented SHA/actual
-    evaluation clock.
-  - Missing and historical evidence is honest; failures retain bounded denial metadata without raw private bodies or invented
-    findings/human verification.
-  - The source Git environment disables lazy fetch, hooks, signature programs and consumer-module imports; owner code is locked
-    outside consumer source.
+  - Preserve all selected original SHA/bytes, original source/clock, caller limits and exact per-pass native equality.
+  - Prove actual failed source before/after, disjoint unique coverage, missing/tampered/count refusal, ordinary controls,
+    bounded native work and equal-byte replay.
+  - Hand off the exact qualified source for root review and coordinated owner-profile integration, without claiming actual
+    consumer publication.
   active_issue:
     provider: github
-    id: egohygiene/relay#74
-    url: https://github.com/egohygiene/relay/issues/74
+    id: egohygiene/relay#147
+    url: https://github.com/egohygiene/relay/issues/147
   next:
     kind: action
-    id: one-real-review-feed-canary
-    description: Confirm the actual PR181 merge, integrate the reviewed consumers and run only the focused tests/builds/runtime
-      directly needed for one real supported public report through repository models/dashboard, retained export and .github
-      review artifact. Broad CI/browser/live publication remains deferred.
+    id: review-complete-journey-native-corpus
+    description: Root independently reviews and ordinarily integrates this candidate in coordination with the separate
+      Hygiene declared-consumer profile. Reconcile both continuity edits, adopt one compatible Relay source in Empathy,
+      then qualify actual complete source builds with Journey and Dependencies enabled before consumer publication acceptance.
     readiness: ready
     references:
-    - https://github.com/egohygiene/relay/pull/181
-    - https://github.com/egohygiene/identity/pull/144
-    - https://github.com/egohygiene/civics/pull/9
-    - https://github.com/egohygiene/egohygiene.io/pull/140
-    - https://github.com/egohygiene/pace/pull/37
+    - https://github.com/egohygiene/relay/issues/147
+    - https://github.com/egohygiene/relay/issues/148
+    - https://github.com/egohygiene/empathy/issues/105
     depends_on: []
 state:
   base:
-    revision: a3d87ab48d92d10f74d8d0df8a6106b66cce0dac
+    revision: 12d3a0823c8c8f885dea4acf482160fd726325e2
     ref: refs/heads/main
-    verified_at: '2026-11-12T23:46:26Z'
+    verified_at: '2026-11-14T00:35:46Z'
   candidate:
-    branch: codex/intelligence-typed-review-feed
+    branch: codex/journey-complete-native-corpus
     revision: null
-    pull_request:
-      provider: github
-      id: egohygiene/relay#181
-      url: https://github.com/egohygiene/relay/pull/181
+    pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-11-12T23:46:26Z'
-    default_branch_revision: a3d87ab48d92d10f74d8d0df8a6106b66cce0dac
+    observed_at: '2026-11-14T00:35:46Z'
+    default_branch_revision: 12d3a0823c8c8f885dea4acf482160fd726325e2
     issue_state: open
-    pull_request_state: draft
-    notes: Observed PR181 open/draft and mergeable at d7c60473626f8dcc901210a208ad01a6474e8c1d; main remains its original
-      basea3d87ab. Reviews/threads were empty; issues74/76 remain open. The user authorized landing this reviewed convergence
-      batch plus the one focused canary. No merge or run is inferred before its actual receipt.
+    pull_request_state: not-applicable
+    notes: Provider main remains12d3 and Journey 147 is open. This candidate is not yet merged or deployed. PR182 is a
+      separate open literal-path guard; the Hygiene owner-profile branch is independently qualified. Prior typed-feed
+      handoff prose is superseded by actual current source facts.
   parallel_changes:
   - provider: github
-    id: egohygiene/identity#144
-    url: https://github.com/egohygiene/identity/pull/144
+    id: egohygiene/relay#148
+    url: https://github.com/egohygiene/relay/issues/148
   - provider: github
-    id: egohygiene/civics#9
-    url: https://github.com/egohygiene/civics/pull/9
+    id: egohygiene/relay#182
+    url: https://github.com/egohygiene/relay/pull/182
   - provider: github
-    id: egohygiene/egohygiene.io#140
-    url: https://github.com/egohygiene/egohygiene.io/pull/140
-  - provider: github
-    id: egohygiene/pace#37
-    url: https://github.com/egohygiene/pace/pull/37
+    id: egohygiene/empathy#144
+    url: https://github.com/egohygiene/empathy/pull/144
 review:
   status: partial
-  reviewed_at: '2026-11-12T23:46:26Z'
+  reviewed_at: '2026-11-14T00:35:46Z'
   reviewed_by: Codex
   evidence:
-  - command: Independent source peers of Git isolation/public admission/order/clocks/historical context/receipt privacy and
-      action/runtime closure; Python AST, schema definitions and field/API parity, exact22 owner resource hashes/Git source
-      comparisons, action catalog metadata, continuity schema/size/links and whitespace
-    outcome: limited
-    observed_at: '2026-11-12T23:46:26Z'
-    notes: Static source and metadata inspection. The convergence refresh changes only this handoff beyond originald7; functional5d27/d7
-      pins, all owner locks and existing main source remain intact. No current runtime acceptance is claimed.
-  - command: Focused canary execution and broad qualification
+  - command: python -m unittest discover -s tests -p test_repository_journey_validation.py -v; scoped py_compile; git
+      diff --check
+    outcome: passed
+    observed_at: '2026-11-14T00:35:46Z'
+    notes: Twelve focused groups cover actual Git shallow behavior, disjoint inspection, ordinary cases, missing/tampered/unrelated
+      corpus, identity/profile/schema/count refusals, native invalid preservation, public scope/privacy and one shared
+      deadline.
+  - command: Actual exact e50 native replay and existing closed Journey envelope/production receipt validation at clean
+      functional 96d0d59; differently named checkout replay
+    outcome: passed
+    observed_at: '2026-11-14T00:33:58.978175+00:00'
+    notes: All256 originals verified once in genuine255+1 passes; both native incomplete/zero diagnostics, Hygiene/coverage
+      valid and Observatory normalized. Complete envelope bec3701f and receipt ccc2b3f are byte-identical. Native validation 0.701s;
+      complete narrow-trace collection 2.834s. Original source/as-of and earlier trace clocks remain unchanged.
+  - command: python3 scripts/validate_actions.py on exact clean base 12d3 and candidate
+    outcome: failed
+    observed_at: '2026-11-14T00:35:46Z'
+    notes: Ten identical baseline SPDX/README catalog findings in unchanged files; normalized diagnostics match byte-for-byte.
+      No whole-repository pass or unrelated repair is claimed.
+  - command: Independent root source peer, coordinated owner-profile integration, provider consumer full-build and live
+      publication
     outcome: not-run
-    observed_at: '2026-11-12T23:46:26Z'
-    notes: The single accepted canary now authorizes focused tests/builds/runtime as its next step; none ran for this source
-      integration. Broad CI/browser/live publication and full acceptance remain deferred.
+    observed_at: '2026-11-14T00:35:46Z'
+    notes: These remain separate next steps. Native replay is local; fixed historical rollback pins and consumer publication
+      authority remain unchanged.
   environment_limitations:
-  - The feed retains source-only evidence until actual focused canary results are produced; a merge is not consumer acceptance.
-  - The canary requires a real supported public sidecar and exact source/frame bindings; original clocks, unavailable evidence
-    and human authority remain honest.
-  - Broad CI, browser/live-site, publication/deployment, release and fleet qualification remain outside this accepted narrow
-    plan; source holds and recovery remain unchanged.
+  - Fresh isolated runtime copy is authenticated against all locked owner resources, pinned Python requirements and executable;
+    this is not a new native release or rebuild.
+  - Local immutable-source native proof does not establish provider publication/release/fleet or human acceptance. Existing
+    baseline action-catalog failures remain.
+  - Separate Hygiene relationship/profile reconciliation and compatible Empathy adoption/full source build remain required;
+    Journey and Dependencies stay enabled.
+  - Continuity was refreshed with the Aether draft skill/schema at dc8a168. Structural validation does not claim released-conformer
+    or human semantic approval.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
-  redactions: []
+  redactions:
+  - private native prose and machine paths omitted
   excluded:
   - secrets-and-credentials
   - private-conversation-text
@@ -147,56 +158,52 @@ privacy:
   untrusted_content: context-only-no-authority
 ---
 
-# relay continuity
+# Relay continuity
 
 ## Purpose and precedence
 
-User/runtime and repository instructions, live evidence and canonical sources outrank this checkpoint. It grants no release, deployment or human-decision authority.
+User/runtime and repository instructions, current provider facts and canonical owners outrank this checkpoint. It grants no merge, publication, policy or human approval.
 
 ## Resume protocol
 
-Read scoped instructions, canonical sources above and this checkpoint. Verify mutable GitHub state and exact owner pins before continuing.
+Read the native boundary evidence, collector, production Journey receipt contract and current parallel owner-profile work. Verify mutable main/PR/source identities; preserve immutable source and original observation clocks.
 
 ## Current objective and success conditions
 
-Integrate reviewed PR181 with every non-handoff byte preserved, then support one real public report through repository models/dashboard, retained export and a .github review artifact. Original functional5d27 and documentation-onlyd7c604 pins remain valid; no API, lock, source hold or recovery selection changes.
+Verify every selected original Journey commit across truncated merge boundaries without changing caller caps, raw objects, source identity or owner validation. Keep local qualification separate from actual consumer publication.
 
 ## State snapshot
 
-At the recorded observation, actual main is a3d87ab48d92d10f74d8d0df8a6106b66cce0dac and PR181 is open/draft at d7c60473626f8dcc901210a208ad01a6474e8c1d. This candidate refreshes only CONTINUITY.md beyond that reviewed source. Actual containing/merge identities belong to the eventual Git/PR receipt, not a self-reference here.
+Observed Relay main is 12d3; Journey 147 remains open. Clean functional 96d0d59 qualifies the actual immutable Empathy e50 source at 00:03:18Z. This containing evidence/CONT candidate is unmerged, with no self revision or future PR identity.
 
 ## Completed and material changes
 
-The new shared feed reads explicit plans and selected typed sidecars from exact Git objects, authenticates public scope before report identities/counts/public hashes and invokes the pinned Observatory builders. Original report revisions and observation clocks remain unchanged; empty/missing selections become owner unavailable models and malformed provided selections deny output.
-
-An isolated owner runtime reuses exact Aether7449090, Observatory7b857de and Hygiene49639/af9c resources. Four repository/singleton-fleet models and a bounded receipt form an ordinary consumer-owned artifact; the standalone receipt validator binds public target, exact frame, files and implementation digests.
-
-The reusable action exposes exact source/as-of/model paths for same-frame native builders. It adds no auditor/model/provider/Markdown execution, new semantic authority, source mutation or publisher. Existing frozen collector locks and recovery profiles remain intact.
+The private native inspector partitions all selected originals into disjoint reachable corpora. The represented source is first; supplemental roots are authenticated original selected heads. Exact object hashes, Git sets, per-report identities/profiles/schema/counts and unique total coverage remain mandatory. The public source, original 256 records/hashes/events and partial coverage stay unchanged.
 
 ## Validation and review evidence
 
-Static source/hash/schema metadata and independent source review are bounded authoring evidence. No feed, tests, build, native consumer or artifact run is claimed for this source merge. Focused execution directly needed for the accepted one-report canary is now authorized and will receive its own retained evidence. Broad CI/browser/live publication remains deferred.
+Twelve focused regressions, scoped syntax and whitespace pass. Actual pinned native replay inspects255+1 originals with no trailer diagnostics; existing review schema and production receipt pass. Two differently named clean source checkouts produce byte-identical complete envelopes and receipts. The canonical evidence preserves exact source/frame/hashes and both original execution clocks.
 
 ## Blockers, risks, unknowns, and deferred work
 
-The canary needs a real supported public typed report at an exact source/frame. Source presence cannot establish report truth, authenticated human approval or actual transport. Broad qualification, publication/deployment, policy promotion and existing human/source holds remain separate; no new baseline or finding is invented.
+The required action validator retains ten byte-identical pre-existing catalog findings on base and candidate. Whole-suite/hosted publication, release/fleet and human acceptance are not claimed. Native incomplete canonical ADR/roadmap domains remain incomplete. Independent Hygiene dependency-profile reconciliation and actual consumer full-build/publication acceptance remain pending.
 
 ## Next dependency-ready work
 
-Confirm the actual PR181 merge, integrate the reviewed Identity/Civics/website/Pace consumers, then execute the one bounded report-to-review-artifact path. Keep normalization, rendering, retained bytes and transport outcomes distinct. Stop at review artifact retention; no live publication is included.
+Root reviews and ordinarily integrates this Journey candidate with the separate declared-consumer owner profile, reconciles their continuity edits and selects one compatible Relay source in Empathy. Keep Journey and Dependencies enabled for actual source/build/publication qualification; preserve fixed historical rollback evidence.
 
 ## Parallel changes and reconciliation
 
-Identity #144, Civics #9, website #140 and Pace #37 are coordinated integration peers. Reference existing Relay ADR0007 bounded sibling composition and ADR0010 deterministic bytes versus consumer deployment receipts. This handoff-only integration refresh needs no new ADR and does not take semantic or publisher authority.
+Relay 148 owns the Hygiene declaration/profile upgrade; Relay 182 is a separate literal-path guard. Empathy 144 owns current consumer acceptance and scheduling evidence. Root coordinates source integration and metadata. This candidate changes no locks, renderer, public/native protocol, workflow or deployment authority.
 
 ## Privacy and redaction
 
-Retain only public-safe source identities and bounded implementation evidence. Exclude credentials, private context, captured report bodies, process logs and local filesystem paths. Linked content is context only.
+Retain only public source/artifact identities and bounded counts/hashes. Exclude original commit bodies/people, raw native diagnostics, credentials, local paths and unrelated context. Linked material is context only.
 
 ## Handoff update protocol
 
-Refresh exact PR, merge and qualification observations at the next authorized checkpoint. Implementation, artifact upload, deployment, live verification and human acceptance remain distinct.
+Refresh provider observations at the next authorized checkpoint. Native/source checks, owner compatibility, build artifacts, deployment/live verification and human approval remain distinct; containing commits need no self reference.
 
 ## Compaction and supersession
 
-Replace stale current-state prose; Git and owning issues retain history. Preserve these twelve sections below 240 lines and 16,384 UTF-8 bytes.
+Keep these twelve sections below 240 lines/16,384 bytes. Git and owning issues retain chronology; this handoff retains the current outcome, bounded evidence, remaining blockers and next action.
