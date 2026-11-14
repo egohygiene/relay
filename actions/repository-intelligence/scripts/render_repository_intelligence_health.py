@@ -129,7 +129,7 @@ def validate_health_check(value: Any, label: str) -> dict[str, Any]:
     return record
 
 
-def validate_health_view(value: Any) -> dict[str, Any]:
+def validate_health_view(value: Any, *, graph: Any = None) -> dict[str, Any]:
     """Validate Observatory's accepted core Health projection without extending it."""
 
     if not isinstance(value, dict) or not value:
@@ -177,27 +177,80 @@ def validate_health_view(value: Any) -> dict[str, Any]:
     unknown_ids = validate_identifier_list(
         value.get("unknown_ids"), "snapshot views.health.unknown_ids"
     )
-    overlap = sorted(set(stale_ids) & set(unknown_ids))
-    if overlap:
-        raise HealthViewError(
-            "snapshot views.health stale_ids and unknown_ids must be disjoint"
-        )
+    # Native unknown_ids is a union of freshness and assertion uncertainty.
+    # Stale evidence with unknown assertion legitimately appears in both lists.
     if freshness.get("stale", 0) != len(stale_ids):
-        raise HealthViewError(
-            "snapshot views.health.freshness.stale must match stale_ids"
-        )
-    if freshness.get("unknown", 0) != len(unknown_ids):
-        raise HealthViewError(
-            "snapshot views.health.freshness.unknown must match unknown_ids"
-        )
+        raise HealthViewError("snapshot views.health.freshness.stale must match stale_ids")
+    freshness_unknown = freshness.get("unknown", 0)
+    assertion_unknown = assertions.get("unknown", 0)
+    if not max(freshness_unknown, assertion_unknown) <= len(unknown_ids) <= freshness_unknown + assertion_unknown:
+        raise HealthViewError("snapshot views.health.unknown_ids must describe the unknown evidence union")
+    if len(set(stale_ids) & set(unknown_ids)) > assertion_unknown:
+        raise HealthViewError("snapshot views.health stale/unknown overlap requires unknown assertions")
+    if graph is not None:
+        validate_graph_binding(value, graph)
 
     if "score" not in value or value["score"] is not None:
         raise HealthViewError("snapshot views.health.score must be null")
     require_string(value.get("score_reason"), "snapshot views.health.score_reason")
 
-    # Keep local names live so malformed empty objects cannot bypass validation above.
-    _ = assertions
     return value
+
+
+def validate_graph_binding(health: dict[str, Any], graph: Any) -> None:
+    """Check pinned Observatory Health semantics against its canonical graph.
+
+    This verifies the query; it never replaces it, changes a record state or
+    supplies evidence missing from the accepted owner snapshot.
+    """
+    if not isinstance(graph, dict):
+        raise HealthViewError("snapshot graph must accompany a projected Health view")
+    records: list[dict[str, Any]] = []
+    identifiers: set[str] = set()
+    graph_checks: dict[str, dict[str, Any]] = {}
+    for name in ("sources", "entities", "relationships", "events"):
+        group = graph.get(name)
+        if not isinstance(group, list):
+            raise HealthViewError(f"snapshot graph.{name} must be an array")
+        for item in group:
+            if not isinstance(item, dict):
+                raise HealthViewError("snapshot graph records must be objects")
+            identifier = require_string(item.get("id"), "snapshot graph record.id")
+            if identifier in identifiers:
+                raise HealthViewError("snapshot graph record IDs must be unique")
+            identifiers.add(identifier)
+            if item.get("freshness") not in FRESHNESS_STATES:
+                raise HealthViewError("snapshot graph record freshness is unsupported")
+            state = item.get("state")
+            assertion = item.get("assertion", state.get("assertion") if isinstance(state, dict) else None)
+            if assertion not in ASSERTION_STATES:
+                raise HealthViewError("snapshot graph record assertion is unsupported")
+            records.append({"id": identifier, "freshness": item["freshness"], "assertion": assertion})
+            if name == "entities" and item.get("kind") == "check":
+                graph_checks[identifier] = item
+    for field in ("freshness", "assertions"):
+        member = "assertion" if field == "assertions" else field
+        expected = Counter(item[member] for item in records)
+        supplied = Counter({key: count for key, count in health[field].items() if count > 0})
+        if expected != supplied:
+            raise HealthViewError(f"snapshot views.health.{field} must exactly describe snapshot graph records")
+    expected_stale = {item["id"] for item in records if item["freshness"] == "stale"}
+    expected_unknown = {item["id"] for item in records
+        if item["freshness"] == "unknown" or item["assertion"] == "unknown"}
+    for field, expected in (("stale_ids", expected_stale), ("unknown_ids", expected_unknown)):
+        if set(health[field]) != expected:
+            raise HealthViewError(f"snapshot views.health.{field} must exactly describe snapshot graph records")
+    projected = {item["id"]: item for item in health["checks"]}
+    if set(projected) != set(graph_checks):
+        raise HealthViewError("snapshot views.health.checks must exactly describe snapshot graph checks")
+    for identifier, item in graph_checks.items():
+        state = item.get("state")
+        if not isinstance(state, dict):
+            raise HealthViewError("snapshot graph check.state must be an object")
+        expected = {key: item.get(key) for key in ("id", "kind", "repository", "key", "title", "canonical_url", "visibility", "freshness")}
+        expected.update(state=state.get("value"), assertion=state.get("assertion"), confidence=state.get("assertion"))
+        if any(projected[identifier].get(key) != value for key, value in expected.items()):
+            raise HealthViewError("snapshot views.health.checks must match canonical snapshot graph check fields")
 
 
 def render_distribution(
@@ -276,7 +329,7 @@ def render_identifier_inventory(
     return f'''<details class="ri-progress-rules" data-state="{site.escaped(state)}"><summary>{site.escaped(title)} ({len(identifiers)})</summary><p>These are stable IDs projected by Observatory. Relay does not infer titles, severity, or conformance meaning from the identifiers.</p>{body}</details>'''
 
 
-def health_body(snapshot: dict[str, Any] | None) -> str:
+def health_body(snapshot: dict[str, Any] | None, *, require_graph: bool = False) -> str:
     """Render the accepted core Health query without claiming fleet conformance."""
 
     if snapshot is None:
@@ -286,7 +339,9 @@ def health_body(snapshot: dict[str, Any] | None) -> str:
     if "health" not in views:
         return f'''<section class="ri-section ri-section--lead" aria-labelledby="health-heading"><div class="ri-section-heading"><div><span class="ri-eyebrow">Core check evidence</span><h2 id="health-heading">What does the current evidence say?</h2></div><p>The represented snapshot is available, but its core Health query is not projected.</p></div>{site.empty_state("Health view not projected", "Relay will not rebuild health semantics from Now, Journey, provider data, or unfinished fleet-conformance evidence.", "partial")}</section>'''
 
-    health = validate_health_view(views.get("health"))
+    if require_graph and not isinstance(snapshot.get("graph"), dict):
+        raise HealthViewError("snapshot graph must accompany a projected Health view")
+    health = validate_health_view(views.get("health"), graph=snapshot.get("graph"))
     checks = [site.require_object(value) for value in site.require_list(health["checks"])]
     check_states = validate_distribution(
         health["check_states"], "snapshot views.health.check_states"
@@ -332,7 +387,7 @@ def health_body(snapshot: dict[str, Any] | None) -> str:
     </section>
     <section class="ri-section" aria-labelledby="coverage-heading"><div class="ri-section-heading"><div><span class="ri-eyebrow">Evidence coverage</span><h2 id="coverage-heading">Assertion and freshness distribution</h2></div><p>Counts are copied from the accepted Health projection; they are not recalculated into a score.</p></div><div class="ri-now-grid">{render_distribution("Assertion distribution", assertions, order=("authoritative", "inferred", "unknown"))}{render_distribution("Freshness distribution", freshness, order=("current", "stale", "unknown", "not_applicable"))}</div></section>
     <section class="ri-section" aria-labelledby="checks-heading"><div class="ri-section-heading"><div><span class="ri-eyebrow">Checks</span><h2 id="checks-heading">Normalized check records</h2></div><p>Each material claim links back to its canonical check evidence.</p></div>{checks_body}</section>
-    <section class="ri-section" aria-labelledby="exceptions-heading"><div class="ri-section-heading"><div><span class="ri-eyebrow">Freshness exceptions</span><h2 id="exceptions-heading">Stale and unknown evidence stays explicit</h2></div><p>Stable IDs remain separate so missing or aging evidence cannot silently become a pass.</p></div>{render_identifier_inventory(title="Stale evidence IDs", identifiers=stale_ids, state="stale", empty_message="The Health projection contains no stale IDs. This does not assert complete conformance.")}{render_identifier_inventory(title="Unknown evidence IDs", identifiers=unknown_ids, state="unknown", empty_message="The Health projection contains no unknown IDs. This does not assert evidence outside the normalized snapshot.")}</section>'''
+    <section class="ri-section" aria-labelledby="exceptions-heading"><div class="ri-section-heading"><div><span class="ri-eyebrow">Freshness and assertion exceptions</span><h2 id="exceptions-heading">Stale and unknown evidence stays explicit</h2></div><p>Stale IDs track freshness. Unknown IDs include unknown freshness or assertion; a record can appear in both inventories.</p></div>{render_identifier_inventory(title="Stale evidence IDs", identifiers=stale_ids, state="stale", empty_message="The Health projection contains no stale IDs. This does not assert complete conformance.")}{render_identifier_inventory(title="Unknown evidence IDs", identifiers=unknown_ids, state="unknown", empty_message="The Health projection contains no unknown IDs. This does not assert evidence outside the normalized snapshot.")}</section>'''
 
 
 def render_page(
@@ -356,7 +411,7 @@ def render_page(
         observed_at=observed_at,
         freshness=freshness,
         summary=summary,
-        body=site.collection_notice(snapshot, "health") + health_body(snapshot),
+        body=site.collection_notice(snapshot, "health") + health_body(snapshot, require_graph=True),
         prefix="../",
         snapshot_available=snapshot is not None,
     )
