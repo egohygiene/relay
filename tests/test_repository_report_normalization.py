@@ -6,17 +6,22 @@
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
 import tempfile
+from typing import Any
 import unittest
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 ACTION_ROOT = REPOSITORY_ROOT / "actions/normalize-repository-report"
 FIXTURE_ROOT = REPOSITORY_ROOT / "tests/fixtures/repository-reports"
 MODULE_PATH = ACTION_ROOT / "scripts/normalize_repository_report.py"
-SPEC = importlib.util.spec_from_file_location("normalize_repository_report", MODULE_PATH)
+SPEC = importlib.util.spec_from_file_location(
+    "normalize_repository_report", MODULE_PATH
+)
 assert SPEC is not None
 assert SPEC.loader is not None
 normalizer = importlib.util.module_from_spec(SPEC)
@@ -53,6 +58,27 @@ def arguments(
     )
 
 
+def actual_megalinter_arguments(input_path: Path) -> argparse.Namespace:
+    """Replay the allowlisted native fixture without changing its original frame."""
+
+    provenance = json.loads(
+        (FIXTURE_ROOT / "megalinter-763-provenance.json").read_text()
+    )
+    args = arguments(
+        "megalinter",
+        input_path,
+        policy_path=FIXTURE_ROOT / "megalinter-763-policy.json",
+    )
+    args.repository = provenance["repository"]
+    args.commit = provenance["source_commit"]
+    args.generated_at = provenance["generated_at"]
+    args.event = "workflow_dispatch"
+    args.workflow = "MegaLinter"
+    args.run_id = str(provenance["run_id"])
+    args.run_attempt = provenance["run_attempt"]
+    return args
+
+
 class RepositoryReportNormalizationTests(unittest.TestCase):
     """Keep producer status, policy, provenance, and freshness deterministic."""
 
@@ -82,6 +108,209 @@ class RepositoryReportNormalizationTests(unittest.TestCase):
         self.assertEqual(summary["findings"]["blocking"], 1)
         self.assertEqual(summary["megalinter"]["tools"]["execution_errors"], 1)
         self.assertEqual(summary["megalinter"]["diagnostics"]["warnings"], 3)
+
+    def test_actual_finalized_results_outrank_prerun_activation_records(self) -> None:
+        path = FIXTURE_ROOT / "megalinter-763-finalized.json"
+        provenance = json.loads(
+            (FIXTURE_ROOT / "megalinter-763-provenance.json").read_text()
+        )
+        self.assertEqual(
+            hashlib.sha256(path.read_bytes()).hexdigest(),
+            provenance["report_projection"]["sha256"],
+        )
+        self.assertLess(path.stat().st_size, 65536)
+        document = json.loads(path.read_text())
+        self.assertEqual(
+            {row["status"] for row in document["active_linters"]}, {"success"}
+        )
+        self.assertEqual(len(document["linters"]), 101)
+        summary = normalizer.normalize(actual_megalinter_arguments(path))
+        self.assertEqual(summary["execution"]["state"], "failure")
+        self.assertEqual(
+            summary["findings"],
+            {
+                "state": "blocked",
+                "total": 29,
+                "blocking": 21,
+                "advisory": 8,
+                "by_severity": {},
+            },
+        )
+        self.assertEqual(
+            summary["megalinter"]["tools"],
+            {
+                "active": 50,
+                "passed": 21,
+                "with_findings": 29,
+                "execution_errors": 0,
+                "runner_failed": True,
+                "blocking": 21,
+                "advisory": 8,
+            },
+        )
+        self.assertEqual(
+            summary["megalinter"]["diagnostics"], {"errors": 74527, "warnings": 17}
+        )
+        self.assertEqual(summary["commit"], provenance["source_commit"])
+        self.assertEqual(summary["generated_at"], provenance["generated_at"])
+        self.assertEqual(summary["provenance"]["run_id"], str(provenance["run_id"]))
+        self.assertEqual(summary["megalinter"]["profile"], "holistic")
+        self.assertNotIn("github_workspace", json.dumps(summary))
+
+    def test_simple_finalized_report_without_prerun_list_has_identical_results(
+        self,
+    ) -> None:
+        original = FIXTURE_ROOT / "megalinter-763-finalized.json"
+        expected = normalizer.normalize(actual_megalinter_arguments(original))
+        document = json.loads(original.read_text())
+        del document["active_linters"]
+        document["linters"] = [row for row in document["linters"] if row["is_active"]]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "simple.json"
+            path.write_text(json.dumps(document))
+            self.assertEqual(
+                normalizer.normalize(actual_megalinter_arguments(path)), expected
+            )
+
+    def test_disabled_unselected_policy_entries_preserve_finalized_results(self) -> None:
+        path = FIXTURE_ROOT / "megalinter-763-finalized.json"
+        expected = normalizer.normalize(actual_megalinter_arguments(path))
+        policy = json.loads((FIXTURE_ROOT / "megalinter-763-policy.json").read_text())
+        policy["tools"].append({"id": "PYTHON_BLACK", "enforcement": "disabled"})
+        with tempfile.TemporaryDirectory() as directory:
+            policy_path = Path(directory) / "policy.json"
+            policy_path.write_text(json.dumps(policy))
+            args = actual_megalinter_arguments(path)
+            args.policy_input = str(policy_path)
+            self.assertEqual(normalizer.normalize(args), expected)
+
+    def test_invalid_finalized_results_never_fall_back_to_prerun_success(self) -> None:
+        original = json.loads(
+            (FIXTURE_ROOT / "megalinter-763-finalized.json").read_text()
+        )
+        cases = []
+        invalid_collections: tuple[Any, ...] = (None, {}, [], ["invalid"])
+        for value in invalid_collections:
+            document = deepcopy(original)
+            document["linters"] = value
+            cases.append(document)
+        for change in (
+            "missing-activation",
+            "invalid-activation",
+            "duplicate",
+            "inventory-mismatch",
+            "missing-status",
+            "invalid-status",
+            "missing-errors",
+            "missing-warnings",
+            "negative-errors",
+            "boolean-warnings",
+            "null-errors",
+            "all-inactive",
+        ):
+            document = deepcopy(original)
+            row = next(row for row in document["linters"] if row["is_active"])
+            if change == "missing-activation":
+                del row["is_active"]
+            elif change == "invalid-activation":
+                row["is_active"] = "true"
+            elif change == "duplicate":
+                document["linters"].append(deepcopy(row))
+            elif change == "inventory-mismatch":
+                row["is_active"] = False
+            elif change == "missing-status":
+                del row["status"]
+            elif change == "invalid-status":
+                row["status"] = "not-run"
+            elif change == "missing-errors":
+                del row["total_number_errors"]
+                del row["number_errors"]
+            elif change == "missing-warnings":
+                del row["total_number_warnings"]
+            elif change == "negative-errors":
+                row["total_number_errors"] = -1
+            elif change == "boolean-warnings":
+                row["total_number_warnings"] = True
+            elif change == "null-errors":
+                row["total_number_errors"] = None
+            elif change == "all-inactive":
+                for item in document["linters"]:
+                    item["is_active"] = False
+                del document["active_linters"]
+            cases.append(document)
+        cases.extend(
+            [
+                {"linters": [], "status": "success", "return_code": 0},
+                {
+                    "linters": [],
+                    "active_linters": [],
+                    "status": "success",
+                    "return_code": 0,
+                },
+            ]
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "invalid.json"
+            for index, document in enumerate(cases):
+                with self.subTest(case=index):
+                    path.write_text(json.dumps(document))
+                    summary = normalizer.normalize(actual_megalinter_arguments(path))
+                    self.assertEqual(summary["execution"]["state"], "failure")
+                    self.assertEqual(summary["findings"]["state"], "unknown")
+                    self.assertEqual(summary["megalinter"]["status"], "invalid")
+
+    def test_duplicate_native_json_keys_and_tool_policy_ids_are_invalid(self) -> None:
+        report = (FIXTURE_ROOT / "megalinter-failure.json").read_text()
+        duplicate = report.replace(
+            '"status": "error"', '"status": "error", "status": "success"', 1
+        )
+        policy = json.loads((FIXTURE_ROOT / "megalinter-policy.json").read_text())
+        with tempfile.TemporaryDirectory() as directory:
+            path, policy_path = (
+                Path(directory) / "report.json",
+                Path(directory) / "policy.json",
+            )
+            path.write_text(duplicate)
+            args = arguments(
+                "megalinter", path, policy_path=FIXTURE_ROOT / "megalinter-policy.json"
+            )
+            summary = normalizer.normalize(args)
+            self.assertEqual(summary["findings"]["state"], "unknown")
+            self.assertEqual(summary["execution"]["state"], "failure")
+            path.write_text(report)
+            for mutation in (
+                "duplicate-policy",
+                "invalid-policy",
+                "empty-policy",
+                "active-disabled-policy",
+                "duplicate-legacy",
+                "empty-legacy",
+            ):
+                with self.subTest(mutation=mutation):
+                    source, matrix = json.loads(report), deepcopy(policy)
+                    if mutation == "duplicate-policy":
+                        matrix["tools"].append(
+                            {"id": "ACTION_ACTIONLINT", "enforcement": "advisory"}
+                        )
+                    elif mutation == "invalid-policy":
+                        matrix["tools"][0]["enforcement"] = "unknown"
+                    elif mutation == "empty-policy":
+                        matrix["tools"] = []
+                    elif mutation == "active-disabled-policy":
+                        matrix["tools"][0]["enforcement"] = "disabled"
+                    elif mutation == "duplicate-legacy":
+                        source["active_linters"].append(
+                            deepcopy(source["active_linters"][0])
+                        )
+                    else:
+                        source["active_linters"] = []
+                    path.write_text(json.dumps(source))
+                    policy_path.write_text(json.dumps(matrix))
+                    summary = normalizer.normalize(
+                        arguments("megalinter", path, policy_path=policy_path)
+                    )
+                    self.assertEqual(summary["execution"]["state"], "failure")
+                    self.assertEqual(summary["findings"]["state"], "unknown")
 
     def test_scorecard_uses_only_commit_matched_api_aggregate(self) -> None:
         summary = normalizer.normalize(

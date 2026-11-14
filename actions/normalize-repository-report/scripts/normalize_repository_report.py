@@ -153,6 +153,17 @@ def bounded_number(value: Any, label: str, *, minimum: float, maximum: float) ->
     return number
 
 
+def unique_json_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    """Reject ambiguous producer objects instead of accepting a last-wins value."""
+
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ReportInputError("producer input contains duplicate JSON object keys")
+        result[key] = value
+    return result
+
+
 def load_object(path: Path, label: str) -> dict[str, Any]:
     """Load one required JSON object with a useful contract error."""
 
@@ -161,6 +172,7 @@ def load_object(path: Path, label: str) -> dict[str, Any]:
     try:
         value = json.loads(
             path.read_text(encoding="utf-8"),
+            object_pairs_hook=unique_json_object,
             parse_constant=reject_nonstandard_json_number,
         )
     except ReportInputError:
@@ -430,20 +442,77 @@ def normalize_osv(document: dict[str, Any], summary: dict[str, Any]) -> None:
     summary["osv"] = {key: value for key, value in source.items() if key not in excluded}
 
 
+def named_megalinter_rows(value: Any) -> list[dict[str, Any]]:
+    """Require unambiguous named rows before selecting producer outcomes."""
+
+    if not isinstance(value, list) or not value:
+        raise ReportInputError("MegaLinter tool results must be a non-empty list")
+    names: set[str] = set()
+    for row in value:
+        if not isinstance(row, dict):
+            raise ReportInputError("MegaLinter tool results must contain JSON objects")
+        name = row.get("name")
+        if (
+            not isinstance(name, str)
+            or not name
+            or name.strip() != name
+            or name in names
+        ):
+            raise ReportInputError(
+                "MegaLinter tool result identities are invalid or duplicated"
+            )
+        names.add(name)
+    return value
+
+
+def megalinter_results(document: dict[str, Any]) -> list[dict[str, Any]]:
+    """Use finalized native results, retaining the legacy active-only format."""
+
+    if "linters" not in document:
+        return named_megalinter_rows(document.get("active_linters"))
+    rows = named_megalinter_rows(document["linters"])
+    if any(type(row.get("is_active")) is not bool for row in rows):
+        raise ReportInputError("MegaLinter finalized tool activation must be explicit")
+    selected = [row for row in rows if row["is_active"]]
+    if not selected:
+        raise ReportInputError(
+            "MegaLinter finalized active tool results are unavailable"
+        )
+    if "active_linters" in document:
+        declared = named_megalinter_rows(document["active_linters"])
+        if {row["name"] for row in declared} != {row["name"] for row in selected}:
+            raise ReportInputError(
+                "MegaLinter finalized and declared active inventories differ"
+            )
+    return selected
+
+
 def normalize_megalinter(
     document: dict[str, Any], policy: dict[str, Any], summary: dict[str, Any]
 ) -> None:
     """Summarize MegaLinter tool outcomes against the canonical policy matrix."""
 
-    active_linters = document.get("active_linters")
+    active_linters = megalinter_results(document)
     tools = policy.get("tools")
-    if not isinstance(active_linters, list) or not isinstance(tools, list):
-        raise ReportInputError("MegaLinter report or tool matrix is missing its tool list")
-    enforcement_by_id = {
-        str(tool.get("id")): str(tool.get("enforcement", "advisory"))
-        for tool in tools
-        if isinstance(tool, dict) and tool.get("id")
-    }
+    if not isinstance(tools, list) or not tools:
+        raise ReportInputError("MegaLinter tool matrix is missing its tool list")
+    enforcement_by_id: dict[str, str] = {}
+    for tool in tools:
+        if not isinstance(tool, dict):
+            raise ReportInputError("MegaLinter tool policy must contain JSON objects")
+        identifier, enforcement = tool.get("id"), tool.get("enforcement")
+        if (
+            not isinstance(identifier, str)
+            or not identifier
+            or identifier.strip() != identifier
+            or identifier in enforcement_by_id
+            or not isinstance(enforcement, str)
+            or enforcement not in {"blocking", "advisory", "disabled"}
+        ):
+            raise ReportInputError(
+                "MegaLinter tool policy identities or enforcement are invalid"
+            )
+        enforcement_by_id[identifier] = enforcement
 
     passed = 0
     finding_tools: list[dict[str, Any]] = []
@@ -452,23 +521,34 @@ def normalize_megalinter(
     diagnostic_warnings = 0
     for linter in active_linters:
         if not isinstance(linter, dict):
-            raise ReportInputError("MegaLinter active_linters must contain JSON objects")
+            raise ReportInputError(
+                "MegaLinter active_linters must contain JSON objects"
+            )
         identifier = str(linter.get("name", "unknown"))
-        status = str(linter.get("status", "unknown")).lower()
-        raw_error_count = linter.get("total_number_errors")
-        if raw_error_count is None:
-            raw_error_count = linter.get("number_errors", 0)
+        status = linter.get("status")
+        if not isinstance(status, str) or status.lower() not in {
+            "success",
+            "warning",
+            "error",
+        }:
+            raise ReportInputError("MegaLinter tool result status is invalid")
+        status = status.lower()
+        if "total_number_errors" not in linter and "number_errors" not in linter:
+            raise ReportInputError("MegaLinter tool result error count is unavailable")
+        raw_error_count = linter.get("total_number_errors", linter.get("number_errors"))
         error_count = nonnegative_integer(
             raw_error_count,
             f"MegaLinter {identifier} error count",
         )
         warning_count = nonnegative_integer(
-            linter.get("total_number_warnings", 0),
+            linter.get("total_number_warnings"),
             f"MegaLinter {identifier} warning count",
         )
         diagnostic_errors += error_count
         diagnostic_warnings += warning_count
         enforcement = enforcement_by_id.get(identifier, "advisory")
+        if enforcement == "disabled":
+            raise ReportInputError("An active MegaLinter tool is disabled by the selected policy")
         compact = {
             "id": identifier,
             "status": status,
@@ -484,11 +564,16 @@ def normalize_megalinter(
             finding_tools.append(compact)
 
     blocking = sum(tool["enforcement"] == "blocking" for tool in finding_tools)
-    root_failed = str(document.get("status", "unknown")).lower() not in {"success", "warning"}
+    root_failed = str(document.get("status", "unknown")).lower() not in {
+        "success",
+        "warning",
+    }
     root_failed = root_failed or document.get("return_code") not in {None, 0}
     execution_failed = bool(execution_errors) or root_failed
     if execution_errors:
-        execution_message = f"{len(execution_errors)} tool execution(s) did not produce findings."
+        execution_message = (
+            f"{len(execution_errors)} tool execution(s) did not produce findings."
+        )
     elif root_failed:
         execution_message = "MegaLinter returned a failing runner status."
     else:
@@ -499,7 +584,9 @@ def normalize_megalinter(
     }
     summary["findings"] = findings(len(finding_tools), blocking, {})
     summary["megalinter"] = {
-        "profile": "holistic" if document.get("validate_all_code_base") else "changed-files",
+        "profile": "holistic"
+        if document.get("validate_all_code_base")
+        else "changed-files",
         "status": str(document.get("status", "unknown")),
         "return_code": document.get("return_code"),
         "tools": {

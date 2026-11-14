@@ -1,0 +1,1368 @@
+{
+  "active_linters": [
+    {
+      "is_active": true,
+      "name": "PYTHON_PYLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "PYTHON_BANDIT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "PYTHON_MYPY",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "PYTHON_PYRIGHT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "PYTHON_RUFF",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "PYTHON_RUFF_FORMAT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "ACTION_ACTIONLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "ANSIBLE_ANSIBLE_LINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "BASH_EXEC",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "BASH_SHELLCHECK",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "BASH_SHFMT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "COPYPASTE_JSCPD",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "CSS_STYLELINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "DOCKERFILE_HADOLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "EDITORCONFIG_EDITORCONFIG_CHECKER",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "HTML_HTMLHINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "JAVASCRIPT_ES",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "JAVASCRIPT_PRETTIER",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "JSON_JSONLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "JSON_V8R",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "JSON_PRETTIER",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "JSON_NPM_PACKAGE_JSON_LINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "LATEX_CHKTEX",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "MARKDOWN_MARKDOWNLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "MARKDOWN_MARKDOWN_TABLE_FORMATTER",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "PERL_PERLCRITIC",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "POWERSHELL_POWERSHELL",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "POWERSHELL_POWERSHELL_FORMATTER",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_CHECKOV",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_DUSTILOCK",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_BETTERLEAKS",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_GRYPE",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_LS_LINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_SECRETLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_SYFT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_TRIVY",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_TRIVY_SBOM",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_TRUFFLEHOG",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "RUBY_RUBOCOP",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "RUST_CLIPPY",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "SPELL_PROSELINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "SPELL_VALE",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "SPELL_LYCHEE",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "TSX_ESLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "TYPESCRIPT_ES",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "TYPESCRIPT_PRETTIER",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "XML_XMLLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "YAML_PRETTIER",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "YAML_YAMLLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "YAML_V8R",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    }
+  ],
+  "linters": [
+    {
+      "is_active": true,
+      "name": "ACTION_ACTIONLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "ANSIBLE_ANSIBLE_LINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "API_SPECTRAL",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "ARM_ARM_TTK",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "BASH_EXEC",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "BASH_SHELLCHECK",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "BASH_SHFMT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "BICEP_BICEP_LINTER",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "C_CLANG_FORMAT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "C_CPPCHECK",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "C_CPPLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "CLOJURE_CLJSTYLE",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "CLOJURE_CLJ_KONDO",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "CLOUDFORMATION_CFN_LINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "COPYPASTE_JSCPD",
+      "number_errors": 1,
+      "return_code": 0,
+      "status": "warning",
+      "total_number_errors": 2744,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "CPP_CLANG_FORMAT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "CPP_CPPCHECK",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "CPP_CPPLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "CSHARP_CSHARPIER",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "CSHARP_DOTNET_FORMAT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "CSHARP_ROSLYNATOR",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "CSS_STYLELINT",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 330,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "DART_DARTANALYZER",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "DOCKERFILE_HADOLINT",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 1,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "EDITORCONFIG_EDITORCONFIG_CHECKER",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 1,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "ENV_DOTENV_LINTER",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "GHERKIN_GHERKIN_LINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "GO_REVIVE",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "GROOVY_NPM_GROOVY_LINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "HTML_HTMLHINT",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 356,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "JAVA_CHECKSTYLE",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "JAVA_PMD",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "JAVASCRIPT_ES",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 1,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "JAVASCRIPT_PRETTIER",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "JSON_JSONLINT",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 1,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "JSON_NPM_PACKAGE_JSON_LINT",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 1,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "JSON_PRETTIER",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 1,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "JSON_V8R",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "KOTLIN_DETEKT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "KOTLIN_KTLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "LATEX_CHKTEX",
+      "number_errors": 160,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 67774,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "LUA_LUACHECK",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "LUA_STYLUA",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "MARKDOWN_MARKDOWNLINT",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 403,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "MARKDOWN_MARKDOWN_TABLE_FORMATTER",
+      "number_errors": 1,
+      "return_code": 0,
+      "status": "warning",
+      "total_number_errors": 1,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "PERL_PERLCRITIC",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "PHP_PHPCS",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "PHP_PHPCSFIXER",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "PHP_PHPLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "PHP_PHPSTAN",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "PHP_PSALM",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "POWERSHELL_POWERSHELL",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "POWERSHELL_POWERSHELL_FORMATTER",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "PROTOBUF_PROTOLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "PYTHON_BANDIT",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 3,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "PYTHON_MYPY",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "PYTHON_PYLINT",
+      "number_errors": 1,
+      "return_code": 0,
+      "status": "warning",
+      "total_number_errors": 281,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "PYTHON_PYRIGHT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "PYTHON_RUFF",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 716,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "PYTHON_RUFF_FORMAT",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 1,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "R_LINTR",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "RAKU_RAKU",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_BETTERLEAKS",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_CHECKOV",
+      "number_errors": 1,
+      "return_code": 0,
+      "status": "warning",
+      "total_number_errors": 58,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_DUSTILOCK",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_GRYPE",
+      "number_errors": 1,
+      "return_code": 0,
+      "status": "warning",
+      "total_number_errors": 544,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_LS_LINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_SECRETLINT",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 1,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_SYFT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_TRIVY",
+      "number_errors": 1,
+      "return_code": 0,
+      "status": "warning",
+      "total_number_errors": 1,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_TRIVY_SBOM",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "REPOSITORY_TRUFFLEHOG",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "ROBOTFRAMEWORK_ROBOCOP",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "RST_RSTCHECK",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "RST_RSTFMT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "RST_RST_LINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "RUBY_RUBOCOP",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "RUST_CLIPPY",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 1,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "SCALA_SCALAFIX",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "SNAKEMAKE_LINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "SNAKEMAKE_SNAKEFMT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "SPELL_CSPELL",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "SPELL_LYCHEE",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 185,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "SPELL_PROSELINT",
+      "number_errors": 1,
+      "return_code": 0,
+      "status": "warning",
+      "total_number_errors": 902,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "SPELL_VALE",
+      "number_errors": 1,
+      "return_code": 0,
+      "status": "warning",
+      "total_number_errors": 1,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "SQL_SQLFLUFF",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "SWIFT_SWIFTLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "TEKTON_TEKTON_LINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "TERRAFORM_TERRAFORM_FMT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "TERRAFORM_TERRAGRUNT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "TERRAFORM_TFLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "TERRAFORM_TOFU_FMT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "TERRAFORM_TOFU_VALIDATE",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "TSX_ESLINT",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 1,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "TYPESCRIPT_ES",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 1,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "TYPESCRIPT_PRETTIER",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 1,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": false,
+      "name": "VBDOTNET_DOTNET_FORMAT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "XML_XMLLINT",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "YAML_PRETTIER",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 1,
+      "total_number_warnings": 17
+    },
+    {
+      "is_active": true,
+      "name": "YAML_V8R",
+      "number_errors": 0,
+      "return_code": 0,
+      "status": "success",
+      "total_number_errors": 0,
+      "total_number_warnings": 0
+    },
+    {
+      "is_active": true,
+      "name": "YAML_YAMLLINT",
+      "number_errors": 1,
+      "return_code": 1,
+      "status": "error",
+      "total_number_errors": 215,
+      "total_number_warnings": 0
+    }
+  ],
+  "return_code": 1,
+  "status": "error",
+  "validate_all_code_base": true
+}

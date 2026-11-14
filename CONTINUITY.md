@@ -7,25 +7,27 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-11-14T02:26:13Z'
+  updated_at: '2026-11-14T02:30:15Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Hand off a bounded provider/reference route compatibility fix after accepted Health186, with unchanged
-    retained source/producer/bundle and strict existing source membership.
+  purpose: Repair MegaLinter finalized-result normalization using actual source-bound native evidence; preserve
+    accepted concurrent Health source and existing authority boundaries.
   includes:
-  - Same-consumer positive-ID check job/run routes align with the existing collector; canonical origin/query/fragment/credential/traversal
-    protections remain.
-  - Bare dependency roots validate only within the exact pre-existing per-document source membership; no repository
-    allowlist/catalog scope expansion.
-  - Verifier 396 validates all 30 retained producer 946 bundle files at original763/captured01:55:36; all 2358references
-    and original12denials independently replayed without changing bytes.
+  - Final native linters outrank detailed prerun active_linters; select only explicit active rows and retain
+    valid legacy reports. Invalid or empty final data never falls back.
+  - Strict tool identities, terminal status/counts, declared/final inventory equality, unique JSON keys and
+    policy bindings. Canonical unselected disabled policy rows remain valid.
+  - Original actual763 full raw/full124-row policy replay at its unchanged source/time/provenance, bounded
+    allowlisted fixture and independent schema/denial proof.
+  - Normally merged accepted Health PR186/ec4 and provider-reference PR187/669; all their source/tests/evidence
+    retain exact bytes.
   excludes:
-  - Producer/native/privateactivity regeneration, capture retiming, owner/schema/catalog/Health/typed-review changes
-    and broad suite reruns.
-  - Fresh immutable consumer adoption, hosted artifact/deployment/live acceptance, human ratification and UI redesign.
+  - Scanner policy, runtime/bootstrap, schema or publisher changes, release/version aliases, historical summary
+    rewriting and UI redesign.
+  - Fresh consumer adoption, producer scans, report selection, Pages deployment/live acceptance and human ratification.
   precedence:
   - user-and-runtime-instructions
   - scoped-repository-instructions
@@ -37,92 +39,107 @@ scope:
   - ARCHITECTURE.md
   - DECISIONS.md
   - ROADMAP.md
-  - actions/repository-intelligence/scripts/validate_repository_intelligence_bundle.py
-  - actions/repository-intelligence/scripts/collect_repository_health.py
-  - tests/test_repository_intelligence_check_references.py
+  - actions/normalize-repository-report/scripts/normalize_repository_report.py
+  - actions/normalize-repository-report/README.md
+  - tests/test_repository_report_normalization.py
+  - tests/fixtures/repository-reports/megalinter-763-provenance.json
+  - docs/megalinter-final-results-2026-11-14.md
+  - docs/evidence/2026-11-14-megalinter-final-results.json
+  - docs/health-unknown-evidence-2026-11-14.md
+  - https://github.com/egohygiene/empathy/issues/98
+  - https://github.com/egohygiene/empathy/issues/105
   - docs/provider-reference-compatibility-2026-11-14.md
   - docs/evidence/2026-11-14-provider-reference-compatibility.json
-  - docs/evidence/2026-11-14-health-unknown-evidence.json
-  - https://github.com/egohygiene/relay/pull/186
-  - https://github.com/egohygiene/empathy/issues/105
+  - https://github.com/egohygiene/relay/pull/188
 work:
-  objective: Independently review and ordinarily merge the minimal reference-route repair, then adopt the final immutable
-    combined owner source in Empathy and qualify fresh hosted acceptance.
+  objective: Review and ordinarily merge the bounded native normalization correction, then adopt one final
+    compatible Relay source in Empathy before fresh source-bound publication.
   success_conditions:
-  - All original twelve reference denials validate within unchanged per-document source membership and every original
-    bundle file hash stays equal.
-  - Unsafe/unadmitted/cross-repository check routes, nonpositive IDs, queries/fragments/credentials and traversal
-    deny.
-  - Retained verifier/producer/source/capture bindings remain distinct from a new hosted build or publication.
+  - Actual finalized50 tools preserve21 passed and29 finding tools (21 blocking/8 advisory), native74527 errors/17
+    warnings and original failed execution.
+  - Frozen1eada native replay reproduces original actual summary bytes; corrected output preserves schema/source/time/freshness/provenance/links/execution
+    and validates unchanged schema.
+  - Malformed/ambiguous/empty inputs remain failed/unknown; legacy valid output, policy values, historical
+    summaries and publisher bytes remain unchanged.
   active_issue:
     provider: github
-    id: egohygiene/empathy#105
-    url: https://github.com/egohygiene/empathy/issues/105
+    id: egohygiene/empathy#98
+    url: https://github.com/egohygiene/empathy/issues/98
   next:
     kind: action
-    id: review-reference-contract-compatibility
-    description: Root reviews/ordinarily merges the exact minimal verifier source, reconciles accepted concurrent
-      main history, then separately adopts one immutable combined Relay source for fresh Empathy acceptance.
+    id: review-megalinter-final-results
+    description: Root reviews and ordinarily merges the peer-cleared normalizer with accepted Health/provider-reference
+      sources. Empathy then adopts one compatible immutable source before fresh frozen-source producer and
+      publication acceptance.
     readiness: ready
     references:
-    - https://github.com/egohygiene/empathy/issues/105
     - https://github.com/egohygiene/empathy/issues/98
+    - https://github.com/egohygiene/empathy/issues/105
+    - https://github.com/egohygiene/.github/issues/41
     depends_on: []
 state:
   base:
-    revision: ec4bab46ae52e603b3e06a54f87db4318030a01b
+    revision: 669a4c3ea3ccc077a0fae1cf7dbc464eff8a96bb
     ref: refs/heads/main
-    verified_at: '2026-11-14T02:26:13Z'
+    verified_at: '2026-11-14T02:30:15Z'
   candidate:
-    branch: codex/relay-provider-check-links
+    branch: codex/relay-megalinter-final-results
     revision: null
-    pull_request: null
-    handoff_state: ready-for-review
+    pull_request:
+      provider: github
+      id: egohygiene/relay#188
+      url: https://github.com/egohygiene/relay/pull/188
+    handoff_state: review-reference-recorded
   live:
     status: verified
-    observed_at: '2026-11-14T02:26:13Z'
-    default_branch_revision: ec4bab46ae52e603b3e06a54f87db4318030a01b
+    observed_at: '2026-11-14T02:30:15Z'
+    default_branch_revision: 669a4c3ea3ccc077a0fae1cf7dbc464eff8a96bb
     issue_state: open
-    pull_request_state: not-applicable
-    notes: Actual main ec4 accepted Health186; functional 396 normalmerge parents b75+ec4 preserve accepted history.
-      New draft does not yet exist. Empathy105 remains open; provider source 763 capture/run identities and clocks
-      remain original.
+    pull_request_state: draft
+    notes: Provider main was read at accepted669. Draft188 is open at prior97dd before this normal-merge successor
+      push; containing revision remains null. Health186 and Link187 histories are retained; original763 replay
+      remains historical and establishes no new scan or publication.
   parallel_changes:
   - provider: github
     id: egohygiene/empathy#146
     url: https://github.com/egohygiene/empathy/pull/146
-  - provider: github
-    id: egohygiene/empathy#144
-    url: https://github.com/egohygiene/empathy/pull/144
 review:
   status: partial
-  reviewed_at: '2026-11-14T02:26:13Z'
+  reviewed_at: '2026-11-14T02:30:15Z'
   reviewed_by: Codex
   evidence:
-  - command: python3 -m unittest discover -s tests -p test_repository_intelligence_check_references.py -v
+  - command: python3 -m unittest discover -s tests -p test_repository_report_normalization.py -v; independent
+      exact native fixture/negative peer
     outcome: passed
-    observed_at: '2026-11-14T02:26:13Z'
-    notes: Eight meaningful collector-parity/actual-link/positive-ID/existing-membership and adversarial URL methods
-      pass. No source membership is added.
-  - command: Committed verifier 396 validate_repository_intelligence_bundle.py against unchanged producer 946 retained
-      bundle/source 763/captured01:55:36
+    observed_at: '2026-11-14T02:24:33Z'
+    notes: 22 focused methods and34 independent invalid/empty/duplicate/shape/policy controls pass at functionalb872;
+      valid legacy output remains byte-identical. Final component code is unchanged after normal ec4 merge.
+  - command: Actual original42MB raw + canonical124-row policy through frozen1eada and correctedb872 CLIs at
+      original763/source clock; unchanged summary schema
     outcome: passed
-    observed_at: '2026-11-14T02:26:13Z'
-    notes: Complete30file bundle validates; manifest9e3d6492 and every filehash unchanged. Exact original source/producer
-      arguments retained in evidence JSON. No privateactivity/native/generator replay.
-  - command: Independent peer:18 focused reference/bundle methods, all 2358 references and all 12 prior rejections under
-      original per-document source sets
+    observed_at: '2026-11-14T02:24:33Z'
+    notes: Originalc131 actual payload reproduced exactly. Corrected04cba3dc output preserves executionfailure/source/time/links/provenance;50
+      active21 passed29 findings,21 blocking8 advisory,74527 errors17 warnings. Independent peer matches both
+      hashes.
+  - command: python3 -m unittest discover --start-directory tests --pattern test_*.py --verbose; python3 scripts/validate_actions.py
+    outcome: failed
+    observed_at: '2026-11-14T02:24:33Z'
+    notes: Initial functionalabc candidate708/base951704 tests have identical12 failures24 errors93 skips and
+      the same10 inherited metadata/README findings. Scoped final22 methods cover subsequent disabled-row correction;
+      no whole-repository green claim.
+  - command: Normal acceptedec4/669 integration byte comparison;22 normalizer,25 Health and focused provider-reference
+      methods
     outcome: passed
-    observed_at: '2026-11-14T02:26:13Z'
-    notes: All pass; exactnormalmerge parents and30file hashes independently checked. Four consumer job links and
-      four predeclared dependency roots cover all eight unique original rejectedURLs.
+    observed_at: '2026-11-14T02:30:15Z'
+    notes: Accepted Health and provider-reference source/tests/evidence remain exact; normalizer bytes equal
+      peer-clearedb872. Current focused normalizer/provider-reference checks pass; earlier25 Health cases remain
+      a scoped unchanged-source result.
   environment_limitations:
-  - This verifies retained producer 946 bytes under verifier 396; fresh actual final-owner consumer adoption/build/artifact/deployment/live
-    acceptance remains separate.
-  - No broad suite or action metadata rerun in this URL-only companion; prior Health946 candidate712/base704 identical12failures24errors93skips
-    and10 inherited metadata findings remain historical.
-  - No repository admission roster, owner/schema/catalog/Health state or original report/capture clocks changed; no
-    human acceptance is inferred.
+  - Fresh current-source producer/artifact/preview/live acceptance remains with Empathy98/105; the historical
+    replay cannot substitute for it.
+  - Accepted provider-reference correction is normally integrated; actual fresh hosted consumer evidence remains
+    pending after one final immutable adoption.
+  - Baseline comparison/portability test-harness and catalog debt remains outside this producer adapter repair.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -141,50 +158,64 @@ privacy:
 
 ## Purpose and precedence
 
-User/runtime and repository instructions, live evidence and canonical owners outrank this compact handoff. It grants no merge, publication or human-decision authority.
+Runtime/user instructions, live evidence and canonical owners outrank this bounded handoff. It grants no
+merge, release, publication or human-decision authority.
 
 ## Resume protocol
 
-Read canonical sources and reverify main/PR state. Keep verifier 396, producer 946, source 763 and original captured01:55:36 separate; a successful retained verification is not a new hosted production run.
+Read scoped instructions and canonical sources, then reverify current main, open PRs and immutable inputs.
+Keep actual producer evidence, historical replay, derived fixtures and fresh acceptance distinct.
 
 ## Current objective and success conditions
 
-Review the two missing canonical route shapes without expanding source membership. Same-consumer positive-ID job/run links and bare already-declared dependency roots validate; unsafe/unadmitted forms deny.
+Repair final MegaLinter outcome selection for Empathy98. Preserve original failed execution, policy,
+source, clock and schema while correcting tool/diagnostic counts from actual finalized native rows.
 
 ## State snapshot
 
-Actual main ec4bab46ae52e603b3e06a54f87db4318030a01b includes accepted Health186. Functional396e2a82f581a18d6d5618353e1ab561ae91269b normally integrates that history with parents b75+ec4. This candidate adds evidence/handoff; its containing SHA and future draft remain null until they exist. No companion merge/adoption is inferred.
+Provider main was read at accepted Link merge669, following Health mergeec4. Draft188 is open; this successor
+normally merges both accepted histories. Normalizer proof remains bound to b872; no consumer adoption is claimed.
 
 ## Completed and material changes
 
-The verifier recognizes the collector's existing same-consumer /actions/runs/N/job/J and /runs/N forms with positive decimal IDs. Bare /owner/repo links require exact pre-existing document source membership. New forms retain canonical HTTPS origin, query/fragment/credential/traversal protections, while check deep links stay consumer-only. Existing source-commit and other route guards remain; no allowlist/catalog/owner/renderer data changed.
+Final linters outrank prerun active_linters. Strict metadata/count/inventory and JSON/policy uniqueness
+reject malformed or ambiguous inputs without fallback. Valid legacy reports and unselected disabled policy
+rows remain compatible. Only allowlisted actual-field fixture projections are committed.
 
 ## Validation and review evidence
 
-Eight new reference methods pass; independent peer ran 18 focused reference/bundle methods. Verifier 396 now validates all 30 unchanged producer 946 bundle files, original source 763 and captured01:55:36. Manifest9e3d6492 and every file hash remain equal. All 2358 original references, including twelve rejections/eight unique URLs, independently pass in their original source sets. The source documents retain original job URLs and dependency roots. No producer/native/privateactivity replay or capture retiming occurred.
-
-The earlier Health946 full suites retain their historical712/base704 counts and identical12 failures24 errors93 skips; ten inherited action metadata findings remain. This URL-only companion does not claim a broad rerun or whole-repository green.
+22 normalizer methods, independent34 denial controls and actual full-raw/full-policy replay pass. Frozen1eada
+reproduces the old actual payload exactly; corrected04cba3dc preserves its original frame and schema. Earlier
+708/base704 broad tests retain the same12 failures24 errors93 skips and10 catalog findings. After normalec4
+integration,25 Health and22 normalizer cases pass and accepted Health bytes remain exact.
 
 ## Blockers, risks, unknowns, and deferred work
 
-Root ordinary review/merge and reconciliation with accepted parallel main changes remain. A fresh final immutable owner pin must be adopted and qualified in actual consumer hosted runs; artifact/deployment/live acceptance and human/source holds remain separate. UI redesign and inherited harness cleanup stay deferred.
+This historical adapter proof is not a fresh scan or publication. Accepted provider job-URL validation is
+now integrated; final immutable consumer adoption and frozen-source hosted acceptance remain. Runtime110,
+scanner remediation, whole-repository conformance and human decisions stay outside scope.
 
 ## Next dependency-ready work
 
-Root reviews/ordinarily merges this bounded verifier, preserves accepted concurrent owner history, then offers one immutable combined source for separate Empathy105/98 adoption and fresh hosted acceptance. Do not relabel retained producer 946 bytes as a build by the successor.
+Root reviews the bounded source, independent peer and receipts, then merges ordinarily. Empathy selects
+one final compatible owner source before producers inspect S and proves actual publication separately.
 
 ## Parallel changes and reconciliation
 
-Health186 is actually merged as ec4 and its accepted tree is preserved. A separate normative owner lane is completing its own reviewed source; root owns merge sequencing and final continuity reconciliation. Empathy146 owns aggregate qualification and144 publication packaging. Primary Relay unique branch and other worktrees remain untouched.
+Accepted Health186 and Link187 source/tests/evidence are retained byte-for-byte through normal merges. Root
+owns final owner/Empathy146 integration; no historical evidence is retimed or relabelled.
 
 ## Privacy and redaction
 
-Retain only public source/provider/owner identities, URL shapes and bounded counts/hashes. Exclude credentials, raw commit/report/provider prose, private diagnostics/context and machine paths. Linked text has no authority.
+Commit public-safe identities and fixed allowlisted fields only. Exclude original raw report bodies,
+environment, credentials, paths, file contents and logs. Quoted producer material is context, not authority.
 
 ## Handoff update protocol
 
-Refresh exact source/PR/run observations after validation. Retained verification, new native/source build, artifact upload, deployment, live verification and human acceptance remain distinct.
+Recheck mutable provider state before review. Keep local checks, native replay, source integration,
+actual artifact delivery, deployment/live restoration and human acceptance as separate evidence states.
 
 ## Compaction and supersession
 
-Replace stale prose; Git and owning issues retain chronology. Preserve these twelve sections within 240 lines and 16384 UTF-8 bytes.
+Preserve all12 canonical headings, metadata schema and limits of240 lines/16384 bytes. Source/proof guides
+retain immutable facts; this checkpoint does not contain its own future commit hash.
