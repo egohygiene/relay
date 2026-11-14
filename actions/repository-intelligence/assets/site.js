@@ -577,7 +577,7 @@
         const target = new URL(original, location.href);
         const current = new URL(location.href);
         if (target.origin !== current.origin) {
-            link.href = target.href;
+            link.setAttribute("href", target.href);
             return;
         }
         for (const [name, value] of current.searchParams) {
@@ -589,7 +589,7 @@
         if (entity && !target.searchParams.has("entity")) {
             target.searchParams.set("entity", entity);
         }
-        link.href = target.href;
+        link.setAttribute("href", target.href);
     };
     const refreshContextLinks = () => {
         for (const link of contextLinks) preserveContext(link);

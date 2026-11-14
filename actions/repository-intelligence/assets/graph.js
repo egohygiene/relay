@@ -168,7 +168,7 @@
                     if (!link) continue;
                     const updateDestination = () => {
                         const href = destination(node);
-                        if (href) link.href = href;
+                        if (href) link.setAttribute("href", href);
                     };
                     link.addEventListener("focus", () => { updateDestination(); inspect(node.id); });
                     link.addEventListener("pointerdown", updateDestination);

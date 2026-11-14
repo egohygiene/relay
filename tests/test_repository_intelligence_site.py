@@ -332,6 +332,7 @@ const links = [
 ].map((link) => ({
   ...link,
   getAttribute(name) { return name === "href" ? this.original : null; },
+  setAttribute(name, value) { if (name === "href") this.href = value; },
   addEventListener() {},
 }));
 const query = {
