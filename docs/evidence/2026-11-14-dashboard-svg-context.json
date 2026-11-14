@@ -1,0 +1,508 @@
+{
+  "schema": "egohygiene.relay.dashboard-svg-context-evidence/v1",
+  "recorded_at": "2026-11-14T05:32:25Z",
+  "issue": "egohygiene/relay#189",
+  "consumer_issue": "egohygiene/empathy#105",
+  "base_revision": "2d0d88bdcfa1c9614a9a6bf7f66b26a397dfec2a",
+  "functional_revision": "e2f7062b29a320153881ef0f2343cf8a4db23e9c",
+  "production_delta": "Exactly two explorer.js context writes use native href attributes. Existing site.js/graph.js repairs, URL construction/allowlists, namespaces, contracts, schemas, source and publication authority remain unchanged.",
+  "generated_route_regression": {
+    "transport": "local-http",
+    "page_errors": [],
+    "checks": [
+      "every declared page and all referenced script bytes initialize",
+      "dashboard explorer initializes every context link before SVG focus",
+      "dashboard native SVG focus inspects its destination",
+      "dashboard native pointer navigation retains query and entity",
+      "dashboard native Enter navigation retains query and entity",
+      "real generated graph includes an entity",
+      "target is a native SVG anchor",
+      "directory target is a native HTML anchor",
+      "shared filter handlers initialized after SVG link setup",
+      "SVG anchor accepts keyboard focus",
+      "SVG focus runs the real graph inspect handler",
+      "query preserved in link destination",
+      "graph entity preserved in link destination",
+      "query preserved in link destination",
+      "graph entity preserved in link destination",
+      "query preserved in link destination",
+      "graph entity preserved in link destination",
+      "query preserved in link destination",
+      "graph entity preserved in link destination",
+      "HTML and SVG context destinations agree",
+      "shared entity handler initialized after SVG link setup",
+      "hash selection retains entity context",
+      "graph remains rendered"
+    ],
+    "routes": [
+      {
+        "file": "index.html",
+        "scripts": [
+          "/intelligence/site.js",
+          "/intelligence/graph.js"
+        ]
+      },
+      {
+        "file": "now/index.html",
+        "scripts": [
+          "/intelligence/site.js"
+        ]
+      },
+      {
+        "file": "roadmap/index.html",
+        "scripts": [
+          "/intelligence/site.js",
+          "/intelligence/graph.js"
+        ]
+      },
+      {
+        "file": "decisions/index.html",
+        "scripts": [
+          "/intelligence/site.js"
+        ]
+      },
+      {
+        "file": "journey/index.html",
+        "scripts": [
+          "/intelligence/site.js"
+        ]
+      },
+      {
+        "file": "dependencies/index.html",
+        "scripts": [
+          "/intelligence/site.js",
+          "/intelligence/graph.js"
+        ]
+      },
+      {
+        "file": "health/index.html",
+        "scripts": [
+          "/intelligence/site.js"
+        ]
+      },
+      {
+        "file": "releases/index.html",
+        "scripts": [
+          "/intelligence/site.js"
+        ]
+      },
+      {
+        "file": "work/index.html",
+        "scripts": [
+          "/intelligence/site.js"
+        ]
+      },
+      {
+        "file": "search/index.html",
+        "scripts": [
+          "/intelligence/site.js"
+        ]
+      },
+      {
+        "file": "compare/index.html",
+        "scripts": [
+          "/intelligence/site.js"
+        ]
+      },
+      {
+        "file": "audits/index.html",
+        "scripts": [
+          "/intelligence/site.js"
+        ]
+      },
+      {
+        "file": "hygiene/index.html",
+        "scripts": [
+          "/intelligence/site.js"
+        ]
+      },
+      {
+        "file": "sanity/index.html",
+        "scripts": [
+          "/intelligence/site.js"
+        ]
+      },
+      {
+        "file": "diagnostics/index.html",
+        "scripts": [
+          "/intelligence/site.js"
+        ]
+      },
+      {
+        "file": "distribution/index.html",
+        "scripts": [
+          "/intelligence/site.js"
+        ]
+      },
+      {
+        "file": "identity/index.html",
+        "scripts": [
+          "/intelligence/site.js"
+        ]
+      },
+      {
+        "file": "dashboard/index.html",
+        "scripts": [
+          "/intelligence/explorer.js",
+          "/intelligence/graph.js"
+        ]
+      }
+    ],
+    "scripts": {
+      "/intelligence/site.js": "exact served bytes",
+      "/intelligence/graph.js": "exact served bytes",
+      "/intelligence/explorer.js": "exact served bytes"
+    },
+    "browser": "151.0.7922.173",
+    "result": "passed"
+  },
+  "old_script_control": {
+    "source": "2d0d88bdcfa1c9614a9a6bf7f66b26a397dfec2a",
+    "outcome": "failed-as-expected",
+    "assertion": "Dashboard initial HTML directory context before any SVG focus",
+    "actual_query": null,
+    "actual_entity": null,
+    "expected_query": "bridge",
+    "expected_entity": "fixture-context"
+  },
+  "relay_asset_audit": {
+    "javascript_asset_count": 3,
+    "assets": [
+      "site.js",
+      "graph.js",
+      "explorer.js"
+    ],
+    "remaining_direct_href_assignments": [
+      {
+        "asset": "graph.js",
+        "line": 116,
+        "target": "HTMLAnchorElement from document.createElement(\"a\")",
+        "disposition": "safe HTML property assignment retained"
+      },
+      {
+        "asset": "site.js",
+        "line": 484,
+        "target": "HTMLAnchorElement from generated <a data-resume-link> template",
+        "disposition": "safe HTML property assignment retained"
+      },
+      {
+        "asset": "site.js",
+        "line": 1098,
+        "target": "HTMLAnchorElement from document.createElement(\"a\")",
+        "disposition": "safe HTML property assignment retained"
+      },
+      {
+        "asset": "site.js",
+        "line": 1198,
+        "target": "HTMLAnchorElement from document.createElement(\"a\")",
+        "disposition": "safe HTML property assignment retained"
+      }
+    ],
+    "mixed_html_svg_writes": "All five shared selector/graph writes across site.js,graph.js,explorer.js now use setAttribute; no unsafe SVG href property writer remains in the three Relay scripts.",
+    "python_node_href_assignment": "Graph dictionary data mapping, not a DOM property writer.",
+    "window_location_writes": "No direct window.location writer in the three Relay assets; URL objects/history updates are separate navigation state."
+  },
+  "preserved_asset_sha256": {
+    "explorer.js": {
+      "base": "67c5967ffefc868d8861cdb5042e8c361c111bf7d478f175318122b26841a06a",
+      "functional": "f970b078bf164b8d4e138856f4a9b923c32f74c27f26574f38d7451af37855f7",
+      "equal": false
+    },
+    "site.js": {
+      "base": "82a0c784169bf451b3f20fb291de6e22a205e7ddc8a17371253eb16102ca6c2a",
+      "functional": "82a0c784169bf451b3f20fb291de6e22a205e7ddc8a17371253eb16102ca6c2a",
+      "equal": true
+    },
+    "graph.js": {
+      "base": "5e6139f03a551f90305cc7ee72fb9641b147a05731b9dd9ee89534e18f2e403c",
+      "functional": "5e6139f03a551f90305cc7ee72fb9641b147a05731b9dd9ee89534e18f2e403c",
+      "equal": true
+    }
+  },
+  "checks": [
+    {
+      "command": "python3 -m unittest discover -s tests -p test_repository_intelligence_dashboard.py -v",
+      "methods": 23,
+      "outcome": "passed",
+      "skips": 0
+    },
+    {
+      "command": "python3 -m unittest discover -s tests -p test_repository_intelligence_site.py -k context -v",
+      "methods": 3,
+      "outcome": "passed",
+      "skips": 0
+    },
+    {
+      "command": "Node syntax, Ruff0.16.5 browser driver, Python compilation and git diff --check",
+      "outcome": "passed"
+    },
+    {
+      "command": "python3 scripts/validate_actions.py",
+      "outcome": "failed-inherited",
+      "findings": 10,
+      "scope": "Same action SPDX/README advertisement baseline; manifest/catalog/README sources unchanged."
+    }
+  ],
+  "independent_retained_consumer": {
+    "observed_at": "2026-11-14T05:30:53.017995+00:00",
+    "scope": "Actual retained S3 HTML/data/CSS and all published Intelligence HTML routes, local HTTP fixture. Candidate changes only explorer.js bytes. This is not canonical deployment or a newly valid composed bundle.",
+    "source": "88667126133cdec5843bf22a09b1ef40b493f5f9",
+    "retained_owner": "2d0d88bdcfa1c9614a9a6bf7f66b26a397dfec2a",
+    "retained_run": {
+      "id": 43560603493,
+      "attempt": 1
+    },
+    "retained_manifest_sha256": "0e5a33806a8009a5bd775923b26c65573a801dbad383ee8053e91ef0694c46bc",
+    "candidate": "e2f7062b29a320153881ef0f2343cf8a4db23e9c",
+    "candidate_explorer_sha256": "f970b078bf164b8d4e138856f4a9b923c32f74c27f26574f38d7451af37855f7",
+    "unchanged_assets": {
+      "site.js": true,
+      "graph.js": true
+    },
+    "routes": [
+      "intelligence/audits/",
+      "intelligence/compare/",
+      "intelligence/dashboard/",
+      "intelligence/decisions/",
+      "intelligence/dependencies/",
+      "intelligence/diagnostics/",
+      "intelligence/distribution/",
+      "intelligence/health/",
+      "intelligence/hygiene/",
+      "intelligence/identity/",
+      "intelligence/",
+      "intelligence/journey/",
+      "intelligence/now/",
+      "intelligence/releases/",
+      "intelligence/roadmap/",
+      "intelligence/sanity/",
+      "intelligence/search/",
+      "intelligence/work/"
+    ],
+    "browser": {
+      "name": "Chromium",
+      "version": "151.0.7922.173",
+      "request_interception": false,
+      "certificate_bypass": false
+    },
+    "expected_old_fail_new_pass": true,
+    "modes": {
+      "original": {
+        "checks": {
+          "all_published_html_routes_200": true,
+          "initial_directory_context_before_focus": false,
+          "actual_svg_focus_inspection_and_context": true,
+          "actual_svg_pointer_navigation_context": true,
+          "actual_svg_keyboard_navigation_context": true,
+          "zero_application_page_errors_all_routes": false
+        },
+        "page_errors": [
+          {
+            "route": "/empathy/intelligence/dashboard/",
+            "message": "Cannot set property href of #<SVGAElement> which has only a getter"
+          },
+          {
+            "route": "/empathy/intelligence/dashboard/",
+            "message": "Cannot set property href of #<SVGAElement> which has only a getter"
+          },
+          {
+            "route": "/empathy/intelligence/dashboard/",
+            "message": "Cannot set property href of #<SVGAElement> which has only a getter"
+          },
+          {
+            "route": "/empathy/intelligence/dashboard/",
+            "message": "Cannot set property href of #<SVGAElement> which has only a getter"
+          }
+        ],
+        "optional_tree_controls_present": 0,
+        "optional_tree_scope": "Tree controls are unselected in the actual retained dashboard; no tree-filter result is inferred.",
+        "all_checks_pass": false
+      },
+      "candidate": {
+        "checks": {
+          "all_published_html_routes_200": true,
+          "initial_directory_context_before_focus": true,
+          "actual_svg_focus_inspection_and_context": true,
+          "actual_svg_pointer_navigation_context": true,
+          "actual_svg_keyboard_navigation_context": true,
+          "zero_application_page_errors_all_routes": true
+        },
+        "page_errors": [],
+        "optional_tree_controls_present": 0,
+        "optional_tree_scope": "Tree controls are unselected in the actual retained dashboard; no tree-filter result is inferred.",
+        "all_checks_pass": true
+      }
+    },
+    "source_receipt_sha256": "41f6b0961e558caf71cf1aed15dcfa8b7e0a74df717f747a3cd9b2ec24a2e1ed"
+  },
+  "independent_complete_composed_asset_audit": {
+    "result": "CLEAR",
+    "base": "2d0d88bdcfa1c9614a9a6bf7f66b26a397dfec2a",
+    "functional": "e2f7062b29a320153881ef0f2343cf8a4db23e9c",
+    "retained_consumer_source": "88667126133cdec5843bf22a09b1ef40b493f5f9",
+    "retained_manifest_sha256": "0e5a33806a8009a5bd775923b26c65573a801dbad383ee8053e91ef0694c46bc",
+    "actual_js_assets": 18,
+    "actual_html_pages": 37,
+    "original_direct_href_property_writer_count": 11,
+    "corrected_direct_href_property_writer_count": 9,
+    "repaired_attribute_writes": 2,
+    "source_delta": "Exactly two explorer href property writes become native attribute writes; all other owner production assets/workflows unchanged.",
+    "direct_href_writer_roles": [
+      {
+        "asset": "intelligence/explorer.js",
+        "writers": 2,
+        "element": "Heterogeneous context selector actually includes native SVG anchors on dashboard; both repaired to attributes."
+      },
+      {
+        "asset": "intelligence/graph.js",
+        "writers": 1,
+        "element": "Explicit document.createElement(\"a\"): HTMLAnchorElement."
+      },
+      {
+        "asset": "intelligence/site.js",
+        "writers": 3,
+        "element": "Two explicit document.createElement(\"a\") comparison links; one rendered data-resume-link anchor. Native resume types checked on every retained page."
+      },
+      {
+        "asset": "static/scripts/script-1-ec880d15.js",
+        "writers": 1,
+        "element": "Explicit document.createElement(\"a\") search result card: HTMLAnchorElement."
+      },
+      {
+        "asset": "static/scripts/script-2-1f9394e6.js",
+        "writers": 2,
+        "element": "Explicit HTML anchor creation and cloned HTML file template anchor; native template types checked on all retained pages."
+      },
+      {
+        "asset": "static/scripts/script-3-2a102aaa.js",
+        "writers": 2,
+        "element": "Both writes are window.location.href navigation, not anchor/SVG DOM properties."
+      }
+    ],
+    "original_error_pages": [
+      {
+        "file": "intelligence/dashboard/index.html",
+        "errors": [
+          "Cannot set property href of #<SVGAElement> which has only a getter"
+        ]
+      }
+    ],
+    "candidate_pages_checked": 37,
+    "candidate_application_page_errors": 0,
+    "all_actual_resume_and_template_anchor_types_html": true,
+    "optional_legacy_tree_profile": {
+      "selected_in_actual_S3": false,
+      "scope": "Absent data-repository-explorer/tree-search is unselected, not a failing filter. This retained-data witness makes no optional tree-filter behavior claim."
+    },
+    "browser": {
+      "name": "Chromium",
+      "version": "151.0.7922.173",
+      "request_interception": false,
+      "certificate_bypass": false
+    },
+    "limits": [
+      "Exact retained S3 HTML/CSS/data copied to local HTTP mount; corrected fixture replaces only explorer.js and is explicitly not a valid sealed publication or canonical live S4 proof.",
+      "Static direct-property-writer inventory is paired with actual DOM namespaces and all37 existing HTML pages; future markup/script changes still require their own coverage."
+    ],
+    "asset_inventory": [
+      {
+        "asset": "intelligence/explorer.js",
+        "sha256": "67c5967ffefc868d8861cdb5042e8c361c111bf7d478f175318122b26841a06a",
+        "direct_href_property_writers": 2
+      },
+      {
+        "asset": "intelligence/graph.js",
+        "sha256": "5e6139f03a551f90305cc7ee72fb9641b147a05731b9dd9ee89534e18f2e403c",
+        "direct_href_property_writers": 1
+      },
+      {
+        "asset": "intelligence/site.js",
+        "sha256": "82a0c784169bf451b3f20fb291de6e22a205e7ddc8a17371253eb16102ca6c2a",
+        "direct_href_property_writers": 3
+      },
+      {
+        "asset": "postscript-77bffeeb.js",
+        "sha256": "77bffeeb5f3b85ae4b5c924f158344ae9763b59f1d65d95b03df5fad25a719e1",
+        "direct_href_property_writers": 0
+      },
+      {
+        "asset": "prescript-2bfc6315.js",
+        "sha256": "2bfc63159a0c9befe69fba38e71d274dd122be47084d82e9c4e3f3bb1e647139",
+        "direct_href_property_writers": 0
+      },
+      {
+        "asset": "static/resource-after-5eb75950.js",
+        "sha256": "5eb7595090e1c6e6a52627450c4752ec0294bb19262d68216e234ce1c751af12",
+        "direct_href_property_writers": 0
+      },
+      {
+        "asset": "static/resource-after-8b336f9a.js",
+        "sha256": "8b336f9ab52938e6f7575a3426f8a3dae8a766dbe772b1d539084ddc205731b0",
+        "direct_href_property_writers": 0
+      },
+      {
+        "asset": "static/resource-after-baba652b.js",
+        "sha256": "baba652bd51ee9578827e01884e01e5e364cc8f88eb41f33cb9bb06df5b30fb9",
+        "direct_href_property_writers": 0
+      },
+      {
+        "asset": "static/resource-after-e13fffa1.js",
+        "sha256": "e13fffa1497844ae87acda32dbb9fb68cb1679bf22d9feddd389cb43107a3fe6",
+        "direct_href_property_writers": 0
+      },
+      {
+        "asset": "static/scripts/script-0-f7c52b6a.js",
+        "sha256": "f7c52b6ad7a63606849b8e69cab346de257d910d91d70ce9792cccc271631db8",
+        "direct_href_property_writers": 0
+      },
+      {
+        "asset": "static/scripts/script-1-ec880d15.js",
+        "sha256": "ec880d1576c45263a404dcf4730af91227383e0d107e374f1cc382362cce24e6",
+        "direct_href_property_writers": 1
+      },
+      {
+        "asset": "static/scripts/script-2-1f9394e6.js",
+        "sha256": "1f9394e68e7eb94068aa59a490f72e673b7768a066d0df386058a2782d4fd244",
+        "direct_href_property_writers": 2
+      },
+      {
+        "asset": "static/scripts/script-3-2a102aaa.js",
+        "sha256": "2a102aaad1b40cd3038d8946e0041d2c0f57031952739a053fbe20484fbd2b2c",
+        "direct_href_property_writers": 2
+      },
+      {
+        "asset": "static/scripts/script-4-cc8afa9d.js",
+        "sha256": "cc8afa9d6f67588b69322d02076337cd9b6f4a8da177d4acced3d65e43816ff6",
+        "direct_href_property_writers": 0
+      },
+      {
+        "asset": "static/scripts/script-5-7e107d7e.js",
+        "sha256": "7e107d7e1765b42da7d15c1518044621f2b807cb805d4650d9d778be28f0ed86",
+        "direct_href_property_writers": 0
+      },
+      {
+        "asset": "static/scripts/script-6-5ef560a8.js",
+        "sha256": "5ef560a8a0c9250c4eb278300201f260815c69bf96a6349c44ca495cb47bd0f8",
+        "direct_href_property_writers": 0
+      },
+      {
+        "asset": "static/scripts/script-7-be15df42.js",
+        "sha256": "be15df42f084a5af0043541bc16d792c952dc4d968653c34f2a819632fb5ad01",
+        "direct_href_property_writers": 0
+      },
+      {
+        "asset": "static/scripts/script-8-d93af9ba.js",
+        "sha256": "d93af9ba5f8718260fdde5fbaacb1a0bbc8117b15c051f8537091b1716e66f71",
+        "direct_href_property_writers": 0
+      }
+    ],
+    "source_receipt_sha256": "deaa3da7f55d626ff1e0fc53b113be4cdfa767ef50783fed21ee63b145dcdd80"
+  },
+  "limits": [
+    "Generated regression is local HTTP/Chromium with real renderer markup and production scripts, not a canonical deployment.",
+    "Roadmap is an additional real-renderer graph stress fixture; overview/dependencies/dashboard are actual production graph placements.",
+    "Actual S3 dashboard has no selected tree controls; no tree-filter failure or recovery is claimed there.",
+    "S3 original hosted/producer/portability/browser evidence retains source886/owner2d and its dashboard TypeErrors. New source/live acceptance remains separately required.",
+    "No UI redesign, whole-repository clean result or full accessibility/human acceptance is inferred."
+  ]
+}
