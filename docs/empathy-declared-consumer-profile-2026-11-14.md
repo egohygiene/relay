@@ -47,8 +47,9 @@ binds the exact functional commits, source observations and receipt hashes.
 ## Remaining acceptance and decision impact
 
 The focused native fixture does not select provider captures; their domains remain
-honestly uncollected. The separate bounded Journey corpus repair must be reviewed
-and integrated before a final immutable Relay pin is offered to Empathy. Empathy
+honestly uncollected. The bounded Journey corpus repair is now merged through Relay PR183 at
+`e2cef7e15c9a441b4015eb2efabad1c21eec8573`. This candidate was rebased onto
+that actual source and a fresh combined native proof was collected. Empathy
 #105/#98 still require fresh actual full-plan source/report clocks, hosted build
 and artifact/deployment receipts and exact-source live verification. No new
 rollback point, source hold, human approval or publication success is inferred.
@@ -58,3 +59,19 @@ with Hygiene, and event ordering restores its existing contract. No blanket
 permission, runtime adoption claim, renderer/native ABI or receipt relaxation is
 introduced. Refs egohygiene/hygiene#76, egohygiene/empathy#105 and
 egohygiene/empathy#98.
+
+## Combined qualification after Journey integration
+
+The [fresh combined record](evidence/empathy-combined-source-2026-11-14.json)
+binds clean functional `82fb8e052a60a3a18c1871379f4e36ba74037fe8` to actual
+branchy Empathy source `e50f35ff32e0534a57315b555a5d67576c435844` at the new
+truthful observation `2026-11-14T00:52:27Z`. No original capture was retimed.
+Real pinned native Journey inspects every one of the 256 original objects in
+255+1 disjoint passes. Attributed Search and all four declared dependency edges
+compose with canonical chronological events. The ordinary source receipt,
+standalone dependency and embedded production provenance schemas pass; all seven
+tamper controls deny. All 39 relevant tests pass, including the 12 Journey groups.
+Differently named owner/consumer checkouts reproduce the complete three-file
+source bundle byte for byte. Earlier native receipts and observation clocks stay
+unchanged in their historical evidence records. Provider captures and actual
+publication remain separate acceptance.
