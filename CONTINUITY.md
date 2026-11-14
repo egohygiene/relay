@@ -80,7 +80,7 @@ state:
     issue_state: open
     pull_request_state: not-applicable
     notes: Provider main f7 and new owner bug189 were verified. Functional repair62dd is local; the containing
-      docs candidate and PR have no identifiers at authorship. Empathy105 stays open for a new consumer cycle.
+      docs candidate and PR have no identifiers at authorship. Empathy #105 stays open for a new consumer cycle.
   parallel_changes: []
 review:
   status: partial
@@ -91,7 +91,7 @@ review:
       input control
     outcome: passed
     observed_at: '2026-11-14T04:34:47Z'
-    notes: Real Chromium151 generated-DOM repair passes18 assertions/zero page errors. Original script control
+    notes: Real Chromium151 generated-DOM repair passes 18 assertions/zero page errors. Original script control
       fails shared filter initialization. Independent retained-consumer peer is recorded in the bounded proof
       when available.
   - command: python3 -m unittest discover -s tests -p test_repository_intelligence_site.py -v; clean f7 single
@@ -139,7 +139,7 @@ User/runtime instructions, verified live evidence and canonical source owners ou
 
 ## Resume protocol
 
-Read the SVG context repair guide, owner189 and consumer105. Reverify mutable main/PR facts and preserve original source clocks and rollback evidence.
+Read the SVG context repair guide, owner #189 and consumer #105. Reverify mutable main/PR facts and preserve original source clocks and rollback evidence.
 
 ## Current objective and success conditions
 
@@ -147,7 +147,7 @@ Repair native SVG context-link destinations while retaining exact URL admission.
 
 ## State snapshot
 
-This candidate is based on verified owner f7. Functional62dd changes three native href writes and regression coverage; its containing documentation revision and PR remain null at authorship. Owner189 and Empathy105 remain open.
+This candidate is based on verified owner f7. Functional 62dd changes three native href writes and regression coverage; its containing documentation revision and PR remain null at authorship. Owner #189 and Empathy #105 remain open.
 
 ## Completed and material changes
 
@@ -155,7 +155,7 @@ Shared site and graph handlers use href attributes compatible with both HTML and
 
 ## Validation and review evidence
 
-Real Chromium151 passes18 assertions with no page errors; original f7 scripts fail initialization. Focused site checks report33 pass and one inherited Hygiene route-lock failure, reproduced on exact base. Node syntax, scoped Ruff, Python compilation and structural continuity checks pass. The action validator retains ten inherited metadata/README findings.
+Real Chromium151 passes 18 assertions with no page errors; original f7 scripts fail initialization. Focused site checks report 33 pass and one inherited Hygiene route-lock failure, reproduced on exact base. Node syntax, scoped Ruff, Python compilation and structural continuity checks pass. The action validator retains ten inherited metadata/README findings.
 
 ## Blockers, risks, unknowns, and deferred work
 
@@ -179,4 +179,4 @@ Refresh actual provider and consumer outcomes at their next authorized checkpoin
 
 ## Compaction and supersession
 
-Keep all twelve canonical headings within240lines/16,384bytes. Dated proof and owning issues retain detailed history; this checkpoint does not contain its own future hash.
+Keep all twelve canonical headings within 240 lines/16,384bytes. Dated proof and owning issues retain detailed history; this checkpoint does not contain its own future hash.
