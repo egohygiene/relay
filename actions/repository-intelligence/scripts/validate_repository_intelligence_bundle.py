@@ -1212,6 +1212,22 @@ def validate_json_contracts(
     return summary, provenance, manifest
 
 
+def consumer_check_reference(path: str, repository: str) -> bool:
+    """Recognize the same-consumer check URLs admitted by the Health collector."""
+    return re.fullmatch(
+        rf"/{re.escape(repository)}/(?:runs/[1-9][0-9]*|actions/runs/[1-9][0-9]*/job/[1-9][0-9]*)",
+        path,
+    ) is not None
+
+
+def declared_repository_root(path: str, repository: str, allowed: set[str] | None) -> bool:
+    """Admit a bare canonical root only within the existing source membership."""
+    target = path.removeprefix("/")
+    return (path.startswith("/") and target != repository
+            and REPOSITORY_PATTERN.fullmatch(target) is not None
+            and target in (allowed or set()))
+
+
 def validate_github_reference(
     path: str,
     repository: str,
@@ -1221,6 +1237,9 @@ def validate_github_reference(
     """Require a reviewed consumer or same-ecosystem canonical GitHub route."""
 
     escaped_repository = re.escape(repository)
+    if (consumer_check_reference(path, repository)
+            or declared_repository_root(path, repository, allowed_external_repositories)):
+        return
     if path in {"/egohygiene", "/features/actions"} or re.fullmatch(
         r"/egohygiene/relay/issues/[0-9]+", path
     ):
@@ -1320,6 +1339,10 @@ def validate_https_reference(
         raise BundleValidationError("external reference contains secret-like data")
     hostname = parsed.hostname.casefold()
     if hostname == "github.com":
+        if (consumer_check_reference(parsed.path, repository)
+                or declared_repository_root(parsed.path, repository, allowed_external_repositories)):
+            if parsed.netloc != "github.com" or parsed.fragment:
+                raise BundleValidationError("GitHub evidence reference must use its canonical origin without a fragment")
         if parsed.query:
             raise BundleValidationError("GitHub reference contains an unsupported query")
         if parsed.fragment and not re.fullmatch(r"[A-Za-z0-9._-]+", parsed.fragment):
