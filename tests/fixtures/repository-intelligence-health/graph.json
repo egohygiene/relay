@@ -1,0 +1,79 @@
+{
+  "sources": [
+    {
+      "id": "source:synthetic-0",
+      "freshness": "current",
+      "assertion": "authoritative"
+    },
+    {
+      "id": "source:synthetic-1",
+      "freshness": "current",
+      "assertion": "authoritative"
+    },
+    {
+      "id": "source:synthetic-2",
+      "freshness": "current",
+      "assertion": "authoritative"
+    }
+  ],
+  "entities": [
+    {
+      "canonical_url": "https://github.com/example/repository/actions/runs/101",
+      "freshness": "current",
+      "id": "ri:example/repository:check:validation-101",
+      "key": "validation-101",
+      "kind": "check",
+      "repository": "example/repository",
+      "title": "Repository validation",
+      "visibility": "public",
+      "state": {
+        "value": "success",
+        "assertion": "authoritative"
+      }
+    },
+    {
+      "canonical_url": "https://github.com/example/repository/actions/runs/102",
+      "freshness": "stale",
+      "id": "ri:example/repository:check:contracts-102",
+      "key": "contracts-102",
+      "kind": "check",
+      "repository": "example/repository",
+      "title": "Contract validation",
+      "visibility": "public",
+      "state": {
+        "value": "failure",
+        "assertion": "inferred"
+      }
+    },
+    {
+      "canonical_url": "https://github.com/example/repository/actions/runs/103",
+      "freshness": "unknown",
+      "id": "ri:example/repository:check:publication-103",
+      "key": "publication-103",
+      "kind": "check",
+      "repository": "example/repository",
+      "title": "Publication verification",
+      "visibility": "public",
+      "state": {
+        "value": "unknown",
+        "assertion": "unknown"
+      }
+    },
+    {
+      "id": "ri:example/repository:repository:example/repository",
+      "key": "example/repository",
+      "title": "Repository",
+      "kind": "repository",
+      "state": {
+        "value": "active",
+        "assertion": "authoritative"
+      },
+      "freshness": "current",
+      "visibility": "public",
+      "canonical_url": "https://github.com/example/repository",
+      "repository": "example/repository"
+    }
+  ],
+  "relationships": [],
+  "events": []
+}
