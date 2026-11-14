@@ -1,0 +1,200 @@
+{
+  "schema": "egohygiene.relay.empathy-combined-source-evidence/v1",
+  "recorded_at": "2026-11-14T00:55:39Z",
+  "scope": "Fresh combined native qualification after the actual Journey183 merge; no provider publication claim.",
+  "base_revision": "e2cef7e15c9a441b4015eb2efabad1c21eec8573",
+  "functional_revision": "82fb8e052a60a3a18c1871379f4e36ba74037fe8",
+  "rebased_profile_commit": "dc97278d4414d0c9345bb97c8ee401e1d5291716",
+  "rebased_event_order_commit": "b21599871bfd4a64dcefdf916cccb97588e71e05",
+  "native_composition": {
+    "observed_at": "2026-11-14T00:53:25Z",
+    "relay_functional_revision": "82fb8e052a60a3a18c1871379f4e36ba74037fe8",
+    "source_dirty": false,
+    "merged_journey_revision": "e2cef7e15c9a441b4015eb2efabad1c21eec8573",
+    "hygiene_owner_revision": "627b448f655afb2f4366654ba3ca3050389e464a",
+    "consumer_repository": "egohygiene/empathy",
+    "consumer_revision": "e50f35ff32e0534a57315b555a5d67576c435844",
+    "source_observed_at": "2026-11-14T00:52:27Z",
+    "selected_sources": [
+      "dependencies",
+      "journey"
+    ],
+    "normalization_profile": "search-attribution-v1",
+    "ordinary_contract_validation": "passed",
+    "embedded_schema_validation": "passed",
+    "standalone_dependency_schema_validation": "passed",
+    "projection_event_count": 256,
+    "projection_event_order": "occurred_at,id",
+    "journey_commit_revisions": 256,
+    "journey_object_hashes": 256,
+    "journey_validation": {
+      "coverage": "valid",
+      "diagnostics_truncated": false,
+      "egolint": "incomplete",
+      "hygiene": "valid",
+      "observatory": "normalized"
+    },
+    "coverage": {
+      "checks": {
+        "collection": "uncollected",
+        "freshness": "unknown",
+        "observed_at": null,
+        "reason": "not_requested"
+      },
+      "decisions": {
+        "collection": "uncollected",
+        "freshness": "unknown",
+        "observed_at": null,
+        "reason": "not_requested"
+      },
+      "deployments": {
+        "collection": "uncollected",
+        "freshness": "unknown",
+        "observed_at": null,
+        "reason": "not_requested"
+      },
+      "git": {
+        "collection": "partial",
+        "freshness": "current",
+        "observed_at": "2026-11-14T00:52:27Z",
+        "reason": "truncated"
+      },
+      "history": {
+        "collection": "partial",
+        "freshness": "current",
+        "observed_at": "2026-11-14T00:52:27Z",
+        "reason": "incomplete"
+      },
+      "issues": {
+        "collection": "uncollected",
+        "freshness": "unknown",
+        "observed_at": null,
+        "reason": "not_requested"
+      },
+      "pull_requests": {
+        "collection": "uncollected",
+        "freshness": "unknown",
+        "observed_at": null,
+        "reason": "not_requested"
+      },
+      "releases": {
+        "collection": "uncollected",
+        "freshness": "unknown",
+        "observed_at": null,
+        "reason": "not_requested"
+      },
+      "roadmap": {
+        "collection": "uncollected",
+        "freshness": "unknown",
+        "observed_at": null,
+        "reason": "not_requested"
+      }
+    },
+    "dependency_scope": {
+      "authority": "egohygiene/hygiene",
+      "bounded": true,
+      "excluded_topology": "uncollected",
+      "kind": "declared_consumption",
+      "package_dependencies": "uncollected",
+      "runtime_adoption": "uncollected"
+    },
+    "public_edges": [
+      {
+        "source": "egohygiene/empathy",
+        "target": "egohygiene/egolint"
+      },
+      {
+        "source": "egohygiene/empathy",
+        "target": "egohygiene/mantle"
+      },
+      {
+        "source": "egohygiene/empathy",
+        "target": "egohygiene/realm"
+      },
+      {
+        "source": "egohygiene/empathy",
+        "target": "egohygiene/relay"
+      }
+    ],
+    "negative_controls": [
+      {
+        "control": "mixed-clock",
+        "result": "denied"
+      },
+      {
+        "control": "missing-domain-coverage",
+        "result": "denied"
+      },
+      {
+        "control": "forged-implementation",
+        "result": "denied"
+      },
+      {
+        "control": "missing-edge",
+        "result": "denied"
+      },
+      {
+        "control": "wrong-policy",
+        "result": "denied"
+      },
+      {
+        "control": "wrong-owner-revision",
+        "result": "denied"
+      },
+      {
+        "control": "private-wrapper",
+        "result": "denied"
+      }
+    ],
+    "receipt_sha256": "af9252911ba3a4a2e8f44afa631f1f299f4cc0115826b3c79e3b0a115739bcce",
+    "candidate_digests": {
+      "projection_sha256": "c9e95b27f1db5f72d7641a3516b504ed6b1cc59df0e02f13e4b15d37ac917a91",
+      "snapshot_sha256": "6d106943e5bd43d13c79db8f9b9551e06d39292d6b79dda36dc1c2876f53d088"
+    },
+    "provider_captures": "not-selected-for-focused-native-replay",
+    "publication": "not-performed"
+  },
+  "different_checkout_reproduction": {
+    "recorded_at": "2026-11-14T00:54:12Z",
+    "relay_functional_revision": "82fb8e052a60a3a18c1871379f4e36ba74037fe8",
+    "consumer_revision": "e50f35ff32e0534a57315b555a5d67576c435844",
+    "source_observed_at": "2026-11-14T00:52:27Z",
+    "complete_three_file_native_source_bundle": "byte-identical",
+    "sha256": {
+      "projection.json": "c9e95b27f1db5f72d7641a3516b504ed6b1cc59df0e02f13e4b15d37ac917a91",
+      "snapshot.json": "6d106943e5bd43d13c79db8f9b9551e06d39292d6b79dda36dc1c2876f53d088",
+      "receipt.json": "af9252911ba3a4a2e8f44afa631f1f299f4cc0115826b3c79e3b0a115739bcce"
+    },
+    "safe_native_trace": {
+      "native_passes": [
+        {
+          "root": "e50f35ff32e0534a57315b555a5d67576c435844",
+          "status": "incomplete",
+          "commits_inspected": 255
+        },
+        {
+          "root": "c154c7d8bf1b46c278725925d2f10926f0a1898b",
+          "status": "incomplete",
+          "commits_inspected": 1
+        }
+      ],
+      "unique_inspected": 256,
+      "total_inspected": 256,
+      "each_original_once": true,
+      "aggregate_native_status": "incomplete"
+    },
+    "collection_seconds": 7.257
+  },
+  "focused_tests": {
+    "profile": 6,
+    "composition": 3,
+    "dependency_renderer": 8,
+    "bundle": 10,
+    "journey_native_validation": 12,
+    "total": 39,
+    "outcome": "passed"
+  },
+  "historical_evidence": "The earlier owner-profile and original Journey evidence records retain their original functional sources, observation clocks and receipts. They are historical controls, not substituted final combined receipts.",
+  "inherited_limitations": "The earlier exact-base comparison records10 package metadata/README findings and19 stale portability harness errors; none was repaired or claimed green. Provider captures remain honestly unselected in this focused native fixture.",
+  "remaining_acceptance": "Root review/ordinary merge, final immutable consumer pin and fresh actual full-plan hosted source/build/artifact/deployment/live qualification remain separate."
+}

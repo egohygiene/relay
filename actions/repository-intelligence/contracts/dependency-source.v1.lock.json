@@ -1,17 +1,17 @@
 {
   "declarations_observed_at": "2026-11-09",
   "files": {
-    "catalog/dependency-boundaries.yaml": "a61e604cdfb8685ae4e6a7becdecd16e7174b76a58019b937ef39097a4975f6b",
-    "catalog/repositories.yaml": "a73767c1bf66419b218f263c60d5cb797b0c45e50ca136e9a5f10e8663fcb783",
-    "catalog/repository-context.json": "0438ed0f3c5976fada318bd041137bb962a501d66df079c2936aa30d2d5f3003",
+    "catalog/dependency-boundaries.yaml": "ac7cf5fae3120b19a4f04bf7b3cfe5ba9f30956256bf9f9d61ffa2dd819e4491",
+    "catalog/repositories.yaml": "9bac787932d0b015a4d640510e488da3c0e24c9bbe8ccdf33f9f56b36ef1bd5c",
+    "catalog/repository-context.json": "9d183d8b0c70573adcd17bbd77fa15a42e2c3142c9a5869c73e3e436d1d07063",
     "schemas/dependency-boundary-register.v1.schema.json": "c6ca721858b78c4adce7a83d6dcbaf1cccbf09896e48c52dd1dc84a6161053c9",
     "schemas/repository-catalog.v1.schema.json": "806683cf970ad66c066d4139f7fef881639c9024e6d15a46d19df8b4788fbc40"
   },
   "normalization_lock": "adr-collector.v1.lock.json",
   "owner": "egohygiene/hygiene",
-  "public_reference_sha256": "291f4f2fdd013648144641292039b12224fc9f1341a752cfa7da0727614fa20f",
-  "revision": "49639c1845cdfd08fbd5a768261a8b3cf515f80f",
+  "public_reference_sha256": "f15bd3a752da28a81025b845d9bd58802dc0881f46f360b0ff9330879dc927f0",
+  "revision": "627b448f655afb2f4366654ba3ca3050389e464a",
   "schema": "egohygiene.relay.declared-dependency-source-lock/v1",
   "scope": "declared-consumption-only",
-  "tree": "f35e00f075ae5fa53bcf7734392f8d1443eb172d"
+  "tree": "1d3618f46bf338c0807b9ac8ba033251dd7352a8"
 }
