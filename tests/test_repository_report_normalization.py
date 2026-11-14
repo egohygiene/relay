@@ -12,6 +12,7 @@ import importlib.util
 import json
 from pathlib import Path
 import tempfile
+from typing import Any
 import unittest
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -188,7 +189,8 @@ class RepositoryReportNormalizationTests(unittest.TestCase):
             (FIXTURE_ROOT / "megalinter-763-finalized.json").read_text()
         )
         cases = []
-        for value in (None, {}, [], ["invalid"]):
+        invalid_collections: tuple[Any, ...] = (None, {}, [], ["invalid"])
+        for value in invalid_collections:
             document = deepcopy(original)
             document["linters"] = value
             cases.append(document)

@@ -37,6 +37,19 @@ execution `failure`. Neither condition becomes green.
 | MegaLinter | `mega-linter-report.json` plus tool matrix   | Each finding-bearing tool inherits `blocking` or `advisory` from the matrix.        |
 | Scorecard  | OpenSSF SARIF and optional official API JSON | Checks below ten are advisory; no aggregate score is invented from SARIF.           |
 
+MegaLinter's finalized `linters` collection is authoritative when present; only
+explicit `is_active: true` rows are counted. The detailed reporter's separate
+`active_linters` list can contain pre-run success values. A valid legacy report
+with only `active_linters` remains supported. Present malformed, empty,
+ambiguous or inventory-inconsistent final results never fall back to that
+pre-run list. Missing statuses/counts and invalid or duplicate policy bindings
+produce failed execution with unknown findings. Canonical disabled policy rows
+remain valid when unselected; a contradictory active selection is invalid.
+
+The [actual-source qualification](../../docs/megalinter-final-results-2026-11-14.md)
+records native replay, original identities, bounded fixture derivation and
+separate consumer acceptance.
+
 An official Scorecard aggregate is accepted only when its repository and full
 commit match the evaluated workflow commit. Stale, missing, or incompatible API
 data leaves `aggregate_score` null while retaining SARIF-derived check signals.
