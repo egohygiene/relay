@@ -53,6 +53,12 @@ class RepositoryIntelligenceHealthTests(unittest.TestCase):
     def populated(self) -> dict[str, object]:
         return copy.deepcopy(self.snapshot)
 
+    def full_snapshot(self) -> dict[str, object]:
+        """Pair the compact synthetic view with its explicit matching graph."""
+        snapshot = self.populated()
+        snapshot["graph"] = json.loads(FIXTURE.with_name("graph.json").read_bytes())
+        return snapshot
+
     def test_populated_view_renders_check_posture_and_canonical_sources(self) -> None:
         rendered = health.health_body(self.populated())
         self.assertIn("What does the current evidence say?", rendered)
@@ -110,7 +116,7 @@ class RepositoryIntelligenceHealthTests(unittest.TestCase):
 
     def test_shell_is_static_first_and_exposes_accessible_filter_hooks(self) -> None:
         rendered = health.render_page(
-            snapshot=self.populated(),
+            snapshot=self.full_snapshot(),
             summary=summary(),
             repository="example/repository",
             source_commit=SOURCE_COMMIT,
@@ -176,13 +182,88 @@ class RepositoryIntelligenceHealthTests(unittest.TestCase):
         with self.assertRaisesRegex(health.HealthViewError, "exactly describe projected checks"):
             health.health_body(snapshot)
 
-    def test_stale_unknown_overlap_fails_closed(self) -> None:
+    def test_impossible_unknown_union_fails_closed(self) -> None:
         snapshot = self.populated()
-        snapshot["views"]["health"]["unknown_ids"] = [
-            "ri:example/repository:check:contracts-102"
-        ]
-        with self.assertRaisesRegex(health.HealthViewError, "must be disjoint"):
+        snapshot["views"]["health"]["unknown_ids"] = []
+        with self.assertRaisesRegex(health.HealthViewError, "unknown evidence union"):
             health.health_body(snapshot)
+
+    def test_overlap_without_unknown_assertions_fails_closed(self) -> None:
+        snapshot = self.populated()
+        snapshot["views"]["health"]["assertions"]["unknown"] = 0
+        snapshot["views"]["health"]["unknown_ids"] = snapshot["views"]["health"]["stale_ids"]
+        with self.assertRaisesRegex(health.HealthViewError, "overlap requires unknown assertions"):
+            health.health_body(snapshot)
+
+    def test_current_unknown_assertion_repository_boundary_matches_actual_failure(self) -> None:
+        snapshot = self.full_snapshot()
+        view = snapshot["views"]["health"]
+        # The actual captured source has four dependency repository declarations
+        # whose catalog freshness is current while runtime assertion is unknown.
+        for name in ("egolint", "mantle", "realm", "relay"):
+            identifier = "ri:egohygiene/" + name + ":repository:egohygiene/" + name
+            snapshot["graph"]["entities"].append({"id": identifier, "kind": "repository",
+                "freshness": "current", "state": {"value": "unknown", "assertion": "unknown"}})
+            view["unknown_ids"].append(identifier)
+        view["freshness"]["current"] += 4
+        view["assertions"]["unknown"] += 4
+        self.assertEqual(view["freshness"]["unknown"], 1)
+        self.assertEqual(len(view["unknown_ids"]), 5)
+        rendered = health.render_page(snapshot=snapshot, summary=summary(), repository="example/repository", source_commit=SOURCE_COMMIT)
+        self.assertIn("Unknown evidence IDs (5)", rendered)
+        self.assertEqual(view["freshness"]["current"], 9)
+
+    def test_stale_unknown_assertion_record_legitimately_overlaps(self) -> None:
+        snapshot = self.full_snapshot()
+        view = snapshot["views"]["health"]
+        check = view["checks"][1]
+        check["assertion"] = check["confidence"] = "unknown"
+        snapshot["graph"]["entities"][1]["state"]["assertion"] = "unknown"
+        view["assertions"]["inferred"] -= 1
+        view["assertions"]["unknown"] += 1
+        view["unknown_ids"].append(check["id"])
+        self.assertIn(check["id"], view["stale_ids"])
+        self.assertIn("Unknown evidence IDs (2)", health.health_body(snapshot, require_graph=True))
+
+    def test_production_health_rejects_missing_graph(self) -> None:
+        with self.assertRaisesRegex(health.HealthViewError, "graph must accompany"):
+            health.render_page(snapshot=self.populated(), summary=summary(), repository="example/repository", source_commit=SOURCE_COMMIT)
+
+    def test_graph_membership_is_bound_even_when_counts_match(self) -> None:
+        snapshot = self.full_snapshot()
+        snapshot["views"]["health"]["unknown_ids"] = ["invented:unknown"]
+        with self.assertRaisesRegex(health.HealthViewError, "unknown_ids must exactly describe"):
+            health.health_body(snapshot)
+
+    def test_graph_counts_are_bound_even_when_unknown_union_size_still_fits(self) -> None:
+        for field, key in (("freshness", "current"), ("assertions", "authoritative")):
+            with self.subTest(field=field):
+                snapshot = self.full_snapshot()
+                snapshot["views"]["health"][field][key] += 1
+                with self.assertRaisesRegex(health.HealthViewError, field + " must exactly describe"):
+                    health.health_body(snapshot)
+
+    def test_graph_checks_cannot_be_omitted_or_relabelled(self) -> None:
+        for mode in ("omitted", "relabelled"):
+            with self.subTest(mode=mode):
+                snapshot = self.full_snapshot()
+                view = snapshot["views"]["health"]
+                if mode == "omitted":
+                    view["checks"] = []
+                    view["check_states"] = {}
+                else:
+                    view["checks"][0]["state"] = "failure"
+                    view["check_states"] = {"failure": 2, "unknown": 1}
+                with self.assertRaisesRegex(health.HealthViewError, "snapshot graph check"):
+                    health.health_body(snapshot)
+
+    def test_invalid_graph_never_falls_back_to_view_only_validation(self) -> None:
+        for invalid in (None, [], {}, {"sources": []}):
+            with self.subTest(graph=invalid):
+                snapshot = self.full_snapshot()
+                snapshot["graph"] = invalid
+                with self.assertRaises(health.HealthViewError):
+                    health.health_body(snapshot, require_graph=True)
 
     def test_freshness_distribution_must_match_exception_ids(self) -> None:
         snapshot = self.populated()
@@ -220,13 +301,13 @@ class RepositoryIntelligenceHealthTests(unittest.TestCase):
 
     def test_rendering_is_deterministic(self) -> None:
         first = health.render_page(
-            snapshot=self.populated(),
+            snapshot=self.full_snapshot(),
             summary=summary(),
             repository="example/repository",
             source_commit=SOURCE_COMMIT,
         )
         second = health.render_page(
-            snapshot=self.populated(),
+            snapshot=self.full_snapshot(),
             summary=summary(),
             repository="example/repository",
             source_commit=SOURCE_COMMIT,

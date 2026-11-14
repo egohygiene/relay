@@ -95,6 +95,7 @@ class RepositoryIntelligenceSiteTests(unittest.TestCase):
             ).read_text(encoding="utf-8")
         )
         self.snapshot["views"]["health"] = health_fixture["views"]["health"]
+        self.snapshot["graph"] = json.loads((REPOSITORY_ROOT / "tests/fixtures/repository-intelligence-health/graph.json").read_bytes())
 
     def build(self, relative: str, *, include_snapshot: bool = True) -> Path:
         output = self.repository / relative
