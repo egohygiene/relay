@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-11-14T00:35:46Z'
+  updated_at: '2026-11-14T00:45:07Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -91,16 +91,16 @@ state:
     default_branch_revision: 12d3a0823c8c8f885dea4acf482160fd726325e2
     issue_state: open
     pull_request_state: not-applicable
-    notes: Provider main remains12d3 and Journey 147 is open. This candidate is not yet merged or deployed. PR182 is a
-      separate open literal-path guard; the Hygiene owner-profile branch is independently qualified. Prior typed-feed
+    notes: Provider main remains12d3 and Journey 147 is open. This candidate is not yet merged or deployed. The companion profile/event-order
+      reference was corrected at 2026-11-14T00:45:07Z to PR184, open/draft at b11855db6bc1cf81a9177cb093da7d6395e8a99a. Prior typed-feed
       handoff prose is superseded by actual current source facts.
   parallel_changes:
   - provider: github
     id: egohygiene/relay#148
     url: https://github.com/egohygiene/relay/issues/148
   - provider: github
-    id: egohygiene/relay#182
-    url: https://github.com/egohygiene/relay/pull/182
+    id: egohygiene/relay#184
+    url: https://github.com/egohygiene/relay/pull/184
   - provider: github
     id: egohygiene/empathy#144
     url: https://github.com/egohygiene/empathy/pull/144
@@ -174,7 +174,7 @@ Verify every selected original Journey commit across truncated merge boundaries 
 
 ## State snapshot
 
-Observed Relay main is 12d3; Journey 147 remains open. Clean functional 96d0d59 qualifies the actual immutable Empathy e50 source at 00:03:18Z. This containing evidence/CONT candidate is unmerged, with no self revision or future PR identity.
+At the original handoff, observed Relay main is 12d3 and Journey 147 remains open. Clean functional 96d0d59 qualifies the actual immutable Empathy e50 source at 00:03:18Z. This containing evidence/CONT candidate is unmerged, with no self revision or future PR identity.
 
 ## Completed and material changes
 
@@ -194,7 +194,7 @@ Root reviews and ordinarily integrates this Journey candidate with the separate 
 
 ## Parallel changes and reconciliation
 
-Relay 148 owns the Hygiene declaration/profile upgrade; Relay 182 is a separate literal-path guard. Empathy 144 owns current consumer acceptance and scheduling evidence. Root coordinates source integration and metadata. This candidate changes no locks, renderer, public/native protocol, workflow or deployment authority.
+Relay 148 owns the Hygiene declaration/profile upgrade; its companion profile/event-order candidate is Relay PR 184. Unrelated OptiFlow backport PR 182 is outside this repair and is not an integration dependency. Empathy 144 owns current consumer acceptance and scheduling evidence. Root coordinates source integration and metadata. This candidate changes no locks, renderer, public/native protocol, workflow or deployment authority.
 
 ## Privacy and redaction
 
