@@ -114,6 +114,13 @@ def browser_check(output: Path):
                     dimensions = page.evaluate("({viewport:innerWidth,document:document.documentElement.scrollWidth})")
                     result["layouts"].append({"route": path or "overview", "width": width, **dimensions})
                     assert dimensions["document"] <= dimensions["viewport"] + 1, result["layouts"][-1]
+                    optional_graph = page.locator('[data-ri-graph-disclosure]')
+                    if optional_graph.count():
+                        optional_graph.locator(':scope > summary').click()
+                        expanded = page.evaluate("({viewport:innerWidth,document:document.documentElement.scrollWidth})")
+                        result["layouts"].append({"route": path or "overview", "width": width,
+                                                  "state": "optional graph expanded", **expanded})
+                        assert expanded["document"] <= expanded["viewport"] + 1, result["layouts"][-1]
                     current = page.locator('nav[data-preserve-context-links] a[aria-current="page"]')
                     assert current.count() == 1 and current.is_visible(), path
             result["checks"].append("all declared routes initialize and expanded navigation stays bounded at three widths")
