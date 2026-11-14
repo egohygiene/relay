@@ -507,7 +507,7 @@ def normalize_megalinter(
             or identifier.strip() != identifier
             or identifier in enforcement_by_id
             or not isinstance(enforcement, str)
-            or enforcement not in {"blocking", "advisory"}
+            or enforcement not in {"blocking", "advisory", "disabled"}
         ):
             raise ReportInputError(
                 "MegaLinter tool policy identities or enforcement are invalid"
@@ -547,6 +547,8 @@ def normalize_megalinter(
         diagnostic_errors += error_count
         diagnostic_warnings += warning_count
         enforcement = enforcement_by_id.get(identifier, "advisory")
+        if enforcement == "disabled":
+            raise ReportInputError("An active MegaLinter tool is disabled by the selected policy")
         compact = {
             "id": identifier,
             "status": status,

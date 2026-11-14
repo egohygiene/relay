@@ -171,6 +171,18 @@ class RepositoryReportNormalizationTests(unittest.TestCase):
                 normalizer.normalize(actual_megalinter_arguments(path)), expected
             )
 
+    def test_disabled_unselected_policy_entries_preserve_finalized_results(self) -> None:
+        path = FIXTURE_ROOT / "megalinter-763-finalized.json"
+        expected = normalizer.normalize(actual_megalinter_arguments(path))
+        policy = json.loads((FIXTURE_ROOT / "megalinter-763-policy.json").read_text())
+        policy["tools"].append({"id": "PYTHON_BLACK", "enforcement": "disabled"})
+        with tempfile.TemporaryDirectory() as directory:
+            policy_path = Path(directory) / "policy.json"
+            policy_path.write_text(json.dumps(policy))
+            args = actual_megalinter_arguments(path)
+            args.policy_input = str(policy_path)
+            self.assertEqual(normalizer.normalize(args), expected)
+
     def test_invalid_finalized_results_never_fall_back_to_prerun_success(self) -> None:
         original = json.loads(
             (FIXTURE_ROOT / "megalinter-763-finalized.json").read_text()
@@ -268,6 +280,7 @@ class RepositoryReportNormalizationTests(unittest.TestCase):
                 "duplicate-policy",
                 "invalid-policy",
                 "empty-policy",
+                "active-disabled-policy",
                 "duplicate-legacy",
                 "empty-legacy",
             ):
@@ -281,6 +294,8 @@ class RepositoryReportNormalizationTests(unittest.TestCase):
                         matrix["tools"][0]["enforcement"] = "unknown"
                     elif mutation == "empty-policy":
                         matrix["tools"] = []
+                    elif mutation == "active-disabled-policy":
+                        matrix["tools"][0]["enforcement"] = "disabled"
                     elif mutation == "duplicate-legacy":
                         source["active_linters"].append(
                             deepcopy(source["active_linters"][0])
