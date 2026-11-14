@@ -10,8 +10,9 @@ CLI, publication-denied review envelopes, collector locks, default source plan,
 consumer deployment gates and recovery pins are unchanged.
 
 The source profile selects Hygiene commit
-`49639c1845cdfd08fbd5a768261a8b3cf515f80f`, the reviewed head of
-[Hygiene #97](https://github.com/egohygiene/hygiene/pull/97). That projection
+`627b448f655afb2f4366654ba3ca3050389e464a`, integrating the narrow declared
+Empathy consumer correction in [Hygiene #119](https://github.com/egohygiene/hygiene/pull/119).
+That projection
 provides public identities and authored role context. Its rows do not declare
 dependency edges. Edges come only from that same revision's canonical
 `consumes`, `dependency_sources` and matching permitted boundary declarations.
@@ -96,7 +97,7 @@ artifact; a self-declared subset digest cannot establish membership.
 
 The receipt also declares its authorized public identity selection. Its direct
 edges and policies must exactly match bounded traversal of
-`contracts/public-dependency-declarations.hygiene-49639c1.json`. This public-only
+`contracts/public-dependency-declarations.hygiene-627b448.json`. This public-only
 reference mirrors the fixed owner's consumed-input mapping, permitted policies
 and forbidden-pair flags. It is verification transport, with immutable Hygiene
 authority, and introduces no canonical registry or dependency-inference rule.

@@ -23,7 +23,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 LOCK_PATH = ROOT / "contracts/public-catalog-admission.v1.lock.json"
 SCHEMA = "egohygiene.relay.public-catalog-admission/v1"
-PUBLIC_ARTIFACT = ROOT / "contracts/public-repositories.hygiene-49639c1.json"
+PUBLIC_ARTIFACT = ROOT / "contracts/public-repositories.hygiene-627b448.json"
 HASH = re.compile(r"[0-9a-f]{64}")
 
 

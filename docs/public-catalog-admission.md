@@ -2,7 +2,7 @@
 
 `validate_selection(rows, metadata)` also authenticates a serialized selected
 subset without loading Git or native tools. It compares public rows to the exact
-byte mirror `contracts/public-repositories.hygiene-49639c1.json`, whose SHA256 must
+byte mirror `contracts/public-repositories.hygiene-627b448.json`, whose SHA256 must
 match the owner artifact pin. The mirror remains owner-authored data; updates
 require a new reviewed source profile. Private wrappers are rejected before
 identity access. Metadata alone does not authenticate membership.
@@ -26,12 +26,18 @@ registry, discover repositories, infer roles, or promote proposed policy. Refs
 [Relay #148](https://github.com/egohygiene/relay/issues/148).
 
 The independent `public-catalog-admission.v1.lock.json` selects Hygiene
-`49639c1845cdfd08fbd5a768261a8b3cf515f80f`, tree
-`f35e00f075ae5fa53bcf7734392f8d1443eb172d`. The public artifact, its closed owner
+`627b448f655afb2f4366654ba3ca3050389e464a`, tree
+`1d3618f46bf338c0807b9ac8ba033251dd7352a8`. The public artifact, its closed owner
 schema and its standard-library validation helper are verified as exact Git
 blobs. The artifact SHA-256 is
-`af9c7186ded0bb57b18741eaa5905314b96d6adb03736946c868e0fc4aa50b26`.
+`f398684be3786b580d36aa3b93bbada70b98f08bd06c7d0f3e3e5efa8d3844c1`.
 Existing collector, normalizer and recovery locks remain unchanged.
+
+The active declaration profile selects that same exact owner revision/tree;
+the reviewed correction explicitly permits Empathy's already-declared Mantle
+and EgoLint relationships without asserting runtime adoption. The earlier
+`49639c1` public mirrors remain byte-preserved for historical generator pins.
+The roster/provider observation timestamps are not refreshed by this upgrade.
 
 `load(catalog_root, requested=None)` returns `(selected_public_rows, metadata)`.
 The caller supplies a Git repository containing the selected immutable owner

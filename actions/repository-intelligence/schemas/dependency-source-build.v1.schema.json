@@ -207,7 +207,7 @@
               "const": "catalog/public-repositories.json"
             },
             "artifact_sha256": {
-              "const": "af9c7186ded0bb57b18741eaa5905314b96d6adb03736946c868e0fc4aa50b26"
+              "const": "f398684be3786b580d36aa3b93bbada70b98f08bd06c7d0f3e3e5efa8d3844c1"
             },
             "helper_sha256": {
               "const": "fd3bb2099f2b9040502f19a8e582e4c4100653bd6cf2ea640cc36338dcfc4273"
@@ -221,7 +221,7 @@
               "const": "egohygiene/hygiene"
             },
             "revision": {
-              "const": "49639c1845cdfd08fbd5a768261a8b3cf515f80f"
+              "const": "627b448f655afb2f4366654ba3ca3050389e464a"
             },
             "schema": {
               "const": "egohygiene.relay.public-catalog-admission/v1"
@@ -600,10 +600,10 @@
             "contracts/public-catalog-admission.v1.lock.json": {
               "$ref": "#/$defs/hash"
             },
-            "contracts/public-dependency-declarations.hygiene-49639c1.json": {
+            "contracts/public-dependency-declarations.hygiene-627b448.json": {
               "$ref": "#/$defs/hash"
             },
-            "contracts/public-repositories.hygiene-49639c1.json": {
+            "contracts/public-repositories.hygiene-627b448.json": {
               "$ref": "#/$defs/hash"
             },
             "public_catalog_admission.py": {
@@ -628,8 +628,8 @@
             "collect_repository_adrs.py",
             "repository_adr_inputs.py",
             "contracts/public-catalog-admission.v1.lock.json",
-            "contracts/public-repositories.hygiene-49639c1.json",
-            "contracts/public-dependency-declarations.hygiene-49639c1.json",
+            "contracts/public-repositories.hygiene-627b448.json",
+            "contracts/public-dependency-declarations.hygiene-627b448.json",
             "schemas/dependency-source-build.v1.schema.json"
           ],
           "type": "object"

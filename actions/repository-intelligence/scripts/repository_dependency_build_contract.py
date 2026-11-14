@@ -20,8 +20,8 @@ UNCOLLECTED = {"collection": "uncollected", "freshness": "unknown", "reason": "n
 FILES = ("collect_repository_dependency_source.py", "collect_repository_dependencies.py", "public_catalog_admission.py",
          "repository_dependency_build_contract.py", "collect_repository_roadmap.py", "collect_repository_adrs.py",
          "repository_adr_inputs.py")
-PUBLIC_FILES = ("contracts/public-catalog-admission.v1.lock.json", "contracts/public-repositories.hygiene-49639c1.json",
-                "contracts/public-dependency-declarations.hygiene-49639c1.json", "schemas/dependency-source-build.v1.schema.json")
+PUBLIC_FILES = ("contracts/public-catalog-admission.v1.lock.json", "contracts/public-repositories.hygiene-627b448.json",
+                "contracts/public-dependency-declarations.hygiene-627b448.json", "schemas/dependency-source-build.v1.schema.json")
 SCOPE = {"kind": "declared_consumption", "authority": "egohygiene/hygiene", "bounded": True,
          "runtime_adoption": "uncollected", "package_dependencies": "uncollected", "excluded_topology": "uncollected"}
 
@@ -94,7 +94,7 @@ def validate(value, repository, source_commit, observed_at):
     declaration_pin = json.loads((ROOT / "contracts/dependency-source.v1.lock.json").read_bytes())
     require(inputs["declarations_observed_at"] == declaration_pin["declarations_observed_at"]
         and inputs["catalog_admission"]["revision"] == declaration_pin["revision"])
-    reference_bytes = (ROOT / "contracts/public-dependency-declarations.hygiene-49639c1.json").read_bytes()
+    reference_bytes = (ROOT / "contracts/public-dependency-declarations.hygiene-627b448.json").read_bytes()
     require(inputs["declaration_reference_sha256"] == declaration_pin["public_reference_sha256"] == digest(reference_bytes))
     reference = json.loads(reference_bytes)
     require(reference["owner"] == "egohygiene/hygiene" and reference["revision"] == declaration_pin["revision"]
