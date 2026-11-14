@@ -1,0 +1,154 @@
+{
+  "schema": "egohygiene.relay.intelligence-ui-review/v1",
+  "observed_at": "2026-11-14T19:42:49Z",
+  "base_revision": "41fe97bc69e44fdaff6b6c34ae28e4d2af22e41b",
+  "functional_revision": "a5387a12bba031143898eb79a48dc1b8b9dd9ffa",
+  "regression_revision": "62a0728a572fd6251eb10303d723fee1f6dbbfe9",
+  "production_files": {
+    "actions/repository-intelligence/assets/dashboard.css": "73ecfd498e0781f91d68246a5269ebce0a1e1ccfc778d4fed7caceea0b4a0a82",
+    "actions/repository-intelligence/assets/graph.css": "a4b43ace1cc6b6192d256b256e215f0642043f3339a9736936d865057b73dc4c",
+    "actions/repository-intelligence/assets/graph.js": "deeacca3bc4f6d43565448c9393967078a47a60d0ca20728fde9e76c75eff172",
+    "actions/repository-intelligence/assets/site.css": "29554df761c8e3595192fe8b8dd9a3ecaebd6d199159bfc5450f77aa62021ce9",
+    "actions/repository-intelligence/scripts/generate_repository_intelligence_dashboard.py": "1a6a02380f0c6f32e50c706b09226c4cc0cb27bfaef16d7c94961ebd2d074674",
+    "actions/repository-intelligence/scripts/generate_repository_intelligence_site.py": "15099a3d46af46060c1f9d7f79c56b004771af6d8f48f6f3b193d42bb3cbd4e2",
+    "actions/repository-intelligence/scripts/render_repository_intelligence_graph.py": "64bfc1b19bb3394bd0e6e48442022ad6df97433cc9eac3024fbfdf8a072d1ebe",
+    "actions/repository-intelligence/scripts/repository_intelligence_routes.py": "aab2c97aa30c7e3ee8e4a993134a2f57bda2cf989ff02656eb91693c73ea1e15"
+  },
+  "scope": "Source UI qualification using production rerenderers and unchanged retained captured inputs over local HTTP; not a valid sealed bundle, canonical HTTPS, consumer adoption or publication.",
+  "retained_source": {
+    "repository": "egohygiene/empathy",
+    "represented_commit": "41d4c8bdba88cd5cc17318647d542eea57a70364",
+    "inputs": {
+      "site/intelligence/summary.json": "7f77eef8be23e6e0dcc9361fd2c556a997238e2b5c628b0095b87e683c6136c9",
+      "site/intelligence/provenance.json": "68eaeff09bb827b4893ca149962fd8385a51c1b7d4b3d5ab9952648bcb9ad63e",
+      "repository-intelligence/sources/snapshot.json": "25a68f12ac6f73fc59a6bff085c2846bfcedfa7c11506bd779b7fdea867857af",
+      "review-feed/repository-audits.json": "78c5795b1627ee025f3750afa211112d91b588ed7851b6e465c073d14ae56713",
+      "review-feed/repository-sanity.json": "f1c7c9f20d13e573264cfde39d25e00edc085a15b1d4ce720cfc86081c8ff6e0"
+    },
+    "scope": "production rerender of retained captured inputs; no new normalization or publication",
+    "old_manifest_reused": false
+  },
+  "browser": {
+    "version": "151.0.7922.173",
+    "routes": 18,
+    "viewport_widths": [
+      1440,
+      768,
+      390
+    ],
+    "layout_observations": 60,
+    "expanded_optional_graph_observations": 6,
+    "page_errors": [],
+    "console_errors": [],
+    "failed_requests": [],
+    "checks": [
+      "all declared routes initialize and expanded navigation stays bounded at three widths",
+      "optional graph follows home content and keyboard disclosure/SVG Enter preserve context",
+      "explicit graph selection opens its native disclosure",
+      "focused owner views and alternate dashboard return with URL context intact",
+      "all navigation and graph directories remain usable without JavaScript"
+    ],
+    "result_sha256": "17ce50c4d1b23b9accdd32b6f13521b8efea6f81c00efded39f7a9af55040f5c"
+  },
+  "original_canonical_observation": {
+    "consumer_source": "41d4c8bdba88cd5cc17318647d542eea57a70364",
+    "generator_source": "41fe97bc69e44fdaff6b6c34ae28e4d2af22e41b",
+    "run": {
+      "id": 43565067306,
+      "attempt": 1
+    },
+    "manifest_sha256": "be7024621c672ffc9a579f028ab46affd9cfa65a0c511f3cd2f11193b65582ba",
+    "result_sha256": "6ffa31fb648908ca1fed3bddfa7503eaa0942ebbc927b5afc8e820363bd916ca",
+    "scope": "Original source/time live observations retained unchanged; candidate measurements are the separate local source UI qualification."
+  },
+  "overflow_regressions": [
+    {
+      "route": "/intelligence/dashboard/",
+      "viewport_width": 768,
+      "original_document_width": 853,
+      "candidate_document_width": 768,
+      "expanded_graph_checked": true
+    },
+    {
+      "route": "/intelligence/",
+      "viewport_width": 390,
+      "original_document_width": 540,
+      "candidate_document_width": 390,
+      "expanded_graph_checked": true
+    },
+    {
+      "route": "/intelligence/dashboard/",
+      "viewport_width": 390,
+      "original_document_width": 540,
+      "candidate_document_width": 390,
+      "expanded_graph_checked": true
+    },
+    {
+      "route": "/intelligence/audits/",
+      "viewport_width": 390,
+      "original_document_width": 640,
+      "candidate_document_width": 390,
+      "expanded_graph_checked": false
+    },
+    {
+      "route": "/intelligence/sanity/",
+      "viewport_width": 390,
+      "original_document_width": 663,
+      "candidate_document_width": 390,
+      "expanded_graph_checked": false
+    }
+  ],
+  "unchanged_input_files": [
+    "summary.json",
+    "provenance.json",
+    "routes.json"
+  ],
+  "checks": {
+    "shared_shell": {
+      "tests": 34,
+      "passed": 33,
+      "failures": 1,
+      "note": "The canonical-route-lock fixture failure is reproduced at the exact base."
+    },
+    "dashboard": {
+      "tests": 23,
+      "failures": 0
+    },
+    "native_svg": {
+      "assertions": 23,
+      "declared_pages": 18,
+      "script_assets": 3,
+      "page_errors": 0,
+      "result_sha256": "29106393ff9a4f8f3478c3ac0bf4bb9ff7eac5e36c63d2a300391f11b02e87d4"
+    },
+    "full_suite": {
+      "tests": 725,
+      "failures": 12,
+      "errors": 24,
+      "skipped": 93,
+      "base_counts_identical": true,
+      "failure_error_id_sha256": "b226ea876b33b08db88dfa8625272f160d3564c820cb019847537eb18e355b15",
+      "introduced_failure_error_ids": []
+    },
+    "action_validation": {
+      "findings": 10,
+      "base_diagnostics_identical_after_path_normalization": true
+    },
+    "compileall": "passed",
+    "graph_javascript_syntax": "passed",
+    "diff_whitespace": "passed"
+  },
+  "acceptance_boundaries": {
+    "relay_27": "open parent; bounded shared overview/navigation progress",
+    "relay_101": "open final release/product acceptance",
+    "relay_74": "open; responsive and navigation clauses qualified here, other original criteria preserved",
+    "relay_76": "open; responsive and navigation clauses qualified here, human evidence and other criteria preserved",
+    "relay_189": "closed by prior S4 source/publication acceptance; this UI work preserves its regression"
+  },
+  "limitations": [
+    "No publisher, source collector, owner model, source clock, registry, contract, immutable pin or historical rollback changes.",
+    "The retained actual owner input is sparse; exhaustive owner lifecycle fixtures and full screen-reader/physical-device certification remain separate.",
+    "Required broad checks retain exact-base failures; no whole-repository or release-green claim.",
+    "Consumer pin adoption, newly sealed composition, live deployment and fleet acceptance remain separate."
+  ]
+}
