@@ -1,0 +1,533 @@
+{
+  "observed_at": "2026-11-14T01:34:37Z",
+  "relay_functional_revision": "a7bad9bdcfefa4cde0b4fb4c18c1e48b3c4f9811",
+  "relay_dirty": false,
+  "source": {
+    "as_of": "2026-11-14T01:17:15Z",
+    "commit_at": "2026-11-14T01:14:58Z",
+    "repository": "egohygiene/empathy",
+    "represented_commit": "382508fe2fbdfb37777a005aa71ddd3af56485c3"
+  },
+  "actual_capture": {
+    "run_id": 43539593798,
+    "run_attempt": 1,
+    "artifact_id": 14091270592,
+    "zip_sha256": "88f0c58b024effb00adf5b8f918bf65c51f21f5b9e1aa46877848bee267c203f",
+    "provider_metadata_checked": true,
+    "mode": "offline native replay of original unchanged public captures; no new hosted intake/publication claim"
+  },
+  "typed_admission": {
+    "schema": "egohygiene.relay.public-catalog-admission/v1",
+    "owner": "egohygiene/hygiene",
+    "revision": "49639c1845cdfd08fbd5a768261a8b3cf515f80f",
+    "artifact_path": "catalog/public-repositories.json",
+    "artifact_sha256": "af9c7186ded0bb57b18741eaa5905314b96d6adb03736946c868e0fc4aa50b26",
+    "schema_sha256": "eeb88b6a99de987500b946bd71c987e1fb7d0bd7350f466885c11ac7603c96d8",
+    "helper_sha256": "fd3bb2099f2b9040502f19a8e582e4c4100653bd6cf2ea640cc36338dcfc4273",
+    "observed_at": "2026-11-09T14:06:57Z",
+    "selected_sha256": "7aaf153aeffc32a494b1a55bb387ff1f1eecf521f4075a03b4cc090acf88c1f9"
+  },
+  "dependency_revision": "627b448f655afb2f4366654ba3ca3050389e464a",
+  "source_domains": [
+    "dependencies",
+    "health",
+    "journey",
+    "releases",
+    "work"
+  ],
+  "normalization_profile": {
+    "feature_kwargs": {
+      "search_attribution": true
+    },
+    "implementation": {
+      "collect_repository_adrs.py": "94af44c5a4980d5bc2b457d4937078bedb2b43247e191a6c49fb0bcaf7b20453",
+      "collect_repository_roadmap.py": "011034b57cd27ffe3f70b7572053e236fcff723e858d89ef907544fbe8b19311",
+      "prepare_repository_adr_build.py": "0a0c96547c85ab9392133d4a0555a18327d85b5ad46ea1d5fed1214015f75237",
+      "repository_search_normalization.py": "21da8c40056d8b7a93d53bf5b10d1dbbddbd6af09af24de82aee47ce44e9e23d"
+    },
+    "profile": "search-attribution-v1",
+    "runtime": {
+      "egolint_sha256": "0a5a6ddc760f7f7a741a2f3d2087d1d6c245b38bebabd578ac029ca8f2f372e3",
+      "lock_sha256": "d5c915f16d3ca6cbe8ab5899f586aeb2ffc3f11ec9b91cd57935f0b8015e4830",
+      "pins": {
+        "feature_kwargs": {
+          "search_attribution": true
+        },
+        "integration_issue": "https://github.com/egohygiene/relay/issues/102",
+        "profile": "search-attribution-v1",
+        "publication": "denied",
+        "schema": "egohygiene.relay.search-normalizer-lock/v1",
+        "sources": {
+          "egolint": {
+            "files": {
+              ".config/rules/repository-intelligence-coverage-sources.v1.json": "d092a56ac69eb27bbdab60ee322e8eaa0dcd59c74a77ef4e98b7dae02b159870",
+              ".config/rules/repository-intelligence.v1.toml": "a0a03c63a722a0af37109976abb40a6691a6cd2cd8e7d25b412862a40b744993",
+              "Cargo.lock": "ecca8f57ebf40c8207ae113a7e14e4522393a8a10dc5f6576b59b6f7b48a96ab",
+              "Cargo.toml": "0949d1e241d8346e8485885b929892a018dd04d098d1cd3c13915c007f4510c6",
+              "rust-toolchain.toml": "24e1453b4e314d5d4407c1da60e7c7eac3914e7483b5098efd436cdd5978fccd",
+              "schemas/intelligence-coverage-report.schema.json": "1e2742f003d780900f7b7de2d6556b07a71be623742906b79b4965aadb78eb20",
+              "schemas/repository-intelligence-report.schema.json": "fa2d0ac0660a6ebdca23f450aa2400017835bfa6a0ae8b3ddaecf7f352155716",
+              "schemas/repository-intelligence.schema.json": "06cee6d863c6c2c9b5009b85fba8574aa55535fffecaa06415b839b0d6c752f5"
+            },
+            "repository": "egohygiene/egolint",
+            "revision": "d917ea524962639494e5bb4b3196192238ba57d9",
+            "tree": "033b3d4c4b91d31de7e9004744dcf97549d12de8"
+          },
+          "hygiene": {
+            "files": {
+              "catalog/repository-intelligence-vocabulary.json": "e61ac19d7907b80d3e1d3e9158d34039a5da43208c309b81919105a9450f8cd7",
+              "docs/ecosystem/REPOSITORY_INTELLIGENCE_COVERAGE.md": "e2889b9481d05afeb3f8e030887ccf1420827ab2ee4cfb524cdfea0a09e1e5f5",
+              "schemas/repository-intelligence.alpha2.schema.json": "7fd7b19c22b2df8c4c6b6f6e8b7c36ae9082a1c415786dc23e33090790c45cf1",
+              "tools/intelligence.py": "a46e0899fc50c8b03a51f1b1cf80c8ca8b8a7f4e6a4dfcae3fdb067f14c7a4c5"
+            },
+            "repository": "egohygiene/hygiene",
+            "revision": "639a003d5ddc4d242c2cf190eeb59a9fc522d199",
+            "tree": "212a81d3f0527dc925ab1379afacaffeebb23658"
+          },
+          "hygiene_adr": {
+            "files": {
+              "catalog/contracts.yaml": "2a8c4e114c2964acbf160ed6f0183013f175d07f6752878b9984542596b6622a",
+              "docs/decisions/MIGRATION.md": "401efcd02d899d37621ac5b315404d6b2dea2db48461884b94a978b03f36e7be",
+              "docs/decisions/POLICY.md": "b8832d30363fc9005460c7353f73a58444f0230bc98960df201969f54682839b",
+              "docs/decisions/RATIFICATION.md": "0e31c754c28b432b22d6698f1ab89231c223bf731831430d5efd67dab7afcddb",
+              "schemas/architecture-decision-policy-reference.v1.schema.json": "fdf451cfa38ba666ec579aa75d2acbd52a56b95e73c7437565b79dfcfb689216",
+              "schemas/architecture-decision.v1.schema.json": "725a7cf58cd0b0454d4d481e8ef72815f29ecca80a5b44da5ce48f7ec6e6b8c4"
+            },
+            "repository": "egohygiene/hygiene",
+            "revision": "a05b14f8b9e2772124f879f818e09a911e996ad8",
+            "tree": "16da72be28aa06c784e3e706e264d1765f130441"
+          },
+          "observatory": {
+            "files": {
+              "contracts/UNICODE-LICENSE.txt": "e7a93b009565cfce55919a381437ac4db883e9da2126fa28b91d12732bc53d96",
+              "contracts/hygiene.repository-intelligence.alpha2.lock.json": "df0b55290173a574c079f12018e316d0ee68bf0bd8a1d7092793889622a9dec1",
+              "contracts/repository-intelligence-search-fields.v1.json": "c08c148cb61ebe7e88aa35931f40186e5bb45e14d0287b7e70eb21a00df2d13e",
+              "contracts/search-fields.v1.js": "73a59057ded90ad87f5273e6d62db52af42bec3d3828bb0c532cb6cfa587a735",
+              "schemas/repository-intelligence-compare.v1.schema.json": "501e06b45e687b906c7c5dd5cdbf80d8b1e4acb35b167f8b3e247285db9f65af",
+              "schemas/repository-intelligence-fleet.v1.schema.json": "b61c8c5b33732bb4b44d849c0d4479c39b85068c9d14a5fb417403cc13b7f39b",
+              "schemas/repository-intelligence-read-model.v1.schema.json": "79e030179a6c84253787a3a7ee902bfce48271e5a27c27a9d731912d5b5d5af3",
+              "schemas/repository-intelligence-search-fields.v1.schema.json": "95782f70560a067c52f1404414f3028d114e7c8ab97366b290365643557d61bf",
+              "schemas/repository-intelligence-view.v1.schema.json": "caee02e1c42d57b05629bb46bd27c87c019b59050c59d071a870a4564badf520",
+              "src/observatory/intelligence.py": "616b9a1319274d915ff3fa2c0d1cbbb1267c255f626e7925c4297773d535c591",
+              "src/observatory/search_fields.py": "19f370893ef7dd9fa0814922f3c47ef65db0414193e61d1e9154515a521f23ca"
+            },
+            "repository": "egohygiene/observatory",
+            "revision": "49a8031f2a5124ff7ab09adbda50a9a5dbe6dec2",
+            "tree": "8eaeb62a3ce58056093df77cc7a6327322aaeaf2"
+          }
+        }
+      }
+    },
+    "schema": "egohygiene.relay.search-normalization-profile/v1"
+  },
+  "empty_feed": {
+    "reports": 0,
+    "receipt_sha256": "29a67d0f5730c669b26814e34560c62a1e0332634f5a388ec933e91fbc703cf0",
+    "schema": "valid",
+    "binding": "valid"
+  },
+  "derived_populated_feed": {
+    "source": {
+      "as_of": "2026-11-14T01:31:53Z",
+      "commit_at": "2026-11-14T01:31:53Z",
+      "repository": "egohygiene/empathy",
+      "represented_commit": "f178cfa427f7ae9f5e85e51d3983269a99d20ec4"
+    },
+    "qualification_only": true,
+    "provider_capture_reuse": false,
+    "reports": 2,
+    "receipt_sha256": "e1e6a9df9d1b5a7e40fee464d42a573405c0ad5054a7d47680d47cafb40e1de8",
+    "schema": "valid",
+    "binding": "valid"
+  },
+  "historical_direct_native_models": {
+    "source": {
+      "as_of": "2026-11-14T01:17:15Z",
+      "commit_at": "2026-11-14T01:14:58Z",
+      "repository": "egohygiene/empathy",
+      "represented_commit": "382508fe2fbdfb37777a005aa71ddd3af56485c3"
+    },
+    "reports": [
+      {
+        "domain": "audits",
+        "repository": "egohygiene/.github",
+        "revision": "1e3f31bade2ecb036e3b668e5231cd7024584751",
+        "path": "audits/organization-source-sanity-20261113T022735Z.json",
+        "sha256": "a9a7cf5955e69c4f80f7e5b767b87741c6399b68ec2ac47860a5bd1cd1b4e251"
+      },
+      {
+        "domain": "sanity",
+        "repository": "egohygiene/.github",
+        "revision": "1e3f31bade2ecb036e3b668e5231cd7024584751",
+        "path": "audits/organization-source-sanity-20261113T022735Z.sanity.json",
+        "sha256": "87128a2a27e4f7b1611b4b62712175ec2d087f4610436d8d9716d49ece72d80d"
+      }
+    ],
+    "domain_record_count": 1,
+    "currentness": "original report revision/clock retained; different historical revision",
+    "human_verification": "unavailable-no-authenticated-human-source-context"
+  },
+  "production_builder_cases": [
+    "actual382 captured combined sources + empty feed",
+    "actual382 captured combined sources + direct native historical models",
+    "distinct derived source + populated feed, provider captures unselected"
+  ],
+  "production_route_admission": "passed all three actual builder cases",
+  "negative_controls": [
+    {
+      "control": "substituted627admission",
+      "result": "denied"
+    },
+    {
+      "control": "mixedsource",
+      "result": "denied"
+    },
+    {
+      "control": "mixedclock",
+      "result": "denied"
+    },
+    {
+      "control": "alteredmodelbytes",
+      "result": "denied"
+    }
+  ],
+  "owner_lock_schema_contract_changes": "none",
+  "publication": "not performed",
+  "embedded_source_receipt_schema": "valid",
+  "typed_denial_schema": "valid both actual negative controls",
+  "selected_report_negative_controls": [
+    {
+      "control": "wrong-report-hash",
+      "source_revision": "928710b9dbc4d30b3314ac9180fb430e33098ebf",
+      "as_of": "2026-11-14T01:35:27Z",
+      "result": "denied",
+      "diagnostic": "REPORT",
+      "only_artifact": "review-feed-denial.json"
+    },
+    {
+      "control": "private-selected-report",
+      "source_revision": "86d90ebac124dcbbfc0f2e5c12b6ceac4ce17db2",
+      "as_of": "2026-11-14T01:35:28Z",
+      "result": "denied",
+      "diagnostic": "VISIBILITY",
+      "only_artifact": "review-feed-denial.json"
+    }
+  ],
+  "validation": {
+    "candidate": {
+      "tests": 697,
+      "failures": 12,
+      "errors": 24,
+      "skips": 93
+    },
+    "base": {
+      "tests": 691,
+      "failures": 12,
+      "errors": 24,
+      "skips": 93
+    },
+    "same_failure_identifiers": true,
+    "new_native_tests": 6,
+    "new_native_tests_status": "passed",
+    "action_validator": {
+      "findings": 10,
+      "same_as_exact_base": true
+    },
+    "final_functional_revision": "a7bad9bdcfefa4cde0b4fb4c18c1e48b3c4f9811"
+  },
+  "source_change": {
+    "path": "actions/repository-intelligence-review-feed/scripts/review_feed.py",
+    "change": "Authenticate/use the exact locked native typed owner admission before consumer Git/source reads, then retain strict collection admission equality. Preserve original path/alias/outside-consumer guards and120-second operation deadline.",
+    "current_shared_dependency_profile": "unchanged627",
+    "typed_owner_profile": "unchanged496",
+    "locked_runtime_resources": 22
+  },
+  "reproduction": {
+    "focus": "python3 -m unittest discover -s tests -p test_repository_review_feed.py -v",
+    "whole_repository": "python3 -m unittest discover --start-directory tests --pattern test_*.py --verbose",
+    "action_metadata": "python3 scripts/validate_actions.py",
+    "successful_argv_templates": [
+      [
+        "${VERIFIED_PYTHON}",
+        "-I",
+        "${RELAY_ROOT}/actions/repository-intelligence-review-feed/scripts/review_feed.py",
+        "--source-root",
+        "${QUALIFICATION_ROOT}/empathy382",
+        "--plan",
+        ".config/repository-intelligence/review-plan.json",
+        "--repository",
+        "egohygiene/empathy",
+        "--represented-commit",
+        "382508fe2fbdfb37777a005aa71ddd3af56485c3",
+        "--as-of",
+        "2026-11-14T01:17:15Z",
+        "--output-directory",
+        ".cache/typed-feed-final",
+        "--runtime-parent",
+        "${QUALIFICATION_ROOT}"
+      ],
+      [
+        "${VERIFIED_PYTHON}",
+        "-I",
+        "${RELAY_ROOT}/actions/repository-intelligence/scripts/prepare_repository_sources_build.py",
+        "--repository-root",
+        "${QUALIFICATION_ROOT}/empathy382",
+        "--work-directory",
+        ".cache/typed-review-combined-final",
+        "--repository",
+        "egohygiene/empathy",
+        "--visibility",
+        "public",
+        "--source-commit",
+        "382508fe2fbdfb37777a005aa71ddd3af56485c3",
+        "--observed-at",
+        "2026-11-14T01:17:15Z",
+        "--known-external-decisions=[]",
+        "--generator-commit",
+        "a7bad9bdcfefa4cde0b4fb4c18c1e48b3c4f9811",
+        "--generator-repository-root",
+        "${RELAY_ROOT}",
+        "--search-attribution",
+        "--collect-journey",
+        "--journey-maximum-commits",
+        "256",
+        "--collect-dependencies",
+        "--dependency-catalog",
+        "${VERIFIED_HYGIENE627}",
+        "--capture-plan",
+        "${QUALIFICATION_ROOT}/actual382-public-captures/source-plan.json",
+        "--capture-root",
+        "${QUALIFICATION_ROOT}/actual382-public-captures",
+        "--runtime",
+        "${VERIFIED_NATIVE_RUNTIME}"
+      ],
+      [
+        "${VERIFIED_PYTHON}",
+        "${RELAY_ROOT}/actions/repository-intelligence/scripts/generate_repository_intelligence_dashboard.py",
+        "--repository-root",
+        "${QUALIFICATION_ROOT}/empathy382",
+        "--reports-root",
+        "${QUALIFICATION_ROOT}/empathy382/.reports",
+        "--output-root",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-combined-empty-site",
+        "--repository",
+        "egohygiene/empathy",
+        "--default-branch",
+        "main",
+        "--source-commit",
+        "382508fe2fbdfb37777a005aa71ddd3af56485c3",
+        "--as-of",
+        "2026-11-14T01:17:15Z",
+        "--timestamp-source",
+        "explicit-input",
+        "--generator-version",
+        "1.2.0",
+        "--generator-repository",
+        "egohygiene/relay",
+        "--generator-ref",
+        "a7bad9bdcfefa4cde0b4fb4c18c1e48b3c4f9811",
+        "--generator-commit",
+        "a7bad9bdcfefa4cde0b4fb4c18c1e48b3c4f9811",
+        "--generator-immutable",
+        "true",
+        "--consumer-visibility",
+        "public",
+        "--stylesheet-source",
+        "${RELAY_ROOT}/actions/repository-intelligence/assets/dashboard.css",
+        "--script-source",
+        "${RELAY_ROOT}/actions/repository-intelligence/assets/explorer.js",
+        "--dashboard-subdirectory",
+        "dashboard"
+      ],
+      [
+        "${VERIFIED_PYTHON}",
+        "-I",
+        "${RELAY_ROOT}/actions/repository-intelligence/scripts/repository_sources_build_contract.py",
+        "--provenance",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-combined-empty-site/provenance.json",
+        "--receipt",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-combined-final/sources/receipt.json",
+        "--snapshot",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-combined-final/sources/snapshot.json"
+      ],
+      [
+        "${VERIFIED_PYTHON}",
+        "${RELAY_ROOT}/actions/repository-intelligence/scripts/generate_repository_intelligence_site.py",
+        "--repository-root",
+        "${QUALIFICATION_ROOT}/empathy382",
+        "--output-root",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-combined-empty-site",
+        "--summary",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-combined-empty-site/summary.json",
+        "--provenance",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-combined-empty-site/provenance.json",
+        "--repository",
+        "egohygiene/empathy",
+        "--source-commit",
+        "382508fe2fbdfb37777a005aa71ddd3af56485c3",
+        "--stylesheet-source",
+        "${RELAY_ROOT}/actions/repository-intelligence/assets/site.css",
+        "--script-source",
+        "${RELAY_ROOT}/actions/repository-intelligence/assets/site.js",
+        "--audits",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-feed-final/repository-audits.json",
+        "--sanity",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-feed-final/repository-sanity.json",
+        "--snapshot",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-combined-final/sources/snapshot.json"
+      ],
+      [
+        "${VERIFIED_PYTHON}",
+        "${RELAY_ROOT}/actions/repository-intelligence/scripts/generate_repository_intelligence_dashboard.py",
+        "--repository-root",
+        "${QUALIFICATION_ROOT}/empathy382",
+        "--reports-root",
+        "${QUALIFICATION_ROOT}/empathy382/.reports",
+        "--output-root",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-combined-historical-site",
+        "--repository",
+        "egohygiene/empathy",
+        "--default-branch",
+        "main",
+        "--source-commit",
+        "382508fe2fbdfb37777a005aa71ddd3af56485c3",
+        "--as-of",
+        "2026-11-14T01:17:15Z",
+        "--timestamp-source",
+        "explicit-input",
+        "--generator-version",
+        "1.2.0",
+        "--generator-repository",
+        "egohygiene/relay",
+        "--generator-ref",
+        "a7bad9bdcfefa4cde0b4fb4c18c1e48b3c4f9811",
+        "--generator-commit",
+        "a7bad9bdcfefa4cde0b4fb4c18c1e48b3c4f9811",
+        "--generator-immutable",
+        "true",
+        "--consumer-visibility",
+        "public",
+        "--stylesheet-source",
+        "${RELAY_ROOT}/actions/repository-intelligence/assets/dashboard.css",
+        "--script-source",
+        "${RELAY_ROOT}/actions/repository-intelligence/assets/explorer.js",
+        "--dashboard-subdirectory",
+        "dashboard"
+      ],
+      [
+        "${VERIFIED_PYTHON}",
+        "-I",
+        "${RELAY_ROOT}/actions/repository-intelligence/scripts/repository_sources_build_contract.py",
+        "--provenance",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-combined-historical-site/provenance.json",
+        "--receipt",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-combined-final/sources/receipt.json",
+        "--snapshot",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-combined-final/sources/snapshot.json"
+      ],
+      [
+        "${VERIFIED_PYTHON}",
+        "${RELAY_ROOT}/actions/repository-intelligence/scripts/generate_repository_intelligence_site.py",
+        "--repository-root",
+        "${QUALIFICATION_ROOT}/empathy382",
+        "--output-root",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-combined-historical-site",
+        "--summary",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-combined-historical-site/summary.json",
+        "--provenance",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-combined-historical-site/provenance.json",
+        "--repository",
+        "egohygiene/empathy",
+        "--source-commit",
+        "382508fe2fbdfb37777a005aa71ddd3af56485c3",
+        "--stylesheet-source",
+        "${RELAY_ROOT}/actions/repository-intelligence/assets/site.css",
+        "--script-source",
+        "${RELAY_ROOT}/actions/repository-intelligence/assets/site.js",
+        "--audits",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-historical382/repository-audits.json",
+        "--sanity",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-historical382/repository-sanity.json",
+        "--snapshot",
+        "${QUALIFICATION_ROOT}/empathy382/.cache/typed-review-combined-final/sources/snapshot.json"
+      ],
+      [
+        "${VERIFIED_PYTHON}",
+        "${RELAY_ROOT}/actions/repository-intelligence/scripts/generate_repository_intelligence_dashboard.py",
+        "--repository-root",
+        "${QUALIFICATION_ROOT}/empathy382-populated",
+        "--reports-root",
+        "${QUALIFICATION_ROOT}/empathy382-populated/.reports",
+        "--output-root",
+        "${QUALIFICATION_ROOT}/empathy382-populated/.cache/typed-review-populated-site",
+        "--repository",
+        "egohygiene/empathy",
+        "--default-branch",
+        "main",
+        "--source-commit",
+        "f178cfa427f7ae9f5e85e51d3983269a99d20ec4",
+        "--as-of",
+        "2026-11-14T01:31:53Z",
+        "--timestamp-source",
+        "explicit-input",
+        "--generator-version",
+        "1.2.0",
+        "--generator-repository",
+        "egohygiene/relay",
+        "--generator-ref",
+        "a7bad9bdcfefa4cde0b4fb4c18c1e48b3c4f9811",
+        "--generator-commit",
+        "a7bad9bdcfefa4cde0b4fb4c18c1e48b3c4f9811",
+        "--generator-immutable",
+        "true",
+        "--consumer-visibility",
+        "public",
+        "--stylesheet-source",
+        "${RELAY_ROOT}/actions/repository-intelligence/assets/dashboard.css",
+        "--script-source",
+        "${RELAY_ROOT}/actions/repository-intelligence/assets/explorer.js",
+        "--dashboard-subdirectory",
+        "dashboard"
+      ],
+      [
+        "${VERIFIED_PYTHON}",
+        "${RELAY_ROOT}/actions/repository-intelligence/scripts/generate_repository_intelligence_site.py",
+        "--repository-root",
+        "${QUALIFICATION_ROOT}/empathy382-populated",
+        "--output-root",
+        "${QUALIFICATION_ROOT}/empathy382-populated/.cache/typed-review-populated-site",
+        "--summary",
+        "${QUALIFICATION_ROOT}/empathy382-populated/.cache/typed-review-populated-site/summary.json",
+        "--provenance",
+        "${QUALIFICATION_ROOT}/empathy382-populated/.cache/typed-review-populated-site/provenance.json",
+        "--repository",
+        "egohygiene/empathy",
+        "--source-commit",
+        "f178cfa427f7ae9f5e85e51d3983269a99d20ec4",
+        "--stylesheet-source",
+        "${RELAY_ROOT}/actions/repository-intelligence/assets/site.css",
+        "--script-source",
+        "${RELAY_ROOT}/actions/repository-intelligence/assets/site.js",
+        "--audits",
+        "${QUALIFICATION_ROOT}/empathy382-populated/.cache/typed-feed-populated/repository-audits.json",
+        "--sanity",
+        "${QUALIFICATION_ROOT}/empathy382-populated/.cache/typed-feed-populated/repository-sanity.json"
+      ]
+    ],
+    "paths": "Variable placeholders identify externally prepared verified tool/owner/runtime and retained qualification roots; each array retains exact argument separation and original source/clock bindings. These native commands are offline replays, not hosted artifact intake."
+  },
+  "original_failure": {
+    "relay_revision": "d7604056e36633a59735318454f20f2984602726",
+    "run_id": 43539593798,
+    "artifact_id": 14090499041,
+    "zip_sha256": "2896baad1260aeb560980d25e514c468364880c63b47ea06506c9b8da63a6d00",
+    "diagnostic": "PIN",
+    "cause": "shared627admission was compared to authenticated native496admission; revision and artifact digest differed while roster remained28"
+  },
+  "peer_review": {
+    "reviewer": "independent sibling agent",
+    "functional_revision": "a7bad9bdcfefa4cde0b4fb4c18c1e48b3c4f9811",
+    "result": "clear",
+    "checks": "six focused tests; path/privacy guards; all22 unchanged owner resources; exact receipts/native source; provider metadata/ZIP; production validate_input+validate_page all6 Audits/Sanity routes across3 builder cases; private/hash denied schemas"
+  }
+}

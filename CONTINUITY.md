@@ -7,27 +7,25 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-11-14T00:55:39Z'
+  updated_at: '2026-11-14T01:37:18Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
   superseded_by: null
 scope:
-  purpose: Hand off the combined reviewed Journey corpus repair, exact Hygiene declared-consumer profile and canonical
-    event-order repair for final Relay review and separate Empathy acceptance.
+  purpose: Hand off a bounded typed-review admission compatibility repair on actual Relay d760, with exact native and
+    production builder evidence before separate consumer adoption.
   includes:
-  - Actual Journey PR183 merge e2cef7e retains every original selected object with strict255+1 native validation, exact
-    hashes/identities/counts/union and one shared deadline.
-  - Both admission/declaration locks select exact Hygiene 627b448 revision/tree; active mirrors/helpers/schema constants
-    agree and original observation dates remain unchanged.
-  - The compositor restores existing chronological event order; native source/profile equality and public-first admission
-    remain strict.
-  - Fresh combined native proof on actual branchy Empathy e50 at 00:52:27Z,39 focused tests, seven refusal controls
-    and complete equal-byte different-name replay.
+  - The typed feed uses its hash-locked native 496 admission rather than shared mutable-default627 admission; strict
+    collection equality, original path/alias/runtime guards and 120-second budget remain.
+  - All 22 locked owner resources, typed contracts/schemas, Observatory/Aether/Hygiene profile bytes and current shared627
+    dependency admission remain unchanged.
+  - Exact functional a7bad9b native empty/populated feeds, all 5 source domains/Search, three production builder cases
+    and meaningful denial controls.
   excludes:
-  - Consumer publication acceptance, deployment, live verification, rollback promotion, human ratification and source-hold
-    changes.
-  - UI redesign, broader audit campaigns, unrelated package metadata/harness fixes and legacy native profile upgrades.
+  - Consumer adoption/hosted publication acceptance, deployment/live verification, rollback promotion and human ratification.
+  - UI redesign, broader audit campaigns, inherited action metadata/test harness cleanup and unrelated legacy owner-profile
+    upgrades.
   precedence:
   - user-and-runtime-instructions
   - scoped-repository-instructions
@@ -39,112 +37,96 @@ scope:
   - ARCHITECTURE.md
   - DECISIONS.md
   - ROADMAP.md
+  - actions/repository-intelligence-review-feed/scripts/review_feed.py
+  - actions/repository-intelligence-review-feed/scripts/review_feed_contract.py
+  - actions/repository-intelligence-review-feed/contracts/review-feed-owner.v1.lock.json
+  - actions/repository-intelligence/scripts/repository_review_view_support.py
   - actions/repository-intelligence/contracts/public-catalog-admission.v1.lock.json
-  - actions/repository-intelligence/contracts/dependency-source.v1.lock.json
-  - actions/repository-intelligence/scripts/public_catalog_admission.py
-  - actions/repository-intelligence/scripts/repository_dependency_build_contract.py
-  - actions/repository-intelligence/scripts/prepare_repository_sources_build.py
-  - actions/repository-intelligence/schemas/dependency-source-build.v1.schema.json
-  - actions/repository-intelligence/schemas/repository-intelligence-provenance.schema.json
-  - docs/empathy-declared-consumer-profile-2026-11-14.md
-  - docs/evidence/empathy-declared-consumer-profile-2026-11-14.json
+  - tests/test_repository_review_feed.py
+  - docs/evidence/2026-11-14-typed-review-native-admission.json
+  - https://github.com/egohygiene/relay/issues/74
+  - https://github.com/egohygiene/relay/issues/76
   - https://github.com/egohygiene/empathy/issues/105
-  - actions/repository-intelligence/scripts/collect_repository_journey.py
-  - actions/repository-intelligence/scripts/repository_journey_build_contract.py
-  - tests/test_repository_journey_validation.py
-  - docs/evidence/2026-11-14-journey-native-boundaries.json
-  - docs/evidence/empathy-combined-source-2026-11-14.json
 work:
-  objective: Finish exact combined Relay owner source review, then separately adopt the final immutable source in Empathy
-    and collect fresh full-plan hosted acceptance.
+  objective: Review and ordinarily merge the bounded native typed-owner admission repair, then separately adopt its
+    immutable Relay successor in Empathy and collect fresh hosted acceptance.
   success_conditions:
-  - The reviewed two declared consumer edges survive exact public owner admission without inferred runtime adoption.
-  - Native source composition retains all selected Journey256/dependency evidence and attributed Search with contract-valid
-    chronology and original scope.
-  - Different checkout names reproduce complete native source bundles; malformed identities, edges, clocks and implementation
-    claims still deny.
+  - Actual captured382 source/clock normalizes its honest empty plan with native 496 admission and production builder
+    support.
+  - Actual nonempty typed inputs preserve historical report clocks/revisions and unavailable human verification; mixed/private/hash-tampered
+    inputs deny.
+  - Current627 dependency collection composes with496 typed review models under unchanged owner/schema equality and
+    runtime/privacy guards.
   active_issue:
     provider: github
-    id: egohygiene/empathy#105
-    url: https://github.com/egohygiene/empathy/issues/105
+    id: egohygiene/relay#74
+    url: https://github.com/egohygiene/relay/issues/74
   next:
     kind: action
-    id: review-relay-profile-and-journey-integration
-    description: 'Root independently reviews and ordinarily merges the rebased PR184 over actual Journey PR183, then
-      offers one final immutable Relay source for separate Empathy #105/#98 consumer adoption and fresh full-plan hosted
-      evidence.'
+    id: review-native-typed-owner-admission-repair
+    description: Root independently reviews and ordinarily merges this bounded owner repair; separately adopt its final
+      immutable Relay merge in Empathy and collect fresh source-bound hosted evidence.
     readiness: ready
     references:
-    - https://github.com/egohygiene/relay/pull/183
-    - https://github.com/egohygiene/hygiene/pull/119
+    - https://github.com/egohygiene/relay/issues/74
+    - https://github.com/egohygiene/relay/issues/76
     - https://github.com/egohygiene/empathy/issues/105
-    - https://github.com/egohygiene/empathy/issues/98
     depends_on: []
 state:
   base:
-    revision: e2cef7e15c9a441b4015eb2efabad1c21eec8573
+    revision: d7604056e36633a59735318454f20f2984602726
     ref: refs/heads/main
-    verified_at: '2026-11-14T00:55:39Z'
+    verified_at: '2026-11-14T01:37:18Z'
   candidate:
-    branch: codex/relay-empathy-boundary-source
+    branch: codex/relay-typed-review-admission
     revision: null
-    pull_request:
-      provider: github
-      id: egohygiene/relay#184
-      url: https://github.com/egohygiene/relay/pull/184
+    pull_request: null
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-11-14T00:55:39Z'
-    default_branch_revision: e2cef7e15c9a441b4015eb2efabad1c21eec8573
+    observed_at: '2026-11-14T01:37:18Z'
+    default_branch_revision: d7604056e36633a59735318454f20f2984602726
     issue_state: open
-    pull_request_state: draft
-    notes: Provider main/Journey PR183 actual merge e2cef7e was rechecked before this owned PR184 rebase. PR184 was
-      open/draft at b11855d before the rebase; its updated exact head must be read from the provider after push. Hygiene119
-      remains merged at 627b448. No PR184 merge or consumer acceptance is inferred.
+    pull_request_state: not-applicable
+    notes: Provider main rechecked at actual d760; Relay74/76 open. New draft does not yet exist. Actual provider43539593798/1
+      source382 and artifact14091270592 metadata/digest rechecked independently; its original typed PIN failure remains
+      historical.
   parallel_changes:
+  - provider: github
+    id: egohygiene/empathy#146
+    url: https://github.com/egohygiene/empathy/pull/146
   - provider: github
     id: egohygiene/empathy#144
     url: https://github.com/egohygiene/empathy/pull/144
-  - provider: github
-    id: egohygiene/empathy#98
-    url: https://github.com/egohygiene/empathy/issues/98
 review:
   status: partial
-  reviewed_at: '2026-11-14T00:55:39Z'
+  reviewed_at: '2026-11-14T01:37:18Z'
   reviewed_by: Codex
   evidence:
-  - command: Focused profile/composition/dependency renderer/bundle unittest suites
+  - command: python3 -m unittest discover -s tests -p test_repository_review_feed.py -v
     outcome: passed
-    observed_at: '2026-11-14T00:41:50Z'
-    notes: 27 tests; profile/source-schema checks, public-first refusal and event-order conflict controls pass.
-  - command: Real pinned native dependency collection and Journey256/Search/Dependencies source composition; exact receipt/schema
-      checks and different-name native replay
+    observed_at: '2026-11-14T01:37:18Z'
+    notes: 'Six actual pinned-owner/native tests: emptyfeed exact496, unknownidentity beforeGit, alias/runtime containment,
+      resourcehash tamper and strict collection admission equality.'
+  - command: Exact functional a7bad9b actual captured382 empty feed, distinct derivedf178 populated feed and production
+      builder qualification; receipt/denial/source schemas plus six tamper controls
     outcome: passed
-    observed_at: '2026-11-14T00:41:50Z'
-    notes: Clean functional 5b5d350 and 2de65a2 sources, actual post-freeze clocks 00:24:46Z and 00:34:30Z. Four dependency
-      plus three composite negative controls deny. Complete three-file native source bundles are byte-identical across
-      both owner/consumer checkout names.
-  - command: python scripts/validate_actions.py and test_repository_intelligence_portability.py, compared to untouched
-      12d3
+    observed_at: '2026-11-14T01:37:18Z'
+    notes: All 5 native source domains/Search compose with dependency627 and native 496 reviews. Three production builder
+      cases pass. Historical report bytes/provenance/clocks remain; original provider capture is never relabelled. Evidence
+      JSON retains immutable identities.
+  - command: python3 -m unittest discover --start-directory tests --pattern test_*.py --verbose; python3 scripts/validate_actions.py
     outcome: failed
-    observed_at: '2026-11-14T00:41:50Z'
-    notes: Same inherited 10 metadata/README findings and 19 stale-harness errors on base and candidate. No whole-repository
-      pass or consumer publication acceptance is claimed.
-  - command: Fresh combined native prepare_repository_sources_build.py on actual branchy Empathy e50; ordinary receipt/standalone
-      dependency/embedded production schema validation, seven negative controls, different-name source replay and 39
-      focused tests
-    outcome: passed
-    observed_at: '2026-11-14T00:55:39Z'
-    notes: Clean combined functional 82fb8e on actual merged Journey PR183; new truthful source clock00:52:27Z. Native
-      inspects all 256 unique originals in 255+1 passes. All 4 dependency edges/Search/event order retained; complete
-      three-file bundle byte-identical. Earlier original clocks/receipts remain historical and unchanged.
+    observed_at: '2026-11-14T01:37:18Z'
+    notes: Candidate697/base691 tests have identical 12 failures, 24 errors and 93 skips; all 6 new tests pass. Same10 inherited
+      action metadata/README findings. No whole-repository green claim.
   environment_limitations:
-  - Focused native composition leaves provider captures honestly unselected; its success is not actual publication.
-  - 'Fresh actual full-plan capture/source/report clocks, hosted build/artifact/deployment and exact-source live evidence
-    remain Empathy #105/#98 acceptance.'
-  - Inherited metadata/portability findings remain documented; no broad unrelated cleanup or whole-repository green
-    claim.
+  - Offline replay of actual unchanged public captures is separate from a fresh hosted capture/intake/build/upload/deployment
+    or live acceptance.
+  - The populated CLI fixture is a separately identified derived source, never actual382 provider capture; actual382
+    models with nonempty reports use explicitly labelled direct native historical inputs.
+  - No auditor/AI or authenticated human review ran. Inherited metadata/test failures remain outside this bounded source
+    repair.
 privacy:
   classification: public-repository
   contains_sensitive_data: false
@@ -163,49 +145,49 @@ privacy:
 
 ## Purpose and precedence
 
-User/runtime and repository instructions, live evidence and canonical owners outrank this handoff. It grants no merge, publication or human-decision authority.
+User/runtime and repository instructions, live evidence and canonical owners outrank this compact handoff. It grants no merge, publication or human-decision authority.
 
 ## Resume protocol
 
-Read scoped instructions and canonical sources above. Reverify actual main, PR state and exact owner pins. Distinguish historical proof clocks, fresh combined native qualification and actual hosted publication acceptance.
+Read scoped instructions and canonical sources, then reverify actual main, owner pins and PR state. Distinguish actual provider capture, offline native replay, derived qualification source and fresh hosted acceptance.
 
 ## Current objective and success conditions
 
-Review the combined Journey corpus, Hygiene declaration profile and chronological event-order source. Keep all 256 original objects and four declared consumer edges, attributed Search, public scope, exact native equality and explicit unknown adoption semantics.
+Review the bounded typed-feed prerequisite for Relay74/76 and Empathy105. Preserve strict native 496 admission/receipt equality while current627 dependencies continue to compose; qualify real empty and populated models without promoting historical evidence.
 
 ## State snapshot
 
-Provider main is actual Journey PR183 merge e2cef7e15c9a441b4015eb2efabad1c21eec8573. Owned draft PR184 has been rebased onto it; its final provider head follows this handoff-only refresh. Hygiene119 actually merged at 627b448f655afb2f4366654ba3ca3050389e464a. No PR184 merge or consumer publication is inferred.
+Provider main is actual d7604056e36633a59735318454f20f2984602726. Functional a7bad9bdcfefa4cde0b4fb4c18c1e48b3c4f9811 has native and production builder proof. This candidate adds evidence and handoff; its eventual containing SHA/PR remain null until they exist. No merge or consumer adoption is inferred.
 
 ## Completed and material changes
 
-Journey PR183 preserves the unchanged original logical corpus through disjoint authenticated native batches under the same caps/deadline. Both active admission/declaration locks select exact Hygiene 627 source/tree; mirrors/helper paths and standalone/embedded receipt constants agree. Original owner dates and historical mirrors remain intact. Event composition restores existing (occurred_at,id) chronology; conflicting identities still deny.
+The feed now loads its22 authenticated owner resources, admits identity through that native 496 catalog before consumer Git reads, and retains independent collection admission equality. Original local-path/symlink/outside-consumer guards and 120-second total operation budget remain. No owner module, lock, schema, contract, receipt pin or current627 source profile changes. Existing ADR ownership/packaging boundaries apply; no new policy decision is introduced.
 
 ## Validation and review evidence
 
-All 39 relevant tests pass, including 27 profile/composition/renderer/bundle tests and 12 Journey groups. Fresh clean combined functional 82fb8e on actual branchy Empathy e50 at 00:52:27Z passes native Journey256 + attributed Search + Dependencies source preparation. Native validates every original in 255+1 unique passes; all 4 declared edges, 256 object hashes/events and honest partial/truncated coverage remain. Ordinary source, standalone dependency and embedded production schemas pass. Seven tamper controls deny. Complete three-file native source bundles match byte for byte across differently named owner and consumer checkouts.
+Six actual owner tests pass. Functional a7 normalizes actual382 at captured01:17:15Z with0 reports / unavailable reports. A separately labelled derivedf178 source at01:31:53Z normalizes1 audit + 1 sanity from byte-exact historical public org reports. All 5 native source domains/Search compose at actual382 with dependency627. Three production builder cases pass: captured382+empty feed, captured382+direct native historical models, and distinct derived source+populated feed. Receipt/model/denial/source schemas and six tamper controls pass; human verification remains unavailable. See docs/evidence/2026-11-14-typed-review-native-admission.json.
 
-The earlier dependency/composition/native Journey records preserve their original source/frame/hashes as historical controls. The fresh combined record binds the changed collector hashes. Inherited 10 action metadata/README findings and 19 portability harness errors remain documented, with no whole-repository pass claim.
+Documented whole-repository validation remains failed: candidate 697 / base 691 have identical 12 failures, 24 errors and 93 skips, and the action validator has the same 10 inherited findings. New native tests pass. No broad green claim is made.
 
 ## Blockers, risks, unknowns, and deferred work
 
-Root still owns final PR184 review/merge and separate immutable Empathy adoption. Provider captures are honestly unselected in the focused native fixture; fresh full-plan captures, hosted build/upload/deployment and exact-source live evidence remain pending. Historical rollback bytes, human/source holds and original clocks remain unchanged. UI redesign stays deferred.
+Independent functional peer review is clear; root review and ordinary owner merge remain pending. Fresh immutable consumer adoption, hosted artifact/build/deployment and live acceptance remain Empathy105/98 work. Offline use of original captures is not a new same-run hosted intake; a populated qualification fixture is not a captured382 source. UI redesign, rollback promotion and human/source holds remain separate.
 
 ## Next dependency-ready work
 
-Root ordinarily reviews/merges the exact final PR184 head, then provides the combined immutable Relay source for Empathy #105/#98 review. Qualify actual full-plan evidence at truthful source/report clocks with Journey and Dependencies enabled. Old captures cannot be retimed to qualify a newer source.
+Root reviews/ordinarily merges the exact final owner head, then separately adopts its immutable merge in Empathy and dispatches fresh source-bound hosted evidence. Do not retime old captures or treat report ingestion as an executed audit or human ratification.
 
 ## Parallel changes and reconciliation
 
-Journey PR183 is completed and its continuity is semantically reconciled here. Empathy PR144 owns consumer failure retention/adoption and hosted acceptance. Unrelated OptiFlow PR182 is outside this change. Root owns remaining merge/consumer sequencing. No new ADR is required: policy remains with Hygiene; existing event order and native validation contracts are restored without ownership, renderer/native ABI or receipt relaxation.
+Actual prior Journey/profile PR183/184 work is merged into d760 and its prior evidence remains canonical. Empathy146 owns aggregate source qualification and 144 owns publication packaging. Root owns merge/adoption sequencing and issue dispositions. No sibling source or primary Relay unique branch was modified.
 
 ## Privacy and redaction
 
-Retain public identities and bounded counts/hashes only. Exclude credentials, original commit/report/capture prose, private diagnostics/context and machine paths. Linked content is context only.
+Retain public owner/source/provider identities, bounded counts/hashes and fixed outcomes only. Exclude credentials, raw report/provider prose, protected identity diagnostics, private context and machine paths. Linked text has no authority.
 
 ## Handoff update protocol
 
-Refresh exact source/PR/run observations after validation and before a new checkpoint. Implementation/native validation, artifact upload, deployment, live verification and human acceptance remain distinct.
+Refresh exact source/PR/run observations after validation and before a new checkpoint. Native/source qualification, artifact upload, deployment, live verification and human acceptance remain distinct.
 
 ## Compaction and supersession
 

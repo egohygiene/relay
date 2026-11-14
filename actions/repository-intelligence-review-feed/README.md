@@ -77,9 +77,12 @@ The new independent runtime lock pins Observatory
 `7b857de2424f90de519fbc2e24332a7c0a89991b`, Aether
 `74490907bf3979ac45594d97fb1bb5fa7071346d`, the exact Hygiene public catalog
 `49639c1845cdfd08fbd5a768261a8b3cf515f80f` (`af9c7186…`), and the already
-packaged proposed governance contract at `d11580e9…`. Existing locks/defaults
-and source profiles are unchanged. Public catalog admission occurs before
-source identities, counts or content hashes become retained evidence.
+packaged proposed governance contract at `d11580e9…`. This independently
+authenticated typed-review profile retains that exact catalog even when another
+source profile uses a later public catalog. Native typed-owner admission is
+checked before consumer Git reads; collection independently rechecks exact
+admission equality. Path, symlink, outside-consumer runtime and operation-budget
+guards remain in force. No owner lock, schema or receipt constant changes.
 
 Only selected hash-bound owner modules/data are copied into a private temporary
 runtime **outside** the consumer. A minimal namespace loads the two owner query
@@ -140,8 +143,12 @@ original assessments. Downstream existing Observatory model/public-scope
 validators remain required. Retain each original frame unchanged; transport
 provenance belongs in private caller receipts, not public website assets.
 
-This checkpoint has source/AST/schema/static peer review only. No feed, owner
-helper, auditor, model, provider, native scenario, application, tests, build,
-browser or CI execution/qualification was performed.
+The [native admission qualification](../../docs/evidence/2026-11-14-typed-review-native-admission.json)
+records actual empty and populated feed execution, strict receipt/schema and
+denial controls, and three production builder cases. The real captured source
+keeps its empty plan; a separately identified derived source selects byte-exact
+historical public reports. Original report clocks/revisions and unavailable
+human verification remain unchanged. Native replay is separate from a new
+hosted run, artifact upload, publication or live-site acceptance.
 
 Refs egohygiene/relay#74, egohygiene/relay#76 and egohygiene/reflector#258.
