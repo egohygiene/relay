@@ -32,7 +32,6 @@ RELAY = ROOT.parent.parent
 LOCK = ROOT / "contracts/review-feed-owner.v1.lock.json"
 PLAN_SCHEMA = ROOT / "contracts/review-plan.v1.schema.json"
 RECEIPT_SCHEMA = ROOT / "contracts/review-feed-receipt.v1.schema.json"
-ADMISSION = RELAY / "actions/repository-intelligence/scripts/public_catalog_admission.py"
 CONTRACT = Path(__file__).with_name("review_feed_contract.py")
 DENIAL = "Typed review feed denied; inspect the selected public owner inputs locally"
 MAX_TOTAL = 16 * 1024 * 1024
@@ -134,19 +133,9 @@ def source_frame(source, repository, revision, as_of, deadline):
         "commit_at": committed.strftime("%Y-%m-%dT%H:%M:%SZ"), "as_of": as_of}
 
 
-def public_context(repository):
-    """Authenticate canonical public identity before source paths, hashes or counts."""
-    owner = module("relay_typed_review_public_catalog", ADMISSION)
-    document = owner.public_document()
-    selected = [row for row in document["repositories"]
-        if row.get("visibility") == "public" and row.get("full_name") == repository]
-    require(len(selected) == 1, "VISIBILITY")
-    pin = owner.lock()
-    admission = {"schema": owner.SCHEMA, "owner": pin["owner"], "revision": pin["revision"],
-        "artifact_path": pin["artifact_path"], "artifact_sha256": pin["files"][pin["artifact_path"]],
-        "schema_sha256": pin["files"][pin["schema_path"]], "helper_sha256": pin["files"][pin["helper_path"]],
-        "observed_at": document["observed_at"], "selected_sha256": owner.digest(owner.encoded(selected))}
-    owner.validate_selection(selected, admission)
+def public_context(repository, audits, data):
+    """Use the authenticated typed owner's catalog before consumer Git reads."""
+    _row, admission, _allowed = audits.shared.admission(repository, admission_root=data)
     return admission
 
 
@@ -309,16 +298,18 @@ def main():
     context, output, args = None, None, None
     try:
         args = parser.parse_args()
-        admission = public_context(args.repository)
+        # Preserve alias/containment guards before allocating owner runtime.
+        # The locked owner must admit identity before consumer Git reads.
         source = local_path(args.source_root)
-        plan_path = contract.relative(args.plan)
-        output = output_path(source, args.output_directory, plan_path)
-        deadline = time.monotonic() + 120
-        frame = source_frame(source, args.repository, args.represented_commit, args.as_of, deadline)
-        context = {"source": frame, "admission": admission}
         temporary, resources = runtime(args.runtime_parent, source)
         with temporary as directory:
             audits, sanity, data = owner_modules(directory, resources)
+            admission = public_context(args.repository, audits, data)
+            plan_path = contract.relative(args.plan)
+            output = output_path(source, args.output_directory, plan_path)
+            deadline = time.monotonic() + 120
+            frame = source_frame(source, args.repository, args.represented_commit, args.as_of, deadline)
+            context = {"source": frame, "admission": admission}
             models, plan, reports, owner_admission = collect(source, plan_path, frame, audits, sanity, data, deadline)
         require(admission == owner_admission, "PIN")
         files = {key + ".json": contract.encoded(value) for key, value in models.items()}
