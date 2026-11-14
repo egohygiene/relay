@@ -94,7 +94,10 @@ def compose(projections, normalize, runtime, coverage):
                         raise ValueError("conflicting-record")
                     record = {**old, "provenance": sorted(set(old["provenance"] + record["provenance"]))}
                 records[record["id"]] = record
-            composed[key] = sorted(records.values(), key=lambda item: item["id"])
+            # The owner event contract orders by occurrence, then identity.
+            # Even an empty second event list must preserve that order.
+            order = (lambda item: (item["occurred_at"], item["id"])) if key == "events" else (lambda item: item["id"])
+            composed[key] = sorted(records.values(), key=order)
     composed["collection_coverage"] = coverage
     snapshot, validation = normalize(runtime, composed)
     if snapshot is None or validation != {"hygiene": "valid", "coverage": "valid", "observatory": "normalized"}:
