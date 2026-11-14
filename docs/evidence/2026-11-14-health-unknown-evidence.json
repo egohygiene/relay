@@ -1,0 +1,217 @@
+{
+  "observed_at": "2026-11-14T02:15:23Z",
+  "relay_functional_revision": "946175a7e56dcfe6e0d43f6264a04f6bd54487d8",
+  "source_revision": "7639304babcba9d4baf21ccea163f31f9045a0c6",
+  "source_as_of": "2026-11-14T01:55:36Z",
+  "original_capture": {
+    "run_id": 43543368971,
+    "run_attempt": 1,
+    "artifact_id": 14093290779,
+    "zip_sha256": "fc1999fcd4001b8944bf9a7fd8e81f9c8d4fc0f2b66f24526ddf2f1f13bc17d1",
+    "provider_metadata_checked": true
+  },
+  "original_typed_reviews": {
+    "artifact_id": 14093011293,
+    "zip_sha256": "b664534291ccb8fb257d2d0baa9bbf11897344517a16a6b8409be86f8c023f32",
+    "used_unchanged": true
+  },
+  "health": {
+    "freshness": {
+      "current": 86,
+      "not_applicable": 768,
+      "unknown": 1
+    },
+    "assertions": {
+      "authoritative": 850,
+      "unknown": 5
+    },
+    "unknown_ids": [
+      "ri:egohygiene/egolint:repository:egohygiene/egolint",
+      "ri:egohygiene/empathy:repository:egohygiene/empathy",
+      "ri:egohygiene/mantle:repository:egohygiene/mantle",
+      "ri:egohygiene/realm:repository:egohygiene/realm",
+      "ri:egohygiene/relay:repository:egohygiene/relay"
+    ],
+    "stale_ids": [],
+    "extra_unknown_assertion_records": [
+      {
+        "id": "ri:egohygiene/egolint:repository:egohygiene/egolint",
+        "freshness": "current",
+        "state": {
+          "assertion": "unknown",
+          "value": "unknown"
+        }
+      },
+      {
+        "id": "ri:egohygiene/mantle:repository:egohygiene/mantle",
+        "freshness": "current",
+        "state": {
+          "assertion": "unknown",
+          "value": "unknown"
+        }
+      },
+      {
+        "id": "ri:egohygiene/realm:repository:egohygiene/realm",
+        "freshness": "current",
+        "state": {
+          "assertion": "unknown",
+          "value": "unknown"
+        }
+      },
+      {
+        "id": "ri:egohygiene/relay:repository:egohygiene/relay",
+        "freshness": "current",
+        "state": {
+          "assertion": "unknown",
+          "value": "unknown"
+        }
+      }
+    ]
+  },
+  "native_source_snapshot_sha256": "8eae7b8d9204b5aec0b398f6b946b1233296824dcf478674536903599b53ef0b",
+  "actual_action_stages": [
+    {
+      "name": "\ud83c\udf33 Generate commit-scoped repository tree",
+      "status": "passed",
+      "script_sha256": "37687de076e872d4c28ab17d941e55ab036e68b101fb0df8e2755dd17e0a3790"
+    },
+    {
+      "name": "\ud83d\udcca Generate private diagnostic activity",
+      "status": "passed",
+      "script_sha256": "81af8704103e27e8a015deea55b75172014db803f0766333f4266b4cf74ba786"
+    },
+    {
+      "name": "\ud83e\udea9 Generate public-safe repository analytics",
+      "status": "passed",
+      "script_sha256": "113df618b5f46dce1e7c435fcb4a2abfa04dbeeb28f2ac64973d503423227382"
+    },
+    {
+      "name": "\u2728 Render static intelligence site",
+      "status": "passed",
+      "script_sha256": "e7590514b47908a2cfbe7dfbc520d907852c5f657f1e2d6809bffdaeb75464e2"
+    },
+    {
+      "name": "\ud83e\uddfe Create deterministic build manifest",
+      "status": "passed",
+      "script_sha256": "418dbcb5bae9cc98ac0367ac41d7484b4e66e66c1eb5229a9e44fa39618ec2c4"
+    },
+    {
+      "name": "\ud83d\udee1\ufe0f Validate generated intelligence bundle",
+      "status": "failed-separate-downstream-reference-guard",
+      "script_sha256": "623d0d1712160d9f320a2fa0e3da0ff520e50b702e032a1bec9cdfa74e4c240b"
+    }
+  ],
+  "negative_controls": [
+    {
+      "control": "missing-graph",
+      "outcome": "denied"
+    },
+    {
+      "control": "empty-graph",
+      "outcome": "denied"
+    },
+    {
+      "control": "same-size-invented-id",
+      "outcome": "denied"
+    },
+    {
+      "control": "freshness-counter",
+      "outcome": "denied"
+    },
+    {
+      "control": "assertion-counter",
+      "outcome": "denied"
+    },
+    {
+      "control": "omitted-checks",
+      "outcome": "denied"
+    },
+    {
+      "control": "false-check-state",
+      "outcome": "denied"
+    }
+  ],
+  "snapshot_mutation": "none",
+  "guard": "production requires full canonical graph; exact counters/union ID memberships/checks checked",
+  "owner_runtime_schema_changes": "none",
+  "public_bundle_manifest_sha256": "9e3d64927e939922361c9790327e0db782083cbada0b630e6347c1fe57caa49c",
+  "full_bundle_validation": "failed at separate GitHub reference owner guard; no allowlist relaxation or input relabelling",
+  "hosted_publication": "not performed; offline replay of original captured source and clock",
+  "validation": {
+    "base_revision": "95105a9f5d99239af0d44d7dbd796fd1507fef31",
+    "functional_revision": "946175a7e56dcfe6e0d43f6264a04f6bd54487d8",
+    "base_tests": 704,
+    "candidate_tests": 712,
+    "same_failures": 12,
+    "same_errors": 24,
+    "same_skips": 93,
+    "same_failure_error_identifiers": true,
+    "focused_health_tests": 25,
+    "focused_health_status": "passed",
+    "focused_site_tests": 34,
+    "focused_site_held_failure": "same inherited hygiene registry route lock mismatch",
+    "action_validator_same_findings": 10
+  },
+  "owner_semantics": {
+    "repository": "egohygiene/observatory",
+    "revision": "49a8031f2a5124ff7ab09adbda50a9a5dbe6dec2",
+    "path": "src/observatory/intelligence.py",
+    "sha256": "616b9a1319274d915ff3fa2c0d1cbbb1267c255f626e7925c4297773d535c591",
+    "query": "_health_view",
+    "unknown_ids": "sorted union of records whose freshness is unknown OR whose assertion/state.assertion is unknown",
+    "freshness": "independent distribution over all graph sources/entities/relationships/events; no assertion relabelling",
+    "overlap": "stale freshness with unknown assertion legitimately belongs to both inventories"
+  },
+  "change": {
+    "renderer": "actions/repository-intelligence/scripts/render_repository_intelligence_health.py",
+    "production": "render_page requires the full graph whenever a Health query is present; exact graph counters, ID memberships and check fields are verified without modifying the snapshot",
+    "compact_helper": "graphless validate_health_view/health_body remain structural view-only helpers with sound union bounds; they do not establish full owner acceptance and cannot be production fallback",
+    "other_owners": "collector/runtime/catalog/schema/typed-review resources unchanged",
+    "copy": "Freshness and assertion exceptions; explains the union and legitimate overlap"
+  },
+  "reproduction": {
+    "native_argv_template": [
+      "${VERIFIED_PYTHON}",
+      "-I",
+      "${RELAY_ROOT}/actions/repository-intelligence/scripts/prepare_repository_sources_build.py",
+      "--repository-root",
+      "${QUALIFICATION_ROOT}/empathy763",
+      "--work-directory",
+      ".cache/health-final",
+      "--repository",
+      "egohygiene/empathy",
+      "--visibility",
+      "public",
+      "--source-commit",
+      "7639304babcba9d4baf21ccea163f31f9045a0c6",
+      "--observed-at",
+      "2026-11-14T01:55:36Z",
+      "--known-external-decisions=[]",
+      "--generator-commit",
+      "946175a7e56dcfe6e0d43f6264a04f6bd54487d8",
+      "--generator-repository-root",
+      "${RELAY_ROOT}",
+      "--search-attribution",
+      "--collect-journey",
+      "--journey-maximum-commits",
+      "256",
+      "--collect-dependencies",
+      "--dependency-catalog",
+      "${VERIFIED_HYGIENE627}",
+      "--capture-plan",
+      "${ORIGINAL_CAPTURE}/extracted/source-plan.json",
+      "--capture-root",
+      "${ORIGINAL_CAPTURE}/extracted",
+      "--runtime",
+      "${VERIFIED_NATIVE_RUNTIME}"
+    ],
+    "health_tests": "python3 -m unittest discover -s tests -p test_repository_intelligence_health.py -v",
+    "site_tests": "python3 -m unittest discover -s tests -p test_repository_intelligence_site.py -v",
+    "action_build_bodies": "The six checked-in action run bodies from commit946 are identified by exact script hashes above. Explicit native preparation uses original unchanged captures; source metadata/capture acquisition/hosted intake are not rerun. Full bundle validation remains a recorded later failure."
+  },
+  "later_reference_hold": {
+    "diagnostic": "GitHub reference is outside the consumer contract",
+    "reference": "https://github.com/egohygiene/empathy/actions/runs/43543368762/job/132288808577",
+    "scope": "Existing collector admits this same-consumer provider job URL; bundle validator omits its shape. Separate source repair; no link allowlist change in this Health checkpoint."
+  }
+}
