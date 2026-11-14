@@ -1,0 +1,80 @@
+{
+  "schema": "egohygiene.relay.svg-context-navigation-evidence/v1",
+  "recorded_at": "2026-11-14T04:34:06Z",
+  "issue": "egohygiene/relay#189",
+  "consumer_issue": "egohygiene/empathy#105",
+  "base_revision": "f7f9bd44713606d9c099adda715db2542c8b66bf",
+  "functional_revision": "62dd90d41264ba3100f4f1730df98a550b8a32cf",
+  "scope": "Three native href-attribute assignments; existing URL construction/admission, schemas, owner pins, source and publication guards unchanged.",
+  "origin": {
+    "legacy_html_writer": "9426b962c634774910a22ad4f79b99c4d7fce2a2",
+    "graph_introduction": "901a525b7e54ea97be972701153a2f0b4e3aa20e",
+    "graph_context_update": "ceb307644a1cfa0d8e7e870e474abbddae139082",
+    "before_batch_relay": "12d3a0823c8c8f885dea4acf482160fd726325e2",
+    "before_batch_assets_equal_base": true,
+    "previous_empathy_generator": "9a6315978766c336566b9fa7139b800fa8789ba5",
+    "previous_empathy_generator_has_graph": false,
+    "interpretation": "Inherited Relay defect newly exposed to Empathy by the current generator upgrade; not an existing Empathy graph regression."
+  },
+  "asset_sha256": {
+    "base": {
+      "site.js": "7519ac472395a38f064ed35c2aa439fd712262d7f1270cde0ff9d6adc1a57b13",
+      "graph.js": "1f02b408bac12484da7df83c4cecd17f1fb9ea21dbb55896d73c0ddacd578669"
+    },
+    "functional": {
+      "site.js": "82a0c784169bf451b3f20fb291de6e22a205e7ddc8a17371253eb16102ca6c2a",
+      "graph.js": "5e6139f03a551f90305cc7ee72fb9641b147a05731b9dd9ee89534e18f2e403c"
+    }
+  },
+  "checks": [
+    {
+      "command": "python3 tests/browser/svg_context_regression.py --output /tmp/svg-context",
+      "source": "62dd90d41264ba3100f4f1730df98a550b8a32cf",
+      "outcome": "passed",
+      "browser": "Chromium151.0.7922.173",
+      "assertions": 18,
+      "page_errors": 0,
+      "fixture": "Real existing Roadmap fixture plus production graph renderer, explicitly public test snapshot; local HTTP, real HTMLAnchorElement/SVGAElement and production scripts.",
+      "coverage": [
+        "shared filter initialization after graph setup",
+        "SVG focus and graph inspection",
+        "pointerdown/click destination update",
+        "query and entity preservation",
+        "HTML/SVG destination parity",
+        "shared entity pointer selection and hash selection"
+      ]
+    },
+    {
+      "command": "Same real-DOM regression with both original f7 script inputs",
+      "outcome": "failed-as-expected",
+      "failure": "Shared filter initialization after SVG setup; original strict site initializer throws on SVG href assignment."
+    },
+    {
+      "command": "python3 -m unittest discover -s tests -p test_repository_intelligence_site.py -v",
+      "outcome": "failed-inherited",
+      "methods": 34,
+      "passed": 33,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "baseline": "Same test_hygiene_registry_lock_matches_repository_route_layout failure reproduced at exact clean f7. Existing Node HTML mock now implements setAttribute while retaining every URL/security assertion."
+    },
+    {
+      "command": "node --check for both changed assets; Ruff0.16.5 for new browser script; Python compilation; git diff --check",
+      "outcome": "passed"
+    },
+    {
+      "command": "python3 scripts/validate_actions.py",
+      "outcome": "failed-inherited",
+      "findings": 10,
+      "baseline": "The same previously recorded action SPDX/README advertisement findings persist; this repair changes no action manifest/catalog/README authority."
+    }
+  ],
+  "retained_consumer_browser_peer": null,
+  "limits": [
+    "This local renderer fixture is not a canonical live consumer result.",
+    "Empathy source adoption, fresh producer intake, full hosted publication/live, rollback/restoration and final browser acceptance remain separately required under Empathy105/98.",
+    "Historical f7/S2 and fixed b71 rollback proofs remain immutable; no old bundle is retroactively upgraded.",
+    "No UI redesign, human acceptance, full accessibility or whole-repository clean result is claimed."
+  ]
+}
