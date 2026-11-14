@@ -54,6 +54,9 @@ body {
   line-height: 1.55;
 }
 
+:where(main, section, article, details, label) { min-width: 0; }
+:where(p, li, dd, dt, code, h1, h2, h3) { overflow-wrap: anywhere; }
+
 a {
   color: var(--cyan);
 }
@@ -90,13 +93,17 @@ a:focus-visible,
   z-index: 8;
   top: 0;
   display: flex;
-  overflow-x: auto;
+  flex-wrap: wrap;
+  align-items: start;
   gap: 0.35rem;
   padding: 0.65rem max(1rem, calc((100% - 76rem) / 2));
   border-bottom: 1px solid var(--border);
   background: rgba(7, 10, 18, 0.88);
   backdrop-filter: blur(18px);
 }
+.experience-nav > details { min-width: 0; }
+.experience-nav summary { padding: 0.45rem 0.7rem; color: var(--muted); cursor: pointer; font-size: 0.78rem; font-weight: 800; }
+.experience-nav .ri-nav-group { display: grid; gap: 0.2rem; }
 
 .experience-nav a {
   flex: 0 0 auto;
@@ -685,10 +692,11 @@ main {
 
 .freshness-row {
   display: grid;
-  grid-template-columns: minmax(8rem, 0.8fr) minmax(10rem, 1.4fr) minmax(8rem, 0.8fr);
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr) minmax(0, 0.8fr);
   gap: 0.75rem;
   align-items: center;
 }
+.freshness-row > * { min-width: 0; }
 
 .freshness-row > div:first-child {
   display: flex;
@@ -1121,6 +1129,9 @@ progress::-moz-progress-bar {
 }
 
 @media (max-width: 42rem) {
+  .experience-nav { position: static; }
+  .experience-nav > details { flex: 1 1 100%; }
+  .experience-nav .ri-nav-group { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .shell {
     width: min(100% - 1.2rem, 76rem);
   }

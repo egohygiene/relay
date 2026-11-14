@@ -1,6 +1,11 @@
 /* Copyright 2026 Ego Hygiene */
 /* SPDX-License-Identifier: MIT */
 
+.ri-graph-disclosure { min-width: 0; margin-block: 2rem; padding: 1rem; border: 1px solid var(--ri-border, #48516a); border-radius: 0.8rem; }
+.ri-graph-disclosure > summary { min-height: 2.75rem; padding-block: 0.45rem; color: var(--ri-text, #f7f8ff); cursor: pointer; font-weight: 700; overflow-wrap: anywhere; }
+.ri-graph-disclosure > summary span { display: block; margin-inline-start: 1rem; color: var(--ri-muted, #aeb7d2); font-size: 0.8rem; font-weight: 400; }
+.ri-graph-disclosure > summary:focus-visible { outline: 3px solid var(--ri-caution, #ffd166); outline-offset: 4px; }
+
 .ri-repository-graph {
   --ri-graph-background: var(--ri-canvas, #0b1020);
   --ri-graph-surface: var(--ri-surface-strong, #171d32);
@@ -21,6 +26,7 @@
 .ri-graph-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 0.8rem; }
 .ri-graph-controls label { display: grid; gap: 0.4rem; min-width: 0; }
 .ri-graph-controls label:first-child { flex: 1 1 18rem; }
+.ri-graph-controls label:first-child select { width: 100%; min-width: 0; }
 .ri-graph-controls label:nth-child(2) { display: flex; align-items: center; min-height: 2.75rem; }
 .ri-graph-controls > div { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .ri-repository-graph :where(button, select) { min-height: 2.75rem; max-width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--ri-graph-border); border-radius: 0.5rem; background: var(--ri-graph-surface); color: var(--ri-graph-text); font: inherit; }

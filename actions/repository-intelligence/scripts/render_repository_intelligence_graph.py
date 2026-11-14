@@ -318,19 +318,27 @@ def graph_body(snapshot: dict | None, repository: str, prefix: str = "", *, owne
 
 def enhance_document(document: str, snapshot: dict | None, repository: str, prefix: str = "", *, owner_views=None) -> str:
     body = graph_body(snapshot, repository, prefix, owner_views=owner_views)
+    optional = ('data-ri-route="intelligence"' in document
+                or '<main id="main-content" class="shell">' in document)
+    if optional:
+        # Native disclosure preserves the complete static graph and directories.
+        # The focused Dependencies route keeps the graph immediately available.
+        body = body.replace(BEGIN, BEGIN + '\n<details class="ri-graph-disclosure" data-ri-graph-disclosure>'
+                            '<summary>Explore the connection graph <span>Optional map and evidence directories</span></summary>', 1)
+        body = body.replace(END, '</details>\n' + END, 1)
     if BEGIN in document or END in document:
         if document.count(BEGIN) != 1 or document.count(END) != 1:
             raise ValueError("GRAPH_DOCUMENT")
         start, finish = document.index(BEGIN), document.index(END) + len(END)
         if start >= finish:
             raise ValueError("GRAPH_DOCUMENT")
-        document = document[:start] + body + document[finish:]
-    else:
-        markers = ('<main id="main-content" tabindex="-1">', '<main id="main-content" class="shell">')
-        marker = next((value for value in markers if document.count(value) == 1), None)
-        if marker is None:
-            raise ValueError("GRAPH_DOCUMENT")
-        document = document.replace(marker, marker + body, 1)
+        document = document[:start] + document[finish:]
+    markers = ('<main id="main-content" tabindex="-1">', '<main id="main-content" class="shell">')
+    marker = next((value for value in markers if document.count(value) == 1), None)
+    if marker is None or document.count('</main>') != 1:
+        raise ValueError("GRAPH_DOCUMENT")
+    document = (document.replace('</main>', body + '</main>', 1) if optional
+                else document.replace(marker, marker + body, 1))
     stylesheet = f'<link rel="stylesheet" href="{prefix}graph.css">'
     script = f'<script src="{prefix}graph.js" defer></script>'
     if stylesheet not in document:

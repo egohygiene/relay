@@ -2335,33 +2335,16 @@ def collection_notice(snapshot: dict[str, Any] | None, route: str) -> str:
         f'{escaped(state_label(claim["collection"]))} · '
         f'{escaped(state_label(claim["freshness"]))}</li>'
         for domain, claim in sorted(claims.items()))
-    return ('<section class="ri-panel" aria-label="Collection coverage"><h2>Collection coverage</h2>'
+    states = ", ".join(f'{sum(claim["collection"] == state for claim in claims.values())} {state_label(state).lower()}'
+                       for state in sorted({claim["collection"] for claim in claims.values()}))
+    return ('<details class="ri-panel ri-coverage" aria-label="Collection coverage">'
+            '<summary>Collection coverage <span>' + escaped(states) + '</span></summary>'
             '<p>Uncollected or unavailable evidence cannot establish an empty result, readiness, '
-            'or a passing check.</p><ul>' + rows + '</ul></section>')
+            'or a passing check.</p><ul>' + rows + '</ul></details>')
 
 
 def navigation(current: str, prefix: str, *, supported_views=()) -> str:
-    overview_current = ' aria-current="page"' if current == "intelligence" else ""
-    links = [
-        f'<a href="{escaped(prefix or "./")}"{overview_current}>Overview</a>'
-    ]
-    for route, label in route_contract.CORE_ROUTES:
-        current_attribute = ' aria-current="page"' if current == route else ""
-        links.append(
-            f'<a href="{escaped(prefix + route + "/")}"{current_attribute}>{escaped(label)}</a>'
-        )
-    extra = []
-    for route, label in route_contract.RESERVED_ROUTES:
-        current_attribute = ' aria-current="page"' if current == route else ""
-        extra.append(f'<a href="{escaped(prefix + route + "/")}"{current_attribute}>{escaped(label)}</a>')
-    open_attribute = " open" if current in route_contract.RESERVED_IDS else ""
-    support_label = "Owner source availability is shown in each view."
-    links.append(f'<details{open_attribute}><summary>Additional evidence views</summary>'
-                 f'<p>{support_label}</p>' + "".join(extra) + '</details>')
-    links.append(
-        f'<a href="{escaped(prefix + "dashboard/")}">Dashboard</a>'
-    )
-    return "".join(links)
+    return route_contract.navigation(current, prefix)
 
 
 def shell_document(
@@ -2449,8 +2432,7 @@ def shell_document(
       </aside>
       <div class="ri-page">
         <header class="ri-hero">
-          <div><span class="ri-kicker"><i aria-hidden="true"></i>{escaped(route_label)} view</span><h1>{escaped(repository.split("/", 1)[-1])}</h1><p>{escaped(route_description)}</p></div>
-          <div class="ri-orbit" data-state="{escaped(freshness)}" role="img" aria-label="Evidence freshness: {escaped(state_label(freshness))}"><span></span><strong>{escaped(state_label(freshness))}</strong><small>evidence</small></div>
+          <div><span class="ri-kicker"><i aria-hidden="true"></i>{escaped(route_label)} view</span><h1>{escaped(repository.split("/", 1)[-1])}</h1><p>{escaped(route_description)}</p><span class="ri-hero-freshness" aria-label="Evidence freshness: {escaped(state_label(freshness))}">Evidence freshness: {status_pill(freshness)}</span></div>
         </header>
         <section class="ri-context" aria-label="Represented source and build context">
           <a href="{escaped(commit_url)}"><span>Represented commit</span><code>{escaped(source_commit[:12])}</code></a>
@@ -2474,25 +2456,26 @@ def shell_document(
 def overview_body(*, supported_views=()) -> str:
     """Render the product entry point without duplicating the operational Now view."""
 
-    cards = []
-    for index, (route, label) in enumerate(route_contract.CORE_ROUTES, start=1):
-        question = ROUTE_QUESTIONS[route]
-        cards.append(
-            f'''<article class="ri-panel">
-              <div class="ri-panel-heading"><span class="ri-panel-icon" aria-hidden="true">{index:02d}</span><div><span class="ri-eyebrow">Evidence view</span><h3>{escaped(label)}</h3></div></div>
-              <p>{escaped(question)}</p>
-              <a class="ri-button ri-button--quiet" data-preserve-context href="./{escaped(route)}/">Open {escaped(label)}</a>
-            </article>'''
-        )
+    primary = (("now", "Pick up the work", "Changes, blockers and the next grounded moves."),
+               ("roadmap", "See the plan", "Declared priorities, dependencies and progress evidence."),
+               ("search", "Find a source", "Look up a repository object and open its canonical evidence."))
+    cards = ''.join(f'''<article class="ri-panel"><span class="ri-eyebrow">{escaped(title)}</span>
+        <h3>{escaped(dict(route_contract.CORE_ROUTES)[route])}</h3><p>{escaped(description)}</p>
+        <a class="ri-button{' ri-button--quiet' if route != 'now' else ''}" data-preserve-context href="./{route}/">Open {escaped(dict(route_contract.CORE_ROUTES)[route])}</a></article>'''
+        for route, title, description in primary)
+    remaining = ''.join(f'<li><a data-preserve-context href="./{route}/">Open {escaped(label)}</a>'
+                        f'<p>{escaped(ROUTE_QUESTIONS[route])}</p></li>'
+                        for route, label in route_contract.CORE_ROUTES if route not in {item[0] for item in primary})
     additional = "".join(
         f'<li><a data-preserve-context href="./{escaped(route)}/">{escaped(label)}</a>: '
         f'{escaped(ROUTE_QUESTIONS[route])} <strong>'
         f'{owner_views.VIEWS[route]["availability"] if route in supported_views else "Source projection unsupported."}</strong></li>'
         for route, label in route_contract.RESERVED_ROUTES)
     return f'''<section class="ri-section ri-section--lead" aria-labelledby="intelligence-heading">
-      <div class="ri-section-heading"><div><span class="ri-eyebrow">Repository orientation</span><h2 id="intelligence-heading">Choose the evidence question</h2></div><p>Each route answers one bounded question from the same represented commit. Unknown and unavailable evidence stays explicit inside the selected view.</p></div>
-      <div class="ri-now-grid ri-overview-grid">{"".join(cards)}</div>
+      <div class="ri-section-heading"><div><span class="ri-eyebrow">Start here</span><h2 id="intelligence-heading">Choose the evidence question</h2></div><p>Pick up the work, check the plan, or find a source. Each view keeps its own coverage and unknowns visible.</p></div>
+      <div class="ri-overview-grid">{cards}</div>
     </section>
+    <section class="ri-section" aria-labelledby="focused-views-heading"><div class="ri-section-heading"><h2 id="focused-views-heading">Go deeper</h2><p>Open the focused view when you need its detail.</p></div><ul class="ri-view-directory">{remaining}</ul></section>
     <section class="ri-section"><details class="ri-panel"><summary>Additional registered evidence views</summary><p>These repository-profile routes preserve stable navigation. Each view states which owner evidence was supplied; missing evidence never means a repository has passed or is not applicable.</p><ul>{additional}</ul></details></section>
     <section class="ri-section" aria-labelledby="dashboard-heading"><div class="ri-panel ri-panel--wide"><div class="ri-panel-heading"><span class="ri-panel-icon" aria-hidden="true">↗</span><div><span class="ri-eyebrow">Build evidence</span><h2 id="dashboard-heading">Inspect the analytics dashboard</h2></div></div><p>Review source-tree, activity, dependency, and generator evidence without confusing the compatibility dashboard with a canonical repository view.</p><a class="ri-button ri-button--quiet" data-preserve-context href="./dashboard/">Open Dashboard</a></div></section>'''
 
