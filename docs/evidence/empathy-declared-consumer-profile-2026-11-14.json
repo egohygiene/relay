@@ -1,0 +1,218 @@
+{
+  "schema": "egohygiene.relay.empathy-declared-consumer-profile-evidence/v1",
+  "recorded_at": "2026-11-14T00:41:50Z",
+  "scope": "Focused immutable owner-profile adoption and existing event-order contract repair; no consumer publication acceptance.",
+  "base_revision": "12d3a0823c8c8f885dea4acf482160fd726325e2",
+  "hygiene_owner_revision": "627b448f655afb2f4366654ba3ca3050389e464a",
+  "hygiene_owner_tree": "1d3618f46bf338c0807b9ac8ba033251dd7352a8",
+  "functional_commits": [
+    "5b5d3505f4909da7120bc53d306d8fb0080c5e05",
+    "2de65a2e112009f67edf3cb4baf1a741feea02b1"
+  ],
+  "unit_checks": {
+    "new_profile_tests": 6,
+    "new_composition_tests": 3,
+    "existing_dependency_renderer_tests": 8,
+    "existing_bundle_tests": 10,
+    "outcome": "27 passed"
+  },
+  "native_dependency": {
+    "observed_at": "2026-11-14T00:25:19Z",
+    "relay_functional_revision": "5b5d3505f4909da7120bc53d306d8fb0080c5e05",
+    "source_dirty": false,
+    "owner_revision": "627b448f655afb2f4366654ba3ca3050389e464a",
+    "consumer_repository": "egohygiene/empathy",
+    "consumer_revision": "2202636a1957ee7598359465b4ae562e1c67358a",
+    "source_observed_at": "2026-11-14T00:24:46Z",
+    "public_catalog_observed_at": "2026-11-09T14:06:57Z",
+    "declarations_observed_at": "2026-11-09",
+    "native_status": "ready",
+    "validation": {
+      "coverage": "valid",
+      "hygiene": "valid",
+      "observatory": "normalized"
+    },
+    "scope": {
+      "authority": "egohygiene/hygiene",
+      "bounded": true,
+      "excluded_topology": "uncollected",
+      "kind": "declared_consumption",
+      "package_dependencies": "uncollected",
+      "runtime_adoption": "uncollected"
+    },
+    "schema_validation": {
+      "standalone": "passed",
+      "embedded": "passed"
+    },
+    "ordinary_contract_validation": "passed",
+    "public_edges": [
+      {
+        "source": "egohygiene/empathy",
+        "target": "egohygiene/egolint"
+      },
+      {
+        "source": "egohygiene/empathy",
+        "target": "egohygiene/mantle"
+      },
+      {
+        "source": "egohygiene/empathy",
+        "target": "egohygiene/realm"
+      },
+      {
+        "source": "egohygiene/empathy",
+        "target": "egohygiene/relay"
+      }
+    ],
+    "negative_controls": [
+      {
+        "control": "missing-edge",
+        "result": "denied"
+      },
+      {
+        "control": "wrong-policy",
+        "result": "denied"
+      },
+      {
+        "control": "wrong-owner-revision",
+        "result": "denied"
+      },
+      {
+        "control": "private-wrapper",
+        "result": "denied"
+      }
+    ],
+    "receipt_sha256": "21449e6063b7af2b89c174fa694b45b083a2a4785fbc61a6d20023e7c189b4e7",
+    "publication": "not-performed"
+  },
+  "native_composition": {
+    "observed_at": "2026-11-14T00:38:58Z",
+    "relay_functional_revision": "2de65a2e112009f67edf3cb4baf1a741feea02b1",
+    "source_dirty": false,
+    "consumer_repository": "egohygiene/empathy",
+    "consumer_revision": "2202636a1957ee7598359465b4ae562e1c67358a",
+    "source_observed_at": "2026-11-14T00:34:30Z",
+    "selected_sources": [
+      "dependencies",
+      "journey"
+    ],
+    "normalization_profile": "search-attribution-v1",
+    "ordinary_contract_validation": "passed",
+    "embedded_schema_validation": "passed",
+    "projection_event_count": 256,
+    "projection_event_order": "occurred_at,id",
+    "coverage": {
+      "checks": {
+        "collection": "uncollected",
+        "freshness": "unknown",
+        "observed_at": null,
+        "reason": "not_requested"
+      },
+      "decisions": {
+        "collection": "uncollected",
+        "freshness": "unknown",
+        "observed_at": null,
+        "reason": "not_requested"
+      },
+      "deployments": {
+        "collection": "uncollected",
+        "freshness": "unknown",
+        "observed_at": null,
+        "reason": "not_requested"
+      },
+      "git": {
+        "collection": "partial",
+        "freshness": "current",
+        "observed_at": "2026-11-14T00:34:30Z",
+        "reason": "truncated"
+      },
+      "history": {
+        "collection": "partial",
+        "freshness": "current",
+        "observed_at": "2026-11-14T00:34:30Z",
+        "reason": "incomplete"
+      },
+      "issues": {
+        "collection": "uncollected",
+        "freshness": "unknown",
+        "observed_at": null,
+        "reason": "not_requested"
+      },
+      "pull_requests": {
+        "collection": "uncollected",
+        "freshness": "unknown",
+        "observed_at": null,
+        "reason": "not_requested"
+      },
+      "releases": {
+        "collection": "uncollected",
+        "freshness": "unknown",
+        "observed_at": null,
+        "reason": "not_requested"
+      },
+      "roadmap": {
+        "collection": "uncollected",
+        "freshness": "unknown",
+        "observed_at": null,
+        "reason": "not_requested"
+      }
+    },
+    "dependency_scope": {
+      "authority": "egohygiene/hygiene",
+      "bounded": true,
+      "excluded_topology": "uncollected",
+      "kind": "declared_consumption",
+      "package_dependencies": "uncollected",
+      "runtime_adoption": "uncollected"
+    },
+    "negative_controls": [
+      {
+        "control": "mixed-clock",
+        "result": "denied"
+      },
+      {
+        "control": "missing-domain-coverage",
+        "result": "denied"
+      },
+      {
+        "control": "forged-implementation",
+        "result": "denied"
+      }
+    ],
+    "receipt_sha256": "e20e82763b8888d262c95c7f18fd2e2134a204ad3cc44d8e79c381084e927d50",
+    "candidate_digests": {
+      "projection_sha256": "764c43e183ab2da5b4453472fbad8c8e8009a0b4e3f0caa59ce7fdc48e3625d1",
+      "snapshot_sha256": "c0910ad03cc030d55c6d00986e62929fd1036c9f6a72429b6e7cb207350dfb0d"
+    },
+    "provider_captures": "not-selected-for-focused-native-replay",
+    "publication": "not-performed"
+  },
+  "different_checkout_reproduction": {
+    "relay_functional_revision": "2de65a2e112009f67edf3cb4baf1a741feea02b1",
+    "consumer_revision": "2202636a1957ee7598359465b4ae562e1c67358a",
+    "source_observed_at": "2026-11-14T00:34:30Z",
+    "complete_three_file_native_source_bundle": "byte-identical",
+    "sha256": {
+      "projection.json": "764c43e183ab2da5b4453472fbad8c8e8009a0b4e3f0caa59ce7fdc48e3625d1",
+      "snapshot.json": "c0910ad03cc030d55c6d00986e62929fd1036c9f6a72429b6e7cb207350dfb0d",
+      "receipt.json": "e20e82763b8888d262c95c7f18fd2e2134a204ad3cc44d8e79c381084e927d50"
+    }
+  },
+  "inherited_check_failures": [
+    {
+      "command": "python scripts/validate_actions.py",
+      "candidate_and_unchanged_base": "same 10 package metadata/README findings",
+      "outcome": "failed; inherited, outside this change"
+    },
+    {
+      "command": "python -m unittest discover -s tests -p test_repository_intelligence_portability.py -v",
+      "candidate_and_unchanged_base": "same 19 subcase errors: KeyError inputs.collect-roadmap in the unchanged action harness",
+      "outcome": "failed; inherited, outside this change"
+    }
+  ],
+  "remaining_acceptance": [
+    "Independently review and merge the separate branchy Journey native-corpus repair.",
+    "Adopt the final combined immutable Relay source in Empathy through separate consumer review.",
+    "Obtain fresh actual full-plan captures, hosted build/upload/deployment and exact-source live evidence; preserve source and report clocks."
+  ],
+  "architecture_impact": "No ownership, policy exception, runtime-adoption claim, renderer/native ABI or receipt relaxation. This adopts reviewed canonical declarations and restores the existing Hygiene event order; no new ADR is required."
+}
