@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-11-14T02:24:33Z'
+  updated_at: '2026-11-14T02:30:15Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -22,7 +22,8 @@ scope:
     policy bindings. Canonical unselected disabled policy rows remain valid.
   - Original actual763 full raw/full124-row policy replay at its unchanged source/time/provenance, bounded
     allowlisted fixture and independent schema/denial proof.
-  - Normally merged accepted Health PR186 at ec4; all its source/tests/evidence retain exact bytes.
+  - Normally merged accepted Health PR186/ec4 and provider-reference PR187/669; all their source/tests/evidence
+    retain exact bytes.
   excludes:
   - Scanner policy, runtime/bootstrap, schema or publisher changes, release/version aliases, historical summary
     rewriting and UI redesign.
@@ -47,6 +48,9 @@ scope:
   - docs/health-unknown-evidence-2026-11-14.md
   - https://github.com/egohygiene/empathy/issues/98
   - https://github.com/egohygiene/empathy/issues/105
+  - docs/provider-reference-compatibility-2026-11-14.md
+  - docs/evidence/2026-11-14-provider-reference-compatibility.json
+  - https://github.com/egohygiene/relay/pull/188
 work:
   objective: Review and ordinarily merge the bounded native normalization correction, then adopt one final
     compatible Relay source in Empathy before fresh source-bound publication.
@@ -64,8 +68,9 @@ work:
   next:
     kind: action
     id: review-megalinter-final-results
-    description: Root reviews and ordinarily merges the independent-peer-cleared normalizer repair; integrate
-      the separate provider URL correction before final consumer pin and frozen-source acceptance.
+    description: Root reviews and ordinarily merges the peer-cleared normalizer with accepted Health/provider-reference
+      sources. Empathy then adopts one compatible immutable source before fresh frozen-source producer and
+      publication acceptance.
     readiness: ready
     references:
     - https://github.com/egohygiene/empathy/issues/98
@@ -74,30 +79,33 @@ work:
     depends_on: []
 state:
   base:
-    revision: ec4bab46ae52e603b3e06a54f87db4318030a01b
+    revision: 669a4c3ea3ccc077a0fae1cf7dbc464eff8a96bb
     ref: refs/heads/main
-    verified_at: '2026-11-14T02:24:33Z'
+    verified_at: '2026-11-14T02:30:15Z'
   candidate:
     branch: codex/relay-megalinter-final-results
     revision: null
-    pull_request: null
-    handoff_state: ready-for-review
+    pull_request:
+      provider: github
+      id: egohygiene/relay#188
+      url: https://github.com/egohygiene/relay/pull/188
+    handoff_state: review-reference-recorded
   live:
     status: verified
-    observed_at: '2026-11-14T02:24:33Z'
-    default_branch_revision: ec4bab46ae52e603b3e06a54f87db4318030a01b
+    observed_at: '2026-11-14T02:30:15Z'
+    default_branch_revision: 669a4c3ea3ccc077a0fae1cf7dbc464eff8a96bb
     issue_state: open
-    pull_request_state: not-applicable
-    notes: Provider main was read at ec4; accepted Health PR186 is normally merged into this branch. The new
-      normalizer draft does not yet exist. Native763 evidence retains its original source/time and does not
-      establish a fresh hosted scan or publication.
+    pull_request_state: draft
+    notes: Provider main was read at accepted669. Draft188 is open at prior97dd before this normal-merge successor
+      push; containing revision remains null. Health186 and Link187 histories are retained; original763 replay
+      remains historical and establishes no new scan or publication.
   parallel_changes:
   - provider: github
     id: egohygiene/empathy#146
     url: https://github.com/egohygiene/empathy/pull/146
 review:
   status: partial
-  reviewed_at: '2026-11-14T02:24:33Z'
+  reviewed_at: '2026-11-14T02:30:15Z'
   reviewed_by: Codex
   evidence:
   - command: python3 -m unittest discover -s tests -p test_repository_report_normalization.py -v; independent
@@ -119,16 +127,18 @@ review:
     notes: Initial functionalabc candidate708/base951704 tests have identical12 failures24 errors93 skips and
       the same10 inherited metadata/README findings. Scoped final22 methods cover subsequent disabled-row correction;
       no whole-repository green claim.
-  - command: Normal acceptedec4 integration byte comparison;22 normalizer and25 Health focused methods
+  - command: Normal acceptedec4/669 integration byte comparison;22 normalizer,25 Health and focused provider-reference
+      methods
     outcome: passed
-    observed_at: '2026-11-14T02:24:33Z'
-    notes: All accepted Health source/tests/evidence bytes remain exact; normalizer/publisher/schema/action
-      metadata and historical evidence boundaries remain separate.
+    observed_at: '2026-11-14T02:30:15Z'
+    notes: Accepted Health and provider-reference source/tests/evidence remain exact; normalizer bytes equal
+      peer-clearedb872. Current focused normalizer/provider-reference checks pass; earlier25 Health cases remain
+      a scoped unchanged-source result.
   environment_limitations:
   - Fresh current-source producer/artifact/preview/live acceptance remains with Empathy98/105; the historical
     replay cannot substitute for it.
-  - The separately exposed legitimate provider job-URL validation gap still needs its own bounded source correction
-    before final aggregate adoption.
+  - Accepted provider-reference correction is normally integrated; actual fresh hosted consumer evidence remains
+    pending after one final immutable adoption.
   - Baseline comparison/portability test-harness and catalog debt remains outside this producer adapter repair.
 privacy:
   classification: public-repository
@@ -163,8 +173,8 @@ source, clock and schema while correcting tool/diagnostic counts from actual fin
 
 ## State snapshot
 
-Provider main was read at accepted Health merge ec4. This branch normally merges that exact source; its
-normalizer functional proof remains bound to b872. New draft creation is next; no consumer adoption is claimed.
+Provider main was read at accepted Link merge669, following Health mergeec4. Draft188 is open; this successor
+normally merges both accepted histories. Normalizer proof remains bound to b872; no consumer adoption is claimed.
 
 ## Completed and material changes
 
@@ -181,19 +191,19 @@ integration,25 Health and22 normalizer cases pass and accepted Health bytes rema
 
 ## Blockers, risks, unknowns, and deferred work
 
-This historical adapter proof is not a fresh scan or publication. A separate provider job-URL validation
-correction, final immutable consumer adoption and frozen-source hosted acceptance remain. Runtime110,
+This historical adapter proof is not a fresh scan or publication. Accepted provider job-URL validation is
+now integrated; final immutable consumer adoption and frozen-source hosted acceptance remain. Runtime110,
 scanner remediation, whole-repository conformance and human decisions stay outside scope.
 
 ## Next dependency-ready work
 
-Root reviews the bounded source, independent peer and receipts, merges ordinarily and coordinates the
-separate compatible URL correction. Empathy then selects one final owner source before producers inspect S.
+Root reviews the bounded source, independent peer and receipts, then merges ordinarily. Empathy selects
+one final compatible owner source before producers inspect S and proves actual publication separately.
 
 ## Parallel changes and reconciliation
 
-Accepted Health186 source/tests/evidence are retained byte-for-byte through a normal merge. Root owns owner
-integration and final Empathy146 checkpoint reconciliation; no historical evidence is retimed or relabelled.
+Accepted Health186 and Link187 source/tests/evidence are retained byte-for-byte through normal merges. Root
+owns final owner/Empathy146 integration; no historical evidence is retimed or relabelled.
 
 ## Privacy and redaction
 

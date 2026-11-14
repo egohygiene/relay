@@ -74,6 +74,9 @@ hash, original legacy bytes and 34 denial controls. Earlier broad candidate
 validation retained the same ten metadata/README findings. Those remain baseline
 limits. The accepted concurrent Health change is normally merged and retained
 byte-for-byte; its 25 focused tests and the 22 normalizer methods pass together.
+The later normal merge retains accepted provider-reference correction
+`669a4c3ea3ccc077a0fae1cf7dbc464eff8a96bb` byte-for-byte; its original retained-bundle
+proof remains bound to its own recorded input frame.
 
 Scoped Mypy 1.19.1, fatal Ruff checks, compilation, Markdown and new-document
 links pass. Bandit retains two unchanged test-loader assertions; Secretlint
