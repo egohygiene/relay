@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "tools": [
+    {
+      "enforcement": "blocking",
+      "id": "ACTION_ACTIONLINT"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "ANSIBLE_ANSIBLE_LINT"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "BASH_EXEC"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "BASH_SHELLCHECK"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "BASH_SHFMT"
+    },
+    {
+      "enforcement": "advisory",
+      "id": "COPYPASTE_JSCPD"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "CSS_STYLELINT"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "DOCKERFILE_HADOLINT"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "EDITORCONFIG_EDITORCONFIG_CHECKER"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "HTML_HTMLHINT"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "JAVASCRIPT_ES"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "JAVASCRIPT_PRETTIER"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "JSON_JSONLINT"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "JSON_NPM_PACKAGE_JSON_LINT"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "JSON_PRETTIER"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "JSON_V8R"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "LATEX_CHKTEX"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "MARKDOWN_MARKDOWNLINT"
+    },
+    {
+      "enforcement": "advisory",
+      "id": "MARKDOWN_MARKDOWN_TABLE_FORMATTER"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "PERL_PERLCRITIC"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "POWERSHELL_POWERSHELL"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "POWERSHELL_POWERSHELL_FORMATTER"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "PYTHON_BANDIT"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "PYTHON_MYPY"
+    },
+    {
+      "enforcement": "advisory",
+      "id": "PYTHON_PYLINT"
+    },
+    {
+      "enforcement": "advisory",
+      "id": "PYTHON_PYRIGHT"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "PYTHON_RUFF"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "PYTHON_RUFF_FORMAT"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "REPOSITORY_BETTERLEAKS"
+    },
+    {
+      "enforcement": "advisory",
+      "id": "REPOSITORY_CHECKOV"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "REPOSITORY_DUSTILOCK"
+    },
+    {
+      "enforcement": "advisory",
+      "id": "REPOSITORY_GRYPE"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "REPOSITORY_LS_LINT"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "REPOSITORY_SECRETLINT"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "REPOSITORY_SYFT"
+    },
+    {
+      "enforcement": "advisory",
+      "id": "REPOSITORY_TRIVY"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "REPOSITORY_TRIVY_SBOM"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "REPOSITORY_TRUFFLEHOG"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "RUBY_RUBOCOP"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "RUST_CLIPPY"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "SPELL_LYCHEE"
+    },
+    {
+      "enforcement": "advisory",
+      "id": "SPELL_PROSELINT"
+    },
+    {
+      "enforcement": "advisory",
+      "id": "SPELL_VALE"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "TSX_ESLINT"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "TYPESCRIPT_ES"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "TYPESCRIPT_PRETTIER"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "XML_XMLLINT"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "YAML_PRETTIER"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "YAML_V8R"
+    },
+    {
+      "enforcement": "blocking",
+      "id": "YAML_YAMLLINT"
+    }
+  ]
+}

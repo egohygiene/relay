@@ -1,0 +1,49 @@
+{
+  "exclusions": [
+    "environment",
+    "credentials",
+    "filesystem paths",
+    "files",
+    "logs",
+    "stdout",
+    "free-form configuration",
+    "native raw report body"
+  ],
+  "generated_at": "2026-11-14T02:00:58Z",
+  "kind": "allowlisted-projection-not-original-archive",
+  "original_summary_sha256": "c13105386260953b9a34e6cb96e8164797faaefa4b520670a3049f63bbde884c",
+  "policy_projection": {
+    "path": "megalinter-763-policy.json",
+    "selection": "Exact id/enforcement pairs for the 50 selected native tool identities; no policy values changed.",
+    "sha256": "f49ad61384aecf7fd23d2f3776787680adf2ec56e43625e9f77e4dd665233366"
+  },
+  "policy_source_sha256": "c13d50cb2952955d41922b15abd11ae69a9c6eca6e764fed9dbf3ce8745440a8",
+  "raw_artifact": {
+    "id": 14092638403,
+    "sha256": "1606bc614c6a9497bbac2cd37e6b0e0dbf4393abce91151757a574f2963235b5"
+  },
+  "raw_report_sha256": "ba3846dbeb53e2d425b671f993c150288ca4d931a21777e1c6aafe3afc667c0f",
+  "report_projection": {
+    "linter_fields": [
+      "name",
+      "is_active",
+      "status",
+      "return_code",
+      "number_errors",
+      "total_number_errors",
+      "total_number_warnings"
+    ],
+    "path": "megalinter-763-finalized.json",
+    "root_fields": [
+      "return_code",
+      "status",
+      "validate_all_code_base"
+    ],
+    "sha256": "73970ddea28800ba7c8d891d3514122067d7c289451f616c3b82c380a1fc7c4f"
+  },
+  "repository": "egohygiene/empathy",
+  "run_attempt": 1,
+  "run_id": 43543368762,
+  "schema": "relay.test-fixture-source/v1",
+  "source_commit": "7639304babcba9d4baf21ccea163f31f9045a0c6"
+}
