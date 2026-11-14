@@ -301,13 +301,13 @@ def main():
         # Preserve alias/containment guards before allocating owner runtime.
         # The locked owner must admit identity before consumer Git reads.
         source = local_path(args.source_root)
+        deadline = time.monotonic() + 120
         temporary, resources = runtime(args.runtime_parent, source)
         with temporary as directory:
             audits, sanity, data = owner_modules(directory, resources)
             admission = public_context(args.repository, audits, data)
             plan_path = contract.relative(args.plan)
             output = output_path(source, args.output_directory, plan_path)
-            deadline = time.monotonic() + 120
             frame = source_frame(source, args.repository, args.represented_commit, args.as_of, deadline)
             context = {"source": frame, "admission": admission}
             models, plan, reports, owner_admission = collect(source, plan_path, frame, audits, sanity, data, deadline)
