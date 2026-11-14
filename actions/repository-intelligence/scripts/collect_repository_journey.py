@@ -16,6 +16,7 @@ from pathlib import Path
 import re
 import sys
 import tempfile
+import time
 import tomllib
 import unicodedata
 
@@ -130,8 +131,70 @@ def inventory(args: argparse.Namespace) -> tuple[list[dict], dict, dict[str, byt
                      "withheld_timestamps": omitted_dates}, objects
 
 
+def validation_batches(source_commit: str, objects: dict[str, bytes]) -> list[tuple[str, dict[str, bytes]]]:
+    """Partition original objects into disjoint histories native Git can inspect.
+
+    A shallow marker suppresses *all* parents, including selected parents of a
+    truncated merge. Give each otherwise hidden branch its own authenticated
+    original root. No object is dropped, rewritten, duplicated or added.
+    """
+    if source_commit not in objects or not 1 <= len(objects) <= base.MAX_RECORDS:
+        base.fail("INPUT")
+    parents = {}
+    total = 0
+    for sha, raw in objects.items():
+        total += len(raw)
+        header, separator, _body = raw.partition(b"\n\n")
+        if (not base.SHA.fullmatch(sha) or not separator or b"\0" in raw
+                or len(raw) > base.MAX_SOURCE or total > MAX_TOTAL):
+            base.fail("INPUT")
+        try:
+            parents[sha] = [line[7:].decode("ascii") for line in header.splitlines()
+                            if line.startswith(b"parent ")]
+        except UnicodeError:
+            base.fail("INPUT")
+        if any(not base.SHA.fullmatch(parent) for parent in parents[sha]):
+            base.fail("INPUT")
+    original_reachable, pending = set(), [source_commit]
+    while pending:
+        sha = pending.pop()
+        if sha in original_reachable:
+            continue
+        original_reachable.add(sha)
+        pending.extend(parent for parent in parents[sha] if parent in objects)
+    if original_reachable != set(objects):
+        base.fail("INPUT")
+    remaining, batches = set(objects), []
+    while remaining:
+        # Start with the represented source. Subsequent roots are original
+        # selected branch heads, never synthetic commits or caller identities.
+        heads = remaining - {parent for sha in remaining for parent in parents[sha]}
+        root = source_commit if not batches else min(heads) if heads else None
+        if root not in remaining:
+            base.fail("INPUT")
+        reached, pending = set(), [root]
+        while pending:
+            sha = pending.pop()
+            if sha in reached:
+                continue
+            reached.add(sha)
+            if all(parent in remaining for parent in parents[sha]):
+                pending.extend(parents[sha])
+        batches.append((root, {sha: objects[sha] for sha in sorted(reached)}))
+        remaining -= reached
+    return batches
+
+
 def source_validate(args: argparse.Namespace, objects: dict[str, bytes]) -> dict:
-    """Run the owner's trailer syntax check in a fresh, bounded, offline Git corpus."""
+    """Authenticate native reports covering every selected original object once.
+
+    The logical selection stays bounded by the caller's unchanged commit cap.
+    Native passes share one 60-second deadline; their disjoint inspected sets
+    must cover the exact original selection. Public output remains one source.
+    """
+    batches = validation_batches(args.source_commit, objects)
+    if len(objects) > args.maximum_commits:
+        base.fail("INPUT")
     catalog = tomllib.loads(base.read_file(
         args.runtime / "egolint/.config/rules/repository-intelligence.v1.toml").decode())
     pins = deepcopy(catalog["upstream-contracts"])
@@ -149,38 +212,64 @@ def source_validate(args: argparse.Namespace, objects: dict[str, bytes]) -> dict
                'decision-directory = "uncollected/decisions"\nindex = "uncollected/index.md"\n'
                '[roadmap]\nstate = "unknown"\npath = "ROADMAP.md"\n'
                f'[commit-history]\nstate = "present"\nmaximum-commits = {args.maximum_commits}\n')
-    with tempfile.TemporaryDirectory() as directory:
-        workspace = Path(directory)
-        (workspace / "template").mkdir()
-        base.git(workspace, "init", "--quiet", "--template", str(workspace / "template"))
-        boundaries = []
-        for sha, raw in sorted(objects.items()):
-            actual = base.git(workspace, "hash-object", "-t", "commit", "-w", "--stdin", data=raw).decode().strip()
-            if actual != sha:
-                base.fail("INPUT")
-            header = raw.partition(b"\n\n")[0]
-            parents = [line[7:].decode("ascii") for line in header.splitlines() if line.startswith(b"parent ")]
-            if any(parent not in objects for parent in parents):
-                boundaries.append(sha)
-        if boundaries:
-            (workspace / ".git/shallow").write_text("\n".join(boundaries) + "\n")
-        (workspace / ".relay-journey-validation.toml").write_text(policy)
-        base.run([str(args.runtime / "egolint-bin"), "--workspace", str(workspace), "validate",
-                  "--repository-intelligence", ".relay-journey-validation.toml",
-                  "--represented-commit", args.source_commit],
-                 cwd=workspace, allowed=(0, 1, 2, 3), timeout=60)
-        report = base.load_json(base.read_file(workspace / ".reports/egolint/repository-intelligence.json"))
     schema = base.load_json(base.read_file(args.runtime / "egolint/schemas/repository-intelligence-report.schema.json"))
-    if (not jsonschema.Draft202012Validator(schema).is_valid(report)
-            or report["repository"] != args.repository
-            or report["represented_commit"]["revision"] != args.source_commit
-            or report["catalog_version"] != catalog["catalog-version"] or report["contracts"] != pins
-            or report["summary"]["commits_inspected"] != len(objects)):
-        # A shallow merge boundary can hide its captured parent branch as well
-        # as an omitted parent. Never admit messages the native owner did not
-        # inspect; acquire a larger complete ancestry and retry instead.
+    validator = jsonschema.Draft202012Validator(schema)
+    deadline = time.monotonic() + 60
+    verified, inspections, diagnostics = set(), [], []
+    diagnostic_count, statuses = 0, set()
+    for root, batch in batches:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory)
+            (workspace / "template").mkdir()
+            base.git(workspace, "init", "--quiet", "--template", str(workspace / "template"))
+            boundaries = []
+            for sha, raw in sorted(batch.items()):
+                if time.monotonic() >= deadline:
+                    base.fail("RUNTIME")
+                actual = base.git(workspace, "hash-object", "-t", "commit", "-w", "--stdin", data=raw).decode().strip()
+                if actual != sha:
+                    base.fail("INPUT")
+                header = raw.partition(b"\n\n")[0]
+                parents = [line[7:].decode("ascii") for line in header.splitlines() if line.startswith(b"parent ")]
+                if any(parent not in batch for parent in parents):
+                    boundaries.append(sha)
+            if boundaries:
+                (workspace / ".git/shallow").write_text("\n".join(boundaries) + "\n")
+            # Count equality alone cannot authenticate the selected set. Confirm
+            # exactly these original objects are reachable from this private root.
+            reachable = base.git(workspace, "rev-list", "--max-count=" + str(args.maximum_commits + 1),
+                                 root, "--", limit=65536).decode("ascii").splitlines()
+            if len(reachable) != len(batch) or set(reachable) != set(batch) or verified.intersection(batch):
+                base.fail("RUNTIME")
+            (workspace / ".relay-journey-validation.toml").write_text(policy)
+            remaining_seconds = deadline - time.monotonic()
+            if remaining_seconds <= 0:
+                base.fail("RUNTIME")
+            base.run([str(args.runtime / "egolint-bin"), "--workspace", str(workspace), "validate",
+                      "--repository-intelligence", ".relay-journey-validation.toml",
+                      "--represented-commit", root],
+                     cwd=workspace, allowed=(0, 1, 2, 3), timeout=remaining_seconds)
+            report = base.load_json(base.read_file(workspace / ".reports/egolint/repository-intelligence.json"))
+        if (time.monotonic() >= deadline or not validator.is_valid(report)
+              or report["repository"] != args.repository
+              or report["represented_commit"]["revision"] != root
+              or report["catalog_version"] != catalog["catalog-version"] or report["contracts"] != pins
+              or report["summary"]["commits_inspected"] != len(batch)):
+            base.fail("RUNTIME")
+        verified.update(batch)
+        statuses.add(report["status"])
+        diagnostic_count += len(report["diagnostics"])
+        diagnostics.extend(report["diagnostics"][:max(0, base.MAX_RECORDS - len(diagnostics))])
+        inspections.append({"root": root, "commits": sorted(batch), "status": report["status"],
+                            "commits_inspected": report["summary"]["commits_inspected"]})
+    if verified != set(objects) or sum(item["commits_inspected"] for item in inspections) != len(objects):
         base.fail("RUNTIME")
-    return report
+    # This is Relay's internal aggregate of authenticated native reports, not a
+    # fabricated native report. Incomplete canonical domains remain incomplete;
+    # any native invalid result remains invalid and denies production admission.
+    return {"status": "invalid" if "invalid" in statuses else "incomplete" if "incomplete" in statuses else "valid",
+            "diagnostics": diagnostics, "diagnostics_truncated": diagnostic_count > base.MAX_RECORDS,
+            "inspections": inspections}
 
 
 def project(args: argparse.Namespace, records: list[dict], scope: dict) -> dict:
@@ -281,7 +370,7 @@ def collect(args: argparse.Namespace) -> dict:
                         "shared_runtime_sha256": base.digest(Path(base.__file__).read_bytes()),
                         "normalizer_adapter_sha256": base.digest(Path(native.__file__).read_bytes())},
             "validation": {**validation, "egolint": report["status"],
-                           "diagnostics_truncated": len(report["diagnostics"]) > base.MAX_RECORDS},
+                           "diagnostics_truncated": report["diagnostics_truncated"]},
             "coverage": projection["collection_coverage"], "diagnostics": diagnostics,
             "projection_candidate": projection, "snapshot_candidate": snapshot,
             "candidate_digests": {"projection_sha256": base.digest(base.json_bytes(projection)),
