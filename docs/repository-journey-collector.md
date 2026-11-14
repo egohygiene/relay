@@ -88,10 +88,26 @@ filtered empty set proves that the repository has no commits. The Git scan
 remains bounded independently of the time window.
 
 Every captured object must be inspected by native EgoLint. At a truncated merge,
-Git's shallow marker can also hide an otherwise captured parent branch. If the
-native inspected count differs, collection denies admission with bounded runtime
-evidence; acquire more complete ancestry and retry. Such a boundary cannot
-silently receive successful native validation.
+Git's shallow marker also hides selected parents of that merge. The adapter
+partitions the **unchanged logical selection** into disjoint native-reachable
+corpora. The first native root is the represented source; supplemental roots
+are original selected branch heads, authenticated through original parent
+headers and exact object hashes. No commit is dropped, duplicated, rewritten or
+invented to fit the native traversal.
+
+For every pass, the exact reachable SHA set must equal that corpus; the native
+report must match its real original root, repository, catalog, contracts, schema
+and exact inspected count. The unique union and summed counts must both equal
+the original selection. A mismatch still denies admission. The caller's 1–256
+logical-commit cap and 2 MiB source-object bound are unchanged. All passes share
+one 60-second deadline rather than receiving separate 60-second allowances.
+
+These are multiple genuine native reports, composed internally by Relay, not a
+synthetic native report claiming the original source was inspected in one pass.
+Any native invalid result remains invalid; native incomplete ADR/roadmap domains
+remain incomplete. Diagnostics stay bounded and sanitized. Private inspection
+details never enter the public envelope, whose source, clocks, records and
+truthful truncated coverage remain unchanged.
 
 `--collected-at` defaults to the explicit observation time. Replaying a previous
 capture must keep its capture time; `--maximum-age-seconds` defaults to 86,400
