@@ -7,7 +7,7 @@ repository:
   continuity_path: CONTINUITY.md
 document:
   status: active
-  updated_at: '2026-11-14T00:41:50Z'
+  updated_at: '2026-11-14T00:43:11Z'
   max_bytes: 16384
   max_lines: 240
   stale_reason: null
@@ -66,6 +66,7 @@ work:
       repin Empathy to the final immutable Relay source and collect fresh full-plan hosted evidence.
     readiness: ready
     references:
+    - https://github.com/egohygiene/relay/pull/183
     - https://github.com/egohygiene/hygiene/pull/119
     - https://github.com/egohygiene/empathy/issues/105
     - https://github.com/egohygiene/empathy/issues/98
@@ -78,17 +79,24 @@ state:
   candidate:
     branch: codex/relay-empathy-boundary-source
     revision: null
-    pull_request: null
+    pull_request:
+      provider: github
+      id: egohygiene/relay#184
+      url: https://github.com/egohygiene/relay/pull/184
     handoff_state: ready-for-review
   live:
     status: verified
-    observed_at: '2026-11-14T00:41:50Z'
+    observed_at: '2026-11-14T00:43:11Z'
     default_branch_revision: 12d3a0823c8c8f885dea4acf482160fd726325e2
     issue_state: open
-    pull_request_state: not-applicable
-    notes: Provider main 12d3 and Empathy105 open were rechecked; Hygiene PR119 is merged at627b448. This candidate
-      has not been merged; containing PR/head belong to its eventual provider receipt.
+    pull_request_state: draft
+    notes: Provider PR184 is open/draft at189709c1a2dad14cb1aae2dc9688b501c4ced463, main remains12d3. Hygiene119 is
+      merged at627b448; Empathy105 remains open. Only handoff metadata follows that reviewed functional/evidence source.
+      No merge or consumer acceptance is inferred.
   parallel_changes:
+  - provider: github
+    id: egohygiene/relay#183
+    url: https://github.com/egohygiene/relay/pull/183
   - provider: github
     id: egohygiene/empathy#98
     url: https://github.com/egohygiene/empathy/issues/98
@@ -150,7 +158,7 @@ Adopt reviewed Hygiene declared-consumer source 627b448 coherently and restore c
 
 ## State snapshot
 
-Base is provider-verified main 12d3a0823c8c8f885dea4acf482160fd726325e2. Hygiene PR119 is actually merged at627b448f655afb2f4366654ba3ca3050389e464a. Candidate branch is codex/relay-empathy-boundary-source; no merge or consumer acceptance is inferred.
+Base is provider-verified main 12d3a0823c8c8f885dea4acf482160fd726325e2. Hygiene PR119 is actually merged at627b448f655afb2f4366654ba3ca3050389e464a. Candidate draft [Relay PR184](https://github.com/egohygiene/relay/pull/184) was observed at exact 189709c1a2dad14cb1aae2dc9688b501c4ced463 before this handoff-only metadata refresh; no merge or consumer acceptance is inferred.
 
 ## Completed and material changes
 
@@ -172,7 +180,7 @@ Root independently reviews this source and the separate Journey repair, integrat
 
 ## Parallel changes and reconciliation
 
-The separate Journey repair 96d0d597 changes its collector, focused tests and guide, with disjoint functional files. Root owns merge order and semantic CONTINUITY reconciliation. Empathy #105/#98 source-failure retention and consumer adoption proceed separately. No new ADR is required: canonical ownership/policy remain with Hygiene and chronology restores its existing contract; renderer/native interfaces and receipt refusal stay intact.
+Separate draft [Journey PR183](https://github.com/egohygiene/relay/pull/183), functional 96d0d597, changes its collector, focused tests and guide, with disjoint functional files. Root owns merge order and semantic CONTINUITY reconciliation. Empathy #105/#98 source-failure retention and consumer adoption proceed separately. No new ADR is required: canonical ownership/policy remain with Hygiene and chronology restores its existing contract; renderer/native interfaces and receipt refusal stay intact.
 
 ## Privacy and redaction
 
