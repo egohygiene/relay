@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 from datetime import UTC, datetime, timedelta
 import html
+import importlib.util
 import json
 from math import ceil, isfinite, pi
 import os
@@ -2067,20 +2068,13 @@ def render_html(
     )
     shell_navigation = ""
     if include_shell_navigation:
-        shell_navigation = f'''<nav class="experience-nav" data-preserve-context-links aria-label="Repository Intelligence views">
-      <a href="{escaped(asset_prefix)}">Overview</a>
-      <a href="{escaped(asset_prefix)}now/">Now</a>
-      <a href="{escaped(asset_prefix)}roadmap/">Roadmap</a>
-      <a href="{escaped(asset_prefix)}decisions/">Decisions</a>
-      <a href="{escaped(asset_prefix)}journey/">Journey</a>
-      <a href="{escaped(asset_prefix)}dependencies/">Dependencies</a>
-      <a href="{escaped(asset_prefix)}health/">Health</a>
-      <a href="{escaped(asset_prefix)}releases/">Releases</a>
-      <a href="{escaped(asset_prefix)}work/">Work</a>
-      <a href="{escaped(asset_prefix)}search/">Search</a>
-      <a href="{escaped(asset_prefix)}compare/">Compare</a>
-      <a aria-current="page" href="./">Dashboard</a>
-    </nav>'''
+        spec = importlib.util.spec_from_file_location(
+            "relay_dashboard_routes", Path(__file__).with_name("repository_intelligence_routes.py"))
+        routes = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(routes)
+        shell_navigation = ('<nav class="experience-nav" data-preserve-context-links '
+                            'aria-label="Repository Intelligence views">'
+                            + routes.navigation("dashboard", asset_prefix) + '</nav>')
     return f"""<!DOCTYPE html>
 <html lang="en">
   <head>

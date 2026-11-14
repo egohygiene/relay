@@ -55,6 +55,11 @@ a:hover { color: #a5fff7; }
 }
 
 button, input, select { font: inherit; }
+/* Long source IDs and nested owner records must wrap inside their own view. */
+:where(main, section, article, aside, details, fieldset, label) { min-width: 0; }
+:where(p, li, dd, dt, code, h2, h3, h4) { overflow-wrap: anywhere; }
+dd { margin-inline-start: 1rem; }
+select, input { min-width: 0; max-width: 100%; }
 
 .ri-skip {
   position: fixed;
@@ -129,6 +134,10 @@ button, input, select { font: inherit; }
 .ri-repository strong { overflow-wrap: anywhere; }
 
 .ri-route-nav { display: grid; gap: 0.2rem; }
+.ri-route-nav > details { min-width: 0; margin-top: 0.4rem; }
+.ri-route-nav summary { padding: 0.65rem 0.75rem; color: var(--ri-muted); cursor: pointer; font-size: 0.8rem; font-weight: 750; }
+.ri-nav-group { display: grid; gap: 0.2rem; padding-inline-start: 0.6rem; border-inline-start: 1px solid var(--ri-border); }
+.ri-route-nav a { display: block; }
 
 .ri-route-nav a {
   padding: 0.58rem 0.75rem;
@@ -175,10 +184,10 @@ button, input, select { font: inherit; }
 
 .ri-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: 2rem;
-  padding-block: clamp(3.5rem, 8vw, 6.8rem) 2.2rem;
+  padding-block: clamp(1.8rem, 4vw, 3rem) 1.4rem;
 }
 
 .ri-kicker, .ri-eyebrow {
@@ -198,13 +207,14 @@ button, input, select { font: inherit; }
   color: transparent;
   background: linear-gradient(100deg, #fff 5%, #cbb9ff 52%, #72ece2 94%);
   background-clip: text;
-  font-size: clamp(3rem, 8vw, 6.4rem);
-  line-height: 0.92;
-  letter-spacing: -0.06em;
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
   overflow-wrap: anywhere;
 }
 
 .ri-hero p { max-width: 45rem; margin: 0; color: var(--ri-muted); font-size: clamp(1rem, 2vw, 1.2rem); }
+.ri-hero-freshness { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; margin-top: 0.8rem; color: var(--ri-muted); font-size: 0.75rem; }
 
 .ri-orbit {
   position: relative;
@@ -334,6 +344,17 @@ button, input, select { font: inherit; }
 .ri-panel-icon { display: grid; width: 2.5rem; aspect-ratio: 1; place-items: center; border: 1px solid var(--ri-border-strong); border-radius: 0.75rem; color: var(--ri-accent); background: rgba(88, 230, 217, 0.08); font-weight: 900; }
 .ri-overview-grid .ri-panel { display: flex; flex-direction: column; }
 .ri-overview-grid .ri-panel > p { flex: 1; color: var(--ri-muted); }
+.ri-overview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.ri-overview-grid h3 { margin: 0.45rem 0 0; font-size: 1.5rem; }
+.ri-view-directory { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem 1.5rem; padding: 0; list-style: none; }
+.ri-view-directory li { padding-block: 0.8rem; border-top: 1px solid var(--ri-border); }
+.ri-view-directory a { font-weight: 750; }
+.ri-view-directory p { margin: 0.3rem 0 0; color: var(--ri-muted); font-size: 0.85rem; }
+.ri-coverage { margin-block: 1rem; padding: 0.85rem 1rem; }
+.ri-coverage summary { cursor: pointer; font-size: 0.85rem; font-weight: 750; }
+.ri-coverage summary span { margin-inline-start: 0.6rem; color: var(--ri-muted); font-size: 0.78rem; font-weight: 500; }
+.ri-coverage ul { display: flex; flex-wrap: wrap; gap: 0.6rem 1.5rem; padding-inline-start: 1.2rem; font-size: 0.8rem; }
+.ri-coverage p { color: var(--ri-muted); font-size: 0.85rem; }
 [data-context-selected] { outline: 2px solid var(--ri-accent); outline-offset: 0.2rem; }
 
 .ri-record-list { display: grid; gap: 0.65rem; }
@@ -948,9 +969,11 @@ footer { display: flex; justify-content: space-between; gap: 1rem; margin-top: 4
 
 @media (max-width: 72rem) {
   .ri-layout { display: block; }
-  .ri-sidebar { position: static; overflow-x: auto; width: 100%; height: auto; padding: 0.75rem 1.2rem; border-right: 0; border-bottom: 1px solid var(--ri-border); }
+  .ri-sidebar { position: static; width: 100%; height: auto; padding: 0.75rem 1.2rem; border-right: 0; border-bottom: 1px solid var(--ri-border); }
   .ri-repository, .ri-local-resume { display: none; }
-  .ri-route-nav { display: flex; width: max-content; }
+  .ri-route-nav { display: flex; flex-wrap: wrap; width: 100%; align-items: start; }
+  .ri-route-nav > details { flex: 1 1 12rem; margin-top: 0; }
+  .ri-nav-group { padding-inline-start: 0; border-inline-start: 0; }
   .ri-context { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ri-context > * { border-bottom: 1px solid var(--ri-border); }
   .ri-context > :nth-child(2n) { border-right: 0; }
@@ -964,16 +987,25 @@ footer { display: flex; justify-content: space-between; gap: 1rem; margin-top: 4
 }
 
 @media (max-width: 48rem) {
-  .ri-global-header nav { display: none; }
+  .ri-global-header { gap: 0.5rem; padding-inline: 0.7rem; }
+  .ri-brand { gap: 0.45rem; font-size: 0.78rem; }
+  .ri-global-header nav { gap: 0; }
+  .ri-global-link { min-width: 2.6rem; }
   .ri-page > :where(header, section, main, footer) { width: min(100% - 1.25rem, 79rem); }
-  .ri-hero { grid-template-columns: 1fr; padding-top: 3rem; }
+  .ri-hero { grid-template-columns: 1fr; padding-top: 1.8rem; }
   .ri-orbit { display: none; }
-  .ri-context { grid-template-columns: 1fr; }
-  .ri-context > * { border-right: 0; }
+  .ri-context { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ri-context > :last-child { grid-column: 1 / -1; }
+  .ri-context code, .ri-context strong { white-space: normal; overflow-wrap: anywhere; }
   .ri-command-bar { position: static; grid-template-columns: 1fr 1fr; }
   .ri-search { grid-column: 1 / -1; }
   .ri-command-bar .ri-button { align-self: end; }
   .ri-now-grid { grid-template-columns: 1fr; }
+  .ri-overview-grid, .ri-view-directory { grid-template-columns: 1fr; }
+  .ri-route-nav > a { flex: 1 1 auto; padding-inline: 0.4rem; font-size: 0.78rem; text-align: center; }
+  .ri-route-nav > details { flex: 1 1 6rem; }
+  .ri-route-nav summary { padding-inline: 0.3rem; font-size: 0.74rem; }
+  .ri-coverage summary span { display: block; margin-inline-start: 1rem; }
   .ri-panel--wide { grid-column: auto; }
   .ri-section-heading { display: block; }
   .ri-section-heading p { margin-top: 0.6rem; }

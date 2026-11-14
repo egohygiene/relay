@@ -115,6 +115,7 @@ def run_browser(output: Path) -> dict:
             initial = directory.evaluate("el => { const url = new URL(el.getAttribute('href'),location.href); return {q:url.searchParams.get('q'),entity:url.searchParams.get('entity')}; }")
             assert initial == {"q": "bridge", "entity": "fixture-context"}, initial
             result["checks"].append("dashboard explorer initializes every context link before SVG focus")
+            page.locator('[data-ri-graph-disclosure] > summary').click()
             graph = page.locator("[data-ri-graph]").first
             svg_link = graph.locator('[data-ri-graph-node="navigation:dependencies"] a')
             svg_link.focus()
@@ -126,6 +127,7 @@ def run_browser(output: Path) -> dict:
             assert page.evaluate("new URL(location.href).searchParams.get('entity')") == "fixture-context"
             result["checks"].append("dashboard native pointer navigation retains query and entity")
             page.goto(dashboard, wait_until="networkidle")
+            page.locator('[data-ri-graph-disclosure] > summary').click()
             page.locator('[data-ri-graph-node="navigation:dependencies"] a').focus()
             page.keyboard.press("Enter")
             page.wait_for_url("**/intelligence/dependencies/**")

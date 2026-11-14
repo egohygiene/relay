@@ -10,6 +10,7 @@ Consumer origins, site prefixes, redirects and publication remain external.
 from __future__ import annotations
 
 import hashlib
+import html
 import json
 from pathlib import Path
 import re
@@ -109,6 +110,31 @@ CORE_ROUTES = tuple((identifier, _DEFINITIONS[identifier]["title"]) for identifi
 RESERVED_ROUTES = tuple((identifier, _DEFINITIONS[identifier]["title"]) for identifier in RESERVED_IDS)
 ROUTES = CORE_ROUTES + RESERVED_ROUTES
 ROUTE_QUESTIONS = dict(_QUESTIONS)
+
+# Presentation groups do not change the locked route registry or availability.
+PRIMARY_NAVIGATION = ("now", "work", "roadmap", "search")
+NAVIGATION_GROUPS = (
+    ("Review evidence", ("health", "dependencies", "audits", "hygiene", "sanity")),
+    ("Trace the story", ("decisions", "journey", "releases", "compare")),
+    ("More tools", ("diagnostics", "distribution", "identity", "dashboard")),
+)
+
+
+def navigation(current: str, prefix: str) -> str:
+    """Keep frequent destinations visible and every route available without JS."""
+    def link(identifier):
+        title = "Overview" if identifier == "intelligence" else _DEFINITIONS[identifier]["title"]
+        href = prefix or "./" if identifier == "intelligence" else prefix + identifier + "/"
+        active = ' aria-current="page"' if identifier == current else ""
+        return f'<a href="{html.escape(href, quote=True)}"{active}>{html.escape(title)}</a>'
+
+    links = [link("intelligence"), *(link(identifier) for identifier in PRIMARY_NAVIGATION)]
+    for label, identifiers in NAVIGATION_GROUPS:
+        expanded = " open" if current in identifiers else ""
+        links.append(f'<details{expanded}><summary>{label}</summary>'
+                     '<div class="ri-nav-group">' + "".join(link(identifier) for identifier in identifiers)
+                     + '</div></details>')
+    return "".join(links)
 
 
 def route(identifier: str, *, supported_views=()) -> dict:

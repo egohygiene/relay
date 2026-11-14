@@ -110,6 +110,8 @@
                 selectedLinks.replaceChildren();
                 selectedEdges.replaceChildren();
                 if (node) {
+                    const disclosure = root.closest("[data-ri-graph-disclosure]");
+                    if (disclosure) disclosure.open = true;
                     heading.textContent = node.label;
                     detail.textContent = node.directory.querySelector("p")?.textContent || `${node.kind} · ${node.state}`;
                     const href = destination(node);
