@@ -1,0 +1,129 @@
+{
+  "observed_at": "2026-11-14T02:23:55Z",
+  "verifier_functional_revision": "396e2a82f581a18d6d5618353e1ab561ae91269b",
+  "accepted_health_revision": "ec4bab46ae52e603b3e06a54f87db4318030a01b",
+  "producer_revision": "946175a7e56dcfe6e0d43f6264a04f6bd54487d8",
+  "consumer_revision": "7639304babcba9d4baf21ccea163f31f9045a0c6",
+  "captured_as_of": "2026-11-14T01:55:36Z",
+  "source_epoch": 1794621243,
+  "full_retained_bundle_validation": "passed",
+  "manifest_sha256": "9e3d64927e939922361c9790327e0db782083cbada0b630e6347c1fe57caa49c",
+  "bundle_files": 30,
+  "bundle_mutation": "none; every retained file hash unchanged",
+  "external_repository_membership": "unchanged; route shape admission only within pre-existing document source membership",
+  "new_routes": {
+    "consumer": "/runs/<positive-id> and /actions/runs/<positive-id>/job/<positive-id>",
+    "external": "bare canonical /owner/repo only when exact repo is already in existing allowed source membership"
+  },
+  "boundaries": "new forms require canonical github.com HTTPS origin, no query/nonempty fragment/credentials/noncanonical segments; check job/run forms stay consumer-only and positive numeric; source commit and existing route guards unchanged",
+  "focused_tests": {
+    "methods": 8,
+    "status": "passed",
+    "command": "python3 -m unittest discover -s tests -p test_repository_intelligence_check_references.py -v"
+  },
+  "source_replay": "original Health946 native/action render/manifest evidence reused; no producer/capture/privateactivity replay or relabelling",
+  "hosted_publication": "not performed; fresh final immutable consumer acceptance remains separate",
+  "original_reference_audit": {
+    "html_documents": 18,
+    "all_references": 2358,
+    "github_references": 1083,
+    "rejections": 12,
+    "unique_urls": [
+      {
+        "url": "https://github.com/egohygiene/empathy/actions/runs/43543368762/job/132288808577",
+        "documents": [
+          "health/index.html",
+          "search/index.html"
+        ],
+        "error": "GitHub reference is outside the consumer contract"
+      },
+      {
+        "url": "https://github.com/egohygiene/empathy/actions/runs/43543368971/job/132288809591",
+        "documents": [
+          "health/index.html",
+          "search/index.html"
+        ],
+        "error": "GitHub reference is outside the consumer contract"
+      },
+      {
+        "url": "https://github.com/egohygiene/empathy/actions/runs/43543369199/job/132288809629",
+        "documents": [
+          "health/index.html",
+          "search/index.html"
+        ],
+        "error": "GitHub reference is outside the consumer contract"
+      },
+      {
+        "url": "https://github.com/egohygiene/empathy/actions/runs/43543385393/job/132288855025",
+        "documents": [
+          "health/index.html",
+          "search/index.html"
+        ],
+        "error": "GitHub reference is outside the consumer contract"
+      },
+      {
+        "url": "https://github.com/egohygiene/egolint",
+        "documents": [
+          "search/index.html"
+        ],
+        "error": "GitHub reference is outside the consumer contract"
+      },
+      {
+        "url": "https://github.com/egohygiene/mantle",
+        "documents": [
+          "search/index.html"
+        ],
+        "error": "GitHub reference is outside the consumer contract"
+      },
+      {
+        "url": "https://github.com/egohygiene/realm",
+        "documents": [
+          "search/index.html"
+        ],
+        "error": "GitHub reference is outside the consumer contract"
+      },
+      {
+        "url": "https://github.com/egohygiene/relay",
+        "documents": [
+          "search/index.html"
+        ],
+        "error": "GitHub reference is outside the consumer contract"
+      }
+    ],
+    "other_rejections": []
+  },
+  "independent_peer": {
+    "functional_revision": "396e2a82f581a18d6d5618353e1ab561ae91269b",
+    "status": "clear",
+    "checks": "18 focused reference/bundle methods pass; original2358references and all12denials rechecked within original document source sets; full30file bundle valid; all hashes unchanged; exact normalmerge parents verified"
+  },
+  "reproduction": {
+    "retained_verification_argv_template": [
+      "python3",
+      "-I",
+      "${VERIFIER_ROOT}/actions/repository-intelligence/scripts/validate_repository_intelligence_bundle.py",
+      "--repository-root",
+      "${RETAINED_CONSUMER_ROOT}",
+      "--output-root",
+      "${RETAINED_CONSUMER_ROOT}/.cache/mindgarden/site/intelligence",
+      "--repository",
+      "egohygiene/empathy",
+      "--repository-visibility",
+      "public",
+      "--source-commit",
+      "7639304babcba9d4baf21ccea163f31f9045a0c6",
+      "--generator-version",
+      "1.6.0",
+      "--generator-source-ref",
+      "946175a7e56dcfe6e0d43f6264a04f6bd54487d8",
+      "--generator-source-commit",
+      "946175a7e56dcfe6e0d43f6264a04f6bd54487d8",
+      "--generator-immutable",
+      "true",
+      "--source-epoch",
+      "1794621243"
+    ],
+    "reference_tests": "python3 -m unittest discover -s tests -p test_repository_intelligence_check_references.py -v",
+    "qualification_boundary": "Verifier396 checks original producer946 bundle; original source763/captured01:55:36 are not relabelled. No new producer/native/privateactivity/hosted run or broad suite is claimed."
+  }
+}
